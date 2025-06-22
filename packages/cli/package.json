@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "chalk": "^4.1.2",
+    "chalk": "^5.0.0",
     "commander": "^14.0.0",
     "dotenv": "^16.5.0"
   }
