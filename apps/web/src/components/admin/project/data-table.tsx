@@ -2,18 +2,23 @@
 
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
-import React from "react";
+import { useState } from "react";
 import type { Project } from "@repo/database/schema";
 import { DataTable } from "@/components/datatable/data-table";
-import { usefetchApi } from "@/components/datatable/hooks/use-fetch-api";
-import { useTableData } from "@/components/datatable/hooks/use-table-data";
 import type { PaginationState } from "@/components/datatable/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useQueryApi } from "@/hooks/use-query-api";
 
 interface Props {
   columns: ColumnDef<Project, unknown>[];
 }
+interface ApiResponse {
+  rows: Project[];
+  count: number;
+  limit: number;
+  offset: number;
+}
+
 export function ProjectsDataTable({ columns }: Props) {
   const t = useTranslations("project");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
@@ -21,19 +26,29 @@ export function ProjectsDataTable({ columns }: Props) {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
 
-  interface ApiResponse {
-    rows: Project[];
-    count: number;
-    limit: number;
-    offset: number;
-  }
+  const { 
+    data: apiResponse, 
+    isLoading, 
+    error: queryError, 
+    refetch 
+  } = useQueryApi<ApiResponse>({
+    endpoint: "/api/projects",
+    pagination,
+    sorting,
+    search: debouncedSearch,
+    queryKey: ['projects', 'list'],
+    keepPreviousData: true,
+  });
 
-  const fetchFn = useCallback(
-    (p: PaginationState, s: SortingState) => usefetchApi<ApiResponse>("/api/projects", p, s, debouncedSearch),
-    [debouncedSearch]
-  );
-
-  const { data, isLoading, error, refetch } = useTableData<Project>(pagination, sorting, fetchFn);
+  const data = {
+    data: apiResponse?.rows || [],
+    count: apiResponse?.count || 0,
+    limit: apiResponse?.limit || pagination.pageSize,
+    offset: apiResponse?.offset || pagination.pageIndex * pagination.pageSize,
+  };
+  
+  // Convert Error object to string for the DataTable component
+  const error = queryError ? queryError.message : null;
 
   return (
     <DataTable<Project>

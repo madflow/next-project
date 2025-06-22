@@ -2,14 +2,12 @@
 
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
-import React from "react";
+import { useState } from "react";
 import type { Member, User } from "@repo/database/schema";
 import { DataTable } from "@/components/datatable/data-table";
-import { usefetchApi } from "@/components/datatable/hooks/use-fetch-api";
-import { useTableData } from "@/components/datatable/hooks/use-table-data";
 import type { ListFilter, PaginationState } from "@/components/datatable/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useQueryApi } from "@/hooks/use-query-api";
 
 type Props = {
   organizationId: string;
@@ -31,16 +29,30 @@ export function OrganisationMembersDataTable({ columns, organizationId }: Props)
   const [filters] = useState<ListFilter[]>([{ column: "organizationId", operator: "=", value: organizationId }]);
   const debouncedSearch = useDebouncedValue(search, 300);
 
-  const fetchFn = useCallback(
-    (p: PaginationState, s: SortingState) => usefetchApi<ApiResponse>("/api/members", p, s, debouncedSearch, filters),
-    [debouncedSearch, filters]
-  );
-
-  const { data, isLoading, error, refetch } = useTableData<{ users: User; members: Member }>(
+  const { 
+    data: apiResponse, 
+    isLoading, 
+    error: queryError, 
+    refetch 
+  } = useQueryApi<ApiResponse>({
+    endpoint: "/api/members",
     pagination,
     sorting,
-    fetchFn
-  );
+    search: debouncedSearch,
+    filters,
+    queryKey: ['organization-members', 'list', organizationId],
+    keepPreviousData: true,
+  });
+
+  const data = {
+    data: apiResponse?.rows || [],
+    count: apiResponse?.count || 0,
+    limit: apiResponse?.limit || pagination.pageSize,
+    offset: apiResponse?.offset || pagination.pageIndex * pagination.pageSize,
+  };
+  
+  // Convert Error object to string for the DataTable component
+  const error = queryError ? queryError.message : null;
 
   return (
     <DataTable<{ users: User; members: Member }>

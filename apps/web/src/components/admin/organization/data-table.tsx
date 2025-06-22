@@ -2,14 +2,12 @@
 
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
-import React from "react";
+import { useState } from "react";
 import type { Organization } from "@repo/database/schema";
 import { DataTable } from "@/components/datatable/data-table";
-import { usefetchApi } from "@/components/datatable/hooks/use-fetch-api";
-import { useTableData } from "@/components/datatable/hooks/use-table-data";
 import type { PaginationState } from "@/components/datatable/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { useQueryApi } from "@/hooks/use-query-api";
 
 interface Props {
   columns: ColumnDef<Organization, unknown>[];
@@ -29,12 +27,29 @@ export function OrganizationsDataTable({ columns }: Props) {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
 
-  const fetchFn = useCallback(
-    (p: PaginationState, s: SortingState) => usefetchApi<ApiResponse>("/api/organizations", p, s, debouncedSearch),
-    [debouncedSearch]
-  );
+  const { 
+    data: apiResponse, 
+    isLoading, 
+    error: queryError, 
+    refetch 
+  } = useQueryApi<ApiResponse>({
+    endpoint: "/api/organizations",
+    pagination,
+    sorting,
+    search: debouncedSearch,
+    queryKey: ['organizations', 'list'],
+    keepPreviousData: true,
+  });
 
-  const { data, isLoading, error, refetch } = useTableData<Organization>(pagination, sorting, fetchFn);
+  const data = {
+    data: apiResponse?.rows || [],
+    count: apiResponse?.count || 0,
+    limit: apiResponse?.limit || pagination.pageSize,
+    offset: apiResponse?.offset || pagination.pageIndex * pagination.pageSize,
+  };
+  
+  // Convert Error object to string for the DataTable component
+  const error = queryError ? queryError.message : null;
 
   return (
     <DataTable<Organization>
