@@ -1,0 +1,29 @@
+{
+  "name": "nextjs-better-auth",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate",
+    "db:push": "turbo run db:push",
+    "db:studio": "turbo run db:studio",
+    "seed": "turbo run seed",
+    "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "npm@11.3.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@repo/database",
+  "version": "0.0.1",
+  "description": "Database package",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "exports": {
+    "./clients": "./src/clients/index.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "type": "module",
+  "dependencies": {
+    "drizzle-orm": "^0.44.2",
+    "drizzle-zod": "^0.8.2",
+    "pg": "^8.16.2"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.2"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "verbatimModuleSyntax": true
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

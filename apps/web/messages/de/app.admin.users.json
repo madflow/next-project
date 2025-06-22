@@ -1,0 +1,65 @@
+{
+  "user": {
+    "actions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "createdAt": "Erstellt am",
+      "email": "E-Mail",
+      "name": "Name",
+      "role": "Rolle"
+    },
+    "createButton": "Benutzer anlegen",
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Benutzer löschen",
+      "deleteButton": {
+        "srText": "Benutzer löschen",
+        "title": "Benutzer löschen"
+      },
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "error": "Löschen des Benutzers fehlgeschlagen",
+      "success": "Benutzer erfolgreich gelöscht",
+      "title": "Benutzer löschen"
+    },
+    "description": "Dies ist die Admin-Benutzerverwaltung. Hier können Sie alle Benutzer verwalten.",
+    "editUser": {
+      "description": "Benutzerdetails aktualisieren",
+      "title": "Benutzer bearbeiten"
+    },
+    "form": {
+      "cancel": "Abbrechen",
+      "confirmPassword": "Passwort bestätigen",
+      "email": "E-Mail",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "errors": {
+        "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        "passwordMatch": "Die Passwörter stimmen nicht überein",
+        "required": "Dieses Feld ist erforderlich"
+      },
+      "name": "Name",
+      "password": "Passwort",
+      "role": "Rolle",
+      "save": "Speichern",
+      "success": {
+        "created": "Benutzer erfolgreich erstellt",
+        "updated": "Benutzer erfolgreich aktualisiert"
+      }
+    },
+    "newUser": {
+      "description": "Einen neuen Benutzer erstellen",
+      "title": "Benutzer anlegen"
+    },
+    "role": {
+      "admin": "Administrator",
+      "user": "Benutzer"
+    },
+    "search": {
+      "placeholder": "Benutzer suchen..."
+    },
+    "title": "Benutzer"
+  }
+}

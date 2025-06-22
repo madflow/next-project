@@ -1,0 +1,74 @@
+{
+  "organization": {
+    "title": "Organizations",
+    "description": "This is the admin organizations page. Here you can manage all organizations.",
+    "createButton": "Create organization",
+    "searchPlaceholder": "Search organizations...",
+    "columns": {
+      "name": "Name",
+      "slug": "Slug",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Delete Organization",
+      "description": "Are you sure you want to delete the organization &ldquo;{name}&rdquo;? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete Organization",
+      "deleting": "Deleting...",
+      "deleteButton": {
+        "title": "Delete organization",
+        "srText": "Delete organization"
+      },
+      "error": "Failed to delete organization"
+    },
+    "create": {
+      "title": "Create organization",
+      "description": "Create a new organization"
+    },
+    "edit": {
+      "title": "Edit organization",
+      "description": "Update organization details"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter organization name",
+        "errors": {
+          "required": "Organization name is required"
+        }
+      },
+      "slug": {
+        "label": "Slug",
+        "placeholder": "Enter URL slug",
+        "description": "This is the URL-friendly version of the name. It can only contain lowercase letters, numbers, and hyphens.",
+        "errors": {
+          "required": "Organization slug is required",
+          "invalid": "Organization slug must be lowercase and contain only letters, numbers and hyphens",
+          "maxLength": "Organization slug must be less than 50 characters"
+        }
+      },
+      "submit": {
+        "create": "Create organization",
+        "update": "Update",
+        "updating": "Updating...",
+        "creating": "Creating..."
+      },
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "createSuccess": "Organization created successfully",
+      "updateSuccess": "Organization updated successfully",
+      "deleteSuccess": "Organization deleted successfully",
+      "error": {
+        "notFound": "Organization not found",
+        "generic": "An error occurred. Please try again.",
+        "duplicateSlug": "An organization with this slug already exists."
+      }
+    }
+  }
+}

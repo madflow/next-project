@@ -1,0 +1,19 @@
+{
+  "signUp": {
+    "title": "Sign Up",
+    "description": "Fill in your details to create an account.",
+    "form": {
+      "email": "Email",
+      "name": "Name",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Sign Up"
+    },
+    "links": {
+      "login": {
+        "question": "Already have an account?",
+        "text": "Login"
+      }
+    }
+  }
+}

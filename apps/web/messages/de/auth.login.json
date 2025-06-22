@@ -1,0 +1,20 @@
+{
+  "login": {
+    "title": "Einloggen",
+    "form": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Einloggen"
+    },
+    "links": {
+      "forgotPassword": {
+        "question": "Passwort vergessen?",
+        "text": "Passwort zurücksetzen"
+      },
+      "signUp": {
+        "question": "Noch keinen Account?",
+        "text": "Registrieren"
+      }
+    }
+  }
+}

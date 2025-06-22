@@ -1,0 +1,65 @@
+{
+  "user": {
+    "actions": {
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "columns": {
+      "actions": "Actions",
+      "createdAt": "Created At",
+      "email": "Email",
+      "name": "Name",
+      "role": "Role"
+    },
+    "createButton": "Create User",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete User",
+      "deleteButton": {
+        "srText": "Delete user",
+        "title": "Delete user"
+      },
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete this user? This action cannot be undone.",
+      "error": "Failed to delete user",
+      "success": "User deleted successfully",
+      "title": "Delete User"
+    },
+    "description": "This is the admin users page. Here you can manage all users.",
+    "editUser": {
+      "description": "Update user details",
+      "title": "Edit User"
+    },
+    "form": {
+      "cancel": "Cancel",
+      "confirmPassword": "Confirm Password",
+      "email": "Email",
+      "error": "An error occurred. Please try again.",
+      "errors": {
+        "email": "Please enter a valid email address",
+        "passwordMatch": "Passwords do not match",
+        "required": "This field is required"
+      },
+      "name": "Name",
+      "password": "Password",
+      "role": "Role",
+      "save": "Save",
+      "success": {
+        "created": "User created successfully",
+        "updated": "User updated successfully"
+      }
+    },
+    "newUser": {
+      "description": "Create a new user",
+      "title": "Create User"
+    },
+    "role": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "search": {
+      "placeholder": "Search users..."
+    },
+    "title": "Users"
+  }
+}

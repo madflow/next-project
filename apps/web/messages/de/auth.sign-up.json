@@ -1,0 +1,19 @@
+{
+  "signUp": {
+    "description": "Füllen Sie Ihre Daten aus, um ein Konto zu erstellen.",
+    "form": {
+      "confirmPassword": "Passwort bestätigen",
+      "email": "E-Mail",
+      "name": "Name",
+      "password": "Passwort",
+      "submit": "Registrieren"
+    },
+    "links": {
+      "login": {
+        "question": "Bereits ein Konto?",
+        "text": "Anmelden"
+      }
+    },
+    "title": "Registrieren"
+  }
+}

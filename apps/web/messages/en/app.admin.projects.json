@@ -1,0 +1,85 @@
+{
+  "project": {
+    "title": "Projects",
+    "description": "This is the admin projects page. Here you can manage all projects.",
+    "createButton": "Create project",
+    "searchPlaceholder": "Search projects...",
+    "columns": {
+      "name": "Name",
+      "slug": "Slug",
+      "organization": "Organization",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Delete Project",
+      "description": "Are you sure you want to delete the project &ldquo;{name}&rdquo;? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete Project",
+      "deleting": "Deleting...",
+      "deleteButton": {
+        "title": "Delete project",
+        "srText": "Delete project"
+      },
+      "error": "Failed to delete project"
+    },
+    "create": {
+      "title": "Create project",
+      "description": "Create a new project"
+    },
+    "edit": {
+      "title": "Edit project",
+      "description": "Update project details"
+    },
+    "form": {
+      "organization": {
+        "label": "Organization",
+        "placeholder": "Select an organization",
+        "loading": "Loading organizations...",
+        "notFound": "No organizations found",
+        "errors": {
+          "required": "Organization is required"
+        }
+      },
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter project name",
+        "errors": {
+          "required": "Project name is required"
+        }
+      },
+      "slug": {
+        "label": "Slug",
+        "placeholder": "Enter URL slug",
+        "description": "This is the URL-friendly version of the name. It can only contain lowercase letters, numbers, and hyphens.",
+        "errors": {
+          "required": "Project slug is required",
+          "invalid": "Project slug must be lowercase and contain only letters, numbers and hyphens",
+          "maxLength": "Project slug must be less than 50 characters"
+        }
+      },
+      "submit": {
+        "create": "Create project",
+        "update": "Update",
+        "updating": "Updating...",
+        "creating": "Creating..."
+      },
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "createSuccess": "Project created successfully",
+      "updateSuccess": "Project updated successfully",
+      "deleteSuccess": "Project deleted successfully",
+      "error": {
+        "notFound": "Project not found",
+        "generic": "An error occurred. Please try again.",
+        "duplicateSlug": "A project with this slug already exists in the selected organization.",
+        "organizationRequired": "Please select an organization"
+      }
+    }
+  }
+}

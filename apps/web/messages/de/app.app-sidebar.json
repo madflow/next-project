@@ -1,0 +1,10 @@
+{
+  "appSidebar": {
+    "menu": "Menü",
+    "sections": "Bereiche",
+    "navItems": {
+      "dashboard": "Dashboard",
+      "admin": "Admin"
+    }
+  }
+}

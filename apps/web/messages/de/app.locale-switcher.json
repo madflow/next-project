@@ -1,0 +1,10 @@
+{
+  "localeSwitcher": {
+    "selectLanguage": "Sprache auswählen",
+    "locale": "Sprache",
+    "languages": {
+      "en": "Englisch",
+      "de": "Deutsch"
+    }
+  }
+}

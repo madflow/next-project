@@ -1,0 +1,21 @@
+{
+  "assignees": ["madflow"],
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "lockFileMaintenance": {
+    "automerge": true,
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "automerge": true,
+      "matchDepTypes": ["devDependencies"]
+    },
+    {
+      "automerge": true,
+      "matchCurrentVersion": "!/^0/",
+      "matchUpdateTypes": ["minor", "patch"]
+    }
+  ],
+  "timezone": "Europe/Berlin"
+}

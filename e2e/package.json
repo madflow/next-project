@@ -1,0 +1,32 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "E2E tests",
+  "scripts": {
+    "e2e": "npx playwright test --project=chromium --workers=1",
+    "e2e:prod": "BASE_URL=http://localhost:3001 npx playwright test --project=chromium --workers=1",
+    "e2e:prod:headed": "BASE_URL=http://localhost:3001 npx playwright test --project=chromium --workers=1 --headed",
+    "e2e:headed": "npx playwright test --project=chromium --headed",
+    "e2e:test:chrome": "npx playwright test --project=chromium",
+    "e2e:firefox": "npx playwright test --project=firefox",
+    "e2e:webkit": "npx playwright test --project=webkit",
+    "e2e:debug": "npx playwright test --debug",
+    "e2e:ui": "npx playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@playwright/test": "^1.53.1",
+    "@types/node": "^22.15.32",
+    "eslint": "^9.29.0",
+    "globals": "^16.2.0",
+    "typescript-eslint": "^8.34.1"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "mailpit-api": "^1.5.1"
+  }
+}

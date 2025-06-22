@@ -1,0 +1,10 @@
+{
+  "localeSwitcher": {
+    "selectLanguage": "Select language",
+    "locale": "Language",
+    "languages": {
+      "en": "English",
+      "de": "German"
+    }
+  }
+}

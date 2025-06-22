@@ -1,0 +1,30 @@
+import { Page } from "@playwright/test";
+import { MailpitClient } from "mailpit-api";
+import assert from "node:assert";
+
+const { SMTP_SERVER_API } = process.env;
+assert(SMTP_SERVER_API);
+
+const smtpServerApi = new MailpitClient(SMTP_SERVER_API);
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function loginUser(page: Page, email: string, password: string) {
+  await page.waitForLoadState("networkidle");
+  await page.waitForSelector("data-testid=auth.login.form.email");
+  await page.getByTestId("auth.login.form.email").fill(email);
+  await page.getByTestId("auth.login.form.password").fill(password);
+  await page.getByTestId("auth.login.form.submit").click();
+  await page.waitForSelector("data-testid=app.sidebar.user-menu-trigger");
+}
+
+export async function logoutUser(page: Page) {
+  await page.getByTestId("app.sidebar.user-menu-trigger").click();
+  await page.getByTestId("app.sign-out").click();
+  await page.waitForLoadState("networkidle");
+  await page.waitForSelector("data-testid=auth.login.form.submit");
+}
+
+export { smtpServerApi };

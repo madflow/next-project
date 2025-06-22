@@ -1,0 +1,20 @@
+{
+  "login": {
+    "title": "Login",
+    "form": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login"
+    },
+    "links": {
+      "forgotPassword": {
+        "question": "Forgot your password?",
+        "text": "Reset password"
+      },
+      "signUp": {
+        "question": "No account yet?",
+        "text": "Sign up"
+      }
+    }
+  }
+}
