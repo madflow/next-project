@@ -1,13 +1,13 @@
 "use client";
 
-import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import type { AuthUser } from "@repo/database/schema";
 import { DataTable } from "@/components/datatable/data-table";
-import type { PaginationState } from "@/components/datatable/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
+import type { PaginationState, SortingState } from "@/types/index";
 
 interface Props {
   columns: ColumnDef<AuthUser, unknown>[];
