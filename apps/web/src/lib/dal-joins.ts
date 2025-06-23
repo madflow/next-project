@@ -40,7 +40,6 @@ export function createListWithJoins<TSchema extends ZodSchema>(
       for (const filter of filters) {
         const column = getTableColumns(table)[filter.column];
         if (!column) {
-          console.warn(`Unknown filter column: ${filter.column}`);
           continue;
         }
         if (filter.operator === "=") {
@@ -84,7 +83,6 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         }
 
         if (!column) {
-          console.warn(`Unknown search column: ${searchColumn}`);
           continue;
         }
 

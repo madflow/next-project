@@ -40,6 +40,18 @@ export function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema
   });
 }
 
+export async function getAuthenticatedClient() {
+  // TODO: maybe wrap this for rls
+  return db;
+}
+
+export async function getSessionUser() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  return session?.user;
+}
+
 export async function assertUserHasRole(role: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -116,7 +128,6 @@ export function createList(table: AnyPgTable, schema: ZodType) {
           }
         }
         if (!column) {
-          console.warn(`Unknown search column: ${searchColumn}`);
           continue;
         }
         whereConditions.push(ilike(column, `%${search}%`));
@@ -140,7 +151,6 @@ export function createList(table: AnyPgTable, schema: ZodType) {
           }
         }
         if (!column) {
-          console.warn(`Unknown orderBy column: ${order.column}`);
           continue;
         }
         if (order.direction === "asc") {

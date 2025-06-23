@@ -1,5 +1,16 @@
 import { sql } from "drizzle-orm";
-import { bigint, boolean, integer, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -64,17 +75,21 @@ export const organization = pgTable("organizations", {
   metadata: text("metadata"),
 });
 
-export const member = pgTable("members", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id")
-    .notNull()
-    .references(() => organization.id, { onDelete: "cascade" }),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  role: text("role").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
-});
+export const member = pgTable(
+  "members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    role: text("role").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [unique().on(table.organizationId, table.userId, table.role)]
+);
 
 export const invitation = pgTable("invitations", {
   id: uuid("id").primaryKey().defaultRandom(),
