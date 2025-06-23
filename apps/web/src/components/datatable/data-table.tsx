@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef, SortingState, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
+import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 import { SearchIcon, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table } from "@/components/ui/table";
@@ -10,7 +10,8 @@ import { DataTablePagination } from "./components/pagination";
 import { TableBodyComponent } from "./components/table-body";
 import { TableHeaderComponent } from "./components/table-header";
 import { DataTableViewOptions } from "./components/view-options";
-import type { PaginationState } from "./types";
+import type { PaginationState, SortingState } from "@/types";
+import { toReactTableSorting, toCustomSorting } from "@/lib/table-utils";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[];
@@ -52,11 +53,11 @@ export function DataTable<TData>({
   };
 
   const handleSetSorting = (updater: SortingState | ((old: SortingState) => SortingState)) => {
-    if (typeof updater === "function") {
-      setSorting(updater as (old: SortingState) => SortingState);
-    } else {
-      setSorting(updater);
-    }
+    // Convert from react-table sorting state to our custom sorting state
+    const newSorting = typeof updater === "function" 
+      ? updater(toCustomSorting(sorting)) 
+      : toCustomSorting(updater);
+    setSorting(newSorting);
   };
 
   const showSearch = typeof searchValue === "string" && typeof onSearchChange === "function";
@@ -72,7 +73,7 @@ export function DataTable<TData>({
     onPaginationChange: handleSetPagination,
     state: {
       pagination,
-      sorting,
+      sorting: toReactTableSorting(sorting),
     },
     rowCount: count || 0,
   });

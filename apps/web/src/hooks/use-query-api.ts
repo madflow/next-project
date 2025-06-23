@@ -6,14 +6,12 @@ import {
   type QueryFunction,
   type QueryObserverResult
 } from '@tanstack/react-query'
-import { type PaginationState, type SortingState } from '@tanstack/react-table'
-
-type ListFilter = {
-  column: string
-  value: string
-}
-
-type ListSortDirection = 'asc' | 'desc'
+import { 
+  type PaginationState, 
+  type SortingState,
+  type ListSortDirection,
+  type ListFilter 
+} from '@/types'
 
 type UseQueryApiOptions<T> = {
   endpoint: string

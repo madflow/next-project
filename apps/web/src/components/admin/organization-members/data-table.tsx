@@ -1,13 +1,13 @@
 "use client";
 
-import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import type { Member, User } from "@repo/database/schema";
 import { DataTable } from "@/components/datatable/data-table";
-import type { ListFilter, PaginationState } from "@/components/datatable/types";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
+import type { PaginationState, SortingState, ListFilter } from "@/types/index";
 
 type Props = {
   organizationId: string;
@@ -26,7 +26,7 @@ export function OrganisationMembersDataTable({ columns, organizationId }: Props)
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [search, setSearch] = useState("");
-  const [filters] = useState<ListFilter[]>([{ column: "organizationId", operator: "=", value: organizationId }]);
+  const [filters] = useState<ListFilter[]>([{ column: "organizationId", value: organizationId }]);
   const debouncedSearch = useDebouncedValue(search, 300);
 
   const { 

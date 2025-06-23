@@ -1,12 +1,8 @@
-export type PaginationState = {
-  pageIndex: number;
-  pageSize: number;
-};
+import { type PaginationState, type ListSortDirection, type ListFilter as GlobalListFilter } from "@/types";
 
-export type ListSortDirection = "asc" | "desc";
+export type { PaginationState, ListSortDirection };
 
-export type ListFilter = {
-  column: string;
+export type ListFilter = GlobalListFilter & {
   operator: string;
   value: string;
 };
