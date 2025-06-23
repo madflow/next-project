@@ -9,10 +9,10 @@ export const testUsers = {
     password: "Tester12345",
     name: "Regular User",
   },
-  profile: {
+  profileChanger: {
     email: "profile@example.com",
     password: "Tester12345",
-    name: "Profile User",
+    name: "Profile Changer",
   },
   emailChanger: {
     email: "emailchanger@example.com",
@@ -27,7 +27,22 @@ export const testUsers = {
   avatarUser: {
     email: "avatar@example.com",
     password: "Tester12345",
-    name: "Avatar User",
+    name: "Avatar user",
+  },
+  accountMultipleOrgs: {
+    email: "accountmultipleorgs@example.com",
+    password: "Tester12345",
+    name: "Account Multiple Orgs",
+  },
+  accountInNoOrg: {
+    email: "account-in-no-org@example.com",
+    password: "Tester12345",
+    name: "Account In No Org",
+  },
+  adminInNoOrg: {
+    email: "admin-in-no-org@example.com",
+    password: "Tester12345",
+    name: "Admin In No Org",
   },
 } as const;
 

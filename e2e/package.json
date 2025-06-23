@@ -6,7 +6,7 @@
     "e2e": "npx playwright test --project=chromium --workers=1",
     "e2e:prod": "BASE_URL=http://localhost:3001 npx playwright test --project=chromium --workers=1",
     "e2e:prod:headed": "BASE_URL=http://localhost:3001 npx playwright test --project=chromium --workers=1 --headed",
-    "e2e:headed": "npx playwright test --project=chromium --headed",
+    "e2e:headed": "npx playwright test --project=chromium --headed --workers=1",
     "e2e:test:chrome": "npx playwright test --project=chromium",
     "e2e:firefox": "npx playwright test --project=firefox",
     "e2e:webkit": "npx playwright test --project=webkit",

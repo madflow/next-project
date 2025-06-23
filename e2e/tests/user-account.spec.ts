@@ -13,7 +13,7 @@ test.describe("User Account", () => {
     await page.goto("/");
 
     // Log in as the profile user
-    await loginUser(page, testUsers.profile.email, testUsers.profile.password);
+    await loginUser(page, testUsers.profileChanger.email, testUsers.profileChanger.password);
 
     // Open user menu
     const userMenuTrigger = page.getByTestId("app.sidebar.user-menu-trigger");
@@ -33,7 +33,7 @@ test.describe("User Account", () => {
     await page.goto("/");
 
     // Log in as the profile user
-    await loginUser(page, testUsers.profile.email, testUsers.profile.password);
+    await loginUser(page, testUsers.profileChanger.email, testUsers.profileChanger.password);
 
     // Navigate to account page
     await page.goto("/user/account");
@@ -67,7 +67,7 @@ test.describe("User Account", () => {
   test("should update user password", async ({ page }) => {
     // Navigate to the login page and log in
     await page.goto("/");
-    await loginUser(page, testUsers.profile.email, testUsers.profile.password);
+    await loginUser(page, testUsers.profileChanger.email, testUsers.profileChanger.password);
 
     // Navigate to account page
     await page.goto("/user/account");
@@ -92,7 +92,7 @@ test.describe("User Account", () => {
     await logoutUser(page);
 
     // Log in with the new password
-    await loginUser(page, testUsers.profile.email, newPassword);
+    await loginUser(page, testUsers.profileChanger.email, newPassword);
 
     // Verify login was successful by checking for user menu
     await expect(page.getByTestId("app.sidebar.user-menu-trigger")).toBeVisible();

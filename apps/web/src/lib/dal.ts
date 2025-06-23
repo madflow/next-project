@@ -3,7 +3,7 @@ import { SQL, asc, count, desc, eq, getTableColumns, ilike, or } from "drizzle-o
 import { AnyPgColumn, AnyPgTable } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { cache } from "react";
-import { ZodSchema, z } from "zod/v4";
+import { ZodType, z } from "zod/v4";
 import { defaultClient as db } from "@repo/database/clients";
 import { USER_ADMIN_ROLE, auth } from "./auth";
 import { DalNotAuthorizedException } from "./exception";
@@ -49,6 +49,15 @@ export async function assertUserHasRole(role: string) {
   }
 }
 
+export async function assertUserHasSession() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session?.user) {
+    throw new DalNotAuthorizedException("Unauthorized");
+  }
+}
+
 export async function assertUserIsAdmin() {
   await assertUserHasRole(USER_ADMIN_ROLE);
 }
@@ -64,7 +73,20 @@ export function withAdminCheck<T extends unknown[], R>(fn: (...args: T) => Promi
     }
   });
 }
-export function createFind<TSchema extends ZodSchema>(table: AnyPgTable & { id: AnyPgColumn }, schema: TSchema) {
+
+export function withSessionCheck<T extends unknown[], R>(fn: (...args: T) => Promise<R>) {
+  return cache(async (...args: T): Promise<R | null> => {
+    try {
+      await assertUserHasSession();
+      return await fn(...args);
+    } catch (error) {
+      console.error(`Error in ${fn.name}:`, error);
+      throw error;
+    }
+  });
+}
+
+export function createFind<TSchema extends ZodType>(table: AnyPgTable & { id: AnyPgColumn }, schema: TSchema) {
   return async (id: string): Promise<z.infer<typeof schema> | null> => {
     const [result] = await db.select().from(table).where(eq(table.id, id)).limit(1);
     if (!result) return null;
@@ -73,7 +95,7 @@ export function createFind<TSchema extends ZodSchema>(table: AnyPgTable & { id: 
   };
 }
 
-export function createList(table: AnyPgTable, schema: ZodSchema) {
+export function createList(table: AnyPgTable, schema: ZodType) {
   return async (options: ListOptions = {}): Promise<z.infer<typeof schema>> => {
     const parsedOptions = await listOptionsSchema.safeParseAsync(options);
     if (!parsedOptions.success) throw new Error("Invalid options");
