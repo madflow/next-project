@@ -1,7 +1,7 @@
 "use client";
 
 import { Folder, ChevronsUpDown, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+// No need to import useRouter since we're not using it anymore
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ type Project = {
 };
 
 export function ProjectSwitcher() {
-  const router = useRouter();
+  // No need for router since we're not using it
   const isMobile = useIsMobile();
   const { data: activeOrganization } = useActiveOrganization();
   const { data: projects = [], isLoading: isProjectsLoading } = useProjectsByOrg();
@@ -51,7 +51,6 @@ export function ProjectSwitcher() {
     setIsSwitching(true);
     try {
       await setActiveProject(project);
-      router.refresh();
     } catch (error) {
       console.error("Failed to switch project", error);
       toast.error("Failed to switch project");
@@ -62,7 +61,7 @@ export function ProjectSwitcher() {
 
   const isLoading = isProjectsLoading || isSwitching || isActiveProjectLoading;
   const displayName = activeProject?.name || "Select project";
-  const isProjectFromCurrentOrg = activeProject?.organizationId === activeOrganization?.id;
+  // Removed unused variable isProjectFromCurrentOrg
 
   if (!activeOrganization) {
     return null; // Don't show project switcher if no org is selected

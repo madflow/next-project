@@ -1,58 +1,66 @@
+"use client";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useActiveOrganization } from "@/lib/auth-client";
+import {
+  getActiveProject,
+  setActiveProject as setStorageActiveProject,
+  clearActiveProject,
+  APP_CONTEXT_KEY,
+} from "@/lib/utils";
 
-const ACTIVE_PROJECT_KEY = "activeProject";
-
-type Project = {
+export type Project = {
   id: string;
   name: string;
   slug: string;
   organizationId: string;
 };
 
-export function useActiveProject() {
-  const router = useRouter();
+const ACTIVE_PROJECT_QUERY_KEY = [APP_CONTEXT_KEY, 'activeProject'] as const;
 
+export function useActiveProject() {
   const queryClient = useQueryClient();
   const { data: activeOrganization } = useActiveOrganization();
   
+  const queryKey = useMemo(
+    () => [...ACTIVE_PROJECT_QUERY_KEY, activeOrganization?.id],
+    [activeOrganization?.id]
+  );
+  
   const { data: activeProject, isLoading } = useQuery<Project | null>({
-    queryKey: [ACTIVE_PROJECT_KEY],
+    queryKey,
     queryFn: () => {
-      if (typeof window === "undefined") return null;
-      const project = localStorage.getItem(ACTIVE_PROJECT_KEY);
-      return project ? JSON.parse(project) : null;
+      if (!activeOrganization?.id) return null;
+      return getActiveProject(activeOrganization.id);
     },
+    enabled: !!activeOrganization?.id,
   });
   
   // Reset active project when organization changes
   useEffect(() => {
     if (activeOrganization?.id && activeProject?.organizationId !== activeOrganization.id) {
-      localStorage.removeItem(ACTIVE_PROJECT_KEY);
-      queryClient.setQueryData([ACTIVE_PROJECT_KEY], null);
+      clearActiveProject();
+      queryClient.setQueryData(queryKey, null);
     }
-  }, [activeOrganization?.id, activeProject?.organizationId, queryClient]);
+  }, [activeOrganization?.id, activeProject?.organizationId, queryClient, queryKey]);
 
   const setActiveProject = useCallback(
     async (project: Project | null) => {
       if (project) {
-        localStorage.setItem(ACTIVE_PROJECT_KEY, JSON.stringify(project));
-        queryClient.setQueryData([ACTIVE_PROJECT_KEY], project);
+        setStorageActiveProject(project);
+        queryClient.setQueryData(queryKey, project);
       } else {
-        localStorage.removeItem(ACTIVE_PROJECT_KEY);
-        queryClient.setQueryData([ACTIVE_PROJECT_KEY], null);
+        clearActiveProject();
+        queryClient.setQueryData(queryKey, null);
       }
-      // Refresh the page to update the UI
-      router.refresh();
     },
-    [router, queryClient]
+    [queryClient, queryKey]
   );
 
   return {
-    activeProject,
+    activeProject: activeOrganization?.id === activeProject?.organizationId ? activeProject : null,
     setActiveProject,
-    isLoading,
+    isLoading: isLoading || !activeOrganization,
   };
 }
