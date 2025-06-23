@@ -1,8 +1,8 @@
 "use client";
 
-import { Folder, ChevronsUpDown, Loader2 } from "lucide-react";
+import { ChevronsUpDown, Folder, Loader2 } from "lucide-react";
 // No need to import useRouter since we're not using it anymore
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +11,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useActiveProject } from "@/hooks/use-active-project";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useProjectsByOrg } from "@/hooks/use-projects-by-org";
 import { useActiveOrganization } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { useProjectsByOrg } from "@/hooks/use-projects-by-org";
-import { useActiveProject } from "@/hooks/use-active-project";
 import { SidebarMenu, SidebarMenuItem } from "./ui/sidebar";
 
 type Project = {
@@ -32,12 +32,10 @@ export function ProjectSwitcher() {
   const { data: projects = [], isLoading: isProjectsLoading } = useProjectsByOrg();
   const { activeProject, setActiveProject, isLoading: isActiveProjectLoading } = useActiveProject();
   const [isSwitching, setIsSwitching] = useState(false);
-  
+
   // Filter projects to only show those for the active organization
-  const filteredProjects = projects.filter(
-    (project: Project) => project.organizationId === activeOrganization?.id
-  );
-  
+  const filteredProjects = projects.filter((project: Project) => project.organizationId === activeOrganization?.id);
+
   // Reset active project if it doesn't belong to current org
   useEffect(() => {
     if (activeProject && activeProject.organizationId !== activeOrganization?.id) {
@@ -47,7 +45,7 @@ export function ProjectSwitcher() {
 
   const handleSelect = async (project: Project) => {
     if (project.id === activeProject?.id) return;
-    
+
     setIsSwitching(true);
     try {
       await setActiveProject(project);
@@ -87,6 +85,7 @@ export function ProjectSwitcher() {
           <DropdownMenuTrigger asChild disabled={isLoading || filteredProjects.length === 0}>
             <Button
               variant="ghost"
+              data-testid="app.project-switcher"
               size="sm"
               className={cn("w-full justify-between px-3", "hover:bg-accent hover:text-accent-foreground")}>
               <div className="flex items-center gap-2">
@@ -118,9 +117,7 @@ export function ProjectSwitcher() {
                 </DropdownMenuItem>
               ))
             ) : (
-              <div className="px-3 py-2 text-sm text-muted-foreground">
-                No projects found
-              </div>
+              <div className="text-muted-foreground px-3 py-2 text-sm">No projects found</div>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

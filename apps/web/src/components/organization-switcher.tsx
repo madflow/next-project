@@ -61,6 +61,7 @@ export function OrganizationSwitcher() {
             <Button
               variant="ghost"
               size="sm"
+              data-testid="app.organization-switcher"
               className={cn("w-full justify-between px-3", "hover:bg-accent hover:text-accent-foreground")}>
               <div className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
