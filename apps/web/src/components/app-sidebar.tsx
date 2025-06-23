@@ -10,6 +10,7 @@ import { NavUser } from "@/components/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { OrganizationSwitcher } from "./organization-switcher";
+import { ProjectSwitcher } from "./project-switcher";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getNavData = (t: (t: any) => string) => ({
@@ -39,6 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <OrganizationSwitcher />
+        <ProjectSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
