@@ -1,6 +1,7 @@
 "use client";
 
 import { Building2, ChevronsUpDown, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ export function OrganizationSwitcher() {
   const { data: activeOrganization } = useActiveOrganization();
 
   const [isSwitching, setIsSwitching] = useState(false);
+  const t = useTranslations("appSidebar");
 
   const handleSelect = async (orgId: string) => {
     if (orgId === activeOrganization?.id) return;
@@ -39,7 +41,7 @@ export function OrganizationSwitcher() {
   };
 
   const isLoading = isOrgsLoading || isSwitching;
-  const displayName = activeOrganization?.name || "Select organization";
+  const displayName = activeOrganization?.name || t("organizationSwitcher.label");
 
   if (isLoading) {
     return (
@@ -75,7 +77,10 @@ export function OrganizationSwitcher() {
             align="start"
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}>
-            {organizations &&
+            <div className="text-muted-foreground px-2 py-1.5 text-sm font-medium">
+              {t("organizationSwitcher.switch")}
+            </div>
+            {organizations?.length > 0 ? (
               organizations.map((org) => (
                 <DropdownMenuItem
                   key={org.id}
@@ -83,10 +88,10 @@ export function OrganizationSwitcher() {
                   className={cn(
                     "cursor-pointer px-3 py-2 text-sm",
                     "focus:bg-accent focus:text-accent-foreground",
-                    activeOrganization && activeOrganization.id === org.id && "bg-accent/50"
+                    activeOrganization?.id === org.id && "bg-accent/50"
                   )}>
                   <div className="flex items-center gap-2">
-                    {activeOrganization && activeOrganization.id === org.id && isSwitching ? (
+                    {activeOrganization?.id === org.id && isSwitching ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <Building2 className="h-4 w-4" />
@@ -94,7 +99,10 @@ export function OrganizationSwitcher() {
                     <span className="truncate">{org.name}</span>
                   </div>
                 </DropdownMenuItem>
-              ))}
+              ))
+            ) : (
+              <div className="text-muted-foreground px-3 py-2 text-sm">{t("organizationSwitcher.noOrganizations")}</div>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

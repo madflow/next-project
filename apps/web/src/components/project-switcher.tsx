@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronsUpDown, Folder, Loader2 } from "lucide-react";
-// No need to import useRouter since we're not using it anymore
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ export function ProjectSwitcher() {
   const { data: projects = [], isLoading: isProjectsLoading } = useProjectsByOrg();
   const { activeProject, setActiveProject, isLoading: isActiveProjectLoading } = useActiveProject();
   const [isSwitching, setIsSwitching] = useState(false);
+  const t = useTranslations("appSidebar");
 
   // Filter projects to only show those for the active organization
   const filteredProjects = projects.filter((project: Project) => project.organizationId === activeOrganization?.id);
@@ -58,7 +59,7 @@ export function ProjectSwitcher() {
   };
 
   const isLoading = isProjectsLoading || isSwitching || isActiveProjectLoading;
-  const displayName = activeProject?.name || "Select project";
+  const displayName = activeProject?.name || t("projectSwitcher.label");
   // Removed unused variable isProjectFromCurrentOrg
 
   if (!activeOrganization) {
@@ -71,7 +72,7 @@ export function ProjectSwitcher() {
         <SidebarMenuItem>
           <Button variant="ghost" size="sm" className="w-full justify-start" disabled>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            <span>Loading projects...</span>
+            <span>{t("projectSwitcher.loading")}</span>
           </Button>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -100,6 +101,7 @@ export function ProjectSwitcher() {
             align="start"
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}>
+            <div className="text-muted-foreground px-2 py-1.5 text-sm font-medium">{t("projectSwitcher.switch")}</div>
             {filteredProjects.length > 0 ? (
               filteredProjects.map((project: Project) => (
                 <DropdownMenuItem
@@ -111,13 +113,17 @@ export function ProjectSwitcher() {
                     activeProject?.id === project.id && "bg-accent/50"
                   )}>
                   <div className="flex items-center gap-2">
-                    <Folder className="h-4 w-4" />
+                    {activeProject?.id === project.id && isSwitching ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Folder className="h-4 w-4" />
+                    )}
                     <span className="truncate">{project.name}</span>
                   </div>
                 </DropdownMenuItem>
               ))
             ) : (
-              <div className="text-muted-foreground px-3 py-2 text-sm">No projects found</div>
+              <div className="text-muted-foreground px-3 py-2 text-sm">{t("projectSwitcher.noProjects")}</div>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

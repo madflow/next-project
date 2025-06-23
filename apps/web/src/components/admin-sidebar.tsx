@@ -1,6 +1,6 @@
 "use client";
 
-import { DatabaseIcon, GanttChartIcon, HouseIcon, MenuIcon, ProjectorIcon, WrenchIcon } from "lucide-react";
+import { Building2, Folder, GanttChartIcon, HouseIcon, MenuIcon, WrenchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import { NavMain } from "@/components/nav-main";
@@ -36,7 +36,7 @@ const getNavData = (t: (t: any) => string) => ({
     {
       name: t("navItems.organizations"),
       url: "/admin/organizations",
-      icon: DatabaseIcon,
+      icon: Building2,
     },
     {
       name: t("navItems.users"),
@@ -46,7 +46,7 @@ const getNavData = (t: (t: any) => string) => ({
     {
       name: t("navItems.projects"),
       url: "/admin/projects",
-      icon: ProjectorIcon,
+      icon: Folder,
     },
   ],
 });

@@ -1,10 +1,21 @@
 {
   "appSidebar": {
     "menu": "Menü",
-    "sections": "Bereiche",
     "navItems": {
-      "dashboard": "Dashboard",
-      "admin": "Admin"
-    }
+      "admin": "Admin",
+      "dashboard": "Dashboard"
+    },
+    "organizationSwitcher": {
+      "label": "Organisation auswählen",
+      "noOrganizations": "Keine Organisationen",
+      "switch": "Organisation wechseln"
+    },
+    "projectSwitcher": {
+      "label": "Projekt auswählen",
+      "loading": "Lade Projekte...",
+      "noProjects": "Keine Projekte gefunden",
+      "switch": "Projekt wechseln"
+    },
+    "sections": "Bereiche"
   }
 }
