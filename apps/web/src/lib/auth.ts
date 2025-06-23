@@ -19,7 +19,14 @@ const authConfig = {
     provider: "pg",
     schema: authSchema,
   }),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
   advanced: {
+    cookiePrefix: "auth",
     database: {
       generateId: false,
     },

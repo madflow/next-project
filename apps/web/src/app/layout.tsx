@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Better Auth",
+  title: "Next Project",
   description: "",
 };
 

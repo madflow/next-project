@@ -1,6 +1,6 @@
 import { hashPassword } from "better-auth/crypto";
 import { adminClient, adminPool } from "@repo/database/clients";
-import { account, invitation, member, organization, project, session, user , rateLimit} from "@repo/database/schema";
+import { account, invitation, member, organization, project, rateLimit, session, user } from "@repo/database/schema";
 
 interface CreateUserParams {
   name: string;
@@ -113,11 +113,11 @@ try {
   // Create organization
   const org = await createOrganization("Test Organization", "test-organization");
 
-// Create another organization
-const org2 = await createOrganization("Test Organization 2", "test-organization-2");
+  // Create another organization
+  const org2 = await createOrganization("Test Organization 2", "test-organization-2");
 
-// Create another organization
-const org3 = await createOrganization("Test Organization 3", "test-organization-3");
+  // Create another organization
+  const org3 = await createOrganization("Test Organization 3", "test-organization-3");
 
   // Create admin user and add to organization
   const adminUserId = await createUser({
@@ -248,14 +248,6 @@ const org3 = await createOrganization("Test Organization 3", "test-organization-
     organizationId: org3.id,
     userId: accountMultipleOrgsUserId,
     role: "owner",
-    createdAt: new Date(),
-  });
-
-  // Add regular user as member of the organization
-  await adminClient.insert(member).values({
-    organizationId: org.id,
-    userId: regularUserId,
-    role: "member",
     createdAt: new Date(),
   });
 
