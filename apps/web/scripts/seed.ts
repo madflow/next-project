@@ -1,6 +1,6 @@
 import { hashPassword } from "better-auth/crypto";
 import { adminClient, adminPool } from "@repo/database/clients";
-import { account, invitation, member, organization, project, session, user } from "@repo/database/schema";
+import { account, invitation, member, organization, project, session, user , rateLimit} from "@repo/database/schema";
 
 interface CreateUserParams {
   name: string;
@@ -105,12 +105,19 @@ await adminClient.delete(member).execute();
 await adminClient.delete(organization).execute();
 await adminClient.delete(account).execute();
 await adminClient.delete(user).execute();
+await adminClient.delete(rateLimit).execute();
 console.log("Tables truncated successfully\n");
 
 // Create seed data
 try {
   // Create organization
   const org = await createOrganization("Test Organization", "test-organization");
+
+// Create another organization
+const org2 = await createOrganization("Test Organization 2", "test-organization-2");
+
+// Create another organization
+const org3 = await createOrganization("Test Organization 3", "test-organization-3");
 
   // Create admin user and add to organization
   const adminUserId = await createUser({
@@ -196,6 +203,62 @@ try {
     password: "Tester12345",
   });
 
+  const accountMultipleOrgsUserId = await createUser({
+    name: "Account Multiple Orgs",
+    email: "accountmultipleorgs@example.com",
+    emailVerified: true,
+    role: "user",
+    password: "Tester12345",
+  });
+
+  const accountInNoOrgUserId = await createUser({
+    name: "Account In No Org",
+    email: "account-in-no-org@example.com",
+    emailVerified: true,
+    role: "user",
+    password: "Tester12345",
+  });
+
+  const adminInNoOrgUserId = await createUser({
+    name: "Admin In No Org",
+    email: "admin-in-no-org@example.com",
+    emailVerified: true,
+    role: "admin",
+    password: "Tester12345",
+  });
+
+  // Add account multiple orgs as member of the organization
+  await adminClient.insert(member).values({
+    organizationId: org.id,
+    userId: accountMultipleOrgsUserId,
+    role: "admin",
+    createdAt: new Date(),
+  });
+
+  // Add account multiple orgs as member of the second organization
+  await adminClient.insert(member).values({
+    organizationId: org2.id,
+    userId: accountMultipleOrgsUserId,
+    role: "member",
+    createdAt: new Date(),
+  });
+
+  // Add account multiple orgs as member of the third organization
+  await adminClient.insert(member).values({
+    organizationId: org3.id,
+    userId: accountMultipleOrgsUserId,
+    role: "owner",
+    createdAt: new Date(),
+  });
+
+  // Add regular user as member of the organization
+  await adminClient.insert(member).values({
+    organizationId: org.id,
+    userId: regularUserId,
+    role: "member",
+    createdAt: new Date(),
+  });
+
   // Add account deleter as member of the organization
   await adminClient.insert(member).values({
     organizationId: org.id,
@@ -213,6 +276,13 @@ try {
 
   // Create a test project in the organization
   await createProject("Test Project", "test-project", org.id);
+
+  // Create two projects in the second organization
+  await createProject("Test Project 2", "test-project-2", org2.id);
+  await createProject("Test Project 3", "test-project-3", org2.id);
+
+  // Create a test project in the third organization
+  await createProject("Test Project 4", "test-project-4", org3.id);
 
   await adminPool.end();
 
