@@ -6,6 +6,6 @@ export default async function Page() {
   if (!session) {
     redirect("/auth/login");
   } else {
-    redirect("/dashboard");
+    redirect("/landing");
   }
 }

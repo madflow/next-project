@@ -28,7 +28,7 @@ const getNavData = (t: (t: any) => string) => ({
   navSecondary: [
     {
       title: t("navItems.app"),
-      url: "/dashboard",
+      url: "/landing",
       icon: HouseIcon,
     },
   ],

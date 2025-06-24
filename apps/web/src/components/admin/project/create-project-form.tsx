@@ -27,8 +27,7 @@ const createFormSchema = (t: ReturnType<typeof useTranslations>) =>
     }),
     slug: z
       .string()
-      .toLowerCase()
-      .regex(/^[a-z0-9-]+$/, {
+      .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/, {
         error: t("form.slug.errors.invalid"),
       })
       .min(1, {
