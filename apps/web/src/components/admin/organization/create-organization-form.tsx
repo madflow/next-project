@@ -20,8 +20,7 @@ const createFormSchema = (t: any) =>
     }),
     slug: z
       .string()
-      .toLowerCase()
-      .regex(/^[a-z0-9-]+$/, {
+      .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/, {
         error: t("organization.form.slug.errors.invalid"),
       })
       .min(1, {

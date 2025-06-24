@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   integer,
   pgTable,
   text,
@@ -66,14 +67,24 @@ export const account = pgTable("accounts", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
 });
 
-export const organization = pgTable("organizations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  slug: text("slug").unique().notNull(),
-  logo: text("logo"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
-  metadata: text("metadata"),
-});
+export const organization = pgTable(
+  "organizations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    slug: text("slug").unique().notNull(),
+    logo: text("logo"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    metadata: text("metadata"),
+  },
+  (table) => [
+    check("organization_slug_check", sql`${table.slug} ~ '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'`),
+    check(
+      "organization_slug_reserved",
+      sql`${table.slug} NOT IN ('admin', 'api', 'auth', 'landing', 'goodbye', '_next', 'public', 'user')`
+    ),
+  ]
+);
 
 export const member = pgTable(
   "members",

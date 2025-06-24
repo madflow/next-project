@@ -1,0 +1,2 @@
+ALTER TABLE "organizations" DROP CONSTRAINT "organization_slug_reserved";--> statement-breakpoint
+ALTER TABLE "organizations" ADD CONSTRAINT "organization_slug_reserved" CHECK ("organizations"."slug" NOT IN ('admin', 'api', 'auth', 'landing', 'goodbye', '_next', 'public', 'user'));
