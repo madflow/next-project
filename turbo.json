@@ -25,6 +25,12 @@
       "cache": false,
       "persistent": true
     },
+    "e2e": {
+      "cache": false
+    },
+    "e2e:deps": {
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
