@@ -11,6 +11,8 @@
     "db:migrate": "turbo run db:migrate",
     "db:push": "turbo run db:push",
     "db:studio": "turbo run db:studio",
+    "e2e": "turbo run e2e",
+    "e2e:deps": "turbo run e2e:deps",
     "seed": "turbo run seed",
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "check-types": "turbo run check-types"
