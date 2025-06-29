@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { NextIntlClientProvider } from "next-intl";
 import type * as React from "react";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppProvider } from "@/context/app-context";
 import { getQueryClient } from "@/lib/get-query-client";
 
 interface ProvidersProps {
@@ -19,9 +20,11 @@ export default function Providers({ children, locale, messages }: ProvidersProps
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
-          {children}
-        </ThemeProvider>
+        <AppProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
+            {children}
+          </ThemeProvider>
+        </AppProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </NextIntlClientProvider>

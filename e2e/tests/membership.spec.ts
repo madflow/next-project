@@ -65,25 +65,24 @@ test.describe("Organization members", () => {
 
       // Test each organization and its projects
       for (const org of testCase.organizations) {
-        // Wait for projects to load when switching organizations
-        const projectsResponsePromise = page.waitForResponse(/projects/);
-
         // Select organization
-        await page.getByTestId("app.organization-switcher").click();
+        const organizationSwitcher = page.getByTestId("app.organization-switcher");
+        await organizationSwitcher.click();
         await page.getByText(org.name, { exact: true }).click();
-        await projectsResponsePromise;
 
         // Verify organization is selected
-        await expect(page.getByTestId("app.organization-switcher").locator("span")).toHaveText(org.name);
+        await expect(organizationSwitcher.locator("span")).toHaveText(org.name);
 
         // Test each project in the organization
         for (const project of org.projects) {
           // Select project
-          await page.getByTestId("app.project-switcher").click();
-          await page.getByText(project, { exact: true }).click();
+          const projectSwitcher = page.getByTestId("app.project-switcher");
+          await projectSwitcher.click();
+          const openProject = page.getByTestId("app.project-switcher.menu").getByText(project, { exact: true });
+          await openProject.click();
 
           // Verify project is selected
-          await expect(page.getByTestId("app.project-switcher").locator("span")).toHaveText(project);
+          await expect(projectSwitcher.locator("span")).toHaveText(project);
 
           // Test page reload
           await page.reload();

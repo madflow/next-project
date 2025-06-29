@@ -1,5 +1,5 @@
 import "server-only";
-import { SQL, asc, count, desc, eq, getTableColumns, ilike, or } from "drizzle-orm";
+import { SQL, and, asc, count, desc, eq, getTableColumns, ilike, or } from "drizzle-orm";
 import { AnyPgColumn, AnyPgTable } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { cache } from "react";
@@ -107,17 +107,27 @@ export function createFind<TSchema extends ZodType>(table: AnyPgTable & { id: An
   };
 }
 
+export function createFindBySlug<TSchema extends ZodType>(table: AnyPgTable & { slug: AnyPgColumn }, schema: TSchema) {
+  return async (slug: string): Promise<z.infer<typeof schema> | null> => {
+    const [result] = await db.select().from(table).where(eq(table.slug, slug)).limit(1);
+    if (!result) return null;
+    const parsedResult = await schema.safeParseAsync(result);
+    return parsedResult.success ? parsedResult.data : null;
+  };
+}
+
 export function createList(table: AnyPgTable, schema: ZodType) {
   return async (options: ListOptions = {}): Promise<z.infer<typeof schema>> => {
     const parsedOptions = await listOptionsSchema.safeParseAsync(options);
     if (!parsedOptions.success) throw new Error("Invalid options");
 
-    const { limit, offset, search, searchColumns, orderBy } = parsedOptions.data;
+    const { filters, limit, offset, search, searchColumns, orderBy } = parsedOptions.data;
 
     const query = db.select().from(table);
     const countQuery = db.select({ count: count() }).from(table);
 
-    const whereConditions: SQL<unknown>[] = [];
+    const whereOrConditions: SQL<unknown>[] = [];
+    const whereAndConditions: SQL<unknown>[] = [];
     if (search && searchColumns) {
       for (const searchColumn of searchColumns) {
         let column: AnyPgColumn | undefined;
@@ -130,13 +140,36 @@ export function createList(table: AnyPgTable, schema: ZodType) {
         if (!column) {
           continue;
         }
-        whereConditions.push(ilike(column, `%${search}%`));
+        whereOrConditions.push(ilike(column, `%${search}%`));
       }
     }
 
-    if (whereConditions.length > 0) {
-      query.where(or(...whereConditions));
-      countQuery.where(or(...whereConditions));
+    if (filters) {
+      for (const filter of filters) {
+        let column: AnyPgColumn | undefined;
+        for (const [key, o] of Object.entries(getTableColumns(table))) {
+          if (key === filter.column) {
+            column = o;
+            break;
+          }
+        }
+        if (!column) {
+          continue;
+        }
+        if (filter.operator === "eq" || filter.operator === "=") {
+          whereAndConditions.push(eq(column, filter.value));
+        }
+      }
+    }
+
+    if (whereOrConditions.length > 0) {
+      query.where(or(...whereOrConditions));
+      countQuery.where(or(...whereOrConditions));
+    }
+
+    if (whereAndConditions.length > 0) {
+      query.where(and(...whereAndConditions));
+      countQuery.where(and(...whereAndConditions));
     }
 
     if (orderBy) {
