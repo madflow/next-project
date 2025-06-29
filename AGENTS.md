@@ -14,3 +14,7 @@ This project uses the following technologies:
 - **Code Formatting:** Prettier
 - **End-to-End Testing:** Playwright
 - **Build Automation:** Make
+
+## Rules for running commands
+
+- Do not run `npm run build` in order to test the project. Run `npm run lint` and `npm run check-types` instead.
