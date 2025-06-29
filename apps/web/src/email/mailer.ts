@@ -28,8 +28,7 @@ export async function sendMail({
   try {
     await transporter.verify();
   } catch (error) {
-    console.log("host", env.SMTP_SERVER_HOST);
-    console.log("port", env.SMTP_SERVER_PORT);
+    
     console.error("There was an error sending the email", error);
     return;
   }
@@ -40,7 +39,6 @@ export async function sendMail({
     text: text,
     html: html ? html : "",
   });
-  console.log("Message Sent", info.messageId);
-  console.log("Mail sent to", to);
+  
   return info;
 }
