@@ -2,6 +2,7 @@ import { BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, organization as organizationPlugin } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
 import { sendMail } from "@/email/mailer";
@@ -19,6 +20,26 @@ const authConfig = {
     provider: "pg",
     schema: authSchema,
   }),
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          const memberships = await db
+            .select()
+            .from(authSchema.member)
+            .where(eq(authSchema.member.userId, session.userId));
+          const singleMembership = memberships.length === 1 && memberships[0];
+          const activeOrganizationId = singleMembership ? singleMembership.organizationId : null;
+          return {
+            data: {
+              ...session,
+              activeOrganizationId,
+            },
+          };
+        },
+      },
+    },
+  },
   session: {
     cookieCache: {
       enabled: true,

@@ -19,8 +19,5 @@ export async function hasAccess(organizationId: string) {
     .select()
     .from(member)
     .where(and(eq(member.organizationId, organizationId), eq(member.userId, user.id)));
-
-  console.log(rows);
-
   return rows.length === 1;
 }

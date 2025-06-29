@@ -1,14 +1,9 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
-import { useActiveOrganization } from "@/lib/auth-client";
-import {
-  getActiveProject,
-  setActiveProject as setStorageActiveProject,
-  clearActiveProject,
-  APP_CONTEXT_KEY,
-} from "@/lib/utils";
+import { Organization } from "better-auth/plugins";
+import { usePathname } from "next/navigation";
+import { useMemo, useState } from "react";
+import { useProjectsByOrg } from "./use-projects-by-org";
 
 export type Project = {
   id: string;
@@ -17,50 +12,38 @@ export type Project = {
   organizationId: string;
 };
 
-const ACTIVE_PROJECT_QUERY_KEY = [APP_CONTEXT_KEY, 'activeProject'] as const;
+type PathParams = {
+  projectSlug: string | null;
+};
 
-export function useActiveProject() {
-  const queryClient = useQueryClient();
-  const { data: activeOrganization } = useActiveOrganization();
-  
-  const queryKey = useMemo(
-    () => [...ACTIVE_PROJECT_QUERY_KEY, activeOrganization?.id],
-    [activeOrganization?.id]
-  );
-  
-  const { data: activeProject, isLoading } = useQuery<Project | null>({
-    queryKey,
-    queryFn: () => {
-      if (!activeOrganization?.id) return null;
-      return getActiveProject(activeOrganization.id);
-    },
-    enabled: !!activeOrganization?.id,
-  });
-  
-  // Reset active project when organization changes
-  useEffect(() => {
-    if (activeOrganization?.id && activeProject?.organizationId !== activeOrganization.id) {
-      clearActiveProject();
-      queryClient.setQueryData(queryKey, null);
+export function useActiveProject(activeOrganization?: Organization | null) {
+  const [activeProjectSlug, setActiveProjectSlug] = useState<string | null>(null);
+  const queryParams = useMemo(() => {
+    const params: Record<string, string> = {};
+    if (activeProjectSlug) {
+      params.slug = activeProjectSlug;
     }
-  }, [activeOrganization?.id, activeProject?.organizationId, queryClient, queryKey]);
+    return params;
+  }, [activeProjectSlug]);
+  const { data, isLoading } = useProjectsByOrg(activeOrganization?.id || "", queryParams);
 
-  const setActiveProject = useCallback(
-    async (project: Project | null) => {
-      if (project) {
-        setStorageActiveProject(project);
-        queryClient.setQueryData(queryKey, project);
-      } else {
-        clearActiveProject();
-        queryClient.setQueryData(queryKey, null);
-      }
-    },
-    [queryClient, queryKey]
-  );
+  const pathname = usePathname();
+
+  useMemo(() => {
+    const segments = pathname.split("/").filter(Boolean);
+    const result: PathParams = {
+      projectSlug: null,
+    };
+    const projectIndex = segments.findIndex((segment: string) => segment === "project");
+    if (projectIndex !== -1 && projectIndex + 1 < segments.length) {
+      setActiveProjectSlug(segments[projectIndex + 1] || null);
+    }
+
+    return result;
+  }, [pathname]);
 
   return {
-    activeProject: activeOrganization?.id === activeProject?.organizationId ? activeProject : null,
-    setActiveProject,
+    activeProject: isLoading ? null : data?.[0],
     isLoading: isLoading || !activeOrganization,
   };
 }

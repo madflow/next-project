@@ -18,7 +18,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { limit, offset, search, orderBy } = processUrlParams(new URL(request.url).searchParams);
+    const { limit, offset, search, orderBy, filters } = processUrlParams(new URL(request.url).searchParams);
+
+    const filtersWithOrganizationId = [
+      ...filters,
+      {
+        column: "organizationId",
+        operator: "eq",
+        value: id,
+      },
+    ];
 
     const result = await listAuthenticated({
       limit,
@@ -26,13 +35,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       search,
       searchColumns: ["name", "slug"],
       orderBy,
-      filters: [
-        {
-          column: "organizationId",
-          operator: "eq",
-          value: id,
-        },
-      ],
+      filters: filtersWithOrganizationId,
     });
 
     return NextResponse.json(result);

@@ -1,5 +1,6 @@
 "use client";
 
+import { Organization } from "better-auth/plugins";
 import { ChartArea } from "lucide-react";
 import {
   SidebarGroup,
@@ -8,21 +9,23 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useActiveProject } from "@/hooks/use-active-project";
-import { useActiveOrganization } from "@/lib/auth-client";
+import { Project } from "@/context/app-context";
 
-export function NavProject() {
-  const { data: activeOrganization } = useActiveOrganization();
-  const { activeProject } = useActiveProject();
+type NavProjectProps = {
+  activeOrganization: Organization | null;
+  activeProject: Project | null;
+};
+export function NavProject({ activeOrganization, activeProject }: NavProjectProps) {
   if (!activeOrganization) return null;
   if (!activeProject) return null;
+  if (activeProject.organizationId !== activeOrganization.id) return null;
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Project</SidebarGroupLabel>
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
-            <a href={`/org/${activeOrganization.slug}/project/${activeProject.slug}`}>
+            <a href={`/project/${activeProject.slug}`}>
               <ChartArea />
               <span>Dashboard</span>
             </a>

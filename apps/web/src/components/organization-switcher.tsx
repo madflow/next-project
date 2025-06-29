@@ -1,5 +1,6 @@
 "use client";
 
+import { Organization } from "better-auth/plugins";
 import { Building2, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -13,15 +14,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { organization, useActiveOrganization, useListOrganizations } from "@/lib/auth-client";
+import { organization, useListOrganizations } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { SidebarMenu, SidebarMenuItem } from "./ui/sidebar";
 
-export function OrganizationSwitcher() {
+type OrganizationSwitcherProps = {
+  activeOrganization: Organization | null;
+};
+
+export function OrganizationSwitcher({ activeOrganization }: OrganizationSwitcherProps) {
   const router = useRouter();
   const isMobile = useIsMobile();
   const { data: organizations = [], isPending: isOrgsLoading } = useListOrganizations();
-  const { data: activeOrganization } = useActiveOrganization();
 
   const [isSwitching, setIsSwitching] = useState(false);
   const t = useTranslations("appSidebar");
