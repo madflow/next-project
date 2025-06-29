@@ -7,7 +7,7 @@ import type { Member, User } from "@repo/database/schema";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
-import type { PaginationState, SortingState, ListFilter } from "@/types/index";
+import type { ListFilter, PaginationState, SortingState } from "@/types/index";
 
 type Props = {
   organizationId: string;
@@ -29,18 +29,18 @@ export function OrganisationMembersDataTable({ columns, organizationId }: Props)
   const [filters] = useState<ListFilter[]>([{ column: "organizationId", value: organizationId }]);
   const debouncedSearch = useDebouncedValue(search, 300);
 
-  const { 
-    data: apiResponse, 
-    isLoading, 
-    error: queryError, 
-    refetch 
+  const {
+    data: apiResponse,
+    isLoading,
+    error: queryError,
+    refetch,
   } = useQueryApi<ApiResponse>({
     endpoint: "/api/members",
     pagination,
     sorting,
     search: debouncedSearch,
     filters,
-    queryKey: ['organization-members', 'list', organizationId],
+    queryKey: ["organization-members", "list", organizationId],
     keepPreviousData: true,
   });
 
@@ -50,7 +50,7 @@ export function OrganisationMembersDataTable({ columns, organizationId }: Props)
     limit: apiResponse?.limit || pagination.pageSize,
     offset: apiResponse?.offset || pagination.pageIndex * pagination.pageSize,
   };
-  
+
   // Convert Error object to string for the DataTable component
   const error = queryError ? queryError.message : null;
 

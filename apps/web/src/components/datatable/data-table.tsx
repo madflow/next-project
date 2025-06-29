@@ -4,14 +4,14 @@ import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from
 import { SearchIcon, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table } from "@/components/ui/table";
+import { toCustomSorting, toReactTableSorting } from "@/lib/table-utils";
+import type { PaginationState, SortingState } from "@/types";
 import { ErrorDisplay } from "./components/error-display";
 import { LoadingDisplay } from "./components/loading-display";
 import { DataTablePagination } from "./components/pagination";
 import { TableBodyComponent } from "./components/table-body";
 import { TableHeaderComponent } from "./components/table-header";
 import { DataTableViewOptions } from "./components/view-options";
-import type { PaginationState, SortingState } from "@/types";
-import { toReactTableSorting, toCustomSorting } from "@/lib/table-utils";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[];
@@ -54,9 +54,7 @@ export function DataTable<TData>({
 
   const handleSetSorting = (updater: SortingState | ((old: SortingState) => SortingState)) => {
     // Convert from react-table sorting state to our custom sorting state
-    const newSorting = typeof updater === "function" 
-      ? updater(toCustomSorting(sorting)) 
-      : toCustomSorting(updater);
+    const newSorting = typeof updater === "function" ? updater(toCustomSorting(sorting)) : toCustomSorting(updater);
     setSorting(newSorting);
   };
 

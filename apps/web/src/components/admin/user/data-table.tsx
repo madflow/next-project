@@ -27,17 +27,17 @@ export function UsersDataTable({ columns }: Props) {
   const debouncedSearch = useDebouncedValue(search, 300);
   const t = useTranslations("user");
 
-  const { 
-    data: apiResponse, 
-    isLoading, 
-    error: queryError, 
-    refetch 
+  const {
+    data: apiResponse,
+    isLoading,
+    error: queryError,
+    refetch,
   } = useQueryApi<ApiResponse>({
     endpoint: "/api/users",
     pagination,
     sorting,
     search: debouncedSearch,
-    queryKey: ['users', 'list'],
+    queryKey: ["users", "list"],
     keepPreviousData: true,
   });
 
@@ -47,7 +47,7 @@ export function UsersDataTable({ columns }: Props) {
     limit: apiResponse?.limit || pagination.pageSize,
     offset: apiResponse?.offset || pagination.pageIndex * pagination.pageSize,
   };
-  
+
   // Convert Error object to string for the DataTable component
   const error = queryError ? queryError.message : null;
 

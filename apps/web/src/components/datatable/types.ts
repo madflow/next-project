@@ -1,4 +1,4 @@
-import { type PaginationState, type ListSortDirection, type ListFilter as GlobalListFilter } from "@/types";
+import { type ListFilter as GlobalListFilter, type ListSortDirection, type PaginationState } from "@/types";
 
 export type { PaginationState, ListSortDirection };
 

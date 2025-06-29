@@ -1,11 +1,9 @@
 "use client";
 
-import { Building2, Folder, GanttChartIcon, HouseIcon, MenuIcon, WrenchIcon } from "lucide-react";
+import { HouseIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import { NavMain } from "@/components/nav-main";
-import { NavPrimary } from "@/components/nav-primary";
-import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,

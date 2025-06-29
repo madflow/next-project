@@ -11,7 +11,7 @@ export type SortingState = Array<{
   desc: boolean;
 }>;
 
-export type ListSortDirection = 'asc' | 'desc';
+export type ListSortDirection = "asc" | "desc";
 
 export interface ListFilter {
   column: string;

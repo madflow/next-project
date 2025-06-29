@@ -1,34 +1,27 @@
-import * as React from 'react'
-import { 
-  useQuery, 
-  type UseQueryOptions, 
-  type QueryKey,
+import {
   type QueryFunction,
-  type QueryObserverResult
-} from '@tanstack/react-query'
-import { 
-  type PaginationState, 
-  type SortingState,
-  type ListSortDirection,
-  type ListFilter 
-} from '@/types'
+  type QueryKey,
+  type QueryObserverResult,
+  type UseQueryOptions,
+  useQuery,
+} from "@tanstack/react-query";
+import * as React from "react";
+import { type ListFilter, type ListSortDirection, type PaginationState, type SortingState } from "@/types";
 
 type UseQueryApiOptions<T> = {
-  endpoint: string
-  pagination: PaginationState
-  sorting: SortingState
-  search?: string
-  filters?: ListFilter[]
-  queryKey?: QueryKey
-  enabled?: boolean
-  keepPreviousData?: boolean
-  onSuccess?: (data: T) => void
-  onError?: (error: Error) => void
-}
+  endpoint: string;
+  pagination: PaginationState;
+  sorting: SortingState;
+  search?: string;
+  filters?: ListFilter[];
+  queryKey?: QueryKey;
+  enabled?: boolean;
+  keepPreviousData?: boolean;
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
+};
 
-export const useQueryApi = <T,>(
-  options: UseQueryApiOptions<T>
-): QueryObserverResult<T, Error> => {
+export const useQueryApi = <T>(options: UseQueryApiOptions<T>): QueryObserverResult<T, Error> => {
   const {
     endpoint,
     pagination,
@@ -40,39 +33,39 @@ export const useQueryApi = <T,>(
     keepPreviousData = true,
     onSuccess,
     onError,
-  } = options
+  } = options;
 
   const fetchData: QueryFunction<T, QueryKey> = async ({ signal }) => {
-    const order: string[] = []
+    const order: string[] = [];
     if (sorting.length > 0) {
       sorting.forEach((item) => {
-        const direction: ListSortDirection = item.desc ? 'desc' : 'asc'
-        order.push(`${item.id}.${direction}`)
-      })
+        const direction: ListSortDirection = item.desc ? "desc" : "asc";
+        order.push(`${item.id}.${direction}`);
+      });
     }
 
     const params = new URLSearchParams({
       limit: pagination.pageSize.toString(),
       offset: (pagination.pageIndex * pagination.pageSize).toString(),
       ...(search && { search }),
-      ...(order.length > 0 && { order: order.join(',') }),
-    })
+      ...(order.length > 0 && { order: order.join(",") }),
+    });
 
     if (filters) {
       filters.forEach((filter) => {
-        params.append(filter.column, filter.value)
-      })
+        params.append(filter.column, filter.value);
+      });
     }
 
-    const response = await fetch(`${endpoint}?${params.toString()}`, { signal })
+    const response = await fetch(`${endpoint}?${params.toString()}`, { signal });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.message || `Failed to fetch ${endpoint}`)
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || `Failed to fetch ${endpoint}`);
     }
 
-    return response.json()
-  }
+    return response.json();
+  };
 
   const queryKeyValue = React.useMemo<QueryKey>(
     () => [
@@ -84,30 +77,30 @@ export const useQueryApi = <T,>(
       ...(Array.isArray(queryKey) ? queryKey : [queryKey]),
     ],
     [endpoint, pagination, sorting, search, filters, queryKey]
-  )
+  );
 
   const queryOptions: UseQueryOptions<T, Error, T, QueryKey> = {
     queryKey: queryKeyValue,
     queryFn: fetchData,
     enabled,
     placeholderData: keepPreviousData ? (previousData) => previousData : undefined,
-  }
+  };
 
-  const result = useQuery<T, Error, T, QueryKey>(queryOptions)
+  const result = useQuery<T, Error, T, QueryKey>(queryOptions);
 
   React.useEffect(() => {
     if (result.data && onSuccess) {
-      onSuccess(result.data)
+      onSuccess(result.data);
     }
-  }, [result.data, onSuccess])
+  }, [result.data, onSuccess]);
 
   React.useEffect(() => {
     if (result.error && onError) {
-      onError(result.error)
+      onError(result.error);
     }
-  }, [result.error, onError])
+  }, [result.error, onError]);
 
-  return result
-}
+  return result;
+};
 
-export default useQueryApi
+export default useQueryApi;
