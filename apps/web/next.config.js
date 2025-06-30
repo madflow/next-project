@@ -6,7 +6,7 @@ const nextConfig = {
   transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   experimental: {
     serverActions: {
-      bodySizeLimit: "10mb", // Increase from default 1MB to 10MB for avatar uploads
+      bodySizeLimit: "100mb",
     },
   },
 };
