@@ -1,11 +1,12 @@
 # Agents rules
 
-> I am not a Cylon.
+> I am not a Cylon. (Gaius Baltar)
 
 ## General rules
 
 - Only make changes in the directories explicitly specified by the user. If no specific directory is mentioned, assume changes should be confined to the most relevant directory based on the request, and confirm if unsure.
 - Never commit changes unless explicitly requested by the user.
+- Never delete node_modules or package-lock.json in order to solve conflicts.
 
 ## Tech Stack
 
@@ -60,6 +61,20 @@ This project uses the following technologies:
 - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
 - Re-use code when possible.
 
+### Pages
+
+- Use Next.js App Router for routing.
+- page.tsx files are always server components. Never convert them to client components.
+
+### Creating new translations
+
+- Use the `next-intl` package to manage translations.
+- The translations files are located in the `messages` directory.
+- Use `next-intl`'s `useTranslation` hook to access translations in client components.
+- Use `getTranslations` in server components.
+- When adding new translation files, add them to the messages array in apps/web/src/i18n/request.ts.
+- The translation keys must be added to apps/web/src/global.d.ts in order to have them available in the `useTranslation` hook.
+
 ### Naming conventions
 
 - Use lowercase with dashes for directories (e.g., components/auth-wizard).
@@ -86,4 +101,4 @@ This project uses the following technologies:
 
 ## Rules for running commands
 
-- Do not run `npm run build` in order to test the project. Run `npm run lint` and `npm run check-types` instead.
+- Do not run `npm run build` in order to test the project or to regenerate types. Run `npm run lint` and `npm run check-types` instead.
