@@ -10,6 +10,7 @@ import {
   withAdminCheck,
   withSessionCheck,
 } from "@/lib/dal";
+import { createListWithJoins } from "@/lib/dal-joins";
 
 export const find = withAdminCheck(createFind(entity, selectProjectSchema));
 
@@ -18,6 +19,15 @@ export const findBySlug = withSessionCheck(createFindBySlug(entity, selectProjec
 export const list = withAdminCheck(createList(entity, selectProjectSchema));
 
 export const listAuthenticated = withSessionCheck(createList(entity, selectProjectSchema));
+
+export const listWithOrganization = withAdminCheck(
+  createListWithJoins(entity, selectProjectSchema, [
+    {
+      table: organization,
+      condition: eq(entity.organizationId, organization.id),
+    },
+  ])
+);
 
 export async function hasAccess(projectId: string) {
   const user = await getSessionUser();

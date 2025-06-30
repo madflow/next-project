@@ -3,17 +3,22 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import type { Project } from "@repo/database/schema";
+import type { Organization, Project } from "@repo/database/schema";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { PaginationState, SortingState } from "@/types/index";
 
+interface ProjectWithOrganization {
+  projects: Project;
+  organizations: Organization;
+}
+
 interface Props {
-  columns: ColumnDef<Project, unknown>[];
+  columns: ColumnDef<ProjectWithOrganization, unknown>[];
 }
 interface ApiResponse {
-  rows: Project[];
+  rows: ProjectWithOrganization[];
   count: number;
   limit: number;
   offset: number;
@@ -51,7 +56,7 @@ export function ProjectsDataTable({ columns }: Props) {
   const error = queryError ? queryError.message : null;
 
   return (
-    <DataTable<Project>
+    <DataTable<ProjectWithOrganization>
       columns={columns}
       data={data.data}
       count={data.count}
