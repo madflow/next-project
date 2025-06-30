@@ -51,8 +51,12 @@
           "fileSize": "File too large: Please upload an image smaller than 2MB",
           "updateFailed": "Failed to update profile with new avatar",
           "uploadFailed": "Failed to upload avatar",
-          "unknown": "An error occurred while uploading your avatar"
+          "deleteFailed": "Failed to delete avatar. Please try again.",
+          "unknown": "An error occurred while uploading your avatar",
+          "invalidUrl": "Invalid avatar URL"
         },
+        "removing": "Removing...",
+        "successDelete": "Profile picture removed successfully",
         "initial": "U",
         "remove": "Remove",
         "saveChanges": "Save Changes",
