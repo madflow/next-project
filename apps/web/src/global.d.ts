@@ -15,6 +15,7 @@ import authForgotPassword from "../messages/en/auth.forgot-password.json";
 import authLogin from "../messages/en/auth.login.json";
 import authResetPassword from "../messages/en/auth.reset-password.json";
 import authSignUp from "../messages/en/auth.sign-up.json";
+import appAdminDatafiles from "../messages/en/app.admin.datafiles.json";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -41,6 +42,7 @@ declare module "next-intl" {
       typeof authForgotPassword &
       typeof authLogin &
       typeof authResetPassword &
-      typeof authSignUp;
+      typeof authSignUp &
+      typeof appAdminDatafiles;
   }
 }

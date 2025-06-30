@@ -6,6 +6,7 @@ import {
   type CreateProjectData as CreateData,
   type UpdateProjectData as UpdateData,
   project as entity,
+  type Project,
 } from "@repo/database/schema";
 import { assertUserIsAdmin } from "@/lib/dal";
 
@@ -22,4 +23,13 @@ export async function update(id: string, data: UpdateData) {
 export async function remove(id: string) {
   assertUserIsAdmin();
   await db.delete(entity).where(eq(entity.id, id));
+}
+
+export async function listProjects(): Promise<Pick<Project, 'id' | 'name'>[]> {
+  const result = await db.select({
+    id: entity.id,
+    name: entity.name,
+  }).from(entity);
+  
+  return result;
 }
