@@ -51,8 +51,12 @@
           "fileSize": "Datei zu groß: Bitte laden Sie ein Bild mit maximal 2 MB hoch",
           "updateFailed": "Profilbild konnte nicht aktualisiert werden",
           "uploadFailed": "Hochladen des Profilbilds fehlgeschlagen",
-          "unknown": "Beim Hochladen Ihres Profilbilds ist ein Fehler aufgetreten"
+          "deleteFailed": "Löschen des Profilbilds fehlgeschlagen. Bitte versuchen Sie es erneut.",
+          "unknown": "Beim Hochladen Ihres Profilbilds ist ein Fehler aufgetreten",
+          "invalidUrl": "Ungültige Profilbild-URL"
         },
+        "removing": "Wird entfernt...",
+        "successDelete": "Profilbild erfolgreich entfernt",
         "initial": "B",
         "remove": "Entfernen",
         "saveChanges": "Änderungen speichern",

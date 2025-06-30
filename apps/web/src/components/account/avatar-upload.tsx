@@ -4,12 +4,13 @@ import { Loader2, Trash2, Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { uploadAvatar } from "@/actions/avatar";
+import { deleteAvatar, uploadAvatar } from "@/actions/avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { updateUser, useSession } from "@/lib/auth-client";
 
 export function AvatarUpload() {
+  // Use the correct namespace for translations
   const t = useTranslations("account.profile.avatar");
   const { data: session } = useSession();
   const user = session?.user;
@@ -51,11 +52,42 @@ export function AvatarUpload() {
     setSelectedFile(file);
   };
 
-  const handleRemoveAvatar = () => {
-    setPreviewUrl(null);
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleRemoveAvatar = async () => {
+    if (!user?.id || !user?.image) return;
+
+    try {
+      startTransition(async () => {
+        // Extract the filename from the image URL
+        const filename = user.image?.split("/").pop();
+        if (!filename) throw new Error(t("error.invalidUrl"));
+
+        // Delete the avatar from S3
+        const deleteResult = await deleteAvatar(user.id, filename);
+        if (!deleteResult.success) {
+          throw new Error(deleteResult.error || "Failed to delete avatar");
+        }
+
+        // Update the user's profile to remove the avatar reference
+        await updateUser({
+          image: null,
+          fetchOptions: {
+            onError: () => {
+              toast.error(t("error.deleteFailed"));
+            },
+            onSuccess: () => {
+              toast.success(t("successDelete"));
+              setPreviewUrl(null);
+              setSelectedFile(null);
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+              }
+            },
+          },
+        });
+      });
+    } catch (error) {
+      console.error("Error deleting avatar:", error);
+      toast.error(error instanceof Error ? error.message : t("error.unknown"));
     }
   };
 
@@ -161,16 +193,22 @@ export function AvatarUpload() {
             {previewUrl ? t("change") : t("upload")}
           </Button>
           {previewUrl && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleRemoveAvatar}
-              disabled={isPending}
-              data-testid="app.user.account.avatar-remove-button">
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t("remove")}
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleRemoveAvatar}
+                disabled={isPending}
+                data-testid="app.user.account.avatar-remove-button">
+                {isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
+                {isPending ? t("removing") : t("remove")}
+              </Button>
+            </>
           )}
         </div>
 
