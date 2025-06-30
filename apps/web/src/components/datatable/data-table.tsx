@@ -4,7 +4,7 @@ import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from
 import { SearchIcon, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table } from "@/components/ui/table";
-import { toCustomSorting, toReactTableSorting } from "@/lib/table-utils";
+import { toCustomSorting, toReactTableSorting } from "./table-utils";
 import type { PaginationState, SortingState } from "@/types";
 import { ErrorDisplay } from "./components/error-display";
 import { LoadingDisplay } from "./components/loading-display";
