@@ -6,11 +6,12 @@ import { NextIntlClientProvider } from "next-intl";
 import type * as React from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppProvider } from "@/context/app-context";
+import { Locale } from "@/i18n/config";
 import { getQueryClient } from "@/lib/get-query-client";
 
 interface ProvidersProps {
   children: React.ReactNode;
-  locale: string;
+  locale: Locale;
   messages: IntlMessages;
 }
 

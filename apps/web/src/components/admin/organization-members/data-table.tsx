@@ -3,7 +3,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import type { Member, User } from "@repo/database/schema";
+import type { Member } from "@/types/member";
+import type { User } from "@/types/user";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";

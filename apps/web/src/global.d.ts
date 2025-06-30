@@ -1,5 +1,5 @@
 import "@tanstack/react-table";
-import { locales } from "@/config";
+import { locales } from "@/i18n/config";
 import appAccount from "../messages/en/app.account.json";
 import appAdminSidebar from "../messages/en/app.admin-sidebar.json";
 import appAdminOrganizations from "../messages/en/app.admin.organizations.json";

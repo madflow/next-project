@@ -4,10 +4,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { type Organization, type Project } from "@repo/database/schema";
 import { remove } from "@/actions/project";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
+import { type Project } from "@/types/project";
+import { type Organization } from "@/types/organization";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 
 interface ProjectWithOrganization {

@@ -8,14 +8,14 @@ import { auth } from "@/lib/auth";
 // also read it from a database, backend service, or any other source.
 const COOKIE_NAME = "APP_LOCALE";
 
-export async function getUserLocale() {
+export async function getUserLocale(): Promise<Locale> {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
   if (session?.user?.locale) {
-    return session.user.locale;
+    return session.user.locale as Locale;
   }
-  return (await cookies()).get(COOKIE_NAME)?.value || defaultLocale;
+  return ((await cookies()).get(COOKIE_NAME)?.value as Locale) || (defaultLocale as Locale);
 }
 
 export async function setUserLocale(locale: Locale) {

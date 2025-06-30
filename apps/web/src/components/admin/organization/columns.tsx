@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { type Organization } from "@repo/database/schema";
+import { type Organization } from "@/types/organization";
 import { remove } from "@/actions/organization";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
