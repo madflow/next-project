@@ -57,7 +57,7 @@ export function DeleteProjectDialog({ projectId, projectName, onDelete }: Props)
           <DialogDescription>
             {t.rich("deleteDialog.description", {
               name: projectName,
-              strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+              strong: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>,
             })}
           </DialogDescription>
         </DialogHeader>

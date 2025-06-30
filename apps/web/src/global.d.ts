@@ -2,6 +2,7 @@ import "@tanstack/react-table";
 import { locales } from "@/i18n/config";
 import appAccount from "../messages/en/app.account.json";
 import appAdminSidebar from "../messages/en/app.admin-sidebar.json";
+import appAdminDashboard from "../messages/en/app.admin.dashboard.json";
 import appAdminOrganizations from "../messages/en/app.admin.organizations.json";
 import appAdminOrganizationsMembers from "../messages/en/app.admin.organizations.members.json";
 import appAdminProjects from "../messages/en/app.admin.projects.json";
@@ -26,6 +27,7 @@ declare module "next-intl" {
   interface AppConfig {
     Locale: (typeof locales)[number];
     Messages: typeof appAccount &
+      typeof appAdminDashboard &
       typeof appAdminSidebar &
       typeof appAdminOrganizations &
       typeof appAdminOrganizationsMembers &
@@ -35,6 +37,7 @@ declare module "next-intl" {
       typeof appDatatable &
       typeof appLocaleSwitcher &
       typeof appNavUser &
+      typeof adminDashboard &
       typeof authForgotPassword &
       typeof authLogin &
       typeof authResetPassword &

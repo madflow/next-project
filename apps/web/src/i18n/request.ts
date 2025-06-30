@@ -19,6 +19,7 @@ export default getRequestConfig(async () => {
     ...(await import(`../../messages/${locale}/app.admin-sidebar.json`)).default,
     ...(await import(`../../messages/${locale}/app.app-sidebar.json`)).default,
     ...(await import(`../../messages/${locale}/app.locale-switcher.json`)).default,
+    ...(await import(`../../messages/${locale}/app.admin.dashboard.json`)).default,
   };
   return {
     locale,

@@ -42,5 +42,5 @@
       "dependsOn": ["^start"]
     }
   },
-  "ui": "tui"
+  "ui": "stream"
 }

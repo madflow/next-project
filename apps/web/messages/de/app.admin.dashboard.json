@@ -1,0 +1,20 @@
+{
+  "adminDashboard": {
+    "organizations": {
+      "description": "Verwalten Sie Organisationen und deren Einstellungen.",
+      "link": "Organisationen anzeigen",
+      "title": "Organisationen"
+    },
+    "projects": {
+      "description": "Verwalten Sie Projekte und deren Konfigurationen.",
+      "link": "Projekte anzeigen",
+      "title": "Projekte"
+    },
+    "users": {
+      "description": "Verwalten Sie Benutzerkonten und Rollen.",
+      "link": "Benutzer anzeigen",
+      "title": "Benutzer"
+    }
+  }
+}
+
