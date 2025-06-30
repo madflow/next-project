@@ -1,13 +1,14 @@
 {
   "adminSidebar": {
     "adminMenu": "Admin-Menü",
-    "sections": "Bereiche",
     "navItems": {
       "admin": "Admin",
       "app": "App",
+      "datasets": "Datensätze",
       "organizations": "Organisationen",
-      "users": "Benutzer",
-      "projects": "Projekte"
-    }
+      "projects": "Projekte",
+      "users": "Benutzer"
+    },
+    "sections": "Bereiche"
   }
 }

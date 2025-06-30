@@ -1,0 +1,76 @@
+{
+  "adminDataset": {
+    "actions": {
+      "cancel": "Cancel",
+      "uploadFile": "Upload File",
+      "uploading": "Uploading..."
+    },
+    "columns": {
+      "actions": "Actions",
+      "filename": "Filename",
+      "hash": "File Hash",
+      "name": "Name",
+      "organization": "Organization",
+      "size": "Size",
+      "type": "Type",
+      "uploaded": "Uploaded",
+      "uploadedAt": "Uploaded"
+    },
+    "datatable": {
+      "noResults": "No results found"
+    },
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "error": "Failed to delete dataset. Please try again.",
+      "success": "Dataset deleted successfully",
+      "title": "Delete Dataset"
+    },
+    "description": "Manage your datasets",
+    "errors": {
+      "fileTooLarge": "File is too large. Maximum size is {maxSize}",
+      "invalidFileType": "Invalid file type. Please upload a .sav, .xlsx, .csv, .ods, or .parquet file",
+      "nameRequired": "Please enter a name for the dataset",
+      "noFileSelected": "Please select a file to upload",
+      "organizationRequired": "Please select an organization",
+      "unknownError": "An error occurred. Please try again.",
+      "uploadFailed": "Failed to upload file. Please try again."
+    },
+    "form": {
+      "createOrganizationFirst": "Create an organization first",
+      "createOrganizationLink": "Create organization",
+      "descriptionLabel": "Description (Optional)",
+      "descriptionPlaceholder": "Add a description for this dataset",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter a name for this dataset",
+      "noOrganizationsAvailable": "No organizations available",
+      "organization": {
+        "label": "Organization",
+        "loading": "Loading organizations...",
+        "notFound": "No organizations found",
+        "placeholder": "Select an organization"
+      },
+      "organizationLabel": "Organization",
+      "selectOrganization": "Select an organization"
+    },
+    "noData": "No datasets found",
+    "searchPlaceholder": "Search files...",
+    "tableActions": {
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this dataset?",
+      "download": "Download"
+    },
+    "title": "Datasets",
+    "upload": {
+      "clickToUpload": "Click to upload",
+      "description": "Upload a new dataset to the system",
+      "orDragAndDrop": "or drag and drop",
+      "supportedFormats": ".sav, .xlsx, .csv, .ods, .parquet",
+      "title": "Upload Dataset"
+    },
+    "uploadButton": "Create dataset",
+    "uploadSuccess": "File uploaded successfully"
+  }
+}
