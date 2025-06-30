@@ -1,0 +1,74 @@
+{
+  "adminDatafile": {
+    "title": "Daten-Dateien",
+    "description": "Verwalten Sie Ihre Daten-Dateien",
+    "searchPlaceholder": "Dateien durchsuchen...",
+    "uploadButton": "Datei hochladen",
+    "upload": {
+      "title": "Daten-Datei hochladen",
+      "description": "Laden Sie eine neue Daten-Datei in das System hoch",
+      "clickToUpload": "Zum Hochladen klicken",
+      "orDragAndDrop": "oder Datei hier ablegen",
+      "supportedFormats": ".sav, .xlsx, .csv, .ods, .parquet"
+    },
+    "form": {
+      "nameLabel": "Dateiname",
+      "namePlaceholder": "Geben Sie einen Namen für diese Datei ein",
+      "projectLabel": "Projekt",
+      "selectProject": "Projekt auswählen",
+      "noProjectsAvailable": "Keine Projekte verfügbar",
+      "createProjectFirst": "Erstellen Sie zuerst ein Projekt",
+      "createProjectLink": "Projekt erstellen",
+      "descriptionLabel": "Beschreibung (Optional)",
+      "descriptionPlaceholder": "Fügen Sie eine Beschreibung für diese Datei hinzu"
+    },
+    "errors": {
+      "noFileSelected": "Bitte wählen Sie eine Datei zum Hochladen aus",
+      "nameRequired": "Bitte geben Sie einen Namen für die Datei ein",
+      "projectRequired": "Bitte wählen Sie ein Projekt aus",
+      "invalidFileType": "Ungültiger Dateityp. Bitte laden Sie eine .sav, .xlsx, .csv, .ods oder .parquet Datei hoch",
+      "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {maxSize}",
+      "uploadFailed": "Hochladen der Datei fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "unknownError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    },
+    "actions": {
+      "uploadFile": "Datei hochladen",
+      "uploading": "Wird hochgeladen...",
+      "cancel": "Abbrechen"
+    },
+    "common": {
+      "copy": "In die Zwischenablage kopieren",
+      "copied": "Kopiert!"
+    },
+    "uploadSuccess": "Datei erfolgreich hochgeladen",
+    "columns": {
+      "name": "Name",
+      "filename": "Dateiname",
+      "type": "Typ",
+      "size": "Größe",
+      "hash": "Datei-Hash",
+      "uploaded": "Hochgeladen",
+      "project": "Projekt",
+      "uploadedAt": "Hochgeladen am",
+      "actions": "Aktionen"
+    },
+    "tableActions": {
+      "download": "Herunterladen",
+      "delete": "Löschen",
+      "deleteConfirm": "Möchten Sie diese Datei wirklich löschen?"
+    },
+    "deleteDialog": {
+      "title": "Daten-Datei löschen",
+      "description": "Sind Sie sicher, dass Sie {name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "error": "Löschen der Daten-Datei fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "success": "Daten-Datei erfolgreich gelöscht"
+    },
+    "noData": "Keine Daten-Dateien gefunden",
+    "datatable": {
+      "noResults": "Keine Ergebnisse gefunden"
+    }
+  }
+}
