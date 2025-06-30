@@ -5,7 +5,7 @@
     "createButton": "Organisation anlegen",
     "searchPlaceholder": "Organisationen durchsuchen...",
     "columns": {
-      "name": "Name",
+      "name": "Organisation",
       "slug": "Slug",
       "createdAt": "Erstellt am",
       "actions": "Aktionen"

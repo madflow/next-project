@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { list } from "@/dal/project";
+import { listWithOrganization } from "@/dal/project";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { processUrlParams } from "../handler";
 
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   try {
     const { limit, offset, search, orderBy } = processUrlParams(new URL(request.url).searchParams);
 
-    const result = await list({
+    const result = await listWithOrganization({
       limit,
       offset,
       search,

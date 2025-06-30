@@ -5,7 +5,7 @@
     "createButton": "Create organization",
     "searchPlaceholder": "Search organizations...",
     "columns": {
-      "name": "Name",
+      "name": "Organization",
       "slug": "Slug",
       "createdAt": "Created At",
       "actions": "Actions"
