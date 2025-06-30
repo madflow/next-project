@@ -122,11 +122,6 @@ export async function uploadAvatar({ file, userId, contentType }: UploadAvatarPa
   }
 }
 
-// Direct upload function that doesn't use presigned URLs
-export async function getAvatarUrl(userId: string, filename: string): Promise<string> {
-  return `/api/users/${userId}/avatars/${encodeURIComponent(filename)}`;
-}
-
 export async function deleteAvatar(userId: string, filename: string) {
   const s3Client = getS3Client();
   try {

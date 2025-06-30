@@ -4,10 +4,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { type AuthUser } from "@repo/database/schema";
 import { remove } from "@/actions/user";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
+import { type AuthUser } from "@/types/user";
 import { DeleteUserDialog } from "./delete-user-dialog";
 
 export const columns: ColumnDef<AuthUser>[] = [

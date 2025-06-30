@@ -8,9 +8,11 @@ import { defaultClient as db } from "@repo/database/clients";
 import { USER_ADMIN_ROLE, auth } from "./auth";
 import { DalNotAuthorizedException } from "./exception";
 
+export const orderByDirectionSchema = z.enum(["asc", "desc"]);
+
 export const orderBySchema = z.object({
   column: z.string(),
-  direction: z.enum(["asc", "desc"]),
+  direction: orderByDirectionSchema,
 });
 
 export const filterSchema = z.object({
@@ -36,7 +38,7 @@ export function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema
     count: z.number(),
     limit: z.number(),
     offset: z.number(),
-    orderBy: z.array(z.object({ column: z.string(), direction: z.enum(["asc", "desc"]) })).optional(),
+    orderBy: z.array(z.object({ column: z.string(), direction: orderByDirectionSchema })).optional(),
   });
 }
 

@@ -102,5 +102,3 @@ export const useQueryApi = <T>(options: UseQueryApiOptions<T>): QueryObserverRes
 
   return result;
 };
-
-export default useQueryApi;

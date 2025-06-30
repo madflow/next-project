@@ -1,6 +1,6 @@
 "use client";
 
-import { Organization } from "better-auth/plugins";
+import { type Organization } from "@/types/organization";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useActiveProject } from "@/hooks/use-active-project";
 import { useActiveOrganization } from "@/lib/auth-client";
@@ -30,7 +30,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function detectContext() {
       if (activeOrganizationSession) {
-        setActiveOrganization(activeOrganizationSession);
+        setActiveOrganization({
+          ...activeOrganizationSession,
+          logo: activeOrganizationSession.logo === undefined ? null : activeOrganizationSession.logo,
+          metadata: activeOrganizationSession.metadata === undefined ? null : activeOrganizationSession.metadata,
+        });
         if (activeProject && activeProject.organizationId !== activeOrganizationSession.id) {
           setActiveProject(null);
         } else if (activeProjectDetected && !activeProject) {

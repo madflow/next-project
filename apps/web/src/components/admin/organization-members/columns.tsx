@@ -1,7 +1,8 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { type Member, User } from "@repo/database/schema";
+import { type Member } from "@/types/member";
+import { type User } from "@/types/user";
 import { removeMember } from "@/actions/member";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Badge } from "@/components/ui/badge";
