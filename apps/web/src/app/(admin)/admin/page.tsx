@@ -1,5 +1,50 @@
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { PageLayout } from "@/components/page/page-layout";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function Page() {
-  return <PageLayout data-testid="admin.page">Admin</PageLayout>;
+  const t = await getTranslations("adminDashboard");
+
+  return (
+    <PageLayout data-testid="admin.page">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="align-center flex flex-col justify-between">
+          <CardHeader>
+            <CardTitle>{t("organizations.title")}</CardTitle>
+            <CardDescription>{t("organizations.description")}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link href="/admin/organizations" className="underline underline-offset-4">
+              {t("organizations.link")}
+            </Link>
+          </CardFooter>
+        </Card>
+
+        <Card className="align-center flex flex-col justify-between">
+          <CardHeader>
+            <CardTitle>{t("users.title")}</CardTitle>
+            <CardDescription>{t("users.description")}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link href="/admin/users" className="underline underline-offset-4">
+              {t("users.link")}
+            </Link>
+          </CardFooter>
+        </Card>
+
+        <Card className="align-center flex flex-col justify-between">
+          <CardHeader>
+            <CardTitle>{t("projects.title")}</CardTitle>
+            <CardDescription>{t("projects.description")}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link href="/admin/projects" className="underline underline-offset-4">
+              {t("projects.link")}
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    </PageLayout>
+  );
 }

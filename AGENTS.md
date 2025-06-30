@@ -8,6 +8,11 @@
 - Never commit changes unless explicitly requested by the user.
 - Never delete node_modules or package-lock.json in order to solve conflicts.
 
+## General rules
+
+- Only make changes in the directories explicitly specified by the user. If no specific directory is mentioned, assume changes should be confined to the most relevant directory based on the request, and confirm if unsure.
+- Never commit changes unless explicitly requested by the user.
+
 ## Tech Stack
 
 This project uses the following technologies:

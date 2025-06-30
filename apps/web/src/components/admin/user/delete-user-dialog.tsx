@@ -59,7 +59,7 @@ export function DeleteUserDialog({ userId, userName, onDelete }: Props) {
           <DialogDescription>
             {t.rich("deleteDialog.description", {
               name: userName,
-              strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+              strong: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>,
             })}
           </DialogDescription>
         </DialogHeader>

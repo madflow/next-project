@@ -24,9 +24,9 @@ export const columns: ColumnDef<AuthUser>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="user.columns.role" />,
     cell: function Cell({ row }) {
       const t = useTranslations("user");
-      const role = row.original.role || "user";
-      // @ts-expect-error Type 'string' is not assignable to type 'never'.
-      return <div>{t(`role.${role}`, { fallback: role })}</div>;
+      const role = (row.original.role as string) || "user";
+      const translationKey = `role.${role}` as const;
+      return <div>{t(translationKey, { fallback: role })}</div>;
     },
   },
   {
