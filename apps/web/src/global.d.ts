@@ -3,6 +3,7 @@ import { locales } from "@/i18n/config";
 import appAccount from "../messages/en/app.account.json";
 import appAdminSidebar from "../messages/en/app.admin-sidebar.json";
 import appAdminDashboard from "../messages/en/app.admin.dashboard.json";
+import appAdminDatasets from "../messages/en/app.admin.datasets.json";
 import appAdminOrganizations from "../messages/en/app.admin.organizations.json";
 import appAdminOrganizationsMembers from "../messages/en/app.admin.organizations.members.json";
 import appAdminProjects from "../messages/en/app.admin.projects.json";
@@ -15,7 +16,6 @@ import authForgotPassword from "../messages/en/auth.forgot-password.json";
 import authLogin from "../messages/en/auth.login.json";
 import authResetPassword from "../messages/en/auth.reset-password.json";
 import authSignUp from "../messages/en/auth.sign-up.json";
-import appAdminDatafiles from "../messages/en/app.admin.datafiles.json";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,6 +43,6 @@ declare module "next-intl" {
       typeof authLogin &
       typeof authResetPassword &
       typeof authSignUp &
-      typeof appAdminDatafiles;
+      typeof appAdminDatasets;
   }
 }
