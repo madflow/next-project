@@ -14,25 +14,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-interface DeleteDatafileDialogProps {
-  datafileId: string;
-  datafileName: string;
+interface DeleteDatasetDialogProps {
+  datasetId: string;
+  datasetName: string;
   onDelete: (id: string) => Promise<void>;
 }
 
-export function DeleteDatafileDialog({
-  datafileId,
-  datafileName,
-  onDelete,
-}: DeleteDatafileDialogProps) {
-  const t = useTranslations("adminDatafile");
+export function DeleteDatasetDialog({ datasetId, datasetName, onDelete }: DeleteDatasetDialogProps) {
+  const t = useTranslations("adminDataset");
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await onDelete(datafileId);
+      await onDelete(datasetId);
       setOpen(false);
       // Refresh the page to reflect the changes
       window.location.reload();
@@ -55,17 +51,14 @@ export function DeleteDatafileDialog({
           setOpen(true);
         }}
         className="cursor-pointer"
-        type="button"
-      >
+        type="button">
         <Trash className="h-4 w-4" />
         <span className="sr-only">{t("tableActions.delete")}</span>
       </Button>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{t("deleteDialog.title")}</DialogTitle>
-          <DialogDescription>
-            {t("deleteDialog.description", { name: datafileName })}
-          </DialogDescription>
+          <DialogDescription>{t("deleteDialog.description", { name: datasetName })}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:gap-0">
           <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -73,16 +66,14 @@ export function DeleteDatafileDialog({
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isDeleting}
-              className="w-full cursor-pointer sm:w-auto"
-            >
+              className="w-full cursor-pointer sm:w-auto">
               {t("deleteDialog.cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-full cursor-pointer sm:w-auto"
-            >
+              className="w-full cursor-pointer sm:w-auto">
               {isDeleting ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
             </Button>
           </div>

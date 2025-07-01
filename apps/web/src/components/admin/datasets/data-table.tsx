@@ -7,14 +7,14 @@ import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { PaginationState, SortingState } from "@/types";
-import type { Datafile } from "@/types/datafile";
+import type { Dataset } from "@/types/dataset";
 
 interface Props {
-  columns: ColumnDef<Datafile, unknown>[];
+  columns: ColumnDef<Dataset, unknown>[];
 }
 
 interface ApiResponse {
-  rows: Datafile[];
+  rows: Dataset[];
   count: number;
   limit: number;
   offset: number;
@@ -52,7 +52,7 @@ export function DatafilesDataTable({ columns }: Props) {
   const error = queryError ? queryError.message : null;
 
   return (
-    <DataTable<Datafile>
+    <DataTable<Dataset>
       columns={columns}
       data={data.data}
       count={data.count}

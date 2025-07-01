@@ -1,0 +1,74 @@
+{
+  "adminDataset": {
+    "actions": {
+      "cancel": "Abbrechen",
+      "uploadFile": "Datei hochladen",
+      "uploading": "Wird hochgeladen..."
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "filename": "Dateiname",
+      "hash": "Datei-Hash",
+      "name": "Name",
+      "project": "Projekt",
+      "size": "Größe",
+      "type": "Typ",
+      "uploaded": "Hochgeladen",
+      "uploadedAt": "Hochgeladen am"
+    },
+    "common": {
+      "copied": "Kopiert!",
+      "copy": "In die Zwischenablage kopieren"
+    },
+    "datatable": {
+      "noResults": "Keine Ergebnisse gefunden"
+    },
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie {name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "error": "Löschen der Daten-Datei fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "success": "Daten-Datei erfolgreich gelöscht",
+      "title": "Daten-Datei löschen"
+    },
+    "description": "Verwalten Sie Ihre Daten-Dateien",
+    "errors": {
+      "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {maxSize}",
+      "invalidFileType": "Ungültiger Dateityp. Bitte laden Sie eine .sav, .xlsx, .csv, .ods oder .parquet Datei hoch",
+      "nameRequired": "Bitte geben Sie einen Namen für die Datei ein",
+      "noFileSelected": "Bitte wählen Sie eine Datei zum Hochladen aus",
+      "projectRequired": "Bitte wählen Sie ein Projekt aus",
+      "unknownError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "uploadFailed": "Hochladen der Datei fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "form": {
+      "createProjectFirst": "Erstellen Sie zuerst ein Projekt",
+      "createProjectLink": "Projekt erstellen",
+      "descriptionLabel": "Beschreibung (Optional)",
+      "descriptionPlaceholder": "Fügen Sie eine Beschreibung für diese Datei hinzu",
+      "nameLabel": "Dateiname",
+      "namePlaceholder": "Geben Sie einen Namen für diese Datei ein",
+      "noProjectsAvailable": "Keine Projekte verfügbar",
+      "projectLabel": "Projekt",
+      "selectProject": "Projekt auswählen"
+    },
+    "noData": "Keine Daten-Dateien gefunden",
+    "searchPlaceholder": "Dateien durchsuchen...",
+    "tableActions": {
+      "delete": "Löschen",
+      "deleteConfirm": "Möchten Sie diese Datei wirklich löschen?",
+      "download": "Herunterladen"
+    },
+    "title": "Daten-Dateien",
+    "upload": {
+      "clickToUpload": "Zum Hochladen klicken",
+      "description": "Laden Sie eine neue Daten-Datei in das System hoch",
+      "orDragAndDrop": "oder Datei hier ablegen",
+      "supportedFormats": ".sav, .xlsx, .csv, .ods, .parquet",
+      "title": "Daten-Datei hochladen"
+    },
+    "uploadButton": "Datei hochladen",
+    "uploadSuccess": "Datei erfolgreich hochgeladen"
+  }
+}
