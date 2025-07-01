@@ -6,9 +6,9 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { uploadDatafile } from "@/actions/datafile";
-import { listProjects } from "@/actions/project";
+import { uploadDataset } from "@/actions/dataset";
 import { Button } from "@/components/ui/button";
+import { useQueryApi } from "@/hooks/use-query-api";
 import { cn } from "@/lib/utils";
 import { formatFileSize } from "@/lib/utils";
 
@@ -21,21 +21,18 @@ type FileWithPreview = File & {
   preview?: string;
 };
 
-export function DatafileUploadForm() {
+export function DatasetUploadForm() {
   const router = useRouter();
-  const t = useTranslations("adminDatafile");
+  const t = useTranslations("adminDataset");
   const [isPending] = useTransition();
   const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
   const [name, setName] = useState("");
-  const [projectId, setProjectId] = useState("");
+  const [organizationId, setOrganizationId] = useState("");
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
-    queryKey: ["projects"],
-    queryFn: listProjects,
-  });
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -90,25 +87,25 @@ export function DatafileUploadForm() {
       return;
     }
 
-    if (!projectId) {
-      toast.error(t("errors.projectRequired"));
+    if (!organizationId) {
+      toast.error(t("errors.organizationRequired"));
       return;
     }
 
     setIsUploading(true);
 
     try {
-      const result = await uploadDatafile({
+      const result = await uploadDataset({
         file: selectedFile,
         name: name.trim(),
-        projectId,
+        organizationId,
         description: description.trim() || undefined,
         contentType: selectedFile.type,
       });
 
       if (result.success) {
         toast.success(t("uploadSuccess"));
-        router.push("/admin/datafiles");
+        router.push("/admin/datasets");
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
@@ -133,7 +130,7 @@ export function DatafileUploadForm() {
   }, [selectedFile]);
 
   // Show loading state while projects are loading
-  if (isLoadingProjects) {
+  if (isLoadingOrganizations) {
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
@@ -231,15 +228,15 @@ export function DatafileUploadForm() {
           {t("form.projectLabel")} <span className="text-destructive">*</span>
         </label>
         <select
-          id="project"
-          value={projectId}
-          onChange={(e) => setProjectId(e.target.value)}
+          id="organization"
+          value={organizationId}
+          onChange={(e) => setOrganizationId(e.target.value)}
           className={cn(
             "border-input bg-background ring-offset-background flex h-10 w-full rounded-md border px-3 py-2 text-sm",
             "focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
             "disabled:cursor-not-allowed disabled:opacity-50"
           )}
-          disabled={isPending || isUploading || projects.length === 0}
+          disabled={isPending || isUploading || organizations.length === 0}
           required>
           <option value="">{projects.length === 0 ? t("form.noProjectsAvailable") : t("form.selectProject")}</option>
           {projects.map((project: Project) => (
@@ -248,14 +245,6 @@ export function DatafileUploadForm() {
             </option>
           ))}
         </select>
-        {projects.length === 0 && (
-          <p className="text-muted-foreground text-sm">
-            {t("form.createProjectFirst")}{" "}
-            <a href="/admin/projects/new" className="text-primary hover:underline">
-              {t("form.createProjectLink")}
-            </a>
-          </p>
-        )}
       </div>
 
       {/* Description */}
