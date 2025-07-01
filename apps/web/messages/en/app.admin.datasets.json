@@ -1,0 +1,74 @@
+{
+  "adminDataset": {
+    "actions": {
+      "cancel": "Cancel",
+      "uploadFile": "Upload File",
+      "uploading": "Uploading..."
+    },
+    "columns": {
+      "actions": "Actions",
+      "filename": "Filename",
+      "hash": "File Hash",
+      "name": "Name",
+      "project": "Project",
+      "size": "Size",
+      "type": "Type",
+      "uploaded": "Uploaded",
+      "uploadedAt": "Uploaded"
+    },
+    "common": {
+      "copied": "Copied!",
+      "copy": "Copy to clipboard"
+    },
+    "datatable": {
+      "noResults": "No results found"
+    },
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "error": "Failed to delete data file. Please try again.",
+      "success": "Data file deleted successfully",
+      "title": "Delete Data File"
+    },
+    "description": "Manage your data files",
+    "errors": {
+      "fileTooLarge": "File is too large. Maximum size is {maxSize}",
+      "invalidFileType": "Invalid file type. Please upload a .sav, .xlsx, .csv, .ods, or .parquet file",
+      "nameRequired": "Please enter a name for the file",
+      "noFileSelected": "Please select a file to upload",
+      "projectRequired": "Please select a project",
+      "unknownError": "An error occurred. Please try again.",
+      "uploadFailed": "Failed to upload file. Please try again."
+    },
+    "form": {
+      "createProjectFirst": "Create a project first",
+      "createProjectLink": "Create project",
+      "descriptionLabel": "Description (Optional)",
+      "descriptionPlaceholder": "Add a description for this file",
+      "nameLabel": "File Name",
+      "namePlaceholder": "Enter a name for this file",
+      "noProjectsAvailable": "No projects available",
+      "projectLabel": "Project",
+      "selectProject": "Select a project"
+    },
+    "noData": "No data files found",
+    "searchPlaceholder": "Search files...",
+    "tableActions": {
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this file?",
+      "download": "Download"
+    },
+    "title": "Data Files",
+    "upload": {
+      "clickToUpload": "Click to upload",
+      "description": "Upload a new data file to the system",
+      "orDragAndDrop": "or drag and drop",
+      "supportedFormats": ".sav, .xlsx, .csv, .ods, .parquet",
+      "title": "Upload Data File"
+    },
+    "uploadButton": "Upload File",
+    "uploadSuccess": "File uploaded successfully"
+  }
+}
