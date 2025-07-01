@@ -10,6 +10,7 @@ import { insertOrganizationSchema } from "@/types/organization";
 import { create } from "@/actions/organization";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,13 +101,24 @@ export function CreateOrganizationForm() {
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          disabled={form.formState.isSubmitting}
-          className="cursor-pointer"
-          data-testid="admin.organizations.new.form.submit">
-          {form.formState.isSubmitting ? t("organization.form.submit.creating") : t("organization.form.submit.create")}
-        </Button>
+        <div className="flex justify-start gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={form.formState.isSubmitting}
+            className="cursor-pointer">
+            {t("organization.form.cancel")}
+          </Button>
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting}
+            className="cursor-pointer"
+            data-testid="admin.organizations.new.form.submit">
+            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {form.formState.isSubmitting ? t("organization.form.submit.creating") : t("organization.form.submit.create")}
+          </Button>
+        </div>
       </form>
     </Form>
   );

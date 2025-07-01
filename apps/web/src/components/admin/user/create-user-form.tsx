@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createFormSchema = (t: any) =>
@@ -117,13 +118,22 @@ export function CreateUserForm() {
             )}
           />
         </div>
-        <div className="flex justify-start">
+        <div className="flex justify-start gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={form.formState.isSubmitting}
+            className="cursor-pointer">
+            {t("user.form.cancel")}
+          </Button>
           <Button
             type="submit"
             className="cursor-pointer"
             data-testid="admin.users.new.form.submit"
             disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Creating..." : t("user.createButton")}
+            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {form.formState.isSubmitting ? t("user.form.save") : t("user.form.save")}
           </Button>
         </div>
       </form>

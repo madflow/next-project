@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 import { insertProjectSchema } from "@/types/project";
 
 type Organization = {
@@ -150,12 +151,21 @@ export function CreateProjectForm() {
             </FormItem>
           )}
         />
-        <div className="pt-2">
+        <div className="flex justify-start gap-4 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={form.formState.isSubmitting || isLoading}
+            className="cursor-pointer">
+            {t("form.cancel")}
+          </Button>
           <Button
             type="submit"
             disabled={form.formState.isSubmitting || isLoading || organizations.length === 0}
             className="cursor-pointer"
             data-testid="admin.projects.new.form.submit">
+            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {form.formState.isSubmitting ? t("form.submit.creating") : t("form.submit.create")}
           </Button>
         </div>
