@@ -7,10 +7,10 @@
     },
     "columns": {
       "actions": "Aktionen",
-      "filename": "Dateiname",
+      "filename": "Name",
       "hash": "Datei-Hash",
       "name": "Name",
-      "project": "Projekt",
+      "organization": "Organisation",
       "size": "Größe",
       "type": "Typ",
       "uploaded": "Hochgeladen",
@@ -28,47 +28,53 @@
       "confirm": "Löschen",
       "deleting": "Wird gelöscht...",
       "description": "Sind Sie sicher, dass Sie {name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
-      "error": "Löschen der Daten-Datei fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "success": "Daten-Datei erfolgreich gelöscht",
-      "title": "Daten-Datei löschen"
+      "error": "Löschen des Datensatzes fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "success": "Datensatz erfolgreich gelöscht",
+      "title": "Datensatz löschen"
     },
-    "description": "Verwalten Sie Ihre Daten-Dateien",
+    "description": "Verwalten Sie Ihre Datensätze",
     "errors": {
       "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {maxSize}",
       "invalidFileType": "Ungültiger Dateityp. Bitte laden Sie eine .sav, .xlsx, .csv, .ods oder .parquet Datei hoch",
       "nameRequired": "Bitte geben Sie einen Namen für die Datei ein",
       "noFileSelected": "Bitte wählen Sie eine Datei zum Hochladen aus",
-      "projectRequired": "Bitte wählen Sie ein Projekt aus",
+      "organizationRequired": "Bitte wählen Sie eine Organisation aus",
       "unknownError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
       "uploadFailed": "Hochladen der Datei fehlgeschlagen. Bitte versuchen Sie es erneut."
     },
     "form": {
-      "createProjectFirst": "Erstellen Sie zuerst ein Projekt",
-      "createProjectLink": "Projekt erstellen",
+      "createOrganizationFirst": "Erstellen Sie zuerst eine Organisation",
+      "createOrganizationLink": "Organisation erstellen",
       "descriptionLabel": "Beschreibung (Optional)",
       "descriptionPlaceholder": "Fügen Sie eine Beschreibung für diese Datei hinzu",
-      "nameLabel": "Dateiname",
-      "namePlaceholder": "Geben Sie einen Namen für diese Datei ein",
-      "noProjectsAvailable": "Keine Projekte verfügbar",
-      "projectLabel": "Projekt",
-      "selectProject": "Projekt auswählen"
+      "nameLabel": "Name",
+      "namePlaceholder": "Geben Sie einen Namen für diesen Datensatz ein",
+      "noOrganizationsAvailable": "Keine Organisationen verfügbar",
+      "organization": {
+        "label": "Organisation",
+        "placeholder": "Organisation auswählen",
+        "loading": "Organisationen werden geladen...",
+        "notFound": "Keine Organisationen gefunden"
+      },
+      "organizationLabel": "Organisation",
+      "selectOrganization": "Organisation auswählen"
     },
-    "noData": "Keine Daten-Dateien gefunden",
+    "noData": "Keine Datensätze gefunden",
     "searchPlaceholder": "Dateien durchsuchen...",
     "tableActions": {
       "delete": "Löschen",
-      "deleteConfirm": "Möchten Sie diese Datei wirklich löschen?",
+      "deleteConfirm": "Möchten Sie diesen Datensatz wirklich löschen?",
       "download": "Herunterladen"
     },
-    "title": "Daten-Dateien",
+    "title": "Datensätze",
     "upload": {
       "clickToUpload": "Zum Hochladen klicken",
-      "description": "Laden Sie eine neue Daten-Datei in das System hoch",
+      "description": "Laden Sie einen neuen Datensatz in das System hoch",
       "orDragAndDrop": "oder Datei hier ablegen",
       "supportedFormats": ".sav, .xlsx, .csv, .ods, .parquet",
-      "title": "Daten-Datei hochladen"
+      "title": "Datensatz anlegen"
     },
-    "uploadButton": "Datei hochladen",
+    "uploadButton": "Datensatz anlegen",
     "uploadSuccess": "Datei erfolgreich hochgeladen"
   }
 }
