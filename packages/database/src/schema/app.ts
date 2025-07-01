@@ -31,21 +31,7 @@ export type CreateProjectData = z.infer<typeof insertProjectSchema>;
 export type Project = z.infer<typeof selectProjectSchema>;
 export type UpdateProjectData = z.infer<typeof updateProjectSchema>;
 
-export const fileMetadata = z.object({
-  version: z.string(),
-  variables: z.array(
-    z.object({
-      name: z.string(),
-      label: z.string(),
-      type: z.string(),
-      format: z.string(),
-    })
-  ),
-});
-
-export type FileMetadata = z.infer<typeof fileMetadata>;
-
-export const datafile = pgTable("datafiles", {
+export const dataset = pgTable("datasets", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
@@ -56,19 +42,18 @@ export const datafile = pgTable("datafiles", {
   storageKey: text("s3_key").notNull(), // S3 object key/path
   uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().defaultNow(),
 
-  projectId: uuid("project_id")
+  organizationId: uuid("organization_id")
     .notNull()
-    .references(() => project.id, { onDelete: "cascade" }),
+    .references(() => organization.id, { onDelete: "cascade" }),
 
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }),
-  metadata: jsonb("metadata").$type<FileMetadata>(), // File-type specific metadata
 });
 
-export const insertDatafileSchema = createInsertSchema(datafile);
-export const selectDatafileSchema = createSelectSchema(datafile);
-export const updateDatafileSchema = createUpdateSchema(datafile);
+export const insertDatasetSchema = createInsertSchema(dataset);
+export const selectDatasetSchema = createSelectSchema(dataset);
+export const updateDatasetSchema = createUpdateSchema(dataset);
 
-export type CreateDatafileData = z.infer<typeof insertDatafileSchema>;
-export type Datafile = z.infer<typeof selectDatafileSchema>;
-export type UpdateDatafileData = z.infer<typeof updateDatafileSchema>;
+export type CreateDatasetData = z.infer<typeof insertDatasetSchema>;
+export type Dataset = z.infer<typeof selectDatasetSchema>;
+export type UpdateDatasetData = z.infer<typeof updateDatasetSchema>;

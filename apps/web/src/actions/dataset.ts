@@ -4,7 +4,7 @@ import { PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
 import { createHash, randomUUID } from "crypto";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
-import { datafile } from "@repo/database/schema";
+import { dataset } from "@repo/database/schema";
 import { env } from "@/env";
 import { auth } from "@/lib/auth";
 import { getS3Client } from "@/lib/storage";
@@ -19,30 +19,30 @@ const ALLOWED_FILE_TYPES = [
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
-export type UploadDatafileResult = {
+export type UploadDatasetResult = {
   success: boolean;
-  datafileId?: string;
+  datasetId?: string;
   url?: string;
   key?: string;
   error?: string;
   details?: unknown;
 };
 
-type UploadDatafileParams = {
+type UploadDatasetParams = {
   file: File;
   name: string;
-  projectId: string;
+  organizationId: string;
   description?: string;
   contentType: string;
 };
 
-export async function uploadDatafile({
+export async function uploadDataset({
   file,
   name,
-  projectId,
+  organizationId,
   description,
   contentType,
-}: UploadDatafileParams): Promise<UploadDatafileResult> {
+}: UploadDatasetParams): Promise<UploadDatasetResult> {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -55,10 +55,10 @@ export async function uploadDatafile({
       };
     }
 
-    if (!projectId) {
+    if (!organizationId) {
       return {
         success: false,
-        error: "Project is required",
+        error: "Organization is required",
       };
     }
 
@@ -96,7 +96,7 @@ export async function uploadDatafile({
       Metadata: {
         "original-filename": file.name,
         "uploaded-by": session.user.id,
-        "project-id": projectId,
+        "organization-id": organizationId,
         "content-type": contentType,
         "file-hash": fileHash,
       },
@@ -107,7 +107,7 @@ export async function uploadDatafile({
 
     // Save to database
     const result = await db
-      .insert(datafile)
+      .insert(dataset)
       .values({
         name: name,
         filename: file.name,
@@ -115,17 +115,13 @@ export async function uploadDatafile({
         fileSize: file.size,
         fileHash: fileHash,
         storageKey: s3Key,
-        projectId: projectId,
+        organizationId,
         description: description || undefined,
-        metadata: {
-          version: "1.0",
-          variables: [],
-        },
         uploadedAt: new Date(),
         updatedAt: new Date(),
         createdAt: new Date(),
       })
-      .returning({ id: datafile.id });
+      .returning({ id: dataset.id });
 
     if (!result[0]?.id) {
       throw new Error("Failed to save file metadata to database");
@@ -133,12 +129,12 @@ export async function uploadDatafile({
 
     return {
       success: true,
-      datafileId: result[0].id,
+      datasetId: result[0].id,
       key: s3Key,
       url: `https://${env.S3_BUCKET_NAME}.s3.${env.S3_REGION}.amazonaws.com/${s3Key}`,
     };
   } catch (error) {
-    console.error("Error uploading datafile:", error);
+    console.error("Error uploading dataset:", error);
 
     let errorMessage = "Failed to upload file";
     if (error instanceof S3ServiceException) {
