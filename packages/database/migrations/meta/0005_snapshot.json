@@ -1,11 +1,11 @@
 {
-  "id": "353a4647-0b67-45fc-880c-e6130e96f03b",
+  "id": "b6815f20-3749-43d8-a0c7-672fc2beb117",
   "prevId": "fc8fd317-b96f-4001-bb8e-1b509df35cc8",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.datafiles": {
-      "name": "datafiles",
+    "public.datasets": {
+      "name": "datasets",
       "schema": "",
       "columns": {
         "id": {
@@ -64,8 +64,8 @@
           "notNull": true,
           "default": "now()"
         },
-        "project_id": {
-          "name": "project_id",
+        "organization_id": {
+          "name": "organization_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -82,22 +82,16 @@
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "datafiles_project_id_projects_id_fk": {
-          "name": "datafiles_project_id_projects_id_fk",
-          "tableFrom": "datafiles",
-          "tableTo": "projects",
+        "datasets_organization_id_organizations_id_fk": {
+          "name": "datasets_organization_id_organizations_id_fk",
+          "tableFrom": "datasets",
+          "tableTo": "organizations",
           "columnsFrom": [
-            "project_id"
+            "organization_id"
           ],
           "columnsTo": [
             "id"

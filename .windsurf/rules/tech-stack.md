@@ -64,21 +64,6 @@ trigger: always_on
 
 - Keep auth logic in `lib/auth.ts`
 - Use `useSession` hook in Client Components
-- In a server component or api route use this pattern to get the session:
-
-```
-import { betterAuth } from "better-auth";
-import { headers } from "next/headers";
-
-export const auth = betterAuth({
-    //...
-})
-
-// calling get session on the server
-await auth.api.getSession({
-    headers: await headers() // some endpoint might require headers
-})
-```
 
 ### Performance Patterns
 
