@@ -1,6 +1,6 @@
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
-import { find } from "@/dal/datafile";
+import { find } from "@/dal/dataset";
 import { env } from "@/env";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { getS3Client } from "@/lib/storage";
