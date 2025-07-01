@@ -13,28 +13,28 @@ import { DeleteDatasetDialog } from "./delete-dataset-dialog";
 export const columns: ColumnDef<Dataset>[] = [
   {
     accessorKey: "name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="admindataset.columns.name" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.name" />,
     cell: function Cell({ row }) {
       return <span className="font-medium">{row.original.name}</span>;
     },
   },
   {
     accessorKey: "filename",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="admindataset.columns.filename" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.filename" />,
   },
   {
     accessorKey: "fileType",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="admindataset.columns.type" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.type" />,
     cell: ({ row }) => row.original.fileType.toUpperCase(),
   },
   {
     accessorKey: "fileSize",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="admindataset.columns.size" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.size" />,
     cell: ({ row }) => formatFileSize(row.original.fileSize),
   },
   {
     accessorKey: "fileHash",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="admindataset.columns.hash" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.hash" />,
     cell: function Cell({ row }) {
       const hash = row.original.fileHash;
       const shortHash = hash ? `${hash.substring(0, 8)}...${hash.substring(hash.length - 4)}` : "";
@@ -48,13 +48,13 @@ export const columns: ColumnDef<Dataset>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="admindataset.columns.uploaded" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.uploaded" />,
     cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     id: "actions",
     cell: function Cell({ row }) {
-      const t = useTranslations("admindataset");
+      const t = useTranslations("adminDataset");
       const dataset = row.original;
 
       const handleDelete = async (id: string) => {
