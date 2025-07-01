@@ -49,8 +49,8 @@ const getNavData = (t: (t: any) => string) => ({
       icon: Folder,
     },
     {
-      name: t("navItems.datafiles"),
-      url: "/admin/datafiles",
+      name: t("navItems.datasets"),
+      url: "/admin/datasets",
       icon: FileIcon,
     },
   ],
