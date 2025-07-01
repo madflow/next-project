@@ -20,8 +20,8 @@ interface ApiResponse {
   offset: number;
 }
 
-export function DatafilesDataTable({ columns }: Props) {
-  const t = useTranslations("adminDatafile");
+export function DatasetsDataTable({ columns }: Props) {
+  const t = useTranslations("adminDataset");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [search, setSearch] = useState("");
@@ -33,11 +33,11 @@ export function DatafilesDataTable({ columns }: Props) {
     error: queryError,
     refetch,
   } = useQueryApi<ApiResponse>({
-    endpoint: "/api/datafiles",
+    endpoint: "/api/datasets",
     pagination,
     sorting,
     search: debouncedSearch,
-    queryKey: ["datafiles", "list"],
+    queryKey: ["datasets", "list"],
     keepPreviousData: true,
   });
 

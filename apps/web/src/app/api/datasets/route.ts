@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { deleteDatafile, list } from "@/dal/datafile";
+import { deleteDataset, list } from "@/dal/dataset";
 import { auth } from "@/lib/auth";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { processUrlParams } from "../handler";
@@ -36,7 +36,7 @@ export async function DELETE(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Only allow admins to delete datafiles
+    // Only allow admins to delete datasets
     if (session.user.role !== "admin") {
       return new NextResponse("Forbidden: Admin access required", { status: 403 });
     }
@@ -45,10 +45,10 @@ export async function DELETE(request: Request) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return new NextResponse("Missing datafile ID", { status: 400 });
+      return new NextResponse("Missing dataset ID", { status: 400 });
     }
 
-    await deleteDatafile(id);
+    await deleteDataset(id);
 
     return new NextResponse(JSON.stringify({ success: true }), {
       status: 200,
@@ -57,7 +57,7 @@ export async function DELETE(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Error deleting datafile:", error);
+    console.error("Error deleting dataset:", error);
     return raiseExceptionResponse(error);
   }
 }
