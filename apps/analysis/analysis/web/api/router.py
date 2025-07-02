@@ -2,6 +2,7 @@ from fastapi import Security
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 
+from analysis.web.api.datasets.routes import router as dataset_router
 from analysis.web.api.health import router as health_router
 from analysis.web.api.security import get_api_key
 
@@ -14,3 +15,4 @@ async def root(api_key: str = Security(get_api_key)) -> dict[str, str]:
 
 
 api_router.include_router(health_router)
+api_router.include_router(dataset_router)
