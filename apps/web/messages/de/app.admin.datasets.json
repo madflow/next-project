@@ -16,10 +16,6 @@
       "uploaded": "Hochgeladen",
       "uploadedAt": "Hochgeladen am"
     },
-    "common": {
-      "copied": "Kopiert!",
-      "copy": "In die Zwischenablage kopieren"
-    },
     "datatable": {
       "noResults": "Keine Ergebnisse gefunden"
     },
@@ -52,15 +48,15 @@
       "noOrganizationsAvailable": "Keine Organisationen verfügbar",
       "organization": {
         "label": "Organisation",
-        "placeholder": "Organisation auswählen",
         "loading": "Organisationen werden geladen...",
-        "notFound": "Keine Organisationen gefunden"
+        "notFound": "Keine Organisationen gefunden",
+        "placeholder": "Organisation auswählen"
       },
       "organizationLabel": "Organisation",
       "selectOrganization": "Organisation auswählen"
     },
     "noData": "Keine Datensätze gefunden",
-    "searchPlaceholder": "Dateien durchsuchen...",
+    "searchPlaceholder": "Datensätze durchsuchen...",
     "tableActions": {
       "delete": "Löschen",
       "deleteConfirm": "Möchten Sie diesen Datensatz wirklich löschen?",
