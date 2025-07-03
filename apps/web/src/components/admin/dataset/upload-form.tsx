@@ -44,6 +44,9 @@ export function DatasetUploadForm() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+    // Validate file type
+    const validTypes = [".sav", ];//".xlsx", ".csv", ".ods", ".parquet"];
+
   useEffect(() => {
     async function loadOrganizations() {
       try {
@@ -77,8 +80,6 @@ export function DatasetUploadForm() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const validTypes = [".sav", ".xlsx", ".csv", ".ods", ".parquet"];
     const fileExt = file.name.split(".").pop()?.toLowerCase();
 
     if (fileExt && !validTypes.includes(`.${fileExt}`)) {
@@ -199,7 +200,7 @@ export function DatasetUploadForm() {
                   name="file-upload"
                   type="file"
                   className="hidden"
-                  accept=".sav,.xlsx,.csv,.ods,.parquet"
+                  accept={validTypes.join(",")}
                   onChange={handleFileChange}
                   disabled={isPending || isUploading}
                 />
