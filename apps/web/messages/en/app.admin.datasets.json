@@ -16,10 +16,6 @@
       "uploaded": "Uploaded",
       "uploadedAt": "Uploaded"
     },
-    "common": {
-      "copied": "Copied!",
-      "copy": "Copy to clipboard"
-    },
     "datatable": {
       "noResults": "No results found"
     },
@@ -32,11 +28,11 @@
       "success": "Dataset deleted successfully",
       "title": "Delete Dataset"
     },
-    "description": "Manage your data files",
+    "description": "Manage your datasets",
     "errors": {
       "fileTooLarge": "File is too large. Maximum size is {maxSize}",
       "invalidFileType": "Invalid file type. Please upload a .sav, .xlsx, .csv, .ods, or .parquet file",
-      "nameRequired": "Please enter a name for the file",
+      "nameRequired": "Please enter a name for the dataset",
       "noFileSelected": "Please select a file to upload",
       "organizationRequired": "Please select an organization",
       "unknownError": "An error occurred. Please try again.",
@@ -46,15 +42,15 @@
       "createOrganizationFirst": "Create an organization first",
       "createOrganizationLink": "Create organization",
       "descriptionLabel": "Description (Optional)",
-      "descriptionPlaceholder": "Add a description for this file",
+      "descriptionPlaceholder": "Add a description for this dataset",
       "nameLabel": "Name",
-      "namePlaceholder": "Enter a name for this file",
+      "namePlaceholder": "Enter a name for this dataset",
       "noOrganizationsAvailable": "No organizations available",
       "organization": {
         "label": "Organization",
-        "placeholder": "Select an organization",
         "loading": "Loading organizations...",
-        "notFound": "No organizations found"
+        "notFound": "No organizations found",
+        "placeholder": "Select an organization"
       },
       "organizationLabel": "Organization",
       "selectOrganization": "Select an organization"
