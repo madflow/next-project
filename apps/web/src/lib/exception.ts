@@ -141,9 +141,39 @@ export class DalNotAuthorizedException extends DalException {
   }
 }
 
+export class ServerActionException extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class ServerActionNotAuthorizedException extends ServerActionException {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class ServerActionFailureException extends ServerActionException {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class ServerActionValidationException extends ServerActionException {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 const toHttpException = (error: unknown): HttpException => {
   if (error instanceof DalNotAuthorizedException) {
     return new HttpException(401, { message: error.message });
+  } else if (error instanceof ServerActionNotAuthorizedException) {
+    return new HttpException(401, { message: error.message });
+  } else if (error instanceof ServerActionFailureException) {
+    return new HttpException(500, { message: error.message });
+  } else if (error instanceof ServerActionValidationException) {
+    return new HttpException(422, { message: error.message });
   }
   return new HttpException(500, { message: "An error occurred" });
 };

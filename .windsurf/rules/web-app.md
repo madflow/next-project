@@ -94,4 +94,5 @@ globs: apps/web/**
 - Use proper error types and messages
 - Handle loading and error states gracefully
 - Log errors appropriately in development/production
-
+- When throwing errors in a server action, dal action or server page, use the Exception classes from `@/lib/exceptions.ts`.
+- When an Exception class is missing, create it and add it to the `@/lib/exceptions.ts` and map it to an HTTP status code.

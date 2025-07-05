@@ -4,17 +4,30 @@ import { PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
 import { createHash, randomUUID } from "crypto";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
-import { dataset } from "@repo/database/schema";
+import {
+  CreateDatasetVariableData,
+  DatasetVariableValueLabel,
+  dataset,
+  datasetVariable,
+  insertDatasetVariableSchema,
+} from "@repo/database/schema";
 import { env } from "@/env";
+import { createAnalysisClient } from "@/lib/analysis-client";
 import { auth } from "@/lib/auth";
+import {
+  ServerActionException,
+  ServerActionNotAuthorizedException,
+  ServerActionValidationException,
+} from "@/lib/exception";
 import { getS3Client } from "@/lib/storage";
+import { datasetReadResponseSchema } from "@/types/dataset";
 
 const ALLOWED_FILE_TYPES = [
   "application/x-spss-sav", // .sav
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-  "text/csv",
-  "application/vnd.oasis.opendocument.spreadsheet", // .ods
-  "application/octet-stream", // .parquet
+  // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  // "text/csv",
+  // "application/vnd.oasis.opendocument.spreadsheet", // .ods
+  // "application/octet-stream", // .parquet
 ];
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
@@ -22,7 +35,6 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 export type UploadDatasetResult = {
   success: boolean;
   datasetId?: string;
-  url?: string;
   key?: string;
   error?: string;
   details?: unknown;
@@ -49,33 +61,15 @@ export async function uploadDataset({
 
   try {
     if (!session?.user) {
-      return {
-        success: false,
-        error: "Unauthorized",
-      };
+      throw new ServerActionNotAuthorizedException("Unauthorized");
     }
 
-    if (!organizationId) {
-      return {
-        success: false,
-        error: "Organization is required",
-      };
+    if (!ALLOWED_FILE_TYPES.includes(contentType) && !file.name.match(/\.(sav)$/i)) {
+      throw new ServerActionValidationException("Invalid file type. Allowed types: .sav");
     }
 
-    // Validate file type
-    if (!ALLOWED_FILE_TYPES.includes(contentType) && !file.name.match(/\.(sav|xlsx|csv|ods|parquet)$/i)) {
-      return {
-        success: false,
-        error: `Invalid file type. Allowed types: ${ALLOWED_FILE_TYPES.join(", ")}`,
-      };
-    }
-
-    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      return {
-        success: false,
-        error: `File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`,
-      };
+      throw new ServerActionValidationException(`File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`);
     }
 
     const s3Client = getS3Client();
@@ -124,14 +118,57 @@ export async function uploadDataset({
       .returning({ id: dataset.id });
 
     if (!result[0]?.id) {
-      throw new Error("Failed to save file metadata to database");
+      throw new ServerActionException("Failed to save file metadata to database");
     }
+
+    const { fetch: analysisFetch } = createAnalysisClient();
+    const fileMetadataResp = await analysisFetch(`/datasets/${result[0]?.id}/metadata`);
+    if (!fileMetadataResp.ok) {
+      throw new ServerActionException("Failed to fetch file metadata from analysis service");
+    }
+    const metadataResult = await fileMetadataResp.json();
+    const datasetReadResponse = datasetReadResponseSchema.safeParse(metadataResult);
+    if (!datasetReadResponse.success) {
+      console.log(datasetReadResponse.error);
+      throw new ServerActionException("Failed to fetch file metadata from analysis service");
+    }
+
+    const { metadata } = datasetReadResponse.data;
+
+    const insertValues: CreateDatasetVariableData[] = [];
+    for (const columnName of metadata.column_names) {
+      const columnLabel = metadata.column_names_to_labels[columnName] as string;
+
+      const variableValues = metadata.variable_value_labels[columnName] ?? {};
+
+      const columnValueLabels: DatasetVariableValueLabel = {};
+      for (const [value, label] of Object.entries(variableValues)) {
+        columnValueLabels[value] = label;
+      }
+
+      const columnLabels = {
+        default: columnLabel,
+      };
+
+      const insertVariable = insertDatasetVariableSchema.parse({
+        name: columnName,
+        label: columnLabel,
+        measure: metadata.variable_measure[columnName],
+        type: metadata.readstat_variable_types[columnName],
+        variableLabels: columnLabels,
+        valueLabels: columnValueLabels,
+        datasetId: result[0].id,
+      } as CreateDatasetVariableData);
+
+      insertValues.push(insertVariable);
+    }
+
+    await db.insert(datasetVariable).values(insertValues);
 
     return {
       success: true,
       datasetId: result[0].id,
       key: s3Key,
-      url: `https://${env.S3_BUCKET_NAME}.s3.${env.S3_REGION}.amazonaws.com/${s3Key}`,
     };
   } catch (error) {
     console.error("Error uploading dataset:", error);
