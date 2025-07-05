@@ -69,19 +69,19 @@ export type CreateDatasetData = z.infer<typeof insertDatasetSchema>;
 export type Dataset = z.infer<typeof selectDatasetSchema>;
 export type UpdateDatasetData = z.infer<typeof updateDatasetSchema>;
 
-type DatasetVariableLabel = Record<string, string>;
-type DatasetVariableValueLabel = {
+export type DatasetVariableLabel = Record<string, string>;
+export type DatasetVariableValueLabel = {
   value: string;
   label: string;
 };
-type DatasetVariableLabels = {
+export type DatasetVariableLabels = {
   default: DatasetVariableValueLabel;
   [key: string]: DatasetVariableValueLabel;
 };
 export type DatasetVariableType = "float" | "double" | "int8" | "int16" | "int32" | "string" | "unknown";
 export type DatasetVariableMeasure = "nominal" | "ordinal" | "scale" | "unknown";
 
-const typeEnum = pgEnum("dataset_variable_type", [
+export const typeEnum = pgEnum("dataset_variable_type", [
   "float",
   "double",
   "int8",
@@ -90,7 +90,7 @@ const typeEnum = pgEnum("dataset_variable_type", [
   "string",
   "unknown",
 ] as const);
-const measureEnum = pgEnum("dataset_variable_measure", ["nominal", "ordinal", "scale", "unknown"] as const);
+export const measureEnum = pgEnum("dataset_variable_measure", ["nominal", "ordinal", "scale", "unknown"] as const);
 
 export const datasetVariable = pgTable(
   "dataset_variables",
@@ -109,7 +109,7 @@ export const datasetVariable = pgTable(
   },
   (table) => [
     {
-      dataasetNameUnique: uniqueIndex().on(table.datasetId, table.name),
+      datasetNameUnique: uniqueIndex().on(table.datasetId, table.name),
     },
   ]
 );

@@ -4,7 +4,13 @@ import { PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
 import { createHash, randomUUID } from "crypto";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
-import { dataset } from "@repo/database/schema";
+import {
+  CreateDatasetVariableData,
+  DatasetVariableValueLabel,
+  dataset,
+  datasetVariable,
+  insertDatasetVariableSchema,
+} from "@repo/database/schema";
 import { env } from "@/env";
 import { createAnalysisClient } from "@/lib/analysis-client";
 import { auth } from "@/lib/auth";
@@ -14,6 +20,7 @@ import {
   ServerActionValidationException,
 } from "@/lib/exception";
 import { getS3Client } from "@/lib/storage";
+import { datasetReadResponseSchema } from "@/types/dataset";
 
 const ALLOWED_FILE_TYPES = [
   "application/x-spss-sav", // .sav
@@ -120,8 +127,41 @@ export async function uploadDataset({
       throw new ServerActionException("Failed to fetch file metadata from analysis service");
     }
     const metadataResult = await fileMetadataResp.json();
+    const datasetReadResponse = datasetReadResponseSchema.safeParse(metadataResult);
+    if (!datasetReadResponse.success) {
+      console.log(datasetReadResponse.error);
+      throw new ServerActionException("Failed to fetch file metadata from analysis service");
+    }
 
-    console.log("metadataResult", metadataResult);
+    const { metadata } = datasetReadResponse.data;
+
+    const insertValues: CreateDatasetVariableData[] = [];
+    for (const columnName of metadata.column_names) {
+      const columnLabel = metadata.column_names_to_labels[columnName] as string;
+
+      const valueLabelsRead = metadata.variable_value_labels[columnName];
+      if (valueLabelsRead) {
+        for (const [value, label] of Object.entries(valueLabelsRead)) {
+          const insertValueLabel: DatasetVariableValueLabel = {
+            value,
+            label,
+          };
+        }
+      }
+
+      const insertVariable = insertDatasetVariableSchema.parse({
+        name: columnName,
+        label: columnLabel,
+        measure: metadata.variable_measure[columnName],
+        type: metadata.readstat_variable_types[columnName],
+        value_labels: insertValueLabel,
+        datasetId: result[0].id,
+      });
+
+      insertValues.push(insertVariable);
+    }
+
+    await db.insert(datasetVariable).values(insertValues);
 
     return {
       success: true,

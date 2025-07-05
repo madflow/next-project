@@ -43,6 +43,13 @@
       "when": 1751366126710,
       "tag": "0005_normal_black_widow",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1751706671296,
+      "tag": "0006_bent_tarot",
+      "breakpoints": true
     }
   ]
 }
