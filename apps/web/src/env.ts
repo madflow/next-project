@@ -3,16 +3,18 @@ import { z } from "zod/v4";
 
 export const env = createEnv({
   server: {
+    ANALYSIS_API_KEY: z.string().default(""),
+    ANALYSIS_API_URL: z.url().default(""),
     AUTH_SECRET: z.string().default(""),
     AUTH_URL: z.string().default(""),
     BASE_URL: z.string().default(""),
-    DATABASE_URL: z.string().url().default("postgres://"),
+    DATABASE_URL: z.url().default("postgres://"),
     MAIL_DEFAULT_SENDER: z.string().default(""),
     NODE_ENV: z.enum(["development", "test", "production"]).default("production"),
     S3_ACCESS_KEY_ID: z.string().default(""),
     S3_BUCKET_NAME: z.string().default(""),
     S3_ENDPOINT: z.string().default(""),
-    S3_REGION: z.string().default("eu-central-1"),
+    S3_REGION: z.string().default("us-east-1"),
     S3_SECRET_ACCESS_KEY: z.string().default(""),
     SITE_NAME: z.string().default(""),
     SMTP_SERVER_HOST: z.string().default(""),
