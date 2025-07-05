@@ -1,5 +1,16 @@
 import { sql } from "drizzle-orm";
-import { bigint, check, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  check,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { organization } from "./auth";
@@ -57,3 +68,65 @@ export const updateDatasetSchema = createUpdateSchema(dataset);
 export type CreateDatasetData = z.infer<typeof insertDatasetSchema>;
 export type Dataset = z.infer<typeof selectDatasetSchema>;
 export type UpdateDatasetData = z.infer<typeof updateDatasetSchema>;
+
+export const datasetVariableLabelSchema = z
+  .object({
+    default: z.string().optional(),
+  })
+  .catchall(z.string().optional());
+
+export const datasetVariableValueLabelSchema = z
+  .object({
+    default: z.string().optional(),
+  })
+  .catchall(z.string().optional());
+
+export const datasetVariableLabelsSchema = z.record(z.string(), datasetVariableValueLabelSchema);
+
+export type DatasetVariableLabel = z.infer<typeof datasetVariableLabelSchema>;
+export type DatasetVariableValueLabel = z.infer<typeof datasetVariableValueLabelSchema>;
+export type DatasetVariableLabels = z.infer<typeof datasetVariableLabelsSchema>;
+
+export type DatasetVariableType = "float" | "double" | "int8" | "int16" | "int32" | "string" | "unknown";
+export type DatasetVariableMeasure = "nominal" | "ordinal" | "scale" | "unknown";
+
+export const typeEnum = pgEnum("dataset_variable_type", [
+  "float",
+  "double",
+  "int8",
+  "int16",
+  "int32",
+  "string",
+  "unknown",
+] as const);
+export const measureEnum = pgEnum("dataset_variable_measure", ["nominal", "ordinal", "scale", "unknown"] as const);
+
+export const datasetVariable = pgTable(
+  "dataset_variables",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: varchar("name", { length: 64 }).notNull(),
+    label: text("label"),
+    type: typeEnum().notNull(),
+    measure: measureEnum().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    variableLabels: jsonb("variable_labels").$type<DatasetVariableLabel>(),
+    valueLabels: jsonb("value_labels").$type<DatasetVariableLabels | null>(),
+    datasetId: uuid("dataset_id")
+      .notNull()
+      .references(() => dataset.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    {
+      datasetNameUnique: uniqueIndex().on(table.datasetId, table.name),
+    },
+  ]
+);
+
+export const insertDatasetVariableSchema = createInsertSchema(datasetVariable);
+export const selectDatasetVariableSchema = createSelectSchema(datasetVariable);
+export const updateDatasetVariableSchema = createUpdateSchema(datasetVariable);
+
+export type CreateDatasetVariableData = z.infer<typeof insertDatasetVariableSchema>;
+export type DatasetVariable = z.infer<typeof selectDatasetVariableSchema>;
+export type UpdateDatasetVariableData = z.infer<typeof updateDatasetVariableSchema>;
