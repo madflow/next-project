@@ -12,14 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Organization } from "@/types/organization";
 import { Loader2 } from "lucide-react";
 import { insertProjectSchema } from "@/types/project";
-
-type Organization = {
-  id: string;
-  name: string;
-  slug: string;
-};
 
 const createFormSchema = (t: ReturnType<typeof useTranslations>) =>
   z.object({

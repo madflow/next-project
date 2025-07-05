@@ -3,6 +3,7 @@ import { locales } from "@/i18n/config";
 import appAccount from "../messages/en/app.account.json";
 import appAdminSidebar from "../messages/en/app.admin-sidebar.json";
 import appAdminDashboard from "../messages/en/app.admin.dashboard.json";
+import appAdminDatasets from "../messages/en/app.admin.datasets.json";
 import appAdminOrganizations from "../messages/en/app.admin.organizations.json";
 import appAdminOrganizationsMembers from "../messages/en/app.admin.organizations.members.json";
 import appAdminProjects from "../messages/en/app.admin.projects.json";
@@ -41,6 +42,7 @@ declare module "next-intl" {
       typeof authForgotPassword &
       typeof authLogin &
       typeof authResetPassword &
-      typeof authSignUp;
+      typeof authSignUp &
+      typeof appAdminDatasets;
   }
 }

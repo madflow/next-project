@@ -1,0 +1,11 @@
+{
+    "name": "@app/analysis",
+    "version": "0.1.0",
+    "scripts": {
+        "dev": "source .venv/bin/activate && poetry run python -m analysis"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs"
+}
