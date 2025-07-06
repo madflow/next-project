@@ -2,8 +2,8 @@
     "name": "@app/analysis",
     "version": "0.1.0",
     "scripts": {
-        "start": "source .venv/bin/activate && poetry run python -m analysis",
-        "dev": "source .venv/bin/activate && poetry run python -m analysis"
+        "start": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'",
+        "dev": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'"
     },
     "keywords": [],
     "author": "",

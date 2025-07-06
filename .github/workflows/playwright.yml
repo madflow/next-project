@@ -71,6 +71,7 @@ jobs:
           python3 -m venv .venv
           source .venv/bin/activate
           poetry install
+      shell: bash
     - name: Install e2e dependencies
       run: npm run e2e:deps
     - name: Build
