@@ -1,0 +1,14 @@
+{
+  "adminDatasetVariable": {
+    "editor": {
+      "title": "Datensatz Editor für {name}"
+    },
+    "searchPlaceholder": "Variablen durchsuchen...",
+    "columns": {
+      "name": "Name",
+      "label": "Label",
+      "type": "Typ",
+      "measure": "Messung"
+    }
+  }
+}
