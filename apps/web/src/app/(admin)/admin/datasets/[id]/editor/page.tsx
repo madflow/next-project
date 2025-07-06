@@ -1,17 +1,17 @@
-import { DatasetVariablesDataTable } from "@/components/admin/dataset-variable/data-table";
-import { columns } from "@/components/admin/dataset-variable/columns";
-import { PageLayout } from "@/components/page/page-layout";
 import { getTranslations } from "next-intl/server";
+import { columns } from "@/components/admin/dataset-variable/columns";
+import { DatasetVariablesDataTable } from "@/components/admin/dataset-variable/data-table";
+import { PageLayout } from "@/components/page/page-layout";
 import { find } from "@/dal/dataset";
 
-interface Props {
-  params: {
+type PageProps = {
+  params: Promise<{
     id: string;
-  };
-}
+  }>;
+};
 
-export default async function Page({ params }: Props) {
-  const { id } = params;
+export default async function Page({ params }: PageProps) {
+  const { id } = await params;
   const t = await getTranslations("adminDatasetVariable");
   const dataset = await find(id);
 
