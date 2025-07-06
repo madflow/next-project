@@ -43,6 +43,7 @@ declare module "next-intl" {
       typeof authLogin &
       typeof authResetPassword &
       typeof authSignUp &
-      typeof appAdminDatasets;
+      typeof appAdminDatasets &
+      typeof appAdminDatasetVariable;
   }
 }
