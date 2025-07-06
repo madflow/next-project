@@ -19,7 +19,7 @@ export default function Providers({ children, locale, messages }: ProvidersProps
   const queryClient = getQueryClient();
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
