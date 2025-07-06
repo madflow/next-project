@@ -44,8 +44,8 @@ export function DatasetUploadForm() {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-    // Validate file type
-    const validTypes = [".sav", ];//".xlsx", ".csv", ".ods", ".parquet"];
+  // Validate file type
+  const validTypes = [".sav"]; //".xlsx", ".csv", ".ods", ".parquet"];
 
   useEffect(() => {
     async function loadOrganizations() {
@@ -196,6 +196,7 @@ export function DatasetUploadForm() {
                 </div>
                 <input
                   id="file-upload"
+                  data-testid="app.admin.dataset.file-upload"
                   ref={fileInputRef}
                   name="file-upload"
                   type="file"
@@ -308,7 +309,10 @@ export function DatasetUploadForm() {
             <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
               {t("actions.cancel")}
             </Button>
-            <Button type="submit" disabled={isPending || isUploading || !selectedFile || projects.length === 0}>
+            <Button
+              type="submit"
+              data-testid="app.admin.dataset.upload-button"
+              disabled={isPending || isUploading || !selectedFile || projects.length === 0}>
               {isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
