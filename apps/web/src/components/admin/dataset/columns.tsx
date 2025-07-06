@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { toast } from "sonner";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,11 @@ export const columns: ColumnDef<Dataset>[] = [
     accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.name" />,
     cell: function Cell({ row }) {
-      return <span className="font-medium">{row.original.name}</span>;
+      return (
+        <Link className="font-medium" href={`/admin/datasets/${row.original.id}/editor`}>
+          {row.original.name}
+        </Link>
+      );
     },
   },
   {
