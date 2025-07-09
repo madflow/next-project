@@ -27,6 +27,7 @@ loguru = "^0.7.3"
 pyreadstat = "^1.3.0"
 pandas = "^2.3.0"
 boto3 = "^1.39.0"
+sentry-sdk = {extras = ["fastapi"], version = "^2.32.0"}
 
 
 [tool.poetry.group.dev.dependencies]

@@ -10,6 +10,7 @@ export const env = createEnv({
     BASE_URL: z.string().default(""),
     DATABASE_URL: z.url().default("postgres://"),
     MAIL_DEFAULT_SENDER: z.string().default(""),
+    NEXT_RUNTIME: z.enum(["edge", "nodejs"]).default("nodejs"),
     NODE_ENV: z.enum(["development", "test", "production"]).default("production"),
     S3_ACCESS_KEY_ID: z.string().default(""),
     S3_BUCKET_NAME: z.string().default(""),

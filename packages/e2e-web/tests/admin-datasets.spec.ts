@@ -12,7 +12,8 @@ test.describe("Admin Datasets", () => {
     await page.getByTestId("admin.datasets.create.upload").click();
     const uploadFile = page.getByTestId("app.admin.dataset.file-upload");
     await uploadFile.setInputFiles("testdata/spss/demo.sav");
-    await page.getByRole("combobox", { name: "Organisation" }).click();
+    await page.waitForSelector("data-testid=app.admin.dataset.selected-file");
+    await page.getByTestId("app.admin.dataset.organization-trigger").click();
     await page.getByTestId("org-option-test-organization").click();
     await page.getByTestId("app.admin.dataset.upload-button").click();
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
