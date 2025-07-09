@@ -6,7 +6,7 @@
 - Correctly determine when to use server vs. client components in Next.js.
 - Use the App Router structure with `page.tsx` files in route directories.
 - Client components must be explicitly marked with `'use client'` at the top of the file.
-- Use kebab-case for directory names (e.g., `components/auth-form`) and component files.
+- Use kebab-case for directory names and files (e.g., `components/auth-form`).
 - Prefer named exports over default exports, i.e. `export function Button() { /* ... */ }` instead of `export default function Button() { /* ... */ }`.
 - Minimize `'use client'` directives:
   - Keep most components as React Server Components (RSC)

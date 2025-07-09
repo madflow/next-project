@@ -22,7 +22,7 @@ interface ApiResponse {
 }
 
 export function DatasetVariablesDataTable({ columns, datasetId }: Props) {
-  const t = useTranslations("adminDatasetVariable");
+  const t = useTranslations("adminDatasetEditor");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [search, setSearch] = useState("");

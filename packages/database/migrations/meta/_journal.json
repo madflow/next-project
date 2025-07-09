@@ -50,6 +50,20 @@
       "when": 1751706671296,
       "tag": "0006_bent_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1752066352849,
+      "tag": "0007_true_natasha_romanoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1752068712457,
+      "tag": "0008_rapid_terror",
+      "breakpoints": true
     }
   ]
 }
