@@ -7,9 +7,9 @@ env:
   NEXT_PUBLIC_SITE_NAME: app
 on:
   push:
-    branches: [ main ]
+    branches: [ main, next ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, next ]
 jobs:
   build-run-test:
     services:
