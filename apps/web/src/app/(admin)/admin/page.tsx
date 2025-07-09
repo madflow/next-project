@@ -44,6 +44,18 @@ export default async function Page() {
             </Link>
           </CardFooter>
         </Card>
+
+        <Card className="align-center flex flex-col justify-between">
+          <CardHeader>
+            <CardTitle>{t("datasets.title")}</CardTitle>
+            <CardDescription>{t("datasets.description")}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link href="/admin/datasets" className="underline underline-offset-4">
+              {t("datasets.link")}
+            </Link>
+          </CardFooter>
+        </Card>
       </div>
     </PageLayout>
   );
