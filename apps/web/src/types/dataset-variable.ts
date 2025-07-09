@@ -1,3 +1,17 @@
-import { DatasetVariable as DatasetVariableType } from "@repo/database/schema";
+import {
+  type CreateDatasetVariableData,
+  type DatasetVariable,
+  type UpdateDatasetVariableData,
+  insertDatasetVariableSchema,
+  selectDatasetVariableSchema,
+  updateDatasetVariableSchema,
+} from "@repo/database/schema";
 
-export type DatasetVariable = DatasetVariableType;
+export {
+  insertDatasetVariableSchema,
+  selectDatasetVariableSchema,
+  updateDatasetVariableSchema,
+  type DatasetVariable,
+  type CreateDatasetVariableData,
+  type UpdateDatasetVariableData,
+};
