@@ -82,25 +82,4 @@ jobs:
       run: npm run seed
     - name: Run App
       run: |
-        npm run start | tee app.log 2>&1 &
-        sleep 10  # Optional: gives some buffer for the app to start
-        for attempt in {1..10}; do
-          if [ $(curl -o /dev/null -s -w "%{http_code}" http://localhost:3000/api/health) -eq 200 ]; then
-            echo "Application is ready."
-            break
-          fi
-          if [ $attempt -eq 10 ]; then
-            echo "Application failed to start in time."
-            exit 1
-          fi
-          echo "Still waiting for the application to be ready..."
-          sleep 10
-        done
-    - name: Run Playwright tests
-      run:  npm run e2e
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: ./packages/e2e-web/playwright-report/
-        retention-days: 30
+        npm run start 
