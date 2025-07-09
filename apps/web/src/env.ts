@@ -17,6 +17,7 @@ export const env = createEnv({
     S3_ENDPOINT: z.string().default(""),
     S3_REGION: z.string().default("us-east-1"),
     S3_SECRET_ACCESS_KEY: z.string().default(""),
+    SENTRY_DSN: z.string().default(""),
     SITE_NAME: z.string().default(""),
     SMTP_SERVER_HOST: z.string().default(""),
     SMTP_SERVER_PASSWORD: z.string().default(""),
