@@ -209,7 +209,7 @@ export function DatasetUploadForm() {
             </div>
 
             {selectedFile && (
-              <div className="bg-card mt-4 rounded-lg border p-4">
+              <div className="bg-card mt-4 rounded-lg border p-4" data-testid="app.admin.dataset.selected-file">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="flex-shrink-0">
@@ -259,9 +259,14 @@ export function DatasetUploadForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("form.organization.label")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} data-testid="organization-select">
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  data-testid="app.admin.dataset.organization-select">
                   <FormControl>
-                    <SelectTrigger className="w-full sm:max-w-[50%]">
+                    <SelectTrigger
+                      className="w-full sm:max-w-[50%]"
+                      data-testid="app.admin.dataset.organization-trigger">
                       <SelectValue placeholder={t("form.organization.placeholder")} />
                     </SelectTrigger>
                   </FormControl>
