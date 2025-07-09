@@ -12,6 +12,17 @@
       "projects": "Projects"
     },
     "projectsExplanation": "A dataset can be added to one or more projects.",
-    "searchPlaceholder": "Search variables..."
+    "searchPlaceholder": "Search variables",
+    "deleteDialog": {
+      "title": "Delete variable",
+      "description": "Are you sure you want to delete the variable {name}? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "error": "Failed to delete variable."
+    },
+    "tableActions": {
+      "delete": "Delete"
+    }
   }
 }

@@ -12,6 +12,7 @@ import {
   datasetVariable,
   insertDatasetVariableSchema,
 } from "@repo/database/schema";
+import { deleteDataset } from "@/dal/dataset";
 import { env } from "@/env";
 import { createAnalysisClient } from "@/lib/analysis-client";
 import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
@@ -202,4 +203,8 @@ export async function uploadDataset({
       details: error instanceof Error ? error.stack : undefined,
     };
   }
+}
+
+export async function remove(datasetId: string) {
+  await deleteDataset(datasetId);
 }

@@ -5,6 +5,7 @@ import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { toast } from "sonner";
+import { remove } from "@/actions/dataset";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatFileSize } from "@/lib/utils";
@@ -64,15 +65,7 @@ export const columns: ColumnDef<Dataset>[] = [
 
       const handleDelete = async (id: string) => {
         try {
-          const response = await fetch(`/api/datasets?id=${id}`, {
-            method: "DELETE",
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to delete dataset");
-          }
-
-          // Refresh the page to update the table
+          await remove(id);
           window.location.reload();
         } catch (error) {
           console.error("Error deleting dataset:", error);

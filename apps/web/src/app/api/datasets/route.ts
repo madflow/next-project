@@ -1,7 +1,5 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { deleteDataset, list } from "@/dal/dataset";
-import { auth } from "@/lib/auth";
+import { list } from "@/dal/dataset";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { processUrlParams } from "../handler";
 
@@ -21,43 +19,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(result);
   } catch (error: unknown) {
-    return raiseExceptionResponse(error);
-  }
-}
-
-export async function DELETE(request: Request) {
-  try {
-    // Get the session
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (!session?.user?.id) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // Only allow admins to delete datasets
-    if (session.user.role !== "admin") {
-      return new NextResponse("Forbidden: Admin access required", { status: 403 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-
-    if (!id) {
-      return new NextResponse("Missing dataset ID", { status: 400 });
-    }
-
-    await deleteDataset(id);
-
-    return new NextResponse(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    console.error("Error deleting dataset:", error);
     return raiseExceptionResponse(error);
   }
 }

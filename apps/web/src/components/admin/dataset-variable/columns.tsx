@@ -1,8 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { remove } from "@/actions/dataset-variable";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import type { DatasetVariable } from "@/types/dataset-variable";
+import { DeleteDatasetVariableDialog } from "./delete-dataset-variable-dialog";
 
 export const columns: ColumnDef<DatasetVariable>[] = [
   {
@@ -23,5 +25,21 @@ export const columns: ColumnDef<DatasetVariable>[] = [
   {
     accessorKey: "measure",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDatasetEditor.columns.measure" />,
+  },
+  {
+    id: "actions",
+    cell: function Cell({ row }) {
+      const datasetVariable = row.original;
+
+      return (
+        <div className="flex justify-end gap-2">
+          <DeleteDatasetVariableDialog
+            datasetVariableId={datasetVariable.id}
+            datasetVariableName={datasetVariable.name}
+            onDelete={remove}
+          />
+        </div>
+      );
+    },
   },
 ];
