@@ -1,5 +1,10 @@
 {
   "adminDatasetEditor": {
+    "common": {
+      "saving": "Wird gespeichert...",
+      "saveChanges": "Änderungen speichern",
+      "cancel": "Abbrechen"
+    },
     "columns": {
       "label": "Label",
       "measure": "Niveau",
@@ -10,6 +15,32 @@
       "title": "Datensatz Editor für {name}",
       "variables": "Variablen",
       "projects": "Projekte"
+    },
+    "editVariable": {
+      "title": "Variable bearbeiten",
+      "description": "Aktualisieren Sie das Label für die Variable",
+      "form": {
+        "label": {
+          "label": "Label",
+          "placeholder": "Geben Sie ein beschreibendes Label ein",
+          "errors": {
+            "required": "Label ist erforderlich"
+          }
+        },
+        "name": {
+          "label": "Name"
+        },
+        "type": {
+          "label": "Typ"
+        },
+        "measure": {
+          "label": "Niveau"
+        },
+        "success": "Variable erfolgreich aktualisiert",
+        "errors": {
+          "updateFailed": "Fehler beim Aktualisieren der Variable"
+        }
+      }
     },
     "projectsExplanation": "Ein Datensatz kann einem oder mehreren Projekten hinzugefügt werden.",
     "searchPlaceholder": "Variablen durchsuchen",
@@ -22,7 +53,8 @@
       "error": "Fehler beim Löschen der Variable."
     },
     "tableActions": {
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
     }
   }
 }

@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { dataset as entity, selectDatasetSchema } from "@repo/database/schema";
 import { env } from "@/env";
 import { createFind, createList, getAuthenticatedClient, withAdminCheck, withSessionCheck } from "@/lib/dal";
+import { DalException } from "@/lib/exception";
 import { getS3Client } from "@/lib/storage";
 
 export const find = withAdminCheck(createFind(entity, selectDatasetSchema));
@@ -20,7 +21,7 @@ export const deleteDataset = withAdminCheck(async (datasetId: string) => {
   const [dataset] = await db.select().from(entity).where(eq(entity.id, datasetId)).limit(1);
 
   if (!dataset) {
-    throw new Error("Dataset not found");
+    throw new DalException("Dataset not found");
   }
 
   try {
@@ -40,6 +41,6 @@ export const deleteDataset = withAdminCheck(async (datasetId: string) => {
     return { success: true };
   } catch (error) {
     console.error("Error deleting dataset:", error);
-    throw new Error("Failed to delete dataset. Please try again.");
+    throw new DalException("Failed to delete dataset. Please try again.");
   }
 });

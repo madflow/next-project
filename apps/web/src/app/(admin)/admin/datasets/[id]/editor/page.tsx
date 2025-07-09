@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { DatasetProjectsTable } from "@/components/admin/dataset-project/data-table";
-import { columns } from "@/components/admin/dataset-variable/columns";
 import { DatasetVariablesDataTable } from "@/components/admin/dataset-variable/data-table";
 import { PageLayout } from "@/components/page/page-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,7 +36,7 @@ export default async function Page({ params }: PageProps) {
           <TabsTrigger value="projects">{t("editor.projects")}</TabsTrigger>
         </TabsList>
         <TabsContent value="variables">
-          <DatasetVariablesDataTable columns={columns} datasetId={id} />
+          <DatasetVariablesDataTable datasetId={id} />
         </TabsContent>
         <TabsContent value="projects">
           <DatasetProjectsTable datasetId={id} organizationId={organization.id} />

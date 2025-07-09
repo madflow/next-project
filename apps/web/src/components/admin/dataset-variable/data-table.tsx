@@ -1,6 +1,5 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
@@ -8,9 +7,9 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { PaginationState, SortingState } from "@/types";
 import type { DatasetVariable } from "@/types/dataset-variable";
+import { useDatasetVariableColumns } from "./columns";
 
 interface Props {
-  columns: ColumnDef<DatasetVariable, unknown>[];
   datasetId: string;
 }
 
@@ -21,7 +20,8 @@ interface ApiResponse {
   offset: number;
 }
 
-export function DatasetVariablesDataTable({ columns, datasetId }: Props) {
+export function DatasetVariablesDataTable({ datasetId }: Props) {
+  const columns = useDatasetVariableColumns();
   const t = useTranslations("adminDatasetEditor");
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
   const [sorting, setSorting] = useState<SortingState>([]);

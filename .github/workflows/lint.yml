@@ -5,9 +5,9 @@ env:
   DO_NOT_TRACK: 1
 on:
   push:
-    branches: [ main ]
+    branches: [ main, next ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, next ]
 jobs:
   build-run-test:
     runs-on: ubuntu-latest

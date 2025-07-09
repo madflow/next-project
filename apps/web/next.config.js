@@ -16,9 +16,8 @@ export default withNextIntl(
   withSentryConfig(nextConfig, {
     org: "rh-5k",
     project: "next-project",
-    // Only print logs for uploading source maps in CI
-    // Set to `true` to suppress logs
-    silent: !process.env.CI,
+    telemetry: false,
+    silent: false,
     // Automatically tree-shake Sentry logger statements to reduce bundle size
     disableLogger: true,
   })
