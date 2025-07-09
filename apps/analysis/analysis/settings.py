@@ -71,6 +71,8 @@ class Settings(BaseSettings):
 
     api_key: str = "your-super-secret-api-key"
 
+    sentry_dsn: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="ANALYSIS_",
