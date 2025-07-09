@@ -12,6 +12,17 @@
       "projects": "Projekte"
     },
     "projectsExplanation": "Ein Datensatz kann einem oder mehreren Projekten hinzugefügt werden.",
-    "searchPlaceholder": "Variablen durchsuchen..."
+    "searchPlaceholder": "Variablen durchsuchen",
+    "deleteDialog": {
+      "title": "Variable löschen",
+      "description": "Sind Sie sicher, dass Sie die Variable {name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "error": "Fehler beim Löschen der Variable."
+    },
+    "tableActions": {
+      "delete": "Löschen"
+    }
   }
 }
