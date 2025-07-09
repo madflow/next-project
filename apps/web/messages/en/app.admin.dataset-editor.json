@@ -1,0 +1,17 @@
+{
+  "adminDatasetEditor": {
+    "columns": {
+      "label": "Label",
+      "measure": "Measure",
+      "name": "Name",
+      "type": "Type"
+    },
+    "editor": {
+      "title": "Dataset Editor for {name}",
+      "variables": "Variables",
+      "projects": "Projects"
+    },
+    "projectsExplanation": "A dataset can be added to one or more projects.",
+    "searchPlaceholder": "Search variables..."
+  }
+}
