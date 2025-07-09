@@ -1,5 +1,10 @@
 {
   "adminDatasetEditor": {
+    "common": {
+      "saving": "Saving...",
+      "saveChanges": "Save changes",
+      "cancel": "Cancel"
+    },
     "columns": {
       "label": "Label",
       "measure": "Measure",
@@ -10,6 +15,32 @@
       "title": "Dataset Editor for {name}",
       "variables": "Variables",
       "projects": "Projects"
+    },
+    "editVariable": {
+      "title": "Edit Variable",
+      "description": "Update the label for the variable",
+      "form": {
+        "label": {
+          "label": "Label",
+          "placeholder": "Enter a descriptive label",
+          "errors": {
+            "required": "Label is required"
+          }
+        },
+        "name": {
+          "label": "Name"
+        },
+        "type": {
+          "label": "Type"
+        },
+        "measure": {
+          "label": "Measure"
+        },
+        "success": "Variable updated successfully",
+        "errors": {
+          "updateFailed": "Failed to update variable"
+        }
+      }
     },
     "projectsExplanation": "A dataset can be added to one or more projects.",
     "searchPlaceholder": "Search variables",
@@ -22,7 +53,8 @@
       "error": "Failed to delete variable."
     },
     "tableActions": {
-      "delete": "Delete"
+      "delete": "Delete",
+      "edit": "Edit"
     }
   }
 }
