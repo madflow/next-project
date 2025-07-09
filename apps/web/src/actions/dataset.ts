@@ -8,12 +8,13 @@ import {
   CreateDatasetVariableData,
   DatasetVariableValueLabel,
   dataset,
+  datasetProject,
   datasetVariable,
   insertDatasetVariableSchema,
 } from "@repo/database/schema";
 import { env } from "@/env";
 import { createAnalysisClient } from "@/lib/analysis-client";
-import { auth } from "@/lib/auth";
+import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 import {
   ServerActionException,
   ServerActionNotAuthorizedException,
@@ -47,6 +48,21 @@ type UploadDatasetParams = {
   description?: string;
   contentType: string;
 };
+
+export async function addToProject(datasetId: string, projectId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new ServerActionNotAuthorizedException("Unauthorized");
+  }
+
+  if (session.user.role !== USER_ADMIN_ROLE) {
+    throw new ServerActionNotAuthorizedException("Unauthorized");
+  }
+  await db.insert(datasetProject).values({ projectId, datasetId });
+}
 
 export async function uploadDataset({
   file,

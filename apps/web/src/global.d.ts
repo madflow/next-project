@@ -3,6 +3,7 @@ import { locales } from "@/i18n/config";
 import appAccount from "../messages/en/app.account.json";
 import appAdminSidebar from "../messages/en/app.admin-sidebar.json";
 import appAdminDashboard from "../messages/en/app.admin.dashboard.json";
+import adminDatasetEditor from "../messages/en/app.admin.dataset-editor.json";
 import appAdminDatasets from "../messages/en/app.admin.datasets.json";
 import appAdminOrganizations from "../messages/en/app.admin.organizations.json";
 import appAdminOrganizationsMembers from "../messages/en/app.admin.organizations.members.json";
@@ -29,6 +30,7 @@ declare module "next-intl" {
     Locale: (typeof locales)[number];
     Messages: typeof appAccount &
       typeof appAdminDashboard &
+      typeof adminDatasetEditor &
       typeof appAdminSidebar &
       typeof appAdminOrganizations &
       typeof appAdminOrganizationsMembers &

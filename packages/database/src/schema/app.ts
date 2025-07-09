@@ -116,11 +116,7 @@ export const datasetVariable = pgTable(
       .notNull()
       .references(() => dataset.id, { onDelete: "cascade" }),
   },
-  (table) => [
-    {
-      datasetNameUnique: uniqueIndex().on(table.datasetId, table.name),
-    },
-  ]
+  (table) => [uniqueIndex("dataset_variable_unique_idx").on(table.name, table.datasetId)]
 );
 
 export const insertDatasetVariableSchema = createInsertSchema(datasetVariable);
@@ -130,3 +126,25 @@ export const updateDatasetVariableSchema = createUpdateSchema(datasetVariable);
 export type CreateDatasetVariableData = z.infer<typeof insertDatasetVariableSchema>;
 export type DatasetVariable = z.infer<typeof selectDatasetVariableSchema>;
 export type UpdateDatasetVariableData = z.infer<typeof updateDatasetVariableSchema>;
+
+export const datasetProject = pgTable(
+  "dataset_projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => project.id, { onDelete: "cascade" }),
+    datasetId: uuid("dataset_id")
+      .notNull()
+      .references(() => dataset.id, { onDelete: "cascade" }),
+  },
+  (table) => [uniqueIndex("dataset_project_unique_idx").on(table.projectId, table.datasetId)]
+);
+
+export const insertDatasetProjectSchema = createInsertSchema(datasetProject);
+export const selectDatasetProjectSchema = createSelectSchema(datasetProject);
+export const updateDatasetProjectSchema = createUpdateSchema(datasetProject);
+
+export type CreateDatasetProjectData = z.infer<typeof insertDatasetProjectSchema>;
+export type DatasetProject = z.infer<typeof selectDatasetProjectSchema>;
+export type UpdateDatasetProjectData = z.infer<typeof updateDatasetProjectSchema>;
