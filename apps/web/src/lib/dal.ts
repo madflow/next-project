@@ -163,15 +163,30 @@ export function createList(table: AnyPgTable, schema: ZodType) {
         }
       }
     }
+    const whereConditions: SQL<unknown>[] = [];
 
+    // Add OR conditions (search)
     if (whereOrConditions.length > 0) {
-      query.where(or(...whereOrConditions));
-      countQuery.where(or(...whereOrConditions));
+      const orCondition = or(...whereOrConditions);
+      if (orCondition) {
+        whereConditions.push(orCondition);
+      }
     }
 
+    // Add AND conditions (filters)
     if (whereAndConditions.length > 0) {
-      query.where(and(...whereAndConditions));
-      countQuery.where(and(...whereAndConditions));
+      const andCondition = and(...whereAndConditions);
+      if (andCondition) {
+        whereConditions.push(andCondition);
+      }
+    }
+
+    // Apply all conditions at once
+    if (whereConditions.length > 0) {
+      const finalWhere = whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions);
+
+      query.where(finalWhere);
+      countQuery.where(finalWhere);
     }
 
     if (orderBy) {
