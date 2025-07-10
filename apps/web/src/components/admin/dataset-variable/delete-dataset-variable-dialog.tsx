@@ -20,7 +20,11 @@ interface DeleteDatasetVariableDialogProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-export function DeleteDatasetVariableDialog({ datasetVariableId, datasetVariableName, onDelete }: DeleteDatasetVariableDialogProps) {
+export function DeleteDatasetVariableDialog({
+  datasetVariableId,
+  datasetVariableName,
+  onDelete,
+}: DeleteDatasetVariableDialogProps) {
   const t = useTranslations("adminDatasetEditor");
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -46,13 +50,13 @@ export function DeleteDatasetVariableDialog({ datasetVariableId, datasetVariable
         variant="outline"
         size="icon"
         title={t("tableActions.delete")}
+        data-testid={`admin.dataset-variable.delete-${datasetVariableName}`}
         onClick={(e) => {
           e.preventDefault();
           setOpen(true);
         }}
         className="cursor-pointer"
-        type="button"
-      >
+        type="button">
         <Trash className="h-4 w-4" />
         <span className="sr-only">{t("tableActions.delete")}</span>
       </Button>
@@ -67,16 +71,15 @@ export function DeleteDatasetVariableDialog({ datasetVariableId, datasetVariable
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isDeleting}
-              className="w-full cursor-pointer sm:w-auto"
-            >
+              className="w-full cursor-pointer sm:w-auto">
               {t("deleteDialog.cancel")}
             </Button>
             <Button
+              data-testid={`admin.dataset-variable.delete-confirm-${datasetVariableName}`}
               variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-full cursor-pointer sm:w-auto"
-            >
+              className="w-full cursor-pointer sm:w-auto">
               {isDeleting ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
             </Button>
           </div>
