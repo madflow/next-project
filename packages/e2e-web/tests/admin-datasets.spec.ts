@@ -17,5 +17,13 @@ test.describe("Admin Datasets", () => {
     await page.getByTestId("org-option-test-organization").click();
     await page.getByTestId("app.admin.dataset.upload-button").click();
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+    await page.getByTestId("app.datatable.search-input").fill("demo");
+    await page.getByRole("link", { name: "demo" }).click();
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await page.getByRole("textbox", { name: "Label" }).click();
+    await page.getByRole("textbox", { name: "Label" }).fill("Age in years edited");
+    await page.getByRole("button", { name: "Save changes" }).click();
   });
 });
