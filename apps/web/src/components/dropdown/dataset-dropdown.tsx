@@ -42,7 +42,7 @@ export function DatasetDropdown({ projectId, onValueChange, defaultValue }: Data
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!data?.rows || data.rows.length === 0) {
     return (
       <Select disabled>
         <SelectTrigger data-testid="app.dropdown.dataset.empty">
@@ -65,7 +65,7 @@ export function DatasetDropdown({ projectId, onValueChange, defaultValue }: Data
       <SelectContent data-testid="app.dropdown.dataset.content">
         <SelectGroup key="dataset-group">
           <SelectLabel key="dataset-label">Select a dataset</SelectLabel>
-          {data.map((item) => (
+          {data.rows.map((item) => (
             <SelectItem
               key={item.datasets.id}
               value={item.datasets.id}

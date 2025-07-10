@@ -1,5 +1,4 @@
 import { notFound, redirect } from "next/navigation";
-import { DatasetDropdown } from "@/components/dropdown/dataset-dropdown";
 import { PageLayout } from "@/components/page/page-layout";
 import { AdHocAnalysis } from "@/components/project/adhoc-analysis";
 import { findBySlug, hasAccess } from "@/dal/project";

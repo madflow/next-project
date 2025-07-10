@@ -25,7 +25,8 @@ export const apiQueryHookParamsSchema = z.object({
   keepPreviousData: z.boolean().optional(),
 });
 
-export type ApiDefaultResponsePayload = {
+export type ApiResponsePayload<T> = {
+  rows: T[];
   count: number;
   limit: number;
   offset: number;
