@@ -31,6 +31,14 @@ export function NavProject({ activeOrganization, activeProject }: NavProjectProp
             </a>
           </SidebarMenuButton>
         </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild>
+            <a href={`/project/${activeProject.slug}/adhoc`}>
+              <ChartArea />
+              <span>AdHoc</span>
+            </a>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );
