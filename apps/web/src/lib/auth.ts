@@ -87,7 +87,7 @@ const authConfig = {
         });
 
         await sendMail({
-          to: user.email, // Send to current email to verify the change
+          to: user.email,
           from: env.MAIL_DEFAULT_SENDER,
           subject: heading,
           text: `${content}\n\n${action}: ${url}`,
@@ -131,6 +131,7 @@ const authConfig = {
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    disableSignUp: false,
     sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }) => {
       const { user, url } = data;
       const { heading, content, action } = getEmailMessage("passwordReset", user.locale);
