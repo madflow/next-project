@@ -1,5 +1,4 @@
 import { Row, flexRender } from "@tanstack/react-table";
-import { useTranslations } from "next-intl";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 interface TableBodyProps<TData> {
@@ -8,7 +7,6 @@ interface TableBodyProps<TData> {
 }
 
 export function TableBodyComponent<TData>({ rows, columnsLength }: TableBodyProps<TData>) {
-  const t = useTranslations();
   return (
     <TableBody>
       {rows.length ? (
@@ -23,9 +21,7 @@ export function TableBodyComponent<TData>({ rows, columnsLength }: TableBodyProp
         ))
       ) : (
         <TableRow>
-          <TableCell colSpan={columnsLength} className="h-24 text-center">
-            {t("datatable.noResults")}
-          </TableCell>
+          <TableCell colSpan={columnsLength} className="h-24 text-center"></TableCell>
         </TableRow>
       )}
     </TableBody>

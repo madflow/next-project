@@ -4,7 +4,6 @@ import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from
 import { SearchIcon, XIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table } from "@/components/ui/table";
-import { toCustomSorting, toReactTableSorting } from "./table-utils";
 import type { PaginationState, SortingState } from "@/types";
 import { ErrorDisplay } from "./components/error-display";
 import { LoadingDisplay } from "./components/loading-display";
@@ -12,6 +11,7 @@ import { DataTablePagination } from "./components/pagination";
 import { TableBodyComponent } from "./components/table-body";
 import { TableHeaderComponent } from "./components/table-header";
 import { DataTableViewOptions } from "./components/view-options";
+import { toCustomSorting, toReactTableSorting } from "./table-utils";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[];
@@ -85,6 +85,7 @@ export function DataTable<TData>({
               {searchValue ? (
                 <button
                   type="button"
+                  data-testid="app.datatable.search-clear-button"
                   aria-label="Clear search"
                   onClick={() => onSearchChange("")}
                   className="text-muted-foreground hover:text-foreground absolute top-1/2 left-2 -translate-y-1/2 transition-colors">
@@ -97,6 +98,7 @@ export function DataTable<TData>({
               )}
               <Input
                 type="text"
+                data-testid="app.datatable.search-input"
                 value={searchValue}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder={searchPlaceholder}

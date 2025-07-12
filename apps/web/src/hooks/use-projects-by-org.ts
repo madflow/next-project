@@ -1,11 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-
-export type Project = {
-  id: string;
-  name: string;
-  slug: string;
-  organizationId: string;
-};
+import { Project } from "@/types/project";
 
 export function useProjectsByOrg(organizationId: string, queryParams?: Record<string, string>) {
   const apiQueryParams = new URLSearchParams(queryParams || {});
@@ -26,7 +20,7 @@ export function useProjectsByOrg(organizationId: string, queryParams?: Record<st
       if (!response.ok) {
         throw new Error("Failed to fetch projects");
       }
-      const data = await response.json();
+      const data = (await response.json()) as { rows: Project[] };
       return data.rows || [];
     },
     enabled: !!organizationId,

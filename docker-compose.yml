@@ -5,6 +5,7 @@ services:
       context: .
       dockerfile: ./apps/web/Dockerfile
     environment:
+      - ANALYSIS_API_KEY=secret
       - AUTH_SECRET=2gH418GartJnclf5xCN6sErzaP3PWgru
       - AUTH_URL=http://localhost:3001
       - BASE_URL=http://localhost:3001

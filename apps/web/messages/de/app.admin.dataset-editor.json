@@ -1,0 +1,60 @@
+{
+  "adminDatasetEditor": {
+    "common": {
+      "saving": "Wird gespeichert...",
+      "saveChanges": "Änderungen speichern",
+      "cancel": "Abbrechen"
+    },
+    "columns": {
+      "label": "Label",
+      "measure": "Niveau",
+      "name": "Name",
+      "type": "Typ"
+    },
+    "editor": {
+      "title": "Datensatz Editor für {name}",
+      "variables": "Variablen",
+      "projects": "Projekte"
+    },
+    "editVariable": {
+      "title": "Variable bearbeiten",
+      "description": "Aktualisieren Sie das Label für die Variable",
+      "form": {
+        "label": {
+          "label": "Label",
+          "placeholder": "Geben Sie ein beschreibendes Label ein",
+          "errors": {
+            "required": "Label ist erforderlich"
+          }
+        },
+        "name": {
+          "label": "Name"
+        },
+        "type": {
+          "label": "Typ"
+        },
+        "measure": {
+          "label": "Niveau"
+        },
+        "success": "Variable erfolgreich aktualisiert",
+        "errors": {
+          "updateFailed": "Fehler beim Aktualisieren der Variable"
+        }
+      }
+    },
+    "projectsExplanation": "Ein Datensatz kann einem oder mehreren Projekten hinzugefügt werden.",
+    "searchPlaceholder": "Variablen durchsuchen",
+    "deleteDialog": {
+      "title": "Variable löschen",
+      "description": "Sind Sie sicher, dass Sie die Variable {name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "error": "Fehler beim Löschen der Variable."
+    },
+    "tableActions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
+    }
+  }
+}
