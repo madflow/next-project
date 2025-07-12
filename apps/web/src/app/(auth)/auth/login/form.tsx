@@ -15,7 +15,11 @@ import { signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { type LoginSchema, loginSchema } from "./schema";
 
-export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+type LoginFormProps = {
+  signUpDisabled: boolean;
+};
+
+export function LoginForm(props: LoginFormProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations();
   const router = useRouter();
@@ -46,7 +50,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader className="align-center flex justify-between space-y-1">
           <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
@@ -99,15 +103,17 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                   {t("login.form.submit")}
                 </Button>
               </div>
-              <div className="mt-4 text-center text-sm">
-                {t("login.links.signUp.question")}{" "}
-                <Link
-                  href="/auth/sign-up"
-                  className="underline underline-offset-4"
-                  data-testid="auth.login.form.sign-up">
-                  {t("login.links.signUp.text")}
-                </Link>
-              </div>
+              {props.signUpDisabled === false && (
+                <div className="mt-4 text-center text-sm">
+                  {t("login.links.signUp.question")}{" "}
+                  <Link
+                    href="/auth/sign-up"
+                    className="underline underline-offset-4"
+                    data-testid="auth.login.form.sign-up">
+                    {t("login.links.signUp.text")}
+                  </Link>
+                </div>
+              )}
             </form>
           </Form>
         </CardContent>
