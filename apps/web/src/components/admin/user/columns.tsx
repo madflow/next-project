@@ -9,6 +9,7 @@ import { DataTableColumnHeader } from "@/components/datatable/components/column-
 import { Button } from "@/components/ui/button";
 import { type AuthUser } from "@/types/user";
 import { DeleteUserDialog } from "./delete-user-dialog";
+import { InfoUserModal } from "./info-user-modal";
 
 export const columns: ColumnDef<AuthUser>[] = [
   {
@@ -46,6 +47,7 @@ export const columns: ColumnDef<AuthUser>[] = [
 
       return (
         <div className="flex flex-row gap-2">
+          <InfoUserModal user={row.original} />
           <Button
             asChild
             variant="outline"
