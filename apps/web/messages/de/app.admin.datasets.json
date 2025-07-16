@@ -31,7 +31,7 @@
     "description": "Verwalten Sie Ihre Datensätze",
     "errors": {
       "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {maxSize}",
-      "invalidFileType": "Ungültiger Dateityp. Bitte laden Sie eine .sav, .xlsx, .csv, .ods oder .parquet Datei hoch",
+      "invalidFileType": "Ungültiger Dateityp. Bitte laden Sie eine .sav Datei hoch",
       "nameRequired": "Bitte geben Sie einen Namen für die Datei ein",
       "noFileSelected": "Bitte wählen Sie eine Datei zum Hochladen aus",
       "organizationRequired": "Bitte wählen Sie eine Organisation aus",
@@ -43,6 +43,7 @@
       "createOrganizationLink": "Organisation erstellen",
       "descriptionLabel": "Beschreibung (Optional)",
       "descriptionPlaceholder": "Fügen Sie eine Beschreibung für diese Datei hinzu",
+      "fileLabel": "Datensatzdatei",
       "nameLabel": "Name",
       "namePlaceholder": "Geben Sie einen Namen für diesen Datensatz ein",
       "noOrganizationsAvailable": "Keine Organisationen verfügbar",
@@ -67,7 +68,7 @@
       "clickToUpload": "Zum Hochladen klicken",
       "description": "Laden Sie einen neuen Datensatz in das System hoch",
       "orDragAndDrop": "oder Datei hier ablegen",
-      "supportedFormats": ".sav, .xlsx, .csv, .ods, .parquet",
+      "supportedFormats": ".sav",
       "title": "Datensatz anlegen"
     },
     "uploadButton": "Datensatz anlegen",
