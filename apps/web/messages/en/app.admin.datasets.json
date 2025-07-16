@@ -30,11 +30,11 @@
     },
     "description": "Manage your datasets",
     "errors": {
-      "fileTooLarge": "File is too large. Maximum size is {maxSize}",
-      "invalidFileType": "Invalid file type. Please upload a .sav, .xlsx, .csv, .ods, or .parquet file",
-      "nameRequired": "Please enter a name for the dataset",
-      "noFileSelected": "Please select a file to upload",
-      "organizationRequired": "Please select an organization",
+      "fileTooLarge": "File is too large. Maximum size is {maxSize}.",
+      "invalidFileType": "Invalid file type. Please upload a .sav file.",
+      "nameRequired": "Please enter a name for the dataset.",
+      "noFileSelected": "Please select a file to upload.",
+      "organizationRequired": "Please select an organization.",
       "unknownError": "An error occurred. Please try again.",
       "uploadFailed": "Failed to upload file. Please try again."
     },
@@ -43,6 +43,7 @@
       "createOrganizationLink": "Create organization",
       "descriptionLabel": "Description (Optional)",
       "descriptionPlaceholder": "Add a description for this dataset",
+      "fileLabel": "Dataset file",
       "nameLabel": "Name",
       "namePlaceholder": "Enter a name for this dataset",
       "noOrganizationsAvailable": "No organizations available",
@@ -67,7 +68,7 @@
       "clickToUpload": "Click to upload",
       "description": "Upload a new dataset to the system",
       "orDragAndDrop": "or drag and drop",
-      "supportedFormats": ".sav, .xlsx, .csv, .ods, .parquet",
+      "supportedFormats": ".sav",
       "title": "Upload Dataset"
     },
     "uploadButton": "Create dataset",
