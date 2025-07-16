@@ -1,7 +1,7 @@
 import tempfile
-from typing import Any, Dict, Optional, Tuple
-from uuid import UUID
+from typing import Any, Dict, List, Optional, Tuple
 
+import pandas as pd
 import pyreadstat
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.routing import APIRouter
@@ -12,11 +12,20 @@ from sqlalchemy.future import select
 from analysis.db.dependencies import get_db_session
 from analysis.db.models.models import Dataset
 from analysis.services.s3_client import S3Client
+from analysis.services.stats import StatisticsService
 from analysis.settings import settings
 from analysis.web.api.schemas.datasets import DatasetResponse
 from analysis.web.api.security import get_api_key
 
 router = APIRouter(tags=["datasets"])
+
+
+class StatsVariable(BaseModel):
+    variable: str
+
+
+class StatsRequest(BaseModel):
+    variables: List[StatsVariable]
 
 
 async def _get_dataset_by_id(db: AsyncSession, dataset_id: str) -> Optional[Dataset]:
@@ -104,6 +113,32 @@ def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             )
 
 
+def _read_dataframe_from_s3(s3_key: str) -> pd.DataFrame:
+    """
+    Read SAV file from S3 and return a pandas DataFrame.
+    """
+    s3_client = S3Client.get_client()
+
+    with tempfile.NamedTemporaryFile(suffix=".sav") as temp_file:
+        try:
+            # Download file from S3 to a temporary file
+            s3_client.download_file(
+                Bucket=settings.s3_bucket_name, Key=s3_key, Filename=temp_file.name
+            )
+
+            # Read the SAV file
+            df, _ = pyreadstat.read_sav(temp_file.name)
+            if df is None:
+                raise ValueError("No data found in SAV file.")
+            return df
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Error reading SAV file: {str(e)}",
+            )
+
+
 @router.get("/datasets/{dataset_id}/metadata", response_model=MetadataResponse)
 async def get_dataset_metadata(
     dataset_id: str,
@@ -143,4 +178,46 @@ async def get_dataset_metadata(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error importing dataset: {str(e)}",
+        )
+
+
+@router.post("/datasets/{dataset_id}/stats")
+async def get_dataset_stats(
+    dataset_id: str,
+    stats_request: StatsRequest,
+    db: AsyncSession = Depends(get_db_session),
+    api_key: str = Security(get_api_key),
+) -> List[Dict[str, Any]]:
+    """
+    Calculate statistics for a list of variables in a dataset.
+    """
+    dataset = await _get_dataset_by_id(db, dataset_id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    if not dataset.s3_key:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Dataset has no associated S3 key",
+        )
+
+    try:
+        df = _read_dataframe_from_s3(dataset.s3_key)
+        stats_service = StatisticsService()
+        results = []
+        for var_request in stats_request.variables:
+            try:
+                stats = stats_service.describe_var(df, var_request.variable)
+                results.append({"variable": var_request.variable, "stats": stats})
+            except ValueError as e:
+                results.append({"variable": var_request.variable, "error": str(e)})
+
+        return results
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing dataset statistics: {str(e)}",
         )
