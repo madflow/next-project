@@ -25,6 +25,7 @@ class StatisticsService:
         if variable_name not in data.columns:
             raise ValueError(f"Variable '{variable_name}' not found in the DataFrame.")
 
+        data = data.replace(-999.0, pd.NA)
         variable = data[variable_name]
         stats = {}
 
@@ -95,7 +96,6 @@ class StatisticsService:
                 else:
                     stats["range"] = None
 
-        # --- Frequency Table (All Types) ---
         if "frequencies" in include:
             counts = variable.value_counts()
             percentages = variable.value_counts(normalize=True) * 100
@@ -104,6 +104,23 @@ class StatisticsService:
             )
             frequency_table_df.index.name = "value"
             frequency_table_df.reset_index(inplace=True)
-            stats["frequency_table"] = frequency_table_df.to_dict("records")
+
+            # Convert to records while preserving original string representation
+            frequency_records = []
+            for _, row in frequency_table_df.iterrows():
+                value = row["value"]
+
+                # Always preserve as string to maintain exact format (e.g., "1.0" stays "1.0")
+                value = str(value) if pd.notna(value) == True else value
+
+                frequency_records.append(
+                    {
+                        "value": value,
+                        "counts": int(row["counts"]),
+                        "percentages": float(row["percentages"]),
+                    }
+                )
+
+            stats["frequency_table"] = frequency_records
 
         return stats
