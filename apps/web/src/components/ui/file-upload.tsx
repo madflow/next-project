@@ -591,6 +591,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
           {children}
           <input
             type="file"
+            data-testid="file-upload-input"
             id={inputId}
             aria-labelledby={labelId}
             aria-describedby={dropzoneId}
