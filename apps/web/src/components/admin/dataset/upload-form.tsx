@@ -1,31 +1,38 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
-import { FileText, Loader2, Upload, X } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import * as z from "zod";
+import { z } from "zod/v4";
 import { uploadDataset } from "@/actions/dataset";
-import { listProjects } from "@/actions/project";
 import { Button } from "@/components/ui/button";
+import {
+  FileUpload,
+  FileUploadDropzone,
+  FileUploadItem,
+  FileUploadItemDelete,
+  FileUploadItemMetadata,
+  FileUploadItemPreview,
+  FileUploadList,
+} from "@/components/ui/file-upload";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { formatFileSize } from "@/lib/utils";
 import { Organization } from "@/types/organization";
 
-type FileWithPreview = File & {
-  preview?: string;
-};
-
-// Form validation schema
 const formSchema = z.object({
+  files: z
+    .array(z.custom<File>())
+    .min(1, "Please select exactly one file")
+    .refine((files) => files.every((file) => file.size <= 100 * 1024 * 1024), {
+      message: "File size must be less than 100MB",
+      path: ["files"],
+    }),
   name: z.string().min(1, "Name is required").trim(),
   organizationId: z.string().min(1, "Organization selection is required"),
   description: z.string().optional(),
@@ -37,15 +44,10 @@ export function DatasetUploadForm() {
   const router = useRouter();
   const t = useTranslations("adminDataset");
   const [isPending] = useTransition();
-  const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Validate file type
-  const validTypes = [".sav"]; //".xlsx", ".csv", ".ods", ".parquet"];
 
   useEffect(() => {
     async function loadOrganizations() {
@@ -65,59 +67,21 @@ export function DatasetUploadForm() {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      files: [],
       name: "",
       organizationId: "",
       description: "",
     },
   });
 
-  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
-    queryKey: ["projects"],
-    queryFn: listProjects,
-  });
-
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const fileExt = file.name.split(".").pop()?.toLowerCase();
-
-    if (fileExt && !validTypes.includes(`.${fileExt}`)) {
-      toast.error(t("errors.invalidFileType"));
-      return;
-    }
-
-    // Validate file size (max 100MB)
-    if (file.size > 100 * 1024 * 1024) {
-      toast.error(t("errors.fileTooLarge", { maxSize: "100MB" }));
-      return;
-    }
-
-    const fileWithPreview = Object.assign(file, {
-      preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined,
-    });
-
-    setSelectedFile(fileWithPreview);
-
-    // Set default name if not set
-    const currentName = form.getValues("name");
-    if (!currentName) {
-      const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
-      form.setValue("name", fileNameWithoutExt);
-    }
-  };
-
-  const handleRemoveFile = () => {
-    if (selectedFile?.preview) {
-      URL.revokeObjectURL(selectedFile.preview);
-    }
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onErrors = (errors: any) => {
+    console.log(errors);
   };
 
   const onSubmit = async (data: FormData) => {
+    const selectedFile = data.files[0];
+
     if (!selectedFile) {
       toast.error(t("errors.noFileSelected"));
       return;
@@ -137,9 +101,6 @@ export function DatasetUploadForm() {
       if (result.success) {
         toast.success(t("uploadSuccess"));
         router.push("/admin/datasets");
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
       } else {
         toast.error(result.error || t("errors.uploadFailed"));
       }
@@ -151,92 +112,70 @@ export function DatasetUploadForm() {
     }
   };
 
-  // Clean up preview URL on unmount
-  useEffect(() => {
-    return () => {
-      if (selectedFile?.preview) {
-        URL.revokeObjectURL(selectedFile.preview);
-      }
-    };
-  }, [selectedFile]);
-
-  // Show loading state while projects are loading
-  if (isLoadingProjects) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-2xl space-y-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* File Upload Area */}
-          <div className="space-y-2">
-            <div className="flex w-full items-center justify-center">
-              <label
-                htmlFor="file-upload"
-                className={cn(
-                  "flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed",
-                  "hover:bg-accent/50 transition-colors",
-                  (isPending || isUploading) && "cursor-not-allowed opacity-50"
-                )}
-                onClick={(e) => {
-                  // Prevent opening the file dialog if already uploading
-                  if (isUploading) e.preventDefault();
-                }}>
-                <div className="flex flex-col items-center justify-center px-4 pt-5 pb-6 text-center">
-                  <Upload className="text-muted-foreground mb-3 h-10 w-10" />
-                  <p className="text-muted-foreground mb-2 text-sm">
-                    <span className="font-semibold">{t("upload.clickToUpload")}</span> {t("upload.orDragAndDrop")}
-                  </p>
-                  <p className="text-muted-foreground text-xs">{t("upload.supportedFormats")} (max 100MB)</p>
-                </div>
-                <input
-                  id="file-upload"
-                  data-testid="app.admin.dataset.file-upload"
-                  ref={fileInputRef}
-                  name="file-upload"
-                  type="file"
-                  className="hidden"
-                  accept={validTypes.join(",")}
-                  onChange={handleFileChange}
-                  disabled={isPending || isUploading}
-                />
-              </label>
-            </div>
-
-            {selectedFile && (
-              <div className="bg-card mt-4 rounded-lg border p-4" data-testid="app.admin.dataset.selected-file">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-md">
-                        <FileText className="h-5 w-5" />
+        <form onSubmit={form.handleSubmit(onSubmit, onErrors)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="files"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("form.fileLabel")}</FormLabel>
+                <FormControl>
+                  <FileUpload
+                    maxFiles={1}
+                    maxSize={100 * 1024 * 1024}
+                    accept=".sav"
+                    className="w-full"
+                    value={field.value}
+                    onValueChange={(value) => {
+                      const nameState = form.getFieldState("name");
+                      if (!nameState.isTouched) {
+                        const fileValue = value[0] ?? null;
+                        if (fileValue) {
+                          form.setValue("name", fileValue.name);
+                        }
+                      }
+                      field.onChange(value);
+                    }}
+                    onFileReject={(_, message) => {
+                      form.setError("files", {
+                        message,
+                      });
+                    }}
+                    multiple={false}>
+                    <FileUploadDropzone>
+                      <div className="flex flex-col items-center gap-1 text-center">
+                        <div className="flex items-center justify-center rounded-full border p-2.5">
+                          <Upload className="text-muted-foreground size-6" />
+                        </div>
+                        <p className="text-muted-foreground mb-2 text-sm">
+                          <span className="font-semibold">{t("upload.clickToUpload")}</span> {t("upload.orDragAndDrop")}
+                        </p>
+                        <p className="text-muted-foreground text-xs">{t("upload.supportedFormats")} (max 100MB)</p>
                       </div>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{selectedFile.name}</p>
-                      <p className="text-muted-foreground text-xs">{formatFileSize(selectedFile.size)}</p>
-                    </div>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemoveFile}
-                    disabled={isPending || isUploading}
-                    aria-label="Remove file">
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+                    </FileUploadDropzone>
+                    <FileUploadList>
+                      {field.value.map((file, index) => (
+                        <FileUploadItem key={index} value={file}>
+                          <FileUploadItemPreview />
+                          <FileUploadItemMetadata />
+                          <FileUploadItemDelete asChild>
+                            <Button variant="ghost" size="icon" className="size-7">
+                              <X />
+                            </Button>
+                          </FileUploadItemDelete>
+                        </FileUploadItem>
+                      ))}
+                    </FileUploadList>
+                  </FileUpload>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
-          </div>
+          />
 
-          {/* File Name */}
           <FormField
             control={form.control}
             name="name"
@@ -246,7 +185,7 @@ export function DatasetUploadForm() {
                   {t("form.nameLabel")} <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder={t("form.namePlaceholder")} disabled={isPending || isUploading} {...field} />
+                  <Input placeholder={t("form.namePlaceholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -314,10 +253,7 @@ export function DatasetUploadForm() {
             <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
               {t("actions.cancel")}
             </Button>
-            <Button
-              type="submit"
-              data-testid="app.admin.dataset.upload-button"
-              disabled={isPending || isUploading || !selectedFile || projects.length === 0}>
+            <Button type="submit" data-testid="app.admin.dataset.upload-button" disabled={isPending || isUploading}>
               {isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
