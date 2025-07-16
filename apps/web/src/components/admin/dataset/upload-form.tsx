@@ -158,7 +158,7 @@ export function DatasetUploadForm() {
                     </FileUploadDropzone>
                     <FileUploadList>
                       {field.value.map((file, index) => (
-                        <FileUploadItem key={index} value={file}>
+                        <FileUploadItem key={index} value={file} data-testid="app.admin.dataset.selected-file">
                           <FileUploadItemPreview />
                           <FileUploadItemMetadata />
                           <FileUploadItemDelete asChild>
