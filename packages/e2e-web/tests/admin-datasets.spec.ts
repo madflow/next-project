@@ -10,7 +10,7 @@ test.describe("Admin Datasets", () => {
     await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
     await page.getByTestId("admin.datasets.create.upload").click();
-    const uploadFile = page.getByTestId("app.admin.dataset.file-upload");
+    const uploadFile = page.getByTestId("file-upload-input");
     await uploadFile.setInputFiles("testdata/spss/demo.sav");
     await page.waitForSelector("data-testid=app.admin.dataset.selected-file");
     await page.getByTestId("app.admin.dataset.organization-trigger").click();
