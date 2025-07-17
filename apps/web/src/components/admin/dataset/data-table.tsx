@@ -41,21 +41,13 @@ export function DatasetsDataTable({ columns }: Props) {
     keepPreviousData: true,
   });
 
-  const data = {
-    data: apiResponse?.rows || [],
-    count: apiResponse?.count || 0,
-    limit: pagination.pageSize,
-    offset: pagination.pageIndex * pagination.pageSize,
-  };
-
-  // Convert Error object to string for the DataTable component
   const error = queryError ? queryError.message : null;
 
   return (
     <DataTable<Dataset>
       columns={columns}
-      data={data.data}
-      count={data.count}
+      data={apiResponse?.rows ?? []}
+      count={apiResponse?.count ?? 0}
       isLoading={isLoading}
       error={error}
       refetch={refetch}
