@@ -3,7 +3,8 @@
     "version": "0.1.0",
     "scripts": {
         "start": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'",
-        "dev": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'"
+        "dev": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'",
+        "test": "bash -c 'source .venv/bin/activate && poetry run pytest'"
     },
     "keywords": [],
     "author": "",
