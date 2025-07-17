@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import { DatasetDropdown } from "@/components/dropdown/dataset-dropdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
-import { transformToRechartsData } from "@/lib/analysis-bridge";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
 import { StatsRequest } from "@/types/stats";
 import { BarAdhoc } from "../chart/bar-adhoc";
+import { CentralTendency } from "../chart/central-tendency-card";
+import { PieAdhoc } from "../chart/pie-adhoc";
+import { ThemeSelector } from "../theme-selector";
 import { Code } from "../ui/code";
 import { AdHocVariables } from "./adhoc-variables";
 
@@ -41,19 +42,19 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     setSelectedVariable(variable);
   };
   return (
-    <div className="flex gap-4">
-      <div className="flex w-64 flex-col gap-4">
+    <div className="theme-container flex gap-4">
+      <div className="flex w-64 max-w-64 min-w-64 flex-col gap-4">
+        <ThemeSelector />
         <DatasetDropdown
           projectId={project.id}
           onValueChange={(value) => {
             setSelectedDataset(value);
           }}
         />
-
         {selectedDataset && <AdHocVariables datasetId={selectedDataset} onAddVariable={handleAddVariable} />}
       </div>
       {selectedDataset && selectedVariable && data && (
-        <Tabs defaultValue="chart">
+        <Tabs defaultValue="chart" className="w-full">
           <TabsList>
             <TabsTrigger value="chart">Chart</TabsTrigger>
             <TabsTrigger value="variable">Variable</TabsTrigger>
@@ -61,14 +62,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           </TabsList>
           <TabsContent value="chart" className="flex flex-col gap-4">
             <BarAdhoc variable={selectedVariable} stats={data} />
-
-            <h3 className="text-2xl font-bold">{selectedVariable.label}</h3>
-            <BarChart width={768} height={400} data={transformToRechartsData(selectedVariable, data)}>
-              {/* <XAxis angle={-90} textAnchor="end" dataKey="label" height={200} /> */}
-              <XAxis dataKey="label" height={200} fontSize={12} fontSizeAdjust={-2} />
-              <YAxis fontSize={12} />
-              <Bar dataKey="count" fill="#8884d8" label="label" />
-            </BarChart>
+            <PieAdhoc variable={selectedVariable} stats={data} />
+            <CentralTendency variable={selectedVariable} stats={data} />
           </TabsContent>
           <TabsContent value="variable">
             <Code>{JSON.stringify(selectedVariable, null, 2)}</Code>

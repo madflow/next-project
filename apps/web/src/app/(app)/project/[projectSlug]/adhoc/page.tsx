@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { ActiveThemeProvider } from "@/components/active-theme";
 import { PageLayout } from "@/components/page/page-layout";
 import { AdHocAnalysis } from "@/components/project/adhoc-analysis";
 import { findBySlug, hasAccess } from "@/dal/project";
@@ -24,7 +25,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageLayout data-testid="app.project.adhoc" title="AdHoc Analysis">
-      <AdHocAnalysis project={project} />
+      <ActiveThemeProvider>
+        <AdHocAnalysis project={project} />
+      </ActiveThemeProvider>
     </PageLayout>
   );
 }
