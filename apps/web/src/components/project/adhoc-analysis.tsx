@@ -16,7 +16,10 @@ type AdHocAnalysisProps = {
 function transformToRechartsData(variableConfig: DatasetVariable, statsData: StatsResponse) {
   // Extract the valueLabels and frequency table
   const valueLabels = variableConfig.valueLabels;
-  const frequencyTable = statsData[0].stats.frequency_table;
+  const firstVariable = statsData[0];
+  if (!firstVariable) return [];
+  const frequencyTable = firstVariable.stats.frequency_table;
+  if (!frequencyTable) return [];
 
   // Transform the data by matching frequency table values to their labels
   const rechartsData = frequencyTable.map((item) => {
@@ -77,10 +80,14 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             <TabsTrigger value="variable">Variable</TabsTrigger>
             <TabsTrigger value="stats">Stats</TabsTrigger>
           </TabsList>
-          <TabsContent value="chart">
+          <TabsContent value="chart" className="flex flex-col gap-4">
+            <h3 className="text-2xl font-bold">{selectedVariable.label}</h3>
             <BarChart width={768} height={400} data={transformToRechartsData(selectedVariable, data)}>
-              <XAxis angle={-90} textAnchor="end" dataKey="label" height={200} />
-              <YAxis />
+              {/* <XAxis angle={-90} textAnchor="end" dataKey="label" height={200} /> */}
+              <XAxis dataKey="label" height={200} fontSize={12} fontSizeAdjust={-2}>
+                <label>Label</label>
+              </XAxis>
+              <YAxis fontSize={12} />
               <Bar dataKey="count" fill="#8884d8" label="label" />
             </BarChart>
           </TabsContent>

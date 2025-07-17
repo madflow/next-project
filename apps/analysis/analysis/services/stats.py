@@ -44,7 +44,7 @@ class StatisticsService:
                     "mode",
                 ]
             else:
-                include = ["count", "mode"]
+                include = ["count", "mode", "frequencies"]
 
         # --- General Statistics ---
         if "count" in include:
