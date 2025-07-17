@@ -59,7 +59,7 @@ export function DatasetDropdown({ projectId, onValueChange, defaultValue }: Data
         onValueChange(value);
       }}
       value={selectedValue}>
-      <SelectTrigger className="w-64" data-testid="app.dropdown.dataset.trigger">
+      <SelectTrigger data-testid="app.dropdown.dataset.trigger" className="w-full">
         <SelectValue placeholder="Select a dataset" />
       </SelectTrigger>
       <SelectContent data-testid="app.dropdown.dataset.content">
@@ -67,6 +67,7 @@ export function DatasetDropdown({ projectId, onValueChange, defaultValue }: Data
           <SelectLabel key="dataset-label">Select a dataset</SelectLabel>
           {data.rows.map((item) => (
             <SelectItem
+              className="truncate"
               key={item.datasets.id}
               value={item.datasets.id}
               data-testid={`dataset-dropdown-item-${item.datasets.id}`}>

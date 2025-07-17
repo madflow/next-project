@@ -26,11 +26,11 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="shadow-xs">
+      <CardHeader className="px-3">
         <Input type="text" placeholder="Search..." onChange={(e) => handleSearch(e.target.value)} value={search} />
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-3">
         <ScrollArea className="flex max-h-[400px] min-h-[300px] flex-col gap-2">
           {data &&
             data.rows.map((variable) => (
@@ -45,7 +45,7 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
             ))}
         </ScrollArea>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="px-3">
         <Button variant={"outline"} className="w-full" onClick={() => setPerPage(perPage + 10)}>
           <ArrowBigDownIcon />
         </Button>
