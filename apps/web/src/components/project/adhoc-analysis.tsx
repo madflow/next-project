@@ -4,39 +4,18 @@ import { useEffect, useState } from "react";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import { DatasetDropdown } from "@/components/dropdown/dataset-dropdown";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StatsRequest, StatsResponse, useDatasetStats } from "@/hooks/use-dataset-stats";
+import { useDatasetStats } from "@/hooks/use-dataset-stats";
+import { transformToRechartsData } from "@/lib/analysis-bridge";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
+import { StatsRequest } from "@/types/stats";
+import { BarAdhoc } from "../chart/bar-adhoc";
 import { Code } from "../ui/code";
 import { AdHocVariables } from "./adhoc-variables";
 
 type AdHocAnalysisProps = {
   project: Project;
 };
-function transformToRechartsData(variableConfig: DatasetVariable, statsData: StatsResponse) {
-  // Extract the valueLabels and frequency table
-  const valueLabels = variableConfig.valueLabels;
-  const firstVariable = statsData[0];
-  if (!firstVariable) return [];
-  const frequencyTable = firstVariable.stats.frequency_table;
-  if (!frequencyTable) return [];
-
-  // Transform the data by matching frequency table values to their labels
-  const rechartsData = frequencyTable.map((item) => {
-    const valueKey = item.value.toString(); // Convert to string to match valueLabels keys
-    console.log(valueKey);
-    const label = valueLabels[valueKey] || `Value ${item.value}`; // Fallback if label not found
-
-    return {
-      label: label,
-      value: item.value,
-      count: item.counts,
-      percentage: item.percentages,
-    };
-  });
-
-  return rechartsData;
-}
 
 export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
@@ -81,12 +60,12 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             <TabsTrigger value="stats">Stats</TabsTrigger>
           </TabsList>
           <TabsContent value="chart" className="flex flex-col gap-4">
+            <BarAdhoc variable={selectedVariable} stats={data} />
+
             <h3 className="text-2xl font-bold">{selectedVariable.label}</h3>
             <BarChart width={768} height={400} data={transformToRechartsData(selectedVariable, data)}>
               {/* <XAxis angle={-90} textAnchor="end" dataKey="label" height={200} /> */}
-              <XAxis dataKey="label" height={200} fontSize={12} fontSizeAdjust={-2}>
-                <label>Label</label>
-              </XAxis>
+              <XAxis dataKey="label" height={200} fontSize={12} fontSizeAdjust={-2} />
               <YAxis fontSize={12} />
               <Bar dataKey="count" fill="#8884d8" label="label" />
             </BarChart>
