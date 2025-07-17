@@ -42,7 +42,7 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         if (!column) {
           continue;
         }
-        if (filter.operator === "=") {
+        if (filter.operator === "=" || filter.operator === "eq") {
           query = query.where(eq(column, filter.value));
         }
       }
