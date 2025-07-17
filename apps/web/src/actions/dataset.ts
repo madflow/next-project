@@ -81,6 +81,10 @@ export async function uploadDataset({
       throw new ServerActionNotAuthorizedException("Unauthorized");
     }
 
+    if (session.user.role !== USER_ADMIN_ROLE) {
+      throw new ServerActionNotAuthorizedException("Unauthorized");
+    }
+
     if (!ALLOWED_FILE_TYPES.includes(contentType) && !file.name.match(/\.(sav)$/i)) {
       throw new ServerActionValidationException("Invalid file type. Allowed types: .sav");
     }
@@ -146,7 +150,7 @@ export async function uploadDataset({
     const metadataResult = await fileMetadataResp.json();
     const datasetReadResponse = datasetReadResponseSchema.safeParse(metadataResult);
     if (!datasetReadResponse.success) {
-      console.log(datasetReadResponse.error);
+      console.error(datasetReadResponse.error);
       throw new ServerActionException("Failed to fetch file metadata from analysis service");
     }
 
