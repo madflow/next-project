@@ -1,0 +1,37 @@
+name: Unit and Integration Tests
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  NEXT_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
+  NEXT_PUBLIC_BASE_URL: http://localhost:3000
+  NEXT_PUBLIC_SITE_NAME: app
+on:
+  push:
+    branches: [ main, next ]
+  pull_request:
+    branches: [ main, next ]
+jobs:
+  run-test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Copy .env.dist
+      run: cp ./apps/web/.env.dist ./apps/web/.env && cp ./packages/database/.env.dist ./packages/database/.env && cp ./apps/analysis/.env.dist ./apps/analysis/.env
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Python deps 
+      run: | 
+          curl -sSL https://install.python-poetry.org | python3 -
+          cd apps/analysis 
+          python3 -m venv .venv
+          source .venv/bin/activate
+          poetry install
+      shell: bash
+    - name: Build
+      run: npm run build
+    - name: Run tests
+      run:  npm run test
