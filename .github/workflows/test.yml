@@ -7,9 +7,9 @@ env:
   NEXT_PUBLIC_SITE_NAME: app
 on:
   push:
-    branches: [ main, next ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, next ]
+    branches: [ main ]
 jobs:
   run-test:
     timeout-minutes: 60
