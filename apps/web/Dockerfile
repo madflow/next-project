@@ -16,6 +16,7 @@ RUN turbo prune @app/web --docker
 FROM base AS installer
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TURBO_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max_old_space_size=4096
 RUN apk update
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -36,7 +37,6 @@ RUN apk update
 RUN apk add --no-cache busybox-extras bash
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TURBO_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max_old_space_size=4096
 WORKDIR /app
 
 # Don't run production as root

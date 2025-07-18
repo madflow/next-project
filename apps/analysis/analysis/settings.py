@@ -1,6 +1,7 @@
 import enum
 from pathlib import Path
 from tempfile import gettempdir
+from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from yarl import URL
@@ -71,7 +72,8 @@ class Settings(BaseSettings):
 
     api_key: str = "your-super-secret-api-key"
 
-    sentry_dsn: str
+    sentry_dsn: Optional[str] = None
+    sentry_sample_rate: float = 1.0
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -11,6 +11,7 @@ from analysis.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class S3Client:
     """Singleton client for S3 storage."""
 
@@ -21,12 +22,15 @@ class S3Client:
         """Get a singleton instance of the S3 client."""
         if cls._instance is None:
             try:
-                logger.debug("Initializing S3 client with settings: %s", {
-                    "region": settings.s3_region,
-                    "endpoint": settings.s3_endpoint,
-                    "bucket": settings.s3_bucket_name,
-                    "access_key_set": bool(settings.s3_access_key_id),
-                })
+                logger.debug(
+                    "Initializing S3 client with settings: %s",
+                    {
+                        "region": settings.s3_region,
+                        "endpoint": settings.s3_endpoint,
+                        "bucket": settings.s3_bucket_name,
+                        "access_key_set": bool(settings.s3_access_key_id),
+                    },
+                )
 
                 session = Session(
                     aws_access_key_id=settings.s3_access_key_id,
@@ -35,18 +39,14 @@ class S3Client:
                 )
 
                 endpoint_url = settings.s3_endpoint
-                use_local = endpoint_url and "localhost" in endpoint_url
 
                 client_config = {
                     "service_name": "s3",
                     "config": boto3.session.Config(signature_version="s3v4"),
                 }
 
-                if use_local:
-                    client_config["endpoint_url"] = endpoint_url
-                    logger.debug("Using local S3 endpoint: %s", endpoint_url)
-                else:
-                    logger.debug("Using AWS S3 endpoint")
+                client_config["endpoint_url"] = endpoint_url
+                logger.debug("Using local S3 endpoint: %s", endpoint_url)
 
                 cls._instance = session.client(**client_config)
                 logger.debug("S3 client initialized successfully")
