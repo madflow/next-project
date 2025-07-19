@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { addToProject } from "@/actions/dataset";
 import { ProjectDropdown } from "@/components/dropdown/project-dropdown";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ type ResponseRow = {
 export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [isAddingToProject, setIsAddingToProject] = useState(false);
+  const t = useTranslations("adminDatasetEditor");
 
   const { data, isSuccess, isError } = useQueryApi<ApiResponsePayload<ResponseRow>>(
     `/api/datasets/${datasetId}/projects`,
@@ -33,17 +35,17 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
 
   const handleAddToProject = async () => {
     if (!selectedProject) {
-      toast.error("Please select a project first.");
+      toast.error(t("selectProjectError"));
       return;
     }
 
     setIsAddingToProject(true);
     try {
       await addToProject(datasetId, selectedProject);
-      toast.success("Dataset added to project successfully!");
+      toast.success(t("addToProjectSuccess"));
     } catch (error) {
-      console.error("Failed to add dataset to project:", error);
-      toast.error("Failed to add dataset to project.");
+      console.error(t("addToProjectError"), error);
+      toast.error(t("addToProjectError"));
     } finally {
       setIsAddingToProject(false);
     }
@@ -53,8 +55,8 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Error</CardTitle>
-          <CardDescription>Failed to fetch projects.</CardDescription>
+          <CardTitle>{t("error")}</CardTitle>
+          <CardDescription>{t("fetchProjectsError")}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -63,19 +65,19 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Projects</CardTitle>
-        <CardDescription>A dataset can be added to one or more projects.</CardDescription>
+        <CardTitle>{t("projects")}</CardTitle>
+        <CardDescription>{t("datasetProjectsDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <ProjectDropdown onValueChange={setSelectedProject} organizationId={organizationId} />
         <Button className="mt-4" onClick={handleAddToProject} disabled={!selectedProject || isAddingToProject}>
-          {isAddingToProject ? "Adding..." : "Add to project"}
+          {isAddingToProject ? t("adding") : t("addToProject")}
         </Button>
         {isSuccess && (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">Name</TableHead>
+                <TableHead className="w-[100px]">{t("name")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

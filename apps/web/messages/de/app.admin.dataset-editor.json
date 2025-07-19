@@ -1,5 +1,15 @@
 {
   "adminDatasetEditor": {
+    "selectProjectError": "Bitte wählen Sie zuerst ein Projekt aus.",
+    "addToProjectSuccess": "Datensatz erfolgreich zum Projekt hinzugefügt!",
+    "addToProjectError": "Fehler beim Hinzufügen des Datensatzes zum Projekt.",
+    "error": "Fehler",
+    "fetchProjectsError": "Fehler beim Abrufen der Projekte.",
+    "projects": "Projekte",
+    "datasetProjectsDescription": "Ein Datensatz kann einem oder mehreren Projekten hinzugefügt werden.",
+    "adding": "Wird hinzugefügt...",
+    "addToProject": "Zu Projekt hinzufügen",
+    "name": "Name",
     "common": {
       "saving": "Wird gespeichert...",
       "saveChanges": "Änderungen speichern",
