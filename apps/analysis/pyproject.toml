@@ -34,7 +34,7 @@ sentry-sdk = {extras = ["fastapi"], version = "^2.32.0"}
 pytest = "^8"
 ruff = "^0.5.0"
 mypy = "^1.10.1"
-pre-commit = "^3.7.1"
+pre-commit = "^4.0.0"
 black = "^24.4.2"
 pytest-cov = "^6.0.0"
 anyio = "^4"
