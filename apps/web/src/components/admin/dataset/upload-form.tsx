@@ -185,7 +185,11 @@ export function DatasetUploadForm() {
                   {t("form.nameLabel")} <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder={t("form.namePlaceholder")} {...field} />
+                  <Input
+                    placeholder={t("form.namePlaceholder")}
+                    {...field}
+                    data-testid="app.admin.dataset.name-input"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -32,8 +32,12 @@ export default async function Page({ params }: PageProps) {
     <PageLayout title={t("editor.title", { name: dataset?.name || "" })}>
       <Tabs defaultValue="variables">
         <TabsList>
-          <TabsTrigger value="variables">{t("editor.variables")}</TabsTrigger>
-          <TabsTrigger value="projects">{t("editor.projects")}</TabsTrigger>
+          <TabsTrigger value="variables" data-testid="app.admin.editor.variables.tab">
+            {t("editor.variables")}
+          </TabsTrigger>
+          <TabsTrigger value="projects" data-testid="app.admin.editor.projects.tab">
+            {t("editor.projects")}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="variables">
           <DatasetVariablesDataTable datasetId={id} />

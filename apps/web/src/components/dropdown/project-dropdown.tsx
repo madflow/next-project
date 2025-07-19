@@ -66,7 +66,7 @@ export function ProjectDropdown({ organizationId, onValueChange, defaultValue }:
         <SelectGroup key="project-group">
           <SelectLabel key="project-label">Select a project</SelectLabel>
           {projects.map((project) => (
-            <SelectItem key={project.id} value={project.id} data-testid={`project-dropdown-item-${project.id}`}>
+            <SelectItem key={project.id} value={project.id} data-testid={`project-dropdown-item-${project.slug}`}>
               {project.name}
             </SelectItem>
           ))}
