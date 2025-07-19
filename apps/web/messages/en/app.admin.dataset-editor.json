@@ -1,5 +1,15 @@
 {
   "adminDatasetEditor": {
+    "selectProjectError": "Please select a project first.",
+    "addToProjectSuccess": "Dataset added to project successfully!",
+    "addToProjectError": "Failed to add dataset to project.",
+    "error": "Error",
+    "fetchProjectsError": "Failed to fetch projects.",
+    "projects": "Projects",
+    "datasetProjectsDescription": "A dataset can be added to one or more projects.",
+    "adding": "Adding...",
+    "addToProject": "Add to project",
+    "name": "Name",
     "common": {
       "saving": "Saving...",
       "saveChanges": "Save changes",

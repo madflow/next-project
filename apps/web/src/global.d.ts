@@ -5,6 +5,7 @@ import appAdminSidebar from "../messages/en/app.admin-sidebar.json";
 import appAdminDashboard from "../messages/en/app.admin.dashboard.json";
 import adminDatasetEditor from "../messages/en/app.admin.dataset-editor.json";
 import appAdminDatasets from "../messages/en/app.admin.datasets.json";
+import appAdminDatasetVariable from "../messages/en/app.admin.dataset-variable.json";
 import appAdminOrganizations from "../messages/en/app.admin.organizations.json";
 import appAdminOrganizationsMembers from "../messages/en/app.admin.organizations.members.json";
 import appAdminProjects from "../messages/en/app.admin.projects.json";
