@@ -91,7 +91,9 @@ def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             )
 
             # Read the SAV file
-            df, meta = pyreadstat.read_sav(temp_file.name, metadataonly=True)
+            df, meta = pyreadstat.read_sav(
+                temp_file.name, metadataonly=True, user_missing=True
+            )
 
             # Convert to dict for JSON serialization
             data = {

@@ -1,67 +1,71 @@
 {
   "adminDatasetEditor": {
-    "selectProjectError": "Please select a project first.",
-    "addToProjectSuccess": "Dataset added to project successfully!",
-    "addToProjectError": "Failed to add dataset to project.",
-    "error": "Error",
-    "fetchProjectsError": "Failed to fetch projects.",
-    "projects": "Projects",
-    "datasetProjectsDescription": "A dataset can be added to one or more projects.",
-    "adding": "Adding...",
     "addToProject": "Add to project",
-    "name": "Name",
-    "common": {
-      "saving": "Saving...",
-      "saveChanges": "Save changes",
-      "cancel": "Cancel"
-    },
+    "addToProjectError": "Failed to add dataset to project.",
+    "addToProjectSuccess": "Dataset added to project successfully!",
+    "adding": "Adding...",
     "columns": {
       "label": "Label",
       "measure": "Measure",
       "name": "Name",
       "type": "Type"
     },
-    "editor": {
-      "title": "Dataset Editor for {name}",
-      "variables": "Variables",
-      "projects": "Projects"
+    "common": {
+      "cancel": "Cancel",
+      "saveChanges": "Save changes",
+      "saving": "Saving..."
+    },
+    "datasetProjectsDescription": "A dataset can be added to one or more projects.",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete the variable {name}? This action cannot be undone.",
+      "error": "Failed to delete variable.",
+      "title": "Delete variable"
     },
     "editVariable": {
-      "title": "Edit Variable",
       "description": "Update the label for the variable",
       "form": {
+        "errors": {
+          "updateFailed": "Failed to update variable"
+        },
         "label": {
-          "label": "Label",
-          "placeholder": "Enter a descriptive label",
           "errors": {
             "required": "Label is required"
-          }
-        },
-        "name": {
-          "label": "Name"
-        },
-        "type": {
-          "label": "Type"
+          },
+          "label": "Label",
+          "placeholder": "Enter a descriptive label"
         },
         "measure": {
           "label": "Measure"
         },
+        "missingValues": {
+          "label": "Missing Values",
+          "placeholder": "Add a missing value"
+        },
+        "name": {
+          "label": "Name"
+        },
         "success": "Variable updated successfully",
-        "errors": {
-          "updateFailed": "Failed to update variable"
+        "type": {
+          "label": "Type"
         }
-      }
+      },
+      "title": "Edit Variable"
     },
+    "editor": {
+      "projects": "Projects",
+      "title": "Dataset Editor for {name}",
+      "variables": "Variables"
+    },
+    "error": "Error",
+    "fetchProjectsError": "Failed to fetch projects.",
+    "name": "Name",
+    "projects": "Projects",
     "projectsExplanation": "A dataset can be added to one or more projects.",
     "searchPlaceholder": "Search variables",
-    "deleteDialog": {
-      "title": "Delete variable",
-      "description": "Are you sure you want to delete the variable {name}? This action cannot be undone.",
-      "cancel": "Cancel",
-      "confirm": "Delete",
-      "deleting": "Deleting...",
-      "error": "Failed to delete variable."
-    },
+    "selectProjectError": "Please select a project first.",
     "tableActions": {
       "delete": "Delete",
       "edit": "Edit"
