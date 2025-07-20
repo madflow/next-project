@@ -12,11 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { updateDatasetVariableSchema } from "@/types/dataset-variable";
+import { JsonArrayEditor } from "./json-array-editor";
 
 // Define the form schema
 const formSchema = z.object({
   id: z.uuid(),
   label: z.string().nullable(),
+  missingValues: z.array(z.string()).nullable(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -28,6 +30,7 @@ type EditDatasetVariableFormProps = {
     label: string | null;
     type: string;
     measure: string;
+    missingValues: string[] | null;
     datasetId: string;
   };
 };
@@ -42,6 +45,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     defaultValues: {
       id: datasetVariable.id,
       label: datasetVariable.label,
+      missingValues: datasetVariable.missingValues,
     },
   });
 
@@ -92,6 +96,23 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                       onBlur={field.onBlur}
                       name={field.name}
                       ref={field.ref}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="missingValues"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("editVariable.form.missingValues.label")}</FormLabel>
+                  <FormControl>
+                    <JsonArrayEditor
+                      value={field.value ?? []}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />

@@ -64,6 +64,13 @@
       "when": 1752068712457,
       "tag": "0008_rapid_terror",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1753004377917,
+      "tag": "0009_curious_dreadnoughts",
+      "breakpoints": true
     }
   ]
 }

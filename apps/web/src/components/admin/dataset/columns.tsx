@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { formatDate, formatFileSize } from "@/lib/utils";
 import type { Dataset } from "@/types/dataset";
 import { DeleteDatasetDialog } from "./delete-dataset-dialog";
+import { InfoDatasetModal } from "./info-dataset-modal";
 
 export const columns: ColumnDef<Dataset>[] = [
   {
@@ -82,6 +83,7 @@ export const columns: ColumnDef<Dataset>[] = [
             </a>
           </Button>
           <DeleteDatasetDialog datasetId={dataset.id} datasetName={dataset.name} onDelete={handleDelete} />
+          <InfoDatasetModal dataset={row.original} />
         </div>
       );
     },
