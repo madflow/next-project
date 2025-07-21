@@ -1,8 +1,8 @@
-import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { find } from "@/dal/dataset-variable";
-import { EditDatasetVariableForm } from "@/components/admin/dataset-variable/edit-dataset-variable-form";
+import { notFound } from "next/navigation";
+import { EditDatasetVariableForm } from "@/components/admin/dataset-editor/edit-dataset-variable-form";
 import { PageLayout } from "@/components/page/page-layout";
+import { find } from "@/dal/dataset-variable";
 
 type PageProps = {
   params: Promise<{
@@ -29,11 +29,11 @@ export default async function EditDatasetVariablePage(props: PageProps) {
 
   return (
     <PageLayout title={t("editVariable.title")} description={t("editVariable.description")}>
-      <EditDatasetVariableForm 
+      <EditDatasetVariableForm
         datasetVariable={{
           ...datasetVariable,
-          datasetId
-        }} 
+          datasetId,
+        }}
       />
     </PageLayout>
   );

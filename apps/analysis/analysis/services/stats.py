@@ -4,7 +4,11 @@ import pandas as pd
 class StatisticsService:
 
     def describe_var(
-        self, data: pd.DataFrame, variable_name: str, include: list[str] | None = None
+        self,
+        data: pd.DataFrame,
+        variable_name: str,
+        include: list[str] | None = None,
+        missing_values: list[str | int | float] | None = None,
     ):
         """
         Generates descriptive statistics for a single variable in a DataFrame based on a list of requested metrics.
@@ -18,6 +22,7 @@ class StatisticsService:
                                                      'range'.
                      Possible values for all data types: 'mode', 'count'.
                      If None, a default set of statistics will be calculated based on the data type.
+            missing_values: A list of values to replace with NaN.
 
         Returns:
             A dictionary containing the requested descriptive statistics.
@@ -25,7 +30,11 @@ class StatisticsService:
         if variable_name not in data.columns:
             raise ValueError(f"Variable '{variable_name}' not found in the DataFrame.")
 
-        data = data.replace(-999.0, pd.NA)
+        if missing_values is not None:
+            numeric_missing_values = self._convert_to_numeric_missing_values(
+                missing_values
+            )
+            data = data.replace(numeric_missing_values, pd.NA)
         variable = data[variable_name]
         stats = {}
 
@@ -124,3 +133,53 @@ class StatisticsService:
             stats["frequency_table"] = frequency_records
 
         return stats
+
+    def _convert_to_numeric_missing_values(self, missing_values: list) -> list:
+        """
+        Converts missing_values to numeric types (int or float).
+
+        Args:
+            missing_values: List of values to convert to numeric
+
+        Returns:
+            List of converted numeric values
+
+        Raises:
+            ValueError: If any value cannot be converted to a numeric type
+        """
+        converted_values = []
+
+        for i, value in enumerate(missing_values):
+            # If already numeric, keep as is
+            if isinstance(value, (int, float)):
+                converted_values.append(value)
+                continue
+
+            # Try to convert string to numeric
+            if isinstance(value, str):
+                # Remove whitespace
+                value = value.strip()
+
+                # Try to convert to int first (for whole numbers)
+                try:
+                    # Check if it's a whole number (no decimal point or .0)
+                    if "." not in value or value.endswith(".0"):
+                        int_val = int(
+                            float(value)
+                        )  # Convert via float to handle "123.0"
+                        converted_values.append(int_val)
+                    else:
+                        # Convert to float for decimal numbers
+                        float_val = float(value)
+                        converted_values.append(float_val)
+                    continue
+                except ValueError:
+                    pass  # Will raise error below
+
+            # If we get here, conversion failed
+            raise ValueError(
+                f"Cannot convert missing_values[{i}] = '{value}' (type: {type(value).__name__}) "
+                f"to a numeric value. All missing_values must be numeric or convertible to numeric."
+            )
+
+        return converted_values

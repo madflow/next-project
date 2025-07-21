@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { DatasetProjects } from "@/components/admin/dataset-project/dataset-projects";
-import { DatasetVariablesDataTable } from "@/components/admin/dataset-variable/data-table";
+import { DatasetVariablesDataTable } from "@/components/admin/dataset-editor/data-table";
+import { DatasetProjects } from "@/components/admin/dataset-editor/dataset-projects";
 import { PageLayout } from "@/components/page/page-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { find } from "@/dal/dataset";

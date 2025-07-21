@@ -48,6 +48,7 @@ type UploadDatasetParams = {
   organizationId: string;
   description?: string;
   contentType: string;
+  missingValues: string[] | null;
 };
 
 export async function addToProject(datasetId: string, projectId: string) {
@@ -71,6 +72,7 @@ export async function uploadDataset({
   organizationId,
   description,
   contentType,
+  missingValues,
 }: UploadDatasetParams): Promise<UploadDatasetResult> {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -132,6 +134,7 @@ export async function uploadDataset({
         storageKey: s3Key,
         organizationId,
         description: description || undefined,
+        missingValues,
         uploadedAt: new Date(),
         updatedAt: new Date(),
         createdAt: new Date(),

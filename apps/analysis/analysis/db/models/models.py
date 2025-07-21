@@ -1,7 +1,7 @@
 import uuid
 
 from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -18,7 +18,7 @@ class Organization(Base):
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    org_metadata = Column('metadata', Text)
+    org_metadata = Column("metadata", JSONB, nullable=True)
 
     # Relationship to datasets
     datasets = relationship("Dataset", back_populates="organization")
@@ -35,6 +35,7 @@ class Dataset(Base):
     file_size = Column(BigInteger, nullable=False)
     file_hash = Column(Text, nullable=False)
     s3_key = Column(Text, nullable=False)
+    missing_values = Column(JSONB, nullable=True)
     uploaded_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

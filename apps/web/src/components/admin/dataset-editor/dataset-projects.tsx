@@ -1,10 +1,10 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import { addToProject } from "@/actions/dataset";
-import { ProjectDropdown } from "@/components/dropdown/project-dropdown";
+import { ProjectSelect } from "@/components/form/project-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -69,7 +69,7 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
         <CardDescription>{t("datasetProjectsDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ProjectDropdown onValueChange={setSelectedProject} organizationId={organizationId} />
+        <ProjectSelect onValueChange={setSelectedProject} organizationId={organizationId} />
         <Button className="mt-4" onClick={handleAddToProject} disabled={!selectedProject || isAddingToProject}>
           {isAddingToProject ? t("adding") : t("addToProject")}
         </Button>

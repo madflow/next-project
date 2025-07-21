@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod/v4";
 import { uploadDataset } from "@/actions/dataset";
+import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
 import {
   FileUpload,
@@ -35,6 +36,7 @@ const formSchema = z.object({
     }),
   name: z.string().min(1, "Name is required").trim(),
   organizationId: z.string().min(1, "Organization selection is required"),
+  missingValues: z.array(z.string()).optional(),
   description: z.string().optional(),
 });
 
@@ -70,6 +72,7 @@ export function DatasetUploadForm() {
       files: [],
       name: "",
       organizationId: "",
+      missingValues: [],
       description: "",
     },
   });
@@ -95,6 +98,7 @@ export function DatasetUploadForm() {
         name: data.name,
         organizationId: data.organizationId,
         description: data.description || undefined,
+        missingValues: data.missingValues || null,
         contentType: selectedFile.type,
       });
 
@@ -181,9 +185,7 @@ export function DatasetUploadForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  {t("form.nameLabel")} <span className="text-destructive">*</span>
-                </FormLabel>
+                <FormLabel>{t("form.nameLabel")}</FormLabel>
                 <FormControl>
                   <Input
                     placeholder={t("form.namePlaceholder")}
@@ -207,9 +209,7 @@ export function DatasetUploadForm() {
                   defaultValue={field.value}
                   data-testid="app.admin.dataset.organization-select">
                   <FormControl>
-                    <SelectTrigger
-                      className="w-full sm:max-w-[50%]"
-                      data-testid="app.admin.dataset.organization-trigger">
+                    <SelectTrigger className="w-full" data-testid="app.admin.dataset.organization-trigger">
                       <SelectValue placeholder={t("form.organization.placeholder")} />
                     </SelectTrigger>
                   </FormControl>
@@ -232,7 +232,20 @@ export function DatasetUploadForm() {
             )}
           />
 
-          {/* Description */}
+          <FormField
+            control={form.control}
+            name="missingValues"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("form.missingValuesLabel")}</FormLabel>
+                <FormControl>
+                  <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="description"
@@ -252,8 +265,7 @@ export function DatasetUploadForm() {
             )}
           />
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-4">
+          <div className="flex justify-start space-x-4 pt-4">
             <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
               {t("actions.cancel")}
             </Button>
