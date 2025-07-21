@@ -18,6 +18,7 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
   const { data } = useDatasetVariables(datasetId, {
     limit: perPage,
     order: [{ column: "name", direction: "asc" }],
+    filters: [{ column: "type", value: "double", operator: "eq" }],
     search,
   });
 
