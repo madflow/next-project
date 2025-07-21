@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DatasetDropdown } from "@/components/dropdown/dataset-dropdown";
+import { DatasetSelect } from "@/components/form/dataset-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
 import { DatasetVariable } from "@/types/dataset-variable";
@@ -45,7 +45,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     <div className="theme-container flex gap-4">
       <div className="flex w-64 max-w-64 min-w-64 flex-col gap-4">
         <ThemeSelector />
-        <DatasetDropdown
+        <DatasetSelect
           projectId={project.id}
           onValueChange={(value) => {
             setSelectedDataset(value);

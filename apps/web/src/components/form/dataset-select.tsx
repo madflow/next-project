@@ -1,5 +1,6 @@
 "use client";
 
+import * as SelectPrimitive from "@radix-ui/react-select";
 import * as React from "react";
 import {
   Select,
@@ -12,20 +13,21 @@ import {
 } from "@/components/ui/select";
 import { useDatasetsByProject } from "@/hooks/use-datasets-by-project";
 
-type DatasetDropdownProps = {
+type DatasetSelectProps = {
   projectId: string;
   onValueChange: (value: string) => void;
   defaultValue?: string;
-} & React.ComponentPropsWithoutRef<"select">;
+  triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
+};
 
-export function DatasetDropdown({ projectId, onValueChange, defaultValue }: DatasetDropdownProps) {
+export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerProps }: DatasetSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data, isLoading, isError } = useDatasetsByProject(projectId);
 
   if (isLoading) {
     return (
       <Select disabled>
-        <SelectTrigger data-testid="app.dropdown.dataset.loading">
+        <SelectTrigger {...triggerProps} data-testid="app.dropdown.dataset.loading">
           <SelectValue placeholder="Loading datasets..." />
         </SelectTrigger>
       </Select>

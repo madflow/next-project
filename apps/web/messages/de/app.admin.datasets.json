@@ -41,9 +41,10 @@
     "form": {
       "createOrganizationFirst": "Erstellen Sie zuerst eine Organisation",
       "createOrganizationLink": "Organisation erstellen",
-      "descriptionLabel": "Beschreibung (Optional)",
+      "descriptionLabel": "Beschreibung (optional)",
       "descriptionPlaceholder": "Fügen Sie eine Beschreibung für diese Datei hinzu",
       "fileLabel": "Datensatzdatei",
+      "missingValuesLabel": "Allgemeine benutzerdefinierte Missing Values (optional)",
       "nameLabel": "Name",
       "namePlaceholder": "Geben Sie einen Namen für diesen Datensatz ein",
       "noOrganizationsAvailable": "Keine Organisationen verfügbar",

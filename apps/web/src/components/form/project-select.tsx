@@ -1,5 +1,6 @@
 "use client";
 
+import * as SelectPrimitive from "@radix-ui/react-select";
 import * as React from "react";
 import {
   Select,
@@ -12,20 +13,21 @@ import {
 } from "@/components/ui/select";
 import { useProjectsByOrg } from "@/hooks/use-projects-by-org";
 
-type ProjectDropdownProps = {
+type ProjectSelectProps = {
   organizationId: string;
   onValueChange: (value: string) => void;
   defaultValue?: string;
+  triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
 };
 
-export function ProjectDropdown({ organizationId, onValueChange, defaultValue }: ProjectDropdownProps) {
+export function ProjectSelect({ organizationId, onValueChange, defaultValue, triggerProps }: ProjectSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data: projects, isLoading, isError } = useProjectsByOrg(organizationId);
 
   if (isLoading) {
     return (
       <Select disabled value={selectedValue}>
-        <SelectTrigger data-testid="project-dropdown-loading">
+        <SelectTrigger {...triggerProps} data-testid="project-dropdown-loading">
           <SelectValue placeholder="Loading projects..." />
         </SelectTrigger>
       </Select>
@@ -35,7 +37,7 @@ export function ProjectDropdown({ organizationId, onValueChange, defaultValue }:
   if (isError) {
     return (
       <Select disabled value={selectedValue}>
-        <SelectTrigger data-testid="project-dropdown-error">
+        <SelectTrigger {...triggerProps} data-testid="project-dropdown-error">
           <SelectValue placeholder="Error loading projects." />
         </SelectTrigger>
       </Select>
@@ -45,7 +47,7 @@ export function ProjectDropdown({ organizationId, onValueChange, defaultValue }:
   if (!projects || projects.length === 0) {
     return (
       <Select disabled value={selectedValue}>
-        <SelectTrigger data-testid="project-dropdown-empty">
+        <SelectTrigger {...triggerProps} data-testid="project-dropdown-empty">
           <SelectValue placeholder="No projects found." />
         </SelectTrigger>
       </Select>
@@ -59,7 +61,7 @@ export function ProjectDropdown({ organizationId, onValueChange, defaultValue }:
         onValueChange(value);
       }}
       value={selectedValue}>
-      <SelectTrigger className="w-[180px]" data-testid="project-dropdown">
+      <SelectTrigger {...triggerProps} className="w-[180px]" data-testid="project-dropdown">
         <SelectValue placeholder="Select a project" />
       </SelectTrigger>
       <SelectContent data-testid="project-dropdown-content">

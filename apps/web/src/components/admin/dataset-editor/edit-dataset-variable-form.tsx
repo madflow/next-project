@@ -8,11 +8,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod/v4";
 import { update } from "@/actions/dataset-variable";
+import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { updateDatasetVariableSchema } from "@/types/dataset-variable";
-import { JsonArrayEditor } from "./json-array-editor";
 
 // Define the form schema
 const formSchema = z.object({
@@ -110,10 +110,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                 <FormItem>
                   <FormLabel>{t("editVariable.form.missingValues.label")}</FormLabel>
                   <FormControl>
-                    <JsonArrayEditor
-                      value={field.value ?? []}
-                      onChange={field.onChange}
-                    />
+                    <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -131,7 +128,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
             </FormItem>
           </div>
 
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-start gap-4">
             <Button
               type="button"
               variant="outline"
