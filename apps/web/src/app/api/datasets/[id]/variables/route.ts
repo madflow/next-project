@@ -19,9 +19,10 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 
   try {
-    const { limit, offset, search, orderBy } = processUrlParams(new URL(request.url).searchParams);
+    const { limit, offset, search, orderBy, filters } = processUrlParams(new URL(request.url).searchParams);
 
     const result = await listByDataset(id, {
+      filters,
       limit,
       offset,
       search,
