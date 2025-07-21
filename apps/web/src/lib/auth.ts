@@ -1,4 +1,4 @@
-import { BetterAuthOptions, betterAuth } from "better-auth";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, organization as organizationPlugin } from "better-auth/plugins";
@@ -13,7 +13,7 @@ import { env } from "@/env";
 export const USER_ADMIN_ROLE = "admin";
 export const USER_ROLE = "user";
 
-const authConfig = {
+export const auth = betterAuth({
   secret: env.AUTH_SECRET,
   baseURL: env.AUTH_URL,
   database: drizzleAdapter(db, {
@@ -159,8 +159,4 @@ const authConfig = {
     }),
     nextCookies(),
   ],
-} satisfies BetterAuthOptions;
-
-export const auth = betterAuth(authConfig) as ReturnType<typeof betterAuth<typeof authConfig>>;
-export type Auth = typeof auth;
-export type Session = Auth["$Infer"]["Session"];
+});
