@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { ActiveThemeProvider } from "@/components/active-theme";
 import { PageLayout } from "@/components/page/page-layout";
@@ -12,6 +13,8 @@ type PageProps = {
 export default async function Page({ params }: PageProps) {
   const { projectSlug } = await params;
 
+  const t = await getTranslations("appProjectAdhoc");
+
   const project = await findBySlug(projectSlug);
   if (!project) {
     return notFound();
@@ -24,7 +27,7 @@ export default async function Page({ params }: PageProps) {
   }
 
   return (
-    <PageLayout data-testid="app.project.adhoc" title="AdHoc Analysis">
+    <PageLayout data-testid="app.project.adhoc" title={t("title")}>
       <ActiveThemeProvider>
         <AdHocAnalysis project={project} />
       </ActiveThemeProvider>

@@ -1,7 +1,8 @@
 "use client";
 
 import { Organization } from "better-auth/plugins";
-import { ChartArea } from "lucide-react";
+import { LayoutTemplate, PieChart } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,26 +17,27 @@ type NavProjectProps = {
   activeProject: Project | null;
 };
 export function NavProject({ activeOrganization, activeProject }: NavProjectProps) {
+  const t = useTranslations("appSidebar");
   if (!activeOrganization) return null;
   if (!activeProject) return null;
   if (activeProject.organizationId !== activeOrganization.id) return null;
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Project</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("sections")}</SidebarGroupLabel>
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
             <a href={`/project/${activeProject.slug}`}>
-              <ChartArea />
-              <span>Dashboard</span>
+              <LayoutTemplate />
+              <span>{t("navItems.dashboard")}</span>
             </a>
           </SidebarMenuButton>
         </SidebarMenuItem>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
             <a href={`/project/${activeProject.slug}/adhoc`}>
-              <ChartArea />
-              <span>AdHoc</span>
+              <PieChart />
+              <span>{t("navItems.adhoc")}</span>
             </a>
           </SidebarMenuButton>
         </SidebarMenuItem>

@@ -33,46 +33,58 @@ const COLOR_THEMES = [
   {
     name: "Blue",
     value: "blue",
+    exampleClassName: "bg-blue-500",
   },
   {
     name: "Green",
     value: "green",
+    exampleClassName: "bg-green-500",
   },
   {
     name: "Amber",
     value: "amber",
+    exampleClassName: "bg-amber-500",
   },
   {
     name: "Rose",
     value: "rose",
+    exampleClassName: "bg-rose-500",
   },
   {
     name: "Purple",
     value: "purple",
+    exampleClassName: "bg-purple-500",
   },
   {
     name: "Orange",
     value: "orange",
+    exampleClassName: "bg-orange-500",
   },
   {
     name: "Teal",
     value: "teal",
+    exampleClassName: "bg-teal-500",
   },
 ];
 
-export function ThemeSelector({ className }: React.ComponentProps<"div">) {
+export type ThemeSelectorProps = {
+  label?: string;
+  placeholder?: string;
+} & React.ComponentProps<"div">;
+
+export function ThemeSelector({ label = "Theme", placeholder = "Select a theme", className }: ThemeSelectorProps) {
   const { activeTheme, setActiveTheme } = useThemeConfig();
 
   return (
     <div className={cn("flex w-full items-center gap-2", className)}>
       <Label htmlFor="theme-selector" className="sr-only">
-        Theme
+        {label}
       </Label>
       <Select value={activeTheme} onValueChange={setActiveTheme}>
         <SelectTrigger id="theme-selector" className="w-full">
           <div className="flex justify-start gap-2">
-            <span className="font-light">Theme:</span>
-            <SelectValue placeholder="Select a theme" />
+            <span className="font-light">{label}:</span>
+            <SelectValue placeholder={placeholder} />
           </div>
         </SelectTrigger>
         <SelectContent align="end">

@@ -22,6 +22,7 @@ export default getRequestConfig(async () => {
     ...(await import(`../../messages/${locale}/app.admin.dashboard.json`)).default,
     ...(await import(`../../messages/${locale}/app.admin.datasets.json`)).default,
     ...(await import(`../../messages/${locale}/app.admin.dataset-editor.json`)).default,
+    ...(await import(`../../messages/${locale}/app.project.adhoc.json`)).default,
   };
   return {
     locale,
