@@ -28,6 +28,17 @@ services:
     ports:
       - "3001:3000"
 
+  drizzle:
+    build:
+      context: .
+      dockerfile: ./packages/database/Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - DOCKER_RUN_MIGRATIONS=1
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
+ 
+
   analysis:
     build:
       context: ./apps/analysis

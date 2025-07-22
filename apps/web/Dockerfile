@@ -8,7 +8,7 @@ RUN apk add --no-cache libc6-compat
 
 # Set working directory
 WORKDIR /app
-RUN npm install --global turbo
+RUN npm install --global turbo@^2
 COPY . .
 RUN turbo prune @app/web --docker
 
@@ -28,10 +28,9 @@ RUN npm install
 # Build the project
 COPY --from=builder /app/out/full/ .
 
-RUN npx turbo build
+RUN npx turbo@^2 build
 
 FROM base AS runner
-
 
 RUN apk update
 RUN apk add --no-cache busybox-extras bash
