@@ -74,6 +74,8 @@ psql:
 
 ## Check 
 check:
+	npm run test
+	npm run check-translations
 	npm run check-types
 	npm run lint
-	npm run test
+

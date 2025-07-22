@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint --max-warnings 0",
     "seed": "tsx --env-file .env ./scripts/seed.ts",
-    "check-translations": "tsx --env-file .env ./scripts/check-translations.ts",
+    "check-translations": "tsx ./scripts/check-translations.ts",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
