@@ -19,7 +19,7 @@ type BarAdhocProps = {
   stats: StatsResponse;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
+export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
   return (
     <Card className="shadow-xs" {...props}>
       <CardHeader>
@@ -27,12 +27,27 @@ export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={transformToRechartsBarData(variable, stats)}>
-            <CartesianGrid vertical={false} />
-            <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <YAxis tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
+          <BarChart
+            layout="vertical"
+            margin={{
+              left: 0,
+            }}
+            barCategoryGap={1}
+            accessibilityLayer
+            data={transformToRechartsBarData(variable, stats)}>
+            <CartesianGrid vertical={true} horizontal={false} />
+            <XAxis dataKey="count" type="number" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
+            <YAxis
+              dataKey="label"
+              type="category"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              fontSize={10}
+              width={200}
+            />
             <Bar dataKey="count" fill="var(--color-count)" radius={5} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
           </BarChart>
         </ChartContainer>
       </CardContent>

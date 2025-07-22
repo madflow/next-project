@@ -8,17 +8,17 @@ import { StatsResponse } from "@/types/stats";
 type BarAdhocProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 function formatDecimal(value?: number) {
   if (!value) return "";
   return new Intl.NumberFormat("de-DE", { style: "decimal" }).format(value);
 }
 
-export function CentralTendency({ variable, stats }: BarAdhocProps) {
+export function MetricsCards({ variable, stats, ...props }: BarAdhocProps) {
   const variableStats = getVariableStats(variable, stats);
   return (
-    <Card className="shadow-xs">
+    <Card className="shadow-xs" {...props}>
       <CardHeader>
         <CardTitle>{variable.label ?? variable.name}</CardTitle>
       </CardHeader>

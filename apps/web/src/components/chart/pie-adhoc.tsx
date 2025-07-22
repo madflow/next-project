@@ -17,9 +17,9 @@ import { StatsResponse } from "@/types/stats";
 type PieAdhocProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export function PieAdhoc({ variable, stats }: PieAdhocProps) {
+export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
   const rechartsData = transformToRechartsPieData(variable, stats);
   const chartConfig: Record<string, ChartConfig> = {};
 
@@ -31,7 +31,7 @@ export function PieAdhoc({ variable, stats }: PieAdhocProps) {
   });
 
   return (
-    <Card className="shadow-xs">
+    <Card className="shadow-xs" {...props}>
       <CardHeader>
         <CardTitle>{variable.label ?? variable.name}</CardTitle>
       </CardHeader>
