@@ -1,0 +1,687 @@
+{
+  "account": {
+    "delete": {
+      "button": "Delete Account",
+      "confirm": {
+        "cancel": "Cancel",
+        "confirm": "Yes, delete my account",
+        "description": "This action cannot be undone. This will permanently delete your account and all of its data.",
+        "title": "Are you sure you want to delete your account?"
+      },
+      "description": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
+      "error": "Failed to delete account.",
+      "returnHome": "Return to Homepage",
+      "success": "Your account has been deleted.",
+      "successMessage": "Your account and all associated data have been permanently deleted.",
+      "successTitle": "Account Deleted",
+      "title": "Delete Account",
+      "verificationSent": "A verification email has been sent to your email address. Please verify the deletion.",
+      "warningDescription": "This action cannot be undone. All your data will be permanently deleted.",
+      "warningTitle": "Danger Zone"
+    },
+    "errors": {
+      "notFound": "User not found.",
+      "unauthorized": "You must be logged in to view this page.",
+      "unknown": "An unknown error occurred."
+    },
+    "password": {
+      "description": "Ensure your account is using a long, random password to stay secure.",
+      "error": "Failed to update password.",
+      "fields": {
+        "confirmPassword": "Confirm New Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "update": "Update Password"
+      },
+      "success": "Password updated successfully.",
+      "title": "Update Password",
+      "validation": {
+        "currentPasswordRequired": "Current password is required.",
+        "newPasswordRequired": "New password is required.",
+        "passwordMismatch": "The new password and confirmation do not match.",
+        "passwordTooShort": "Password must be at least 8 characters long."
+      }
+    },
+    "profile": {
+      "avatar": {
+        "change": "Change",
+        "description": "Update your profile picture",
+        "error": {
+          "deleteFailed": "Failed to delete avatar. Please try again.",
+          "fileSize": "File too large: Please upload an image smaller than 2MB",
+          "fileType": "Invalid file type: Please upload an image file",
+          "invalidUrl": "Invalid avatar URL",
+          "unknown": "An error occurred while uploading your avatar",
+          "updateFailed": "Failed to update profile with new avatar",
+          "uploadFailed": "Failed to upload avatar"
+        },
+        "initial": "U",
+        "remove": "Remove",
+        "removing": "Removing...",
+        "saveChanges": "Save Changes",
+        "saving": "Saving...",
+        "success": "Your profile picture has been updated",
+        "successDelete": "Profile picture removed successfully",
+        "title": "Profile Picture",
+        "upload": "Upload"
+      },
+      "emailChangeError": "Failed to update email. Please try again.",
+      "emailChangeNotice": "A verification email will be sent to your new email address.",
+      "emailChangeSent": "Verification email sent to your new email address.",
+      "emailDescription": "Change your email address",
+      "emailTitle": "Update Your Email",
+      "error": "Failed to update profile.",
+      "fields": {
+        "currentEmail": "Current Email",
+        "locale": "Language",
+        "name": "Name",
+        "newEmail": "New Email",
+        "newEmailPlaceholder": "Enter new email address",
+        "updateEmail": "Update Email",
+        "updateProfile": "Update Profile"
+      },
+      "nameDescription": "Change your display name",
+      "nameTitle": "Update Your Name",
+      "success": "Profile updated successfully."
+    },
+    "title": "Account Settings"
+  },
+  "adminDashboard": {
+    "datasets": {
+      "description": "Manage datasets and their configurations.",
+      "link": "View Datasets",
+      "title": "Datasets"
+    },
+    "organizations": {
+      "description": "Manage organizations and their settings.",
+      "link": "View Organizations",
+      "title": "Organizations"
+    },
+    "projects": {
+      "description": "Manage projects and their configurations.",
+      "link": "View Projects",
+      "title": "Projects"
+    },
+    "users": {
+      "description": "Manage user accounts and roles.",
+      "link": "View Users",
+      "title": "Users"
+    }
+  },
+  "adminDataset": {
+    "actions": {
+      "cancel": "Cancel",
+      "uploadFile": "Upload File",
+      "uploading": "Uploading..."
+    },
+    "columns": {
+      "actions": "Actions",
+      "filename": "Filename",
+      "hash": "File Hash",
+      "name": "Name",
+      "organization": "Organization",
+      "size": "Size",
+      "type": "Type",
+      "uploaded": "Uploaded",
+      "uploadedAt": "Uploaded"
+    },
+    "datatable": {
+      "noResults": "No results found"
+    },
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "error": "Failed to delete dataset. Please try again.",
+      "success": "Dataset deleted successfully",
+      "title": "Delete Dataset"
+    },
+    "description": "Manage your datasets",
+    "errors": {
+      "fileTooLarge": "File is too large. Maximum size is {maxSize}.",
+      "invalidFileType": "Invalid file type. Please upload a .sav file.",
+      "nameRequired": "Please enter a name for the dataset.",
+      "noFileSelected": "Please select a file to upload.",
+      "organizationRequired": "Please select an organization.",
+      "unknownError": "An error occurred. Please try again.",
+      "uploadFailed": "Failed to upload file. Please try again."
+    },
+    "form": {
+      "createOrganizationFirst": "Create an organization first",
+      "createOrganizationLink": "Create organization",
+      "descriptionLabel": "Description (optional)",
+      "descriptionPlaceholder": "Add a description for this dataset",
+      "fileLabel": "Dataset file",
+      "missingValuesLabel": "General Custom Missing Values (optional)",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter a name for this dataset",
+      "noOrganizationsAvailable": "No organizations available",
+      "organization": {
+        "label": "Organization",
+        "loading": "Loading organizations...",
+        "notFound": "No organizations found",
+        "placeholder": "Select an organization"
+      },
+      "organizationLabel": "Organization",
+      "selectOrganization": "Select an organization"
+    },
+    "noData": "No datasets found",
+    "searchPlaceholder": "Search files...",
+    "tableActions": {
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this dataset?",
+      "download": "Download"
+    },
+    "title": "Datasets",
+    "upload": {
+      "clickToUpload": "Click to upload",
+      "description": "Upload a new dataset to the system",
+      "orDragAndDrop": "or drag and drop",
+      "supportedFormats": ".sav",
+      "title": "Upload Dataset"
+    },
+    "uploadButton": "Create dataset",
+    "uploadSuccess": "File uploaded successfully"
+  },
+  "adminDatasetEditor": {
+    "addToProject": "Add to project",
+    "addToProjectError": "Failed to add dataset to project.",
+    "addToProjectSuccess": "Dataset added to project successfully!",
+    "adding": "Adding...",
+    "columns": {
+      "label": "Label",
+      "measure": "Measure",
+      "name": "Name",
+      "type": "Type"
+    },
+    "common": {
+      "cancel": "Cancel",
+      "saveChanges": "Save changes",
+      "saving": "Saving..."
+    },
+    "datasetProjectsDescription": "A dataset can be added to one or more projects.",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete the variable {name}? This action cannot be undone.",
+      "error": "Failed to delete variable.",
+      "title": "Delete variable"
+    },
+    "editVariable": {
+      "description": "Update the label for the variable",
+      "form": {
+        "errors": {
+          "updateFailed": "Failed to update variable"
+        },
+        "label": {
+          "errors": {
+            "required": "Label is required"
+          },
+          "label": "Label",
+          "placeholder": "Enter a descriptive label"
+        },
+        "measure": {
+          "label": "Measure"
+        },
+        "missingValues": {
+          "label": "Missing Values",
+          "placeholder": "Add a missing value"
+        },
+        "name": {
+          "label": "Name"
+        },
+        "success": "Variable updated successfully",
+        "type": {
+          "label": "Type"
+        }
+      },
+      "title": "Edit Variable"
+    },
+    "editor": {
+      "projects": "Projects",
+      "title": "Dataset Editor for {name}",
+      "variables": "Variables"
+    },
+    "error": "Error",
+    "fetchProjectsError": "Failed to fetch projects.",
+    "name": "Name",
+    "projects": "Projects",
+    "projectsExplanation": "A dataset can be added to one or more projects.",
+    "searchPlaceholder": "Search variables",
+    "selectProjectError": "Please select a project first.",
+    "tableActions": {
+      "delete": "Delete",
+      "edit": "Edit"
+    }
+  },
+  "adminSidebar": {
+    "adminMenu": "Admin menu",
+    "navItems": {
+      "admin": "Admin",
+      "app": "App",
+      "datasets": "Datasets",
+      "organizations": "Organizations",
+      "projects": "Projects",
+      "users": "Users"
+    },
+    "sections": "Sections"
+  },
+  "appProjectAdhoc": {
+    "theme": "Theme",
+    "themePlaceholder": "Select theme...",
+    "title": "Ad hoc analysis"
+  },
+  "appSidebar": {
+    "menu": "Menu",
+    "navItems": {
+      "adhoc": "Adhoc analysis",
+      "admin": "Admin",
+      "dashboard": "Dashboard",
+      "project": "Project"
+    },
+    "organizationSwitcher": {
+      "label": "Select organization",
+      "noOrganizations": "No organizations",
+      "switch": "Switch organization"
+    },
+    "projectSwitcher": {
+      "label": "Select project",
+      "loading": "Loading projects...",
+      "noProjects": "No projects found",
+      "switch": "Switch project"
+    },
+    "sections": "Sections"
+  },
+  "datatable": {
+    "clearSorting": "Clear sorting",
+    "loading": "Loading...",
+    "noResults": "No results",
+    "pagination": {
+      "goToFirstPage": "Go to first page",
+      "goToLastPage": "Go to last page",
+      "goToNextPage": "Go to next page",
+      "goToPreviousPage": "Go to previous page",
+      "pageInfo": "Page {current} of {total}",
+      "rowsPerPage": "Rows per page",
+      "total": "Total: {count}"
+    },
+    "retry": "Retry",
+    "sortAscending": "Sort ascending",
+    "sortDescending": "Sort descending",
+    "viewOptions": {
+      "toggleColumns": "Toggle columns",
+      "view": "View"
+    }
+  },
+  "forgotPassword": {
+    "description": "Enter your email address and we'll send you a link to reset your password.",
+    "form": {
+      "email": "Email",
+      "submit": "Send reset link",
+      "submitting": "Sending..."
+    },
+    "links": {
+      "login": "Back to login"
+    },
+    "messages": {
+      "success": {
+        "description": "We've sent you a link to reset your password. Please check your email.",
+        "title": "Check your email"
+      }
+    },
+    "title": "Forgot your password?"
+  },
+  "localeSwitcher": {
+    "languages": {
+      "de": "German",
+      "en": "English"
+    },
+    "locale": "Language",
+    "selectLanguage": "Select language"
+  },
+  "login": {
+    "form": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login"
+    },
+    "links": {
+      "forgotPassword": {
+        "question": "Forgot your password?",
+        "text": "Reset password"
+      },
+      "signUp": {
+        "question": "No account yet?",
+        "text": "Sign up"
+      }
+    },
+    "title": "Login"
+  },
+  "navUser": {
+    "account": "Account",
+    "error": {
+      "signOut": "Failed to sign out. Please try again."
+    },
+    "menuButton": {
+      "srText": "Open user menu"
+    },
+    "signOut": "Sign out",
+    "signingOut": "Signing out..."
+  },
+  "organization": {
+    "actions": {
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "columns": {
+      "actions": "Actions",
+      "createdAt": "Created At",
+      "name": "Organization",
+      "slug": "Slug"
+    },
+    "create": {
+      "description": "Create a new organization",
+      "title": "Create organization"
+    },
+    "createButton": "Create organization",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete Organization",
+      "deleteButton": {
+        "srText": "Delete organization",
+        "title": "Delete organization"
+      },
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete the organization &ldquo;{name}&rdquo;? This action cannot be undone.",
+      "error": "Failed to delete organization",
+      "title": "Delete Organization"
+    },
+    "description": "This is the admin organizations page. Here you can manage all organizations.",
+    "edit": {
+      "description": "Update organization details",
+      "title": "Edit organization"
+    },
+    "form": {
+      "cancel": "Cancel",
+      "name": {
+        "errors": {
+          "required": "Organization name is required"
+        },
+        "label": "Name",
+        "placeholder": "Enter organization name"
+      },
+      "slug": {
+        "description": "This is the URL-friendly version of the name. It can only contain lowercase letters, numbers, and hyphens.",
+        "errors": {
+          "invalid": "Organization slug must be lowercase and contain only letters, numbers and hyphens",
+          "maxLength": "Organization slug must be less than 50 characters",
+          "required": "Organization slug is required"
+        },
+        "label": "Slug",
+        "placeholder": "Enter URL slug"
+      },
+      "submit": {
+        "create": "Create organization",
+        "creating": "Creating...",
+        "update": "Update",
+        "updating": "Updating..."
+      }
+    },
+    "messages": {
+      "createSuccess": "Organization created successfully",
+      "deleteSuccess": "Organization deleted successfully",
+      "error": {
+        "duplicateSlug": "An organization with this slug already exists.",
+        "generic": "An error occurred. Please try again.",
+        "notFound": "Organization not found"
+      },
+      "updateSuccess": "Organization updated successfully"
+    },
+    "searchPlaceholder": "Search organizations...",
+    "title": "Organizations"
+  },
+  "organizationMembers": {
+    "actions": {
+      "remove": "Remove"
+    },
+    "add": {
+      "description": "Invite a new member to join this organization",
+      "form": {
+        "actions": {
+          "cancel": "Cancel",
+          "submit": "Add member"
+        },
+        "errors": {
+          "searchFailed": "Failed to search users",
+          "submitFailed": "Failed to add member"
+        },
+        "role": {
+          "label": "Role",
+          "options": {
+            "admin": "Admin",
+            "member": "Member",
+            "owner": "Owner"
+          },
+          "placeholder": "Select a role..."
+        },
+        "success": {
+          "description": "The member has been added to the organization",
+          "title": "Member added"
+        },
+        "user": {
+          "label": "User",
+          "noResults": "No users found",
+          "placeholder": "Select a user...",
+          "searchPlaceholder": "Search users...",
+          "searching": "Searching...",
+          "selectUser": "Select a user"
+        }
+      },
+      "title": "Add member to organization"
+    },
+    "addMember": "Add member",
+    "columns": {
+      "email": "Email",
+      "name": "Name",
+      "role": "Role"
+    },
+    "description": "Manage members of this organization",
+    "removeDialog": {
+      "cancel": "Cancel",
+      "confirm": "Remove member",
+      "deleteButton": {
+        "srText": "Remove member",
+        "title": "Remove member"
+      },
+      "deleting": "Removing...",
+      "description": "Are you sure you want to remove {name} from this organization?",
+      "error": "Failed to remove member",
+      "title": "Remove member"
+    },
+    "searchPlaceholder": "Search members...",
+    "title": "{name} members"
+  },
+  "project": {
+    "actions": {
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "columns": {
+      "actions": "Actions",
+      "createdAt": "Created At",
+      "name": "Name",
+      "organization": "Organization",
+      "slug": "Slug"
+    },
+    "create": {
+      "description": "Create a new project",
+      "title": "Create project"
+    },
+    "createButton": "Create project",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete Project",
+      "deleteButton": {
+        "srText": "Delete project",
+        "title": "Delete project"
+      },
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete the project &ldquo;{name}&rdquo;? This action cannot be undone.",
+      "error": "Failed to delete project",
+      "title": "Delete Project"
+    },
+    "description": "This is the admin projects page. Here you can manage all projects.",
+    "edit": {
+      "description": "Update project details",
+      "title": "Edit project"
+    },
+    "form": {
+      "cancel": "Cancel",
+      "name": {
+        "errors": {
+          "required": "Project name is required"
+        },
+        "label": "Name",
+        "placeholder": "Enter project name"
+      },
+      "organization": {
+        "errors": {
+          "required": "Organization is required"
+        },
+        "label": "Organization",
+        "loading": "Loading organizations...",
+        "notFound": "No organizations found",
+        "placeholder": "Select an organization"
+      },
+      "slug": {
+        "description": "This is the URL-friendly version of the name. It can only contain lowercase letters, numbers, and hyphens.",
+        "errors": {
+          "invalid": "Project slug must be lowercase and contain only letters, numbers and hyphens",
+          "maxLength": "Project slug must be less than 50 characters",
+          "required": "Project slug is required"
+        },
+        "label": "Slug",
+        "placeholder": "Enter URL slug"
+      },
+      "submit": {
+        "create": "Create project",
+        "creating": "Creating...",
+        "update": "Update",
+        "updating": "Updating..."
+      }
+    },
+    "messages": {
+      "createSuccess": "Project created successfully",
+      "deleteSuccess": "Project deleted successfully",
+      "error": {
+        "duplicateSlug": "A project with this slug already exists in the selected organization.",
+        "generic": "An error occurred. Please try again.",
+        "notFound": "Project not found",
+        "organizationRequired": "Please select an organization"
+      },
+      "updateSuccess": "Project updated successfully"
+    },
+    "searchPlaceholder": "Search projects...",
+    "title": "Projects"
+  },
+  "resetPassword": {
+    "description": "Enter your new password below.",
+    "form": {
+      "newPassword": "New Password",
+      "submit": "Reset Password",
+      "submitting": "Resetting..."
+    },
+    "links": {
+      "login": "Back to login"
+    },
+    "messages": {
+      "success": {
+        "description": "Your password has been reset. You may now login.",
+        "title": "Password reset"
+      }
+    },
+    "title": "Reset Password"
+  },
+  "signUp": {
+    "description": "Fill in your details to create an account.",
+    "form": {
+      "confirmPassword": "Confirm Password",
+      "email": "Email",
+      "name": "Name",
+      "password": "Password",
+      "submit": "Sign Up"
+    },
+    "links": {
+      "login": {
+        "question": "Already have an account?",
+        "text": "Login"
+      }
+    },
+    "title": "Sign Up"
+  },
+  "user": {
+    "actions": {
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "columns": {
+      "actions": "Actions",
+      "createdAt": "Created At",
+      "email": "Email",
+      "name": "Name",
+      "role": "Role"
+    },
+    "createButton": "Create User",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete User",
+      "deleteButton": {
+        "srText": "Delete user",
+        "title": "Delete user"
+      },
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete this user? This action cannot be undone.",
+      "error": "Failed to delete user",
+      "success": "User deleted successfully",
+      "title": "Delete User"
+    },
+    "description": "This is the admin users page. Here you can manage all users.",
+    "editUser": {
+      "description": "Update user details",
+      "title": "Edit User"
+    },
+    "form": {
+      "cancel": "Cancel",
+      "confirmPassword": "Confirm Password",
+      "email": "Email",
+      "error": "An error occurred. Please try again.",
+      "errors": {
+        "email": "Please enter a valid email address",
+        "passwordMatch": "Passwords do not match",
+        "required": "This field is required"
+      },
+      "name": "Name",
+      "password": "Password",
+      "role": "Role",
+      "save": "Save",
+      "success": {
+        "created": "User created successfully",
+        "updated": "User updated successfully"
+      }
+    },
+    "newUser": {
+      "description": "Create a new user",
+      "title": "Create User"
+    },
+    "role": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "search": {
+      "placeholder": "Search users..."
+    },
+    "title": "Users"
+  }
+}
