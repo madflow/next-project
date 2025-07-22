@@ -1,12 +1,18 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod/v4";
 
+const booleanString = z.string().transform((val) => {
+  const lower = val.toLowerCase();
+  return lower === "true" || lower === "1" || lower === "yes";
+});
+
 export const env = createEnv({
   server: {
     ANALYSIS_API_KEY: z.string().default(""),
     ANALYSIS_API_URL: z.url().default(""),
     AUTH_SECRET: z.string().default(""),
     AUTH_URL: z.string().default(""),
+    AUTH_DISABLE_SIGNUP: booleanString.default(true),
     BASE_URL: z.string().default(""),
     DATABASE_URL: z.url().default("postgres://"),
     MAIL_DEFAULT_SENDER: z.string().default(""),
