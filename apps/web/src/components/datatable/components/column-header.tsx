@@ -32,7 +32,7 @@ export function DataTableColumnHeader<TData, TValue>({
     }
   }
 
-  // Safe type assertion for translation key
+  // @ts-expect-error Dynamic translation hack
   const translatedTitle = t(title as string);
 
   return (

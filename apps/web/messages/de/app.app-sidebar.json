@@ -2,8 +2,10 @@
   "appSidebar": {
     "menu": "Menü",
     "navItems": {
+      "adhoc": "Ad hoc Analyse",
       "admin": "Admin",
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "project": "Projekt"
     },
     "organizationSwitcher": {
       "label": "Organisation auswählen",

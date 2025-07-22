@@ -58,7 +58,7 @@ export function DatasetUploadForm() {
         setOrganizations(result.rows);
       } catch (error) {
         console.error("Failed to load organizations", error);
-        toast.error(t("messages.error.generic"));
+        toast.error(t("errors.unknownError"));
       } finally {
         setIsLoading(false);
       }

@@ -27,6 +27,7 @@ export const columns: ColumnDef<AuthUser>[] = [
       const t = useTranslations("user");
       const role = (row.original.role as string) || "user";
       const translationKey = `role.${role}` as const;
+      // @ts-expect-error Dynamic translation hack
       return <div>{t(translationKey, { fallback: role })}</div>;
     },
   },

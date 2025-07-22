@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { DatasetSelect } from "@/components/form/dataset-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +23,8 @@ type AdHocAnalysisProps = {
 export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
   const [selectedVariable, setSelectedVariable] = useState<DatasetVariable | null>(null);
+
+  const t = useTranslations("appProjectAdhoc");
 
   function supportsChart(chartType: AnalysisChartType, variable: DatasetVariable): boolean {
     const supportedCharts: AnalysisChartType[] = [];
@@ -71,7 +74,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   return (
     <div className="theme-container flex gap-4">
       <div className="flex w-64 max-w-64 min-w-64 flex-col gap-4">
-        <ThemeSelector />
+        <ThemeSelector placeholder={t("themePlaceholder")} label={t("theme")} className="w-full" />
         <DatasetSelect
           projectId={project.id}
           onValueChange={(value) => {
