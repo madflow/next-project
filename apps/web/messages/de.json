@@ -1,0 +1,687 @@
+{
+  "account": {
+    "delete": {
+      "button": "Konto löschen",
+      "confirm": {
+        "cancel": "Abbrechen",
+        "confirm": "Ja, mein Konto löschen",
+        "description": "Diese Aktion kann nicht rückgängig gemacht werden. Ihr Konto und alle damit verbundenen Daten werden dauerhaft gelöscht.",
+        "title": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten?"
+      },
+      "description": "Sobald Ihr Konto gelöscht ist, werden alle damit verbundenen Daten dauerhaft entfernt. Bitte laden Sie alle Daten herunter, die Sie behalten möchten, bevor Sie Ihr Konto löschen.",
+      "error": "Löschen des Kontos fehlgeschlagen.",
+      "returnHome": "Zurück zur Startseite",
+      "success": "Ihr Konto wurde gelöscht.",
+      "successMessage": "Ihr Konto und alle damit verbundenen Daten wurden dauerhaft gelöscht.",
+      "successTitle": "Konto gelöscht",
+      "title": "Konto löschen",
+      "verificationSent": "Eine Bestätigungs-E-Mail wurde an Ihre E-Mail-Adresse gesendet. Bitte bestätigen Sie die Löschung.",
+      "warningDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Daten werden dauerhaft gelöscht.",
+      "warningTitle": "Gefahrenzone"
+    },
+    "errors": {
+      "notFound": "Benutzer nicht gefunden.",
+      "unauthorized": "Sie müssen angemeldet sein, um diese Seite anzuzeigen.",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten."
+    },
+    "password": {
+      "description": "Stellen Sie sicher, dass Ihr Konto ein langes, sicheres Passwort verwendet.",
+      "error": "Passwortaktualisierung fehlgeschlagen.",
+      "fields": {
+        "confirmPassword": "Neues Passwort bestätigen",
+        "currentPassword": "Aktuelles Passwort",
+        "newPassword": "Neues Passwort",
+        "update": "Passwort aktualisieren"
+      },
+      "success": "Passwort erfolgreich aktualisiert.",
+      "title": "Passwort aktualisieren",
+      "validation": {
+        "currentPasswordRequired": "Aktuelles Passwort ist erforderlich.",
+        "newPasswordRequired": "Neues Passwort ist erforderlich.",
+        "passwordMismatch": "Die neuen Passwörter stimmen nicht überein.",
+        "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein."
+      }
+    },
+    "profile": {
+      "avatar": {
+        "change": "Ändern",
+        "description": "Aktualisieren Sie Ihr Profilbild",
+        "error": {
+          "deleteFailed": "Löschen des Profilbilds fehlgeschlagen. Bitte versuchen Sie es erneut.",
+          "fileSize": "Datei zu groß: Bitte laden Sie ein Bild mit maximal 2 MB hoch",
+          "fileType": "Ungültiger Dateityp: Bitte laden Sie eine Bilddatei hoch",
+          "invalidUrl": "Ungültige Profilbild-URL",
+          "unknown": "Beim Hochladen Ihres Profilbilds ist ein Fehler aufgetreten",
+          "updateFailed": "Profilbild konnte nicht aktualisiert werden",
+          "uploadFailed": "Hochladen des Profilbilds fehlgeschlagen"
+        },
+        "initial": "B",
+        "remove": "Entfernen",
+        "removing": "Wird entfernt...",
+        "saveChanges": "Änderungen speichern",
+        "saving": "Wird gespeichert...",
+        "success": "Ihr Profilbild wurde erfolgreich aktualisiert",
+        "successDelete": "Profilbild erfolgreich entfernt",
+        "title": "Profilbild",
+        "upload": "Hochladen"
+      },
+      "emailChangeError": "E-Mail konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+      "emailChangeNotice": "Eine Bestätigungs-E-Mail wird an Ihre neue E-Mail-Adresse gesendet.",
+      "emailChangeSent": "Bestätigungs-E-Mail an Ihre neue E-Mail-Adresse gesendet.",
+      "emailDescription": "Ändern Sie Ihre E-Mail-Adresse",
+      "emailTitle": "E-Mail-Adresse aktualisieren",
+      "error": "Fehler beim Aktualisieren des Profils.",
+      "fields": {
+        "currentEmail": "Aktuelle E-Mail",
+        "locale": "Sprache",
+        "name": "Name",
+        "newEmail": "Neue E-Mail",
+        "newEmailPlaceholder": "Neue E-Mail-Adresse eingeben",
+        "updateEmail": "E-Mail aktualisieren",
+        "updateProfile": "Profil aktualisieren"
+      },
+      "nameDescription": "Ändern Sie Ihren Anzeigenamen",
+      "nameTitle": "Namen aktualisieren",
+      "success": "Profil erfolgreich aktualisiert."
+    },
+    "title": "Kontoeinstellungen"
+  },
+  "adminDashboard": {
+    "datasets": {
+      "description": "Verwalten Sie Datensätze und deren Konfigurationen.",
+      "link": "Datensätze anzeigen",
+      "title": "Datensätze"
+    },
+    "organizations": {
+      "description": "Verwalten Sie Organisationen und deren Einstellungen.",
+      "link": "Organisationen anzeigen",
+      "title": "Organisationen"
+    },
+    "projects": {
+      "description": "Verwalten Sie Projekte und deren Konfigurationen.",
+      "link": "Projekte anzeigen",
+      "title": "Projekte"
+    },
+    "users": {
+      "description": "Verwalten Sie Benutzerkonten und Rollen.",
+      "link": "Benutzer anzeigen",
+      "title": "Benutzer"
+    }
+  },
+  "adminDataset": {
+    "actions": {
+      "cancel": "Abbrechen",
+      "uploadFile": "Datei hochladen",
+      "uploading": "Wird hochgeladen..."
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "filename": "Name",
+      "hash": "Datei-Hash",
+      "name": "Name",
+      "organization": "Organisation",
+      "size": "Größe",
+      "type": "Typ",
+      "uploaded": "Hochgeladen",
+      "uploadedAt": "Hochgeladen am"
+    },
+    "datatable": {
+      "noResults": "Keine Ergebnisse gefunden"
+    },
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie {name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "error": "Löschen des Datensatzes fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "success": "Datensatz erfolgreich gelöscht",
+      "title": "Datensatz löschen"
+    },
+    "description": "Verwalten Sie Ihre Datensätze",
+    "errors": {
+      "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {maxSize}",
+      "invalidFileType": "Ungültiger Dateityp. Bitte laden Sie eine .sav Datei hoch",
+      "nameRequired": "Bitte geben Sie einen Namen für die Datei ein",
+      "noFileSelected": "Bitte wählen Sie eine Datei zum Hochladen aus",
+      "organizationRequired": "Bitte wählen Sie eine Organisation aus",
+      "unknownError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "uploadFailed": "Hochladen der Datei fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "form": {
+      "createOrganizationFirst": "Erstellen Sie zuerst eine Organisation",
+      "createOrganizationLink": "Organisation erstellen",
+      "descriptionLabel": "Beschreibung (optional)",
+      "descriptionPlaceholder": "Fügen Sie eine Beschreibung für diese Datei hinzu",
+      "fileLabel": "Datensatzdatei",
+      "missingValuesLabel": "Allgemeine benutzerdefinierte Missing Values (optional)",
+      "nameLabel": "Name",
+      "namePlaceholder": "Geben Sie einen Namen für diesen Datensatz ein",
+      "noOrganizationsAvailable": "Keine Organisationen verfügbar",
+      "organization": {
+        "label": "Organisation",
+        "loading": "Organisationen werden geladen...",
+        "notFound": "Keine Organisationen gefunden",
+        "placeholder": "Organisation auswählen"
+      },
+      "organizationLabel": "Organisation",
+      "selectOrganization": "Organisation auswählen"
+    },
+    "noData": "Keine Datensätze gefunden",
+    "searchPlaceholder": "Datensätze durchsuchen...",
+    "tableActions": {
+      "delete": "Löschen",
+      "deleteConfirm": "Möchten Sie diesen Datensatz wirklich löschen?",
+      "download": "Herunterladen"
+    },
+    "title": "Datensätze",
+    "upload": {
+      "clickToUpload": "Zum Hochladen klicken",
+      "description": "Laden Sie einen neuen Datensatz in das System hoch",
+      "orDragAndDrop": "oder Datei hier ablegen",
+      "supportedFormats": ".sav",
+      "title": "Datensatz anlegen"
+    },
+    "uploadButton": "Datensatz anlegen",
+    "uploadSuccess": "Datei erfolgreich hochgeladen"
+  },
+  "adminDatasetEditor": {
+    "addToProject": "Zu Projekt hinzufügen",
+    "addToProjectError": "Fehler beim Hinzufügen des Datensatzes zum Projekt.",
+    "addToProjectSuccess": "Datensatz erfolgreich zum Projekt hinzugefügt!",
+    "adding": "Wird hinzugefügt...",
+    "columns": {
+      "label": "Label",
+      "measure": "Niveau",
+      "name": "Name",
+      "type": "Typ"
+    },
+    "common": {
+      "cancel": "Abbrechen",
+      "saveChanges": "Änderungen speichern",
+      "saving": "Wird gespeichert..."
+    },
+    "datasetProjectsDescription": "Ein Datensatz kann einem oder mehreren Projekten hinzugefügt werden.",
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie die Variable {name} löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "error": "Fehler beim Löschen der Variable.",
+      "title": "Variable löschen"
+    },
+    "editVariable": {
+      "description": "Aktualisieren Sie das Label für die Variable",
+      "form": {
+        "errors": {
+          "updateFailed": "Fehler beim Aktualisieren der Variable"
+        },
+        "label": {
+          "errors": {
+            "required": "Label ist erforderlich"
+          },
+          "label": "Label",
+          "placeholder": "Geben Sie ein beschreibendes Label ein"
+        },
+        "measure": {
+          "label": "Niveau"
+        },
+        "missingValues": {
+          "label": "Missing Values",
+          "placeholder": "Missing value hinzufügen"
+        },
+        "name": {
+          "label": "Name"
+        },
+        "success": "Variable erfolgreich aktualisiert",
+        "type": {
+          "label": "Typ"
+        }
+      },
+      "title": "Variable bearbeiten"
+    },
+    "editor": {
+      "projects": "Projekte",
+      "title": "Datensatz Editor für {name}",
+      "variables": "Variablen"
+    },
+    "error": "Fehler",
+    "fetchProjectsError": "Fehler beim Abrufen der Projekte.",
+    "name": "Name",
+    "projects": "Projekte",
+    "projectsExplanation": "Ein Datensatz kann einem oder mehreren Projekten hinzugefügt werden.",
+    "searchPlaceholder": "Variablen durchsuchen",
+    "selectProjectError": "Bitte wählen Sie zuerst ein Projekt aus.",
+    "tableActions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
+    }
+  },
+  "adminSidebar": {
+    "adminMenu": "Admin-Menü",
+    "navItems": {
+      "admin": "Admin",
+      "app": "App",
+      "datasets": "Datensätze",
+      "organizations": "Organisationen",
+      "projects": "Projekte",
+      "users": "Benutzer"
+    },
+    "sections": "Bereiche"
+  },
+  "appProjectAdhoc": {
+    "theme": "Farbthema",
+    "themePlaceholder": "Farbthema auswählen...",
+    "title": "Ad hoc Analyse"
+  },
+  "appSidebar": {
+    "menu": "Menü",
+    "navItems": {
+      "adhoc": "Ad hoc Analyse",
+      "admin": "Admin",
+      "dashboard": "Dashboard",
+      "project": "Projekt"
+    },
+    "organizationSwitcher": {
+      "label": "Organisation auswählen",
+      "noOrganizations": "Keine Organisationen",
+      "switch": "Organisation wechseln"
+    },
+    "projectSwitcher": {
+      "label": "Projekt auswählen",
+      "loading": "Lade Projekte...",
+      "noProjects": "Keine Projekte gefunden",
+      "switch": "Projekt wechseln"
+    },
+    "sections": "Bereiche"
+  },
+  "datatable": {
+    "clearSorting": "Sortierung zurücksetzen",
+    "loading": "Wird geladen...",
+    "noResults": "Keine Ergebnisse",
+    "pagination": {
+      "goToFirstPage": "Zur ersten Seite",
+      "goToLastPage": "Zur letzten Seite",
+      "goToNextPage": "Zur nächsten Seite",
+      "goToPreviousPage": "Zur vorherigen Seite",
+      "pageInfo": "Seite {current} von {total}",
+      "rowsPerPage": "Zeilen pro Seite",
+      "total": "Gesamt: {count}"
+    },
+    "retry": "Erneut versuchen",
+    "sortAscending": "Aufsteigend sortieren",
+    "sortDescending": "Absteigend sortieren",
+    "viewOptions": {
+      "toggleColumns": "Spalten ein-/ausblenden",
+      "view": "Ansicht"
+    }
+  },
+  "forgotPassword": {
+    "description": "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts zu.",
+    "form": {
+      "email": "E-Mail",
+      "submit": "Link zum Zurücksetzen senden",
+      "submitting": "Wird gesendet..."
+    },
+    "links": {
+      "login": "Zurück zur Anmeldung"
+    },
+    "messages": {
+      "success": {
+        "description": "Wir haben Ihnen einen Link zum Zurücksetzen Ihres Passworts gesendet. Bitte überprüfen Sie Ihre E-Mails.",
+        "title": "Überprüfen Sie Ihre E-Mails"
+      }
+    },
+    "title": "Passwort vergessen?"
+  },
+  "localeSwitcher": {
+    "languages": {
+      "de": "Deutsch",
+      "en": "Englisch"
+    },
+    "locale": "Sprache",
+    "selectLanguage": "Sprache auswählen"
+  },
+  "login": {
+    "form": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "submit": "Einloggen"
+    },
+    "links": {
+      "forgotPassword": {
+        "question": "Passwort vergessen?",
+        "text": "Passwort zurücksetzen"
+      },
+      "signUp": {
+        "question": "Noch keinen Account?",
+        "text": "Registrieren"
+      }
+    },
+    "title": "Einloggen"
+  },
+  "navUser": {
+    "account": "Konto",
+    "error": {
+      "signOut": "Abmeldung fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "menuButton": {
+      "srText": "Benutzermenü öffnen"
+    },
+    "signOut": "Abmelden",
+    "signingOut": "Melde ab..."
+  },
+  "organization": {
+    "actions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "createdAt": "Erstellt am",
+      "name": "Organisation",
+      "slug": "Slug"
+    },
+    "create": {
+      "description": "Neue Organisation anlegen",
+      "title": "Organisation anlegen"
+    },
+    "createButton": "Organisation anlegen",
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Organisation löschen",
+      "deleteButton": {
+        "srText": "Organisation löschen",
+        "title": "Organisation löschen"
+      },
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie die Organisation &ldquo;{name}&rdquo; löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "error": "Löschen der Organisation fehlgeschlagen",
+      "title": "Organisation löschen"
+    },
+    "description": "Dies ist die Admin-Seite für Organisationen. Hier können Sie alle Organisationen verwalten.",
+    "edit": {
+      "description": "Organisationsdetails aktualisieren",
+      "title": "Organisation bearbeiten"
+    },
+    "form": {
+      "cancel": "Abbrechen",
+      "name": {
+        "errors": {
+          "required": "Der Name der Organisation ist erforderlich"
+        },
+        "label": "Name",
+        "placeholder": "Namen der Organisation eingeben"
+      },
+      "slug": {
+        "description": "Dies ist die URL-freundliche Version des Namens. Er darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten.",
+        "errors": {
+          "invalid": "Der URL-Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
+          "maxLength": "Der URL-Slug darf maximal 50 Zeichen lang sein",
+          "required": "Der URL-Slug ist erforderlich"
+        },
+        "label": "Slug",
+        "placeholder": "URL-Slug eingeben"
+      },
+      "submit": {
+        "create": "Organisation anlegen",
+        "creating": "Wird erstellt...",
+        "update": "Aktualisieren",
+        "updating": "Wird aktualisiert..."
+      }
+    },
+    "messages": {
+      "createSuccess": "Organisation erfolgreich erstellt",
+      "deleteSuccess": "Organisation erfolgreich gelöscht",
+      "error": {
+        "duplicateSlug": "Eine Organisation mit diesem Slug existiert bereits.",
+        "generic": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        "notFound": "Organisation nicht gefunden"
+      },
+      "updateSuccess": "Organisation erfolgreich aktualisiert"
+    },
+    "searchPlaceholder": "Organisationen durchsuchen...",
+    "title": "Organisationen"
+  },
+  "organizationMembers": {
+    "actions": {
+      "remove": "Entfernen"
+    },
+    "add": {
+      "description": "Laden Sie ein neues Mitglied ein, sich dieser Organisation anzuschließen",
+      "form": {
+        "actions": {
+          "cancel": "Abbrechen",
+          "submit": "Mitglied hinzufügen"
+        },
+        "errors": {
+          "searchFailed": "Suche nach Benutzern fehlgeschlagen",
+          "submitFailed": "Hinzufügen des Mitglieds fehlgeschlagen"
+        },
+        "role": {
+          "label": "Rolle",
+          "options": {
+            "admin": "Administrator",
+            "member": "Mitglied",
+            "owner": "Eigentümer"
+          },
+          "placeholder": "Rolle auswählen..."
+        },
+        "success": {
+          "description": "Das Mitglied wurde der Organisation hinzugefügt",
+          "title": "Mitglied hinzugefügt"
+        },
+        "user": {
+          "label": "Benutzer",
+          "noResults": "Keine Benutzer gefunden",
+          "placeholder": "Benutzer auswählen...",
+          "searchPlaceholder": "Benutzer suchen...",
+          "searching": "Suche...",
+          "selectUser": "Benutzer auswählen"
+        }
+      },
+      "title": "Mitglied zur Organisation hinzufügen"
+    },
+    "addMember": "Mitglied hinzufügen",
+    "columns": {
+      "email": "E-Mail",
+      "name": "Name",
+      "role": "Rolle"
+    },
+    "description": "Verwalten Sie die Mitglieder dieser Organisation",
+    "removeDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Mitglied entfernen",
+      "deleteButton": {
+        "srText": "Mitglied entfernen",
+        "title": "Mitglied entfernen"
+      },
+      "deleting": "Wird entfernt...",
+      "description": "Sind Sie sicher, dass Sie {name} aus dieser Organisation entfernen möchten?",
+      "error": "Entfernen des Mitglieds fehlgeschlagen",
+      "title": "Mitglied entfernen"
+    },
+    "searchPlaceholder": "Mitglieder suchen...",
+    "title": "Mitglieder von {name}"
+  },
+  "project": {
+    "actions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "createdAt": "Erstellt am",
+      "name": "Name",
+      "organization": "Organisation",
+      "slug": "Slug"
+    },
+    "create": {
+      "description": "Neues Projekt anlegen",
+      "title": "Projekt erstellen"
+    },
+    "createButton": "Projekt erstellen",
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Projekt löschen",
+      "deleteButton": {
+        "srText": "Projekt löschen",
+        "title": "Projekt löschen"
+      },
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie das Projekt &ldquo;{name}&rdquo; löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "error": "Löschen des Projekts fehlgeschlagen",
+      "title": "Projekt löschen"
+    },
+    "description": "Dies ist die Admin-Seite für Projekte. Hier können Sie alle Projekte verwalten.",
+    "edit": {
+      "description": "Projektdetails aktualisieren",
+      "title": "Projekt bearbeiten"
+    },
+    "form": {
+      "cancel": "Abbrechen",
+      "name": {
+        "errors": {
+          "required": "Der Name des Projekts ist erforderlich"
+        },
+        "label": "Name",
+        "placeholder": "Namen des Projekts eingeben"
+      },
+      "organization": {
+        "errors": {
+          "required": "Bitte wählen Sie eine Organisation aus"
+        },
+        "label": "Organisation",
+        "loading": "Organisationen werden geladen...",
+        "notFound": "Keine Organisationen gefunden",
+        "placeholder": "Organisation auswählen"
+      },
+      "slug": {
+        "description": "Dies ist die URL-freundliche Version des Namens. Er darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten.",
+        "errors": {
+          "invalid": "Der URL-Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
+          "maxLength": "Der URL-Slug darf maximal 50 Zeichen lang sein",
+          "required": "Der URL-Slug ist erforderlich"
+        },
+        "label": "Slug",
+        "placeholder": "URL-Slug eingeben"
+      },
+      "submit": {
+        "create": "Projekt erstellen",
+        "creating": "Wird erstellt...",
+        "update": "Aktualisieren",
+        "updating": "Wird aktualisiert..."
+      }
+    },
+    "messages": {
+      "createSuccess": "Projekt erfolgreich erstellt",
+      "deleteSuccess": "Projekt erfolgreich gelöscht",
+      "error": {
+        "duplicateSlug": "Ein Projekt mit diesem Slug existiert bereits in der ausgewählten Organisation.",
+        "generic": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        "notFound": "Projekt nicht gefunden",
+        "organizationRequired": "Bitte wählen Sie eine Organisation aus"
+      },
+      "updateSuccess": "Projekt erfolgreich aktualisiert"
+    },
+    "searchPlaceholder": "Projekte durchsuchen...",
+    "title": "Projekte"
+  },
+  "resetPassword": {
+    "description": "Geben Sie unten Ihr neues Passwort ein.",
+    "form": {
+      "newPassword": "Neues Passwort",
+      "submit": "Passwort zurücksetzen",
+      "submitting": "Wird zurückgesetzt..."
+    },
+    "links": {
+      "login": "Zurück zum Login"
+    },
+    "messages": {
+      "success": {
+        "description": "Ihr Passwort wurde zurückgesetzt. Sie können sich jetzt anmelden.",
+        "title": "Passwort zurückgesetzt"
+      }
+    },
+    "title": "Passwort zurücksetzen"
+  },
+  "signUp": {
+    "description": "Füllen Sie Ihre Daten aus, um ein Konto zu erstellen.",
+    "form": {
+      "confirmPassword": "Passwort bestätigen",
+      "email": "E-Mail",
+      "name": "Name",
+      "password": "Passwort",
+      "submit": "Registrieren"
+    },
+    "links": {
+      "login": {
+        "question": "Bereits ein Konto?",
+        "text": "Anmelden"
+      }
+    },
+    "title": "Registrieren"
+  },
+  "user": {
+    "actions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "createdAt": "Erstellt am",
+      "email": "E-Mail",
+      "name": "Name",
+      "role": "Rolle"
+    },
+    "createButton": "Benutzer anlegen",
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Benutzer löschen",
+      "deleteButton": {
+        "srText": "Benutzer löschen",
+        "title": "Benutzer löschen"
+      },
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "error": "Löschen des Benutzers fehlgeschlagen",
+      "success": "Benutzer erfolgreich gelöscht",
+      "title": "Benutzer löschen"
+    },
+    "description": "Dies ist die Admin-Benutzerverwaltung. Hier können Sie alle Benutzer verwalten.",
+    "editUser": {
+      "description": "Benutzerdetails aktualisieren",
+      "title": "Benutzer bearbeiten"
+    },
+    "form": {
+      "cancel": "Abbrechen",
+      "confirmPassword": "Passwort bestätigen",
+      "email": "E-Mail",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "errors": {
+        "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        "passwordMatch": "Die Passwörter stimmen nicht überein",
+        "required": "Dieses Feld ist erforderlich"
+      },
+      "name": "Name",
+      "password": "Passwort",
+      "role": "Rolle",
+      "save": "Speichern",
+      "success": {
+        "created": "Benutzer erfolgreich erstellt",
+        "updated": "Benutzer erfolgreich aktualisiert"
+      }
+    },
+    "newUser": {
+      "description": "Einen neuen Benutzer erstellen",
+      "title": "Benutzer anlegen"
+    },
+    "role": {
+      "admin": "Administrator",
+      "user": "Benutzer"
+    },
+    "search": {
+      "placeholder": "Benutzer suchen..."
+    },
+    "title": "Benutzer"
+  }
+}
