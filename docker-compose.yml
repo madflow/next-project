@@ -7,37 +7,41 @@ services:
     environment:
       - ANALYSIS_API_KEY=secret
       - ANALYSIS_API_URL=http://analysis:3003/api
-      - AUTH_SECRET=2gH418GartJnclf5xCN6sErzaP3PWgru
+      - AUTH_DISABLE_SIGNUP=false
+      - AUTH_SECRET=super-secret-key
       - AUTH_URL=http://localhost:3001
       - BASE_URL=http://localhost:3001
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
       - MAIL_DEFAULT_SENDER='no-reply@example.com'
       - NEXT_PUBLIC_BASE_URL=http://localhost:3001
       - NEXT_PUBLIC_SITE_NAME='App'
-      - NDOE_ENV=production
+      - NODE_ENV=production
       - S3_ACCESS_KEY_ID=s3 
       - S3_BUCKET_NAME=app
       - S3_ENDPOINT=http://s3:7070
       - S3_REGION=us-east-1
       - S3_SECRET_ACCESS_KEY=s3
-      - SITE_NAME='Better Auth and Next.js'
+      - SITE_NAME='Next Project'
       - SMTP_SERVER_HOST=smtp
       - SMTP_SERVER_PASSWORD=user
       - SMTP_SERVER_PORT=1025
       - SMTP_SERVER_USERNAME=password
     ports:
       - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   drizzle:
     build:
       context: .
       dockerfile: ./packages/database/Dockerfile
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - DOCKER_RUN_MIGRATIONS=1
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
- 
 
   analysis:
     build:

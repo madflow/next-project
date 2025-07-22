@@ -131,7 +131,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    disableSignUp: false,
+    disableSignUp: env.AUTH_DISABLE_SIGNUP,
     sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }) => {
       const { user, url } = data;
       const { heading, content, action } = getEmailMessage("passwordReset", user.locale);

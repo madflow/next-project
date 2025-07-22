@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { LoginForm } from "./form";
 
+export const dynamic = "force-dynamic";
+
 export default function Page() {
   const signUpDisabled = auth.options.emailAndPassword.disableSignUp;
   return (
