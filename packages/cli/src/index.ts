@@ -1,12 +1,20 @@
+import chalk from "chalk";
 import { Command } from "commander";
-import "dotenv/config";
 
-process.on("SIGINT", () => process.exit(0));
-process.on("SIGTERM", () => process.exit(0));
-
-async function main() {
-  const program = new Command("cli");
-  program.parse();
+export function makeCommand(name: string) {
+  return new Command(name);
 }
 
-main();
+export function printLint(line: string) {
+  console.log(line);
+}
+
+export function printSuccessLine(line: string) {
+  const formattedLine = chalk.bgGreen.white(line);
+  console.log(formattedLine);
+}
+
+export function printErrorLine(line: string) {
+  const formattedLine = chalk.bgRed.white(line);
+  console.log(formattedLine);
+}

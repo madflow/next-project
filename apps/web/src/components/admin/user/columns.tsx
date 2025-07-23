@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { remove } from "@/actions/user";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { type AuthUser } from "@/types/user";
 import { DeleteUserDialog } from "./delete-user-dialog";
@@ -27,8 +28,9 @@ export const columns: ColumnDef<AuthUser>[] = [
       const t = useTranslations("user");
       const role = (row.original.role as string) || "user";
       const translationKey = `role.${role}` as const;
+      const badgeVariant = role === "user" ? "secondary" : "default";
       // @ts-expect-error Dynamic translation hack
-      return <div>{t(translationKey, { fallback: role })}</div>;
+      return <Badge variant={badgeVariant}>{t(translationKey, { fallback: role })}</Badge>;
     },
   },
   {
