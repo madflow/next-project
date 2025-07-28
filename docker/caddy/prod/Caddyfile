@@ -2,8 +2,6 @@
 {
 	# Email for Let's Encrypt
 	# email {$CADDY_EMAIL}
-	# Use Let's Encrypt staging for testing (remove this line for production)
-	acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
 }
 
 # Main application - facing the internet
