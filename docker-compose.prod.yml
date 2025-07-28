@@ -2,7 +2,6 @@ services:
 
   caddy:
     image: caddy:2
-    platform: linux/amd64
     ports:
       - "80:80"
       - "443:443"
@@ -16,7 +15,6 @@ services:
 
   app:
     image: ghcr.io/madflow/next-project-app:main
-    platform: linux/amd64
     environment:
       - ANALYSIS_API_KEY=${ANALYSIS_API_KEY}
       - ANALYSIS_API_URL=${ANALYSIS_API_URL}
@@ -46,7 +44,6 @@ services:
 
   analysis:
     image: ghcr.io/madflow/next-project-analysis:main
-    platform: linux/amd64
     environment:
       -  ANALYSIS_DB_HOST=${POSTGRES_HOST}
       -  ANALYSIS_DB_PORT=${POSTGRES_PORT}
@@ -70,7 +67,6 @@ services:
 
   migrations:
     image: ghcr.io/madflow/next-project-db:main
-    platform: linux/amd64
     environment:
       - DOCKER_RUN_MIGRATIONS=1
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -81,7 +77,6 @@ services:
   # https://hub.docker.com/_/postgres/
   postgres:
     image: "postgres:17-alpine"
-    platform: linux/amd64
     command: "postgres -c log_statement=all"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
@@ -99,7 +94,6 @@ services:
   #https://mailpit.axllent.org/docs/install/docker/
   smtp:
     image: axllent/mailpit
-    platform: linux/amd64
     environment:
       MP_WEBROOT: /__mail/
       MP_MAX_MESSAGES: 5000
