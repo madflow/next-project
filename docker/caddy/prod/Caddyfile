@@ -8,16 +8,15 @@
 
 # Main application - facing the internet
 {$SITE_ADDRESS} {
-	# SMTP web interface with basic auth
-	handle /__mail* {
-		basic_auth {
-      {$BASIC_AUTH}
-		}
-		reverse_proxy smtp:8025 {
-			# Only set Host header, other headers are set automatically
-			header_up Host {upstream_hostport}
-			header_up X-Real-IP {remote_host}
-		}
+
+	basic_auth {
+		{$BASIC_AUTH}
+	}
+
+  redir /__mail /__mail/
+	handle_path /__mail/* {
+    rewrite * /__mail{path}
+		reverse_proxy smtp:8025
 	}
 
 	# Main application (catch-all)
