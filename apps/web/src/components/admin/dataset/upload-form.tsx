@@ -26,6 +26,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Organization } from "@/types/organization";
 
+function generateDatasetName(filename: string): string {
+  // Return empty string if filename is empty or null
+  if (!filename) {
+    return "";
+  }
+
+  // Remove file extension
+  const nameWithoutExtension = filename.includes(".") ? filename.substring(0, filename.lastIndexOf(".")) : filename;
+
+  // Handle cases where filename might be just an extension (e.g., ".bashrc")
+  if (!nameWithoutExtension) {
+    return "";
+  }
+
+  // Replace underscores with hyphens
+  const withHyphens = nameWithoutExtension.replace(/_/g, "-");
+
+  // Convert to title case: uppercase first letter, rest lowercase
+  const firstChar = withHyphens.charAt(0).toUpperCase();
+  const rest = withHyphens.slice(1).toLowerCase();
+
+  return `${firstChar}${rest}`;
+}
+
 type FormData = {
   files: File[];
   name: string;
@@ -144,7 +168,7 @@ export function DatasetUploadForm() {
                       if (!nameState.isTouched) {
                         const fileValue = value[0] ?? null;
                         if (fileValue) {
-                          form.setValue("name", fileValue.name);
+                          form.setValue("name", generateDatasetName(fileValue.name));
                         }
                       }
                       field.onChange(value);
