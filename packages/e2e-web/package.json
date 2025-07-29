@@ -12,7 +12,8 @@
     "e2e:webkit": "npx playwright test --project=webkit",
     "e2e:debug": "npx playwright test --debug",
     "e2e:ui": "npx playwright test --ui",
-    "e2e:deps": "playwright install --with-deps"
+    "e2e:deps": "playwright install --with-deps",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
