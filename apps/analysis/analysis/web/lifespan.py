@@ -4,8 +4,6 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from analysis.db.meta import meta
-from analysis.db.models import load_all_models
 from analysis.settings import settings
 
 
@@ -28,15 +26,6 @@ def _setup_db(app: FastAPI) -> None:  # pragma: no cover
     app.state.db_session_factory = session_factory
 
 
-async def _create_tables() -> None:  # pragma: no cover
-    """Populates tables in the database."""
-    load_all_models()
-    engine = create_async_engine(str(settings.db_url))
-    async with engine.begin() as connection:
-        await connection.run_sync(meta.create_all)
-    await engine.dispose()
-
-
 @asynccontextmanager
 async def lifespan_setup(
     app: FastAPI,
@@ -53,7 +42,6 @@ async def lifespan_setup(
 
     app.middleware_stack = None
     _setup_db(app)
-    await _create_tables()
     app.middleware_stack = app.build_middleware_stack()
 
     yield

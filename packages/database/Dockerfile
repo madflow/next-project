@@ -13,6 +13,7 @@ RUN npm install --global turbo@^2
 COPY . .
 
 RUN turbo prune @repo/database --docker
+RUN turbo build
 
 FROM base AS runner
 
