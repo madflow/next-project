@@ -25,7 +25,7 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
   const [isAddingToProject, setIsAddingToProject] = useState(false);
   const t = useTranslations("adminDatasetEditor");
 
-  const { data, isSuccess, isError } = useQueryApi<ApiResponsePayload<ResponseRow>>(
+  const { data, isSuccess, isError, refetch } = useQueryApi<ApiResponsePayload<ResponseRow>>(
     `/api/datasets/${datasetId}/projects`,
     {
       limit: 100,
@@ -42,6 +42,7 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
     setIsAddingToProject(true);
     try {
       await addToProject(datasetId, selectedProject);
+      refetch();
       toast.success(t("addToProjectSuccess"));
     } catch (error) {
       console.error(t("addToProjectError"), error);
