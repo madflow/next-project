@@ -328,7 +328,8 @@
     "tableActions": {
       "delete": "Löschen",
       "deleteConfirm": "Möchten Sie diesen Datensatz wirklich löschen?",
-      "download": "Herunterladen"
+      "download": "Herunterladen",
+      "edit": "Bearbeiten"
     },
     "title": "Datensätze",
     "upload": {
@@ -340,6 +341,35 @@
     },
     "uploadButton": "Datensatz anlegen",
     "uploadSuccess": "Datei erfolgreich hochgeladen"
+  },
+  "dataset": {
+    "edit": {
+      "title": "Datensatz bearbeiten",
+      "description": "Datensatzdetails aktualisieren"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Namen des Datensatzes eingeben",
+        "errors": {
+          "required": "Der Name des Datensatzes ist erforderlich"
+        }
+      },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Beschreibung des Datensatzes eingeben"
+      },
+      "submit": {
+        "update": "Aktualisieren",
+        "updating": "Wird aktualisiert..."
+      }
+    },
+    "messages": {
+      "updateSuccess": "Datensatz erfolgreich aktualisiert",
+      "error": {
+        "generic": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+      }
+    }
   },
   "adminDatasetEditor": {
     "addToProject": "Zu Projekt hinzufügen",
