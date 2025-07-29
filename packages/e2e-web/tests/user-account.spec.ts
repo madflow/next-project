@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
-import { loginUser, logoutUser, smtpServerApi } from "../utils";
+import { extractLinkFromMessage, loginUser, logoutUser, smtpServerApi } from "../utils";
 
 test.afterAll(async () => {
   await smtpServerApi.deleteMessages();
@@ -124,16 +124,7 @@ test.describe("User Account", () => {
 
     expect(searchMessages.messages.length).toBe(1);
     const message = searchMessages.messages[0];
-    const linkCheck = await smtpServerApi.linkCheck(message.ID);
-
-    // Find the verification link
-    let verifyLink = "";
-    for (const link of linkCheck.Links) {
-      if (link.URL.includes("verify-email")) {
-        verifyLink = link.URL;
-        break;
-      }
-    }
+    const verifyLink = await extractLinkFromMessage(message, "verify-email");
 
     expect(verifyLink).toBeTruthy();
 

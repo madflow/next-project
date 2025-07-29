@@ -11,7 +11,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/compone
 import { Project, useAppContext } from "@/context/app-context";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { NavProject } from "./nav-project";
-import { OrganizationSwitcher } from "./organization-switcher";
+import { OrganizationMenu } from "./organization-menu";
 import { ProjectSwitcher } from "./project-switcher";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,7 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <OrganizationSwitcher activeOrganization={activeOrganization} />
+        <OrganizationMenu activeOrganization={activeOrganization} />
         <ProjectSwitcher
           organizationId={activeOrganization?.id ?? ""}
           activeProject={activeProject}

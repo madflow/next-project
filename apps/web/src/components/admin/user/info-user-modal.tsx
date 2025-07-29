@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import { InfoIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Code } from "@/components/ui/code";
 import {
@@ -22,7 +22,7 @@ export const InfoUserModal = ({ user }: InfoUserModalProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="cursor-pointer">
           <InfoIcon />
         </Button>
       </DialogTrigger>
