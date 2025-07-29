@@ -139,13 +139,17 @@
   },
   "projectAdhocAnalysis": {
     "tabs": {
-      "chart": "Diagramm",
       "variable": "Variable",
+      "chart": "Diagramm",
       "stats": "Statistiken"
     },
     "errors": {
       "fetchStats": "Fehler beim Laden der Statistiken"
     }
+  },
+  "projectAdhocVariables": {
+    "search": "Variablen durchsuchen...",
+    "loadMore": "Weitere Variablen laden"
   },
   "formProjectSelect": {
     "selectProject": "Projekt auswählen",
