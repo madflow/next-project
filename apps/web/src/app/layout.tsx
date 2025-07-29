@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getMessages } from "next-intl/server";
 import localFont from "next/font/local";
+import { env } from "@/env";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -14,7 +15,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Next Project",
+  title: env.SITE_NAME ?? "Next Project",
   description: "",
 };
 
