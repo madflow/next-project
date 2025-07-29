@@ -36,14 +36,7 @@ type FormData = {
 
 export function DatasetUploadForm() {
   const router = useRouter();
-  type UploadFormTranslations = {
-    (key: `buttons.${'upload' | 'uploading'}`): string;
-    (key: `formLabels.${'name' | 'organization' | 'missingValues' | 'description'}`): string;
-    (key: `validation.${'files.required' | 'files.sizeLimit' | 'name.required' | 'organizationId.required'}`): string;
-    (key: `upload.${'clickToUpload' | 'orDragAndDrop' | 'supportedFormats'}`): string;
-    (key: 'noOrganizations' | 'cancel' | 'success' | 'error' | 'messages.success' | 'messages.error' | 'errors.unknownError'): string;
-  };
-  const t = useTranslations("adminDatasetUploadForm") as unknown as UploadFormTranslations;
+  const t = useTranslations("adminDatasetUploadForm");
   const [isPending] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
 
@@ -66,19 +59,21 @@ export function DatasetUploadForm() {
   }, [t]);
 
   const form = useForm<FormData>({
-    resolver: zodResolver(z.object({
-      files: z
-        .array(z.custom<File>())
-        .min(1, t('validation.files.required'))
-        .refine((files) => files.every((file) => file.size <= 100 * 1024 * 1024), {
-          message: t('validation.files.sizeLimit'),
-          path: ["files"],
-        }),
-      name: z.string().min(1, t('validation.name.required')).trim(),
-      organizationId: z.string().min(1, t('validation.organizationId.required')),
-      missingValues: z.array(z.string()).optional(),
-      description: z.string().optional(),
-    })),
+    resolver: zodResolver(
+      z.object({
+        files: z
+          .array(z.custom<File>())
+          .min(1, t("validation.files.required"))
+          .refine((files) => files.every((file) => file.size <= 100 * 1024 * 1024), {
+            message: t("validation.files.sizeLimit"),
+            path: ["files"],
+          }),
+        name: z.string().min(1, t("validation.name.required")).trim(),
+        organizationId: z.string().min(1, t("validation.organizationId.required")),
+        missingValues: z.array(z.string()).optional(),
+        description: z.string().optional(),
+      })
+    ),
     defaultValues: {
       files: [],
       name: "",
@@ -168,7 +163,7 @@ export function DatasetUploadForm() {
                         <p className="text-muted-foreground mb-2 text-sm">
                           <span className="font-semibold">{t("upload.clickToUpload")}</span> {t("upload.orDragAndDrop")}
                         </p>
-                        <p className="text-muted-foreground text-xs">{t('upload.supportedFormats')}</p>
+                        <p className="text-muted-foreground text-xs">{t("upload.supportedFormats")}</p>
                       </div>
                     </FileUploadDropzone>
                     <FileUploadList>
@@ -198,11 +193,7 @@ export function DatasetUploadForm() {
               <FormItem>
                 <FormLabel>{t("formLabels.name")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("formLabels.name")}
-                    {...field}
-                    data-testid="app.admin.dataset.name-input"
-                  />
+                  <Input placeholder={t("formLabels.name")} {...field} data-testid="app.admin.dataset.name-input" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -228,7 +219,7 @@ export function DatasetUploadForm() {
                     {isLoading ? (
                       <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("buttons.uploading")}</div>
                     ) : organizations.length === 0 ? (
-                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("noOrganizations")}</div>
+                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("messages.noOrganizations")}</div>
                     ) : (
                       organizations.map((org) => (
                         <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
@@ -278,7 +269,7 @@ export function DatasetUploadForm() {
 
           <div className="flex justify-start space-x-4 pt-4">
             <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
-              {t("cancel")}
+              {t("buttons.cancel")}
             </Button>
             <Button type="submit" data-testid="app.admin.dataset.upload-button" disabled={isPending || isUploading}>
               {isUploading ? (
