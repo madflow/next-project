@@ -9,6 +9,7 @@ import { DatasetVariable } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
 import { AnalysisChartType, StatsRequest } from "@/types/stats";
 import { BarAdhoc } from "../chart/bar-adhoc";
+import BarSkeleton from "../chart/bar-skeleton";
 import { HorizontalBarAdhoc } from "../chart/horizontal-bar-adhoc";
 import { MetricsCards } from "../chart/metrics-cards";
 import { PieAdhoc } from "../chart/pie-adhoc";
@@ -52,7 +53,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
 
   const t = useTranslations("projectAdhocAnalysis");
 
-  const { data, mutate } = useDatasetStats(selectedDataset || "", {
+  const { data, mutate, isPending } = useDatasetStats(selectedDataset || "", {
     onError: (error) => {
       console.error(t("errors.fetchStats"), error);
     },
@@ -71,6 +72,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const handleAddVariable = (variable: DatasetVariable) => {
     setSelectedVariable(variable);
   };
+
   return (
     <div className="theme-container flex gap-4">
       <div className="flex w-64 max-w-64 min-w-64 flex-col gap-4">
@@ -83,6 +85,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         />
         {selectedDataset && <AdHocVariables datasetId={selectedDataset} onAddVariable={handleAddVariable} />}
       </div>
+      {isPending && <BarSkeleton />}
       {selectedDataset && selectedVariable && data && (
         <Tabs defaultValue="chart" className="w-full">
           <TabsList>
