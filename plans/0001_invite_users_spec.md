@@ -1,44 +1,45 @@
-# User Invitation Feature Specification
+# Invite Users Feature Specification
 
 ## Introduction
 
-This specification outlines the implementation of a user invitation feature for the Next.js application. The feature will allow administrators to invite new users to join their organization through a modal interface that captures the invitee's email address and sends an invitation.
+This specification outlines the implementation of a user invitation feature for the Next.js application. The feature will allow administrators to invite new users to organizations through a modal interface that collects email addresses and sends invitations.
 
 ## Task List
 
-1. **Create InviteUserModal Component**
-   - Build a client-side modal component for user invitation
+1. **Create Invite Modal Component**
+   - Create a new client component for the invitation modal
    - Include email input field with validation
-   - Add form submission handling
-   - Implement loading and error states
+   - Add invite button and cancel/close functionality
+   - Implement proper form handling and submission
 
 2. **Integrate Modal with Members Page**
    - Add "Invite User" button to the members page
-   - Implement modal open/close functionality
-   - Ensure proper state management between parent and modal
+   - Connect button to open the invitation modal
+   - Ensure modal opens and closes properly
 
 3. **Implement Invitation Logic**
-   - Use the provided `authClient.organization.inviteMember` API
-   - Handle successful invitations with user feedback
-   - Manage error scenarios with appropriate messaging
+   - Use the provided `authClient.organization.inviteMember` method
+   - Handle form submission with email validation
+   - Set role to "member" and resend to true
+   - Use organizationId from the page parameters
 
-4. **Add Form Validation**
-   - Validate email format before submission
-   - Provide clear error messages for invalid inputs
-   - Prevent duplicate submissions during processing
+4. **Add User Feedback**
+   - Show loading state during invitation process
+   - Display success message on successful invitation
+   - Handle and display error messages appropriately
+   - Close modal after successful invitation
 
-5. **Update Members Page UI**
-   - Position the invite button appropriately within the existing layout
-   - Ensure consistent styling with the current design system
-   - Handle modal backdrop and focus management
+5. **Style the Components**
+   - Ensure modal follows existing design patterns
+   - Make the interface responsive and accessible
+   - Style the invite button to match existing UI
 
 ## Implementation Details
 
 ### Target File
-- **Location**: `apps/web/src/app/(admin)/admin/organizations/[id]/members/page.tsx`
-- **New Component**: `InviteUserModal` (client component)
+- `apps/web/src/app/(admin)/admin/organizations/[id]/members/page.tsx`
 
-### API Integration
+### API Usage
 ```javascript
 const { data, error } = await authClient.organization.inviteMember({
     email: "example@gmail.com", // required
@@ -49,35 +50,22 @@ const { data, error } = await authClient.organization.inviteMember({
 ```
 
 ### Component Requirements
-- Modal must be a client component (`"use client"`)
-- Email input with proper validation
-- Submit button with loading state
-- Cancel/close functionality
-- Error handling and display
+- Modal component must be a client component
+- Form should validate email format before submission
+- Handle organizationId from page parameters
+- Proper error handling and user feedback
 
 ## Acceptance Criteria
 
-### Functional Requirements
 - [ ] "Invite User" button is visible on the members page
 - [ ] Clicking the button opens a modal with email input field
-- [ ] Email validation prevents invalid email submissions
-- [ ] Valid email submissions trigger the invite API call
-- [ ] Successful invitations show confirmation message and close modal
-- [ ] Failed invitations display appropriate error messages
-- [ ] Modal can be closed via cancel button, backdrop click, or ESC key
-- [ ] Loading states prevent multiple simultaneous submissions
-
-### Technical Requirements
-- [ ] InviteUserModal is implemented as a client component
-- [ ] Modal integrates properly with existing members page layout
-- [ ] API calls use the specified `authClient.organization.inviteMember` method
-- [ ] Organization ID is properly passed from the page context
-- [ ] Component follows existing code patterns and styling conventions
-
-### User Experience Requirements
-- [ ] Modal appears with smooth animation
-- [ ] Form validation provides immediate feedback
-- [ ] Success and error states are clearly communicated
-- [ ] Interface remains responsive during API calls
+- [ ] Modal can be closed using cancel button or close icon
+- [ ] Email field has proper validation (required, valid email format)
+- [ ] Submitting valid email triggers the invite API call
+- [ ] Loading state is shown during API call
+- [ ] Success message appears after successful invitation
+- [ ] Error messages are displayed for failed invitations
 - [ ] Modal closes automatically after successful invitation
-- [ ] Focus management follows accessibility best practices
+- [ ] Component follows existing design patterns and styling
+- [ ] Modal is responsive and accessible
+- [ ] No existing functionality is broken or removed

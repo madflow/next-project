@@ -77,8 +77,6 @@ This project uses the following technologies:
 - The translations files are located in the `messages` directory.
 - Use `next-intl`'s `useTranslation` hook to access translations in client components.
 - Use `getTranslations` in server components.
-- When adding new translation files, add them to the messages array in apps/web/src/i18n/request.ts.
-- The translation keys must be added to apps/web/src/global.d.ts in order to have them available in the `useTranslation` hook.
 
 ### Naming conventions
 
@@ -97,6 +95,7 @@ This project uses the following technologies:
 
 - Use Tailwind CSS for styling.
 - Use Shadcn UI for components.
+- Use "Sonner" for toasts.
 
 ### Data fetching & forms
 
