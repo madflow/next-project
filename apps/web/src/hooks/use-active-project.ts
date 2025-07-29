@@ -1,6 +1,6 @@
 "use client";
 
-import { type Organization } from "@/types/organization";
+import { type Organization } from "better-auth/plugins";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useProjectsByOrg } from "./use-projects-by-org";

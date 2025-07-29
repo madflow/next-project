@@ -387,6 +387,34 @@
   "adminUserInfoModal": {
     "close": "Close"
   },
+  "adminUserInviteForm": {
+    "buttons": {
+      "sendInvitation": "Send Invitation",
+      "sending": "Sending..."
+    },
+    "formLabels": {
+      "email": "Email",
+      "organization": "Organization",
+      "role": "Role"
+    },
+    "formPlaceholders": {
+      "email": "Enter email",
+      "selectRole": "Select a role"
+    },
+    "messages": {
+      "inviteError": "Failed to send invitation",
+      "inviteSuccess": "Invitation sent successfully"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "member": "Member",
+      "owner": "Owner"
+    },
+    "validation": {
+      "organizationRequired": "Organization is required",
+      "validEmailRequired": "Valid email is required"
+    }
+  },
   "appSidebar": {
     "menu": "Menu",
     "navItems": {
@@ -396,6 +424,7 @@
       "project": "Project"
     },
     "organizationSwitcher": {
+      "invite": "Invite user",
       "label": "Select organization",
       "noOrganizations": "No organizations",
       "switch": "Switch organization"
@@ -407,6 +436,18 @@
       "switch": "Switch project"
     },
     "sections": "Sections"
+  },
+  "authAcceptInvitation": {
+    "acceptButton": "Accept invitation",
+    "alreadyMember": "You are already a member of this organization.",
+    "description": "You have been invited to join an organization. Click the button below to accept.",
+    "errorOccurred": "An error occurred while accepting the invitation",
+    "failedToAccept": "Failed to accept invitation",
+    "invitationAccepted": "Invitation accepted successfully",
+    "needToSignUp": "You need to sign up to accept this invitation.",
+    "notAuthorized": "You do not have permission to accept this invitation.",
+    "notSignedIn": "You need to sign in to accept this invitation.",
+    "title": "Accept Invitation"
   },
   "chartMetricsCard": {
     "count": "Count",
@@ -490,11 +531,25 @@
     "noDatasets": "No datasets found.",
     "selectDataset": "Select a dataset"
   },
+  "formOrganizationSelect": {
+    "errorLoading": "Error loading organizations",
+    "loadingOrganizations": "Loading organizations...",
+    "noOrganizations": "No organizations found",
+    "selectOrganization": "Select an organization"
+  },
   "formProjectSelect": {
     "errorLoading": "Error loading projects",
     "loadingProjects": "Loading projects...",
     "noProjects": "No projects found",
     "selectProject": "Select a project"
+  },
+  "inviteUserModal": {
+    "buttonText": "Invite User",
+    "close": "Close",
+    "description": "Invite a new user to join your organization",
+    "descriptionOrg": "Invite a new user to join <highlight>{name}</highlight>. An invitation will be sent by email.",
+    "title": "Invite User",
+    "titleUser": "Invite {name}"
   },
   "localeSwitcher": {
     "languages": {

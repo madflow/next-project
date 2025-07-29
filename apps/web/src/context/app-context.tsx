@@ -1,6 +1,6 @@
 "use client";
 
-import { type Organization } from "@/types/organization";
+import { type Organization } from "better-auth/plugins";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useActiveProject } from "@/hooks/use-active-project";
 import { useActiveOrganization } from "@/lib/auth-client";

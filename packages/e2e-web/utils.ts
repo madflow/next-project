@@ -27,4 +27,16 @@ export async function logoutUser(page: Page) {
   await page.waitForSelector("data-testid=auth.login.form.submit");
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const extractLinkFromMessage = async (message: any, linkFragment: string) => {
+  const linkCheck = await smtpServerApi.linkCheck(message.ID);
+  let foundLink = "";
+  for (const link of linkCheck.Links) {
+    if (link.URL.includes(linkFragment)) {
+      foundLink = link.URL;
+    }
+  }
+  return foundLink;
+};
+
 export { smtpServerApi };

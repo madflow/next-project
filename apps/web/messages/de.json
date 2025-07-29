@@ -387,6 +387,34 @@
   "adminUserInfoModal": {
     "close": "Schließen"
   },
+  "adminUserInviteForm": {
+    "buttons": {
+      "sendInvitation": "Einladung senden",
+      "sending": "Wird gesendet..."
+    },
+    "formLabels": {
+      "email": "E-Mail",
+      "organization": "Organisation",
+      "role": "Rolle"
+    },
+    "formPlaceholders": {
+      "email": "E-Mail eingeben",
+      "selectRole": "Rolle auswählen"
+    },
+    "messages": {
+      "inviteError": "Einladung konnte nicht gesendet werden",
+      "inviteSuccess": "Einladung erfolgreich gesendet"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "member": "Mitglied",
+      "owner": "Eigentümer"
+    },
+    "validation": {
+      "organizationRequired": "Organisation ist erforderlich",
+      "validEmailRequired": "Gültige E-Mail-Adresse ist erforderlich"
+    }
+  },
   "appSidebar": {
     "menu": "Menü",
     "navItems": {
@@ -396,6 +424,7 @@
       "project": "Projekt"
     },
     "organizationSwitcher": {
+      "invite": "Anwender einladen",
       "label": "Organisation auswählen",
       "noOrganizations": "Keine Organisationen",
       "switch": "Organisation wechseln"
@@ -407,6 +436,18 @@
       "switch": "Projekt wechseln"
     },
     "sections": "Bereiche"
+  },
+  "authAcceptInvitation": {
+    "acceptButton": "Einladung annehmen",
+    "alreadyMember": "Sie sind bereits Mitglied dieser Organisation.",
+    "description": "Sie wurden eingeladen, einer Organisation beizutreten. Klicken Sie auf die Schaltfläche unten, um die Einladung anzunehmen.",
+    "errorOccurred": "Beim Annehmen der Einladung ist ein Fehler aufgetreten",
+    "failedToAccept": "Einladung konnte nicht angenommen werden",
+    "invitationAccepted": "Einladung erfolgreich angenommen",
+    "needToSignUp": "Sie müssen sich registrieren, um diese Einladung anzunehmen.",
+    "notAuthorized": "Sie haben keine Berechtigung, diese Einladung anzunehmen.",
+    "notSignedIn": "Sie sollten angemeldet sein, um diese Einladung anzunehmen.",
+    "title": "Einladung annehmen"
   },
   "chartMetricsCard": {
     "count": "Anzahl",
@@ -490,11 +531,25 @@
     "noDatasets": "Keine Datensätze gefunden.",
     "selectDataset": "Datensatz auswählen"
   },
+  "formOrganizationSelect": {
+    "errorLoading": "Fehler beim Laden der Organisationen.",
+    "loadingOrganizations": "Organisationen werden geladen...",
+    "noOrganizations": "Keine Organisationen gefunden.",
+    "selectOrganization": "Organisation auswählen"
+  },
   "formProjectSelect": {
     "errorLoading": "Fehler beim Laden der Projekte.",
     "loadingProjects": "Projekte werden geladen...",
     "noProjects": "Keine Projekte gefunden.",
     "selectProject": "Projekt auswählen"
+  },
+  "inviteUserModal": {
+    "buttonText": "Benutzer einladen",
+    "close": "Schließen",
+    "description": "Laden Sie einen neuen Benutzer ein, Ihrer Organisation beizutreten",
+    "descriptionOrg": "Laden Sie einen neuen Benutzer ein, Ihrer Organisation beizutreten: <highlight>{name}</highlight>. Es wird eine Einladung per E-Mail verschickt.",
+    "title": "Benutzer einladen",
+    "titleUser": "{name} einladen"
   },
   "localeSwitcher": {
     "languages": {
