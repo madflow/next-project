@@ -1,4 +1,0 @@
-ALTER TABLE "projects" ADD CONSTRAINT "project_slug_check" CHECK ("projects"."slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$');--> statement-breakpoint
-ALTER TABLE "projects" ADD CONSTRAINT "project_slug_reserved" CHECK ("projects"."slug" NOT IN ('admin', 'api', 'auth', 'landing', 'public', 'user'));--> statement-breakpoint
-ALTER TABLE "organizations" ADD CONSTRAINT "organization_slug_check" CHECK ("organizations"."slug" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$');--> statement-breakpoint
-ALTER TABLE "organizations" ADD CONSTRAINT "organization_slug_reserved" CHECK ("organizations"."slug" NOT IN ('admin', 'api', 'auth', 'landing', 'public', 'user'));
