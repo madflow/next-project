@@ -1,7 +1,165 @@
 {
+  "pageLanding": {
+    "title": "Globale Startseite"
+  },
+  "pageProjectLanding": {
+    "title": "Projekt-Startseite"
+  },
+  "adminDatasetUploadForm": {
+    "validation": {
+      "files": {
+        "required": "Bitte wählen Sie genau eine Datei aus",
+        "sizeLimit": "Die Dateigröße muss kleiner als 100 MB sein"
+      },
+      "name": {
+        "required": "Name ist erforderlich"
+      },
+      "organizationId": {
+        "required": "Die Auswahl einer Organisation ist erforderlich"
+      }
+    },
+    "upload": {
+      "clickToUpload": "Zum Hochladen klicken",
+      "orDragAndDrop": "oder per Drag & Drop ablegen",
+      "supportedFormats": "Unterstützte Formate: CSV, Excel, JSON (max. 100 MB)"
+    },
+    "formLabels": {
+      "name": "Datensatzname",
+      "organization": "Organisation",
+      "missingValues": "Fehlende Werte",
+      "description": "Beschreibung"
+    },
+    "buttons": {
+      "upload": "Datensatz hochladen",
+      "uploading": "Wird hochgeladen..."
+    },
+    "messages": {
+      "success": "Datensatz erfolgreich hochgeladen",
+      "error": "Fehler beim Hochladen des Datensatzes",
+      "noOrganizations": "Keine Organisationen gefunden",
+      "cancel": "Abbrechen"
+    },
+    "errors": {
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es später noch einmal."
+    }
+  },
+  "adminDatasetInfoModal": {
+    "buttons": {
+      "close": "Schließen"
+    }
+  },
+  "accountDeleteDialog": {
+    "title": "Konto löschen",
+    "description": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird Ihr Konto dauerhaft gelöscht und alle damit verbundenen Daten werden entfernt.",
+    "formLabels": {
+      "currentPassword": "Aktuelles Passwort"
+    },
+    "buttons": {
+      "cancel": "Abbrechen",
+      "confirm": "Konto löschen",
+      "confirmLoading": "Wird gelöscht..."
+    },
+    "messages": {
+      "success": "Ihr Konto wurde erfolgreich gelöscht",
+      "error": "Löschen des Kontos fehlgeschlagen. Bitte versuchen Sie es erneut."
+    }
+  },
+  "adminUserCreateForm": {
+    "validation": {
+      "nameRequired": "Benutzername ist erforderlich",
+      "validEmailRequired": "Gültige E-Mail-Adresse ist erforderlich"
+    },
+    "formLabels": {
+      "name": "Name",
+      "email": "E-Mail",
+      "role": "Rolle"
+    },
+    "formPlaceholders": {
+      "name": "Namen eingeben",
+      "email": "E-Mail eingeben",
+      "selectRole": "Rolle auswählen"
+    },
+    "roles": {
+      "user": "Benutzer",
+      "admin": "Administrator"
+    },
+    "messages": {
+      "createSuccess": "Benutzer erfolgreich erstellt",
+      "createError": "Benutzer konnte nicht erstellt werden"
+    },
+    "buttons": {
+      "save": "Speichern",
+      "saving": "Wird gespeichert...",
+      "cancel": "Abbrechen"
+    }
+  },
+  "adminUserInfoModal": {
+    "close": "Schließen"
+  },
+  "adminUserEditForm": {
+    "validation": {
+      "nameRequired": "Benutzername ist erforderlich",
+      "validEmailRequired": "Gültige E-Mail-Adresse ist erforderlich",
+      "roleRequired": "Rolle ist erforderlich"
+    },
+    "formLabels": {
+      "name": "Name",
+      "email": "E-Mail",
+      "role": "Rolle"
+    },
+    "formPlaceholders": {
+      "selectRole": "Rolle auswählen"
+    },
+    "roles": {
+      "user": "Benutzer",
+      "admin": "Administrator"
+    },
+    "messages": {
+      "updateSuccess": "Benutzer aktualisiert",
+      "updateFailed": "Aktualisierung fehlgeschlagen"
+    },
+    "buttons": {
+      "update": "Aktualisieren",
+      "updating": "Wird aktualisiert..."
+    }
+  },
+  "chartMetricsCard": {
+    "count": "Anzahl",
+    "mean": "Mittelwert",
+    "stdev": "Standardabweichung",
+    "median": "Median",
+    "min": "Minimum",
+    "max": "Maximum"
+  },
+  "formDatasetSelect": {
+    "selectDataset": "Datensatz auswählen",
+    "loadingDatasets": "Datensätze werden geladen...",
+    "errorLoading": "Fehler beim Laden der Datensätze.",
+    "noDatasets": "Keine Datensätze gefunden."
+  },
+  "projectAdhocAnalysis": {
+    "tabs": {
+      "chart": "Diagramm",
+      "variable": "Variable",
+      "stats": "Statistiken"
+    },
+    "errors": {
+      "fetchStats": "Fehler beim Laden der Statistiken"
+    }
+  },
+  "formProjectSelect": {
+    "selectProject": "Projekt auswählen",
+    "loadingProjects": "Projekte werden geladen...",
+    "errorLoading": "Fehler beim Laden der Projekte.",
+    "noProjects": "Keine Projekte gefunden."
+  },
+  "pageProjectAdhoc": {
+    "title": "Ad Hoc Analyse"
+  },
   "account": {
     "delete": {
       "button": "Konto löschen",
+      "error": "Fehler beim Löschen des Kontos. Bitte versuchen Sie es später erneut.",
       "confirm": {
         "cancel": "Abbrechen",
         "confirm": "Ja, mein Konto löschen",
@@ -9,7 +167,6 @@
         "title": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten?"
       },
       "description": "Sobald Ihr Konto gelöscht ist, werden alle damit verbundenen Daten dauerhaft entfernt. Bitte laden Sie alle Daten herunter, die Sie behalten möchten, bevor Sie Ihr Konto löschen.",
-      "error": "Löschen des Kontos fehlgeschlagen.",
       "returnHome": "Zurück zur Startseite",
       "success": "Ihr Konto wurde gelöscht.",
       "successMessage": "Ihr Konto und alle damit verbundenen Daten wurden dauerhaft gelöscht.",
@@ -267,11 +424,6 @@
       "users": "Benutzer"
     },
     "sections": "Bereiche"
-  },
-  "appProjectAdhoc": {
-    "theme": "Farbthema",
-    "themePlaceholder": "Farbthema auswählen...",
-    "title": "Ad hoc Analyse"
   },
   "appSidebar": {
     "menu": "Menü",
@@ -620,6 +772,18 @@
       }
     },
     "title": "Registrieren"
+  },
+  "themeSelector": {
+    "colorThemes": "Farben",
+    "label": "Design",
+    "labelSelect": "Design:",
+    "placeholder": "Design auswählen"
+  },
+  "themeToggle": {
+    "dark": "Dunkel",
+    "light": "Hell",
+    "system": "System",
+    "toggleTheme": "Design umschalten"
   },
   "user": {
     "actions": {

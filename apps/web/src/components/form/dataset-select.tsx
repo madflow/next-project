@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as React from "react";
 import {
@@ -23,12 +24,13 @@ type DatasetSelectProps = {
 export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerProps }: DatasetSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data, isLoading, isError } = useDatasetsByProject(projectId);
+  const t = useTranslations("formDatasetSelect");
 
   if (isLoading) {
     return (
       <Select disabled>
         <SelectTrigger {...triggerProps} data-testid="app.dropdown.dataset.loading">
-          <SelectValue placeholder="Loading datasets..." />
+          <SelectValue placeholder={t("loadingDatasets")} />
         </SelectTrigger>
       </Select>
     );
@@ -38,7 +40,7 @@ export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerP
     return (
       <Select disabled>
         <SelectTrigger data-testid="app.dropdown.dataset.error">
-          <SelectValue placeholder="Error loading datasets." />
+          <SelectValue placeholder={t("errorLoading")} />
         </SelectTrigger>
       </Select>
     );
@@ -48,7 +50,7 @@ export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerP
     return (
       <Select disabled>
         <SelectTrigger data-testid="app.dropdown.dataset.empty">
-          <SelectValue placeholder="No datasets found." />
+          <SelectValue placeholder={t("noDatasets")} />
         </SelectTrigger>
       </Select>
     );
@@ -62,11 +64,11 @@ export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerP
       }}
       value={selectedValue}>
       <SelectTrigger data-testid="app.dropdown.dataset.trigger" className="w-full">
-        <SelectValue placeholder="Select a dataset" />
+        <SelectValue placeholder={t("selectDataset")} />
       </SelectTrigger>
       <SelectContent data-testid="app.dropdown.dataset.content">
         <SelectGroup key="dataset-group">
-          <SelectLabel key="dataset-label">Select a dataset</SelectLabel>
+          <SelectLabel key="dataset-label">{t("selectDataset")}</SelectLabel>
           {data.rows.map((item) => (
             <SelectItem
               className="truncate"

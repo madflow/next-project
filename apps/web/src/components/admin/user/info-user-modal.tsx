@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Code } from "@/components/ui/code";
@@ -17,6 +18,7 @@ type InfoUserModalProps = {
   user: User;
 };
 export const InfoUserModal = ({ user }: InfoUserModalProps) => {
+  const t = useTranslations("adminUserInfoModal");
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -32,7 +34,7 @@ export const InfoUserModal = ({ user }: InfoUserModalProps) => {
         <Code>{JSON.stringify(user, null, 2)}</Code>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Close</Button>
+            <Button variant="outline">{t("close")}</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

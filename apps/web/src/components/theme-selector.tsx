@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useThemeConfig } from "@/components/active-theme";
 import { Label } from "@/components/ui/label";
 import {
@@ -67,24 +68,21 @@ const COLOR_THEMES = [
   },
 ];
 
-export type ThemeSelectorProps = {
-  label?: string;
-  placeholder?: string;
-} & React.ComponentProps<"div">;
+export type ThemeSelectorProps = React.ComponentProps<"div">;
 
-export function ThemeSelector({ label = "Theme", placeholder = "Select a theme", className }: ThemeSelectorProps) {
+export function ThemeSelector({ ...props }: ThemeSelectorProps) {
+  const t = useTranslations("themeSelector");
   const { activeTheme, setActiveTheme } = useThemeConfig();
-
   return (
-    <div className={cn("flex w-full items-center gap-2", className)}>
+    <div className={cn("flex w-full items-center gap-2", props.className)}>
       <Label htmlFor="theme-selector" className="sr-only">
-        {label}
+        {t("label")}
       </Label>
       <Select value={activeTheme} onValueChange={setActiveTheme}>
         <SelectTrigger id="theme-selector" className="w-full">
           <div className="flex justify-start gap-2">
-            <span className="font-light">{label}:</span>
-            <SelectValue placeholder={placeholder} />
+            <span className="font-light">{t("labelSelect")}</span>
+            <SelectValue placeholder={t("placeholder")} />
           </div>
         </SelectTrigger>
         <SelectContent align="end">
@@ -97,7 +95,7 @@ export function ThemeSelector({ label = "Theme", placeholder = "Select a theme",
           </SelectGroup>
           <SelectSeparator />
           <SelectGroup>
-            <SelectLabel>Colors</SelectLabel>
+            <SelectLabel>{t("colorThemes")}</SelectLabel>
             {COLOR_THEMES.map((theme) => (
               <SelectItem key={theme.name} value={theme.value} className="data-[state=checked]:opacity-50">
                 {theme.name}

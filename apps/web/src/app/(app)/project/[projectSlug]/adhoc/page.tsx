@@ -13,7 +13,7 @@ type PageProps = {
 export default async function Page({ params }: PageProps) {
   const { projectSlug } = await params;
 
-  const t = await getTranslations("appProjectAdhoc");
+  const t = await getTranslations("pageProjectAdhoc");
 
   const project = await findBySlug(projectSlug);
   if (!project) {

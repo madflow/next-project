@@ -26,25 +26,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Organization } from "@/types/organization";
 
-const formSchema = z.object({
-  files: z
-    .array(z.custom<File>())
-    .min(1, "Please select exactly one file")
-    .refine((files) => files.every((file) => file.size <= 100 * 1024 * 1024), {
-      message: "File size must be less than 100MB",
-      path: ["files"],
-    }),
-  name: z.string().min(1, "Name is required").trim(),
-  organizationId: z.string().min(1, "Organization selection is required"),
-  missingValues: z.array(z.string()).optional(),
-  description: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
+type FormData = {
+  files: File[];
+  name: string;
+  organizationId: string;
+  missingValues?: string[];
+  description?: string;
+};
 
 export function DatasetUploadForm() {
   const router = useRouter();
-  const t = useTranslations("adminDataset");
+  type UploadFormTranslations = {
+    (key: `buttons.${'upload' | 'uploading'}`): string;
+    (key: `formLabels.${'name' | 'organization' | 'missingValues' | 'description'}`): string;
+    (key: `validation.${'files.required' | 'files.sizeLimit' | 'name.required' | 'organizationId.required'}`): string;
+    (key: `upload.${'clickToUpload' | 'orDragAndDrop' | 'supportedFormats'}`): string;
+    (key: 'noOrganizations' | 'cancel' | 'success' | 'error' | 'messages.success' | 'messages.error' | 'errors.unknownError'): string;
+  };
+  const t = useTranslations("adminDatasetUploadForm") as unknown as UploadFormTranslations;
   const [isPending] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
 
@@ -67,7 +66,19 @@ export function DatasetUploadForm() {
   }, [t]);
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(z.object({
+      files: z
+        .array(z.custom<File>())
+        .min(1, t('validation.files.required'))
+        .refine((files) => files.every((file) => file.size <= 100 * 1024 * 1024), {
+          message: t('validation.files.sizeLimit'),
+          path: ["files"],
+        }),
+      name: z.string().min(1, t('validation.name.required')).trim(),
+      organizationId: z.string().min(1, t('validation.organizationId.required')),
+      missingValues: z.array(z.string()).optional(),
+      description: z.string().optional(),
+    })),
     defaultValues: {
       files: [],
       name: "",
@@ -86,7 +97,7 @@ export function DatasetUploadForm() {
     const selectedFile = data.files[0];
 
     if (!selectedFile) {
-      toast.error(t("errors.noFileSelected"));
+      toast.error(t("validation.files.required"));
       return;
     }
 
@@ -103,10 +114,10 @@ export function DatasetUploadForm() {
       });
 
       if (result.success) {
-        toast.success(t("uploadSuccess"));
+        toast.success(t("messages.success"));
         router.push("/admin/datasets");
       } else {
-        toast.error(result.error || t("errors.uploadFailed"));
+        toast.error(result.error || t("messages.error"));
       }
     } catch (error) {
       console.error("Upload error:", error);
@@ -125,7 +136,7 @@ export function DatasetUploadForm() {
             name="files"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("form.fileLabel")}</FormLabel>
+                <FormLabel>{t("formLabels.name")}</FormLabel>
                 <FormControl>
                   <FileUpload
                     maxFiles={1}
@@ -157,7 +168,7 @@ export function DatasetUploadForm() {
                         <p className="text-muted-foreground mb-2 text-sm">
                           <span className="font-semibold">{t("upload.clickToUpload")}</span> {t("upload.orDragAndDrop")}
                         </p>
-                        <p className="text-muted-foreground text-xs">{t("upload.supportedFormats")} (max 100MB)</p>
+                        <p className="text-muted-foreground text-xs">{t('upload.supportedFormats')}</p>
                       </div>
                     </FileUploadDropzone>
                     <FileUploadList>
@@ -185,10 +196,10 @@ export function DatasetUploadForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("form.nameLabel")}</FormLabel>
+                <FormLabel>{t("formLabels.name")}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t("form.namePlaceholder")}
+                    placeholder={t("formLabels.name")}
                     {...field}
                     data-testid="app.admin.dataset.name-input"
                   />
@@ -203,21 +214,21 @@ export function DatasetUploadForm() {
             name="organizationId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("form.organization.label")}</FormLabel>
+                <FormLabel>{t("formLabels.organization")}</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                   data-testid="app.admin.dataset.organization-select">
                   <FormControl>
                     <SelectTrigger className="w-full" data-testid="app.admin.dataset.organization-trigger">
-                      <SelectValue placeholder={t("form.organization.placeholder")} />
+                      <SelectValue placeholder={t("formLabels.organization")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {isLoading ? (
-                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.loading")}</div>
+                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("buttons.uploading")}</div>
                     ) : organizations.length === 0 ? (
-                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.notFound")}</div>
+                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("noOrganizations")}</div>
                     ) : (
                       organizations.map((org) => (
                         <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
@@ -237,7 +248,7 @@ export function DatasetUploadForm() {
             name="missingValues"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("form.missingValuesLabel")}</FormLabel>
+                <FormLabel>{t("formLabels.missingValues")}</FormLabel>
                 <FormControl>
                   <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
                 </FormControl>
@@ -251,10 +262,10 @@ export function DatasetUploadForm() {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("form.descriptionLabel")}</FormLabel>
+                <FormLabel>{t("formLabels.description")}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={t("form.descriptionPlaceholder")}
+                    placeholder={t("formLabels.description")}
                     disabled={isPending || isUploading}
                     rows={3}
                     {...field}
@@ -267,16 +278,16 @@ export function DatasetUploadForm() {
 
           <div className="flex justify-start space-x-4 pt-4">
             <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
-              {t("actions.cancel")}
+              {t("cancel")}
             </Button>
             <Button type="submit" data-testid="app.admin.dataset.upload-button" disabled={isPending || isUploading}>
               {isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("actions.uploading")}
+                  {t("buttons.uploading")}
                 </>
               ) : (
-                t("actions.uploadFile")
+                t("buttons.upload")
               )}
             </Button>
           </div>

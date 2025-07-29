@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as React from "react";
 import {
@@ -23,12 +24,13 @@ type ProjectSelectProps = {
 export function ProjectSelect({ organizationId, onValueChange, defaultValue, triggerProps }: ProjectSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data: projects, isLoading, isError } = useProjectsByOrg(organizationId);
+  const t = useTranslations("formProjectSelect");
 
   if (isLoading) {
     return (
       <Select disabled value={selectedValue}>
         <SelectTrigger {...triggerProps} data-testid="project-dropdown-loading">
-          <SelectValue placeholder="Loading projects..." />
+          <SelectValue placeholder={t("loadingProjects")} />
         </SelectTrigger>
       </Select>
     );
@@ -38,7 +40,7 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
     return (
       <Select disabled value={selectedValue}>
         <SelectTrigger {...triggerProps} data-testid="project-dropdown-error">
-          <SelectValue placeholder="Error loading projects." />
+          <SelectValue placeholder={t("errorLoading")} />
         </SelectTrigger>
       </Select>
     );
@@ -48,7 +50,7 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
     return (
       <Select disabled value={selectedValue}>
         <SelectTrigger {...triggerProps} data-testid="project-dropdown-empty">
-          <SelectValue placeholder="No projects found." />
+          <SelectValue placeholder={t("noProjects")} />
         </SelectTrigger>
       </Select>
     );
@@ -62,11 +64,11 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
       }}
       value={selectedValue}>
       <SelectTrigger {...triggerProps} className="w-[180px]" data-testid="project-dropdown">
-        <SelectValue placeholder="Select a project" />
+        <SelectValue placeholder={t("selectProject")} />
       </SelectTrigger>
       <SelectContent data-testid="project-dropdown-content">
         <SelectGroup key="project-group">
-          <SelectLabel key="project-label">Select a project</SelectLabel>
+          <SelectLabel key="project-label">{t("selectProject")}</SelectLabel>
           {projects.map((project) => (
             <SelectItem key={project.id} value={project.id} data-testid={`project-dropdown-item-${project.slug}`}>
               {project.name}

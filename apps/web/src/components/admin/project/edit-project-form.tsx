@@ -20,60 +20,28 @@ type Organization = {
   slug: string;
 };
 
-// Base schema without translations
-const baseSchema = {
-  id: z.string().min(1),
-  name: z.string().min(1),
-  slug: z
-    .string()
-    .toLowerCase()
-    .regex(/^[a-z0-9-]+$/)
-    .min(1)
-    .max(50),
-  organizationId: z.string().min(1),
-  updatedAt: z.date(),
-};
-
 // Function to create schema with translations
-const createFormSchema = (t: ReturnType<typeof useTranslations>) => {
-  return z.object(baseSchema).superRefine((data, ctx) => {
-    if (!data.name) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["name"],
-        message: t("form.name.errors.required"),
-      });
-    }
-    if (!data.slug) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["slug"],
-        message: t("form.slug.errors.required"),
-      });
-    } else if (!/^[a-z0-9-]+$/.test(data.slug)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["slug"],
-        message: t("form.slug.errors.invalid"),
-      });
-    } else if (data.slug.length > 50) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["slug"],
-        message: t("form.slug.errors.maxLength"),
-      });
-    }
-    if (!data.organizationId) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["organizationId"],
-        message: t("form.organization.errors.required"),
-      });
-    }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const createFormSchema = (t: any) => {
+  return z.object({
+    id: z.string().min(1),
+    name: z.string().min(1, { message: t("form.name.errors.required") }),
+    slug: z
+      .string()
+      .toLowerCase()
+      .min(1, { message: t("form.slug.errors.required") })
+      .max(50, { message: t("form.slug.errors.maxLength") })
+      .regex(/^[a-z0-9-]+$/, { message: t("form.slug.errors.invalid") }),
+    organizationId: z.string().min(1, { message: t("form.organization.errors.required") }),
+    updatedAt: z.date(),
   });
 };
 
-type FormValues = z.infer<ReturnType<typeof createFormSchema>> & {
+type FormValues = {
+  id: string;
+  name: string;
+  slug: string;
+  organizationId: string;
   updatedAt: Date;
 };
 
