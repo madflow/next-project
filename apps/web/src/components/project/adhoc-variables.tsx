@@ -1,4 +1,5 @@
 import { ArrowBigDownIcon, ArrowRightCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useDatasetVariables } from "@/hooks/use-dataset-variables";
 import { DatasetVariable } from "@/types/dataset-variable";
@@ -15,6 +16,10 @@ type AdHocAnalysisProps = {
 export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps) {
   const [perPage, setPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  type AdhocVariablesTranslations = {
+    (key: 'search' | 'loadMore'): string;
+  };
+  const t = useTranslations("projectAdhocVariables") as unknown as AdhocVariablesTranslations;
   const { data } = useDatasetVariables(datasetId, {
     limit: perPage,
     order: [{ column: "name", direction: "asc" }],
@@ -29,7 +34,7 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
   return (
     <Card className="shadow-xs">
       <CardHeader className="px-3">
-        <Input type="text" placeholder="Search..." onChange={(e) => handleSearch(e.target.value)} value={search} />
+        <Input type="text" placeholder={t("search")} onChange={(e) => handleSearch(e.target.value)} value={search} />
       </CardHeader>
       <CardContent className="px-3">
         <ScrollArea className="flex max-h-[400px] min-h-[300px] flex-col gap-2">
@@ -49,8 +54,9 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
         </ScrollArea>
       </CardContent>
       <CardFooter className="px-3">
-        <Button variant={"outline"} className="w-full" onClick={() => setPerPage(perPage + 10)}>
-          <ArrowBigDownIcon />
+        <Button variant={"outline"} className="w-full gap-2" onClick={() => setPerPage(perPage + 10)}>
+          <ArrowBigDownIcon className="h-4 w-4" />
+          <span>{t('loadMore')}</span>
         </Button>
       </CardFooter>
     </Card>

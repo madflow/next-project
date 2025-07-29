@@ -156,6 +156,10 @@
       "fetchStats": "Error loading dataset statistics"
     }
   },
+  "projectAdhocVariables": {
+    "search": "Search variables...",
+    "loadMore": "Load more variables"
+  },
   "account": {
     "delete": {
       "button": "Delete Account",
