@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,10 +14,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Organization } from "@/types/organization";
-import { Loader2 } from "lucide-react";
 import { insertProjectSchema } from "@/types/project";
 
-const createFormSchema = (t: ReturnType<typeof useTranslations>) =>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const createFormSchema = (t: any) =>
   z.object({
     name: z.string().min(1, {
       error: t("form.name.errors.required"),

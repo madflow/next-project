@@ -1,7 +1,165 @@
 {
+  "formProjectSelect": {
+    "selectProject": "Select a project",
+    "noProjects": "No projects found",
+    "loadingProjects": "Loading projects...",
+    "errorLoading": "Error loading projects"
+  },
+  "pageProjectAdhoc": {
+    "title": "Ad Hoc Analysis"
+  },
+  "pageLanding": {
+    "title": "Global landing page"
+  },
+  "pageProjectLanding": {
+    "title": "Project landing page"
+  },
+  "adminDatasetUploadForm": {
+    "validation": {
+      "files": {
+        "required": "Please select exactly one file",
+        "sizeLimit": "File size must be less than 100MB"
+      },
+      "name": {
+        "required": "Name is required"
+      },
+      "organizationId": {
+        "required": "Organization selection is required"
+      }
+    },
+    "messages": {
+      "noOrganizations": "No organizations found",
+      "cancel": "Cancel",
+      "success": "Dataset uploaded successfully",
+      "error": "Failed to upload dataset"
+    },
+    "upload": {
+      "clickToUpload": "Click to upload",
+      "orDragAndDrop": "or drag and drop",
+      "supportedFormats": "Supported formats: CSV, Excel, JSON (max 100MB)"
+    },
+    "formLabels": {
+      "name": "Dataset Name",
+      "organization": "Organization",
+      "missingValues": "Missing Values",
+      "description": "Description"
+    },
+    "buttons": {
+      "upload": "Upload Dataset",
+      "uploading": "Uploading..."
+    },
+    "errors": {
+      "unknownError": "An unknown error occurred. Please try again later."
+    }
+  },
+  "adminDatasetInfoModal": {
+    "buttons": {
+      "close": "Close"
+    }
+  },
+  "accountDeleteDialog": {
+    "title": "Delete Account",
+    "description": "This action cannot be undone. This will permanently delete your account and remove all associated data.",
+    "formLabels": {
+      "currentPassword": "Current Password"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "confirm": "Delete Account",
+      "confirmLoading": "Deleting..."
+    },
+    "messages": {
+      "success": "Your account has been deleted successfully",
+      "error": "Failed to delete account. Please try again."
+    }
+  },
+  "adminUserCreateForm": {
+    "validation": {
+      "nameRequired": "User name is required",
+      "validEmailRequired": "Valid email is required"
+    },
+    "formLabels": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role"
+    },
+    "formPlaceholders": {
+      "name": "Enter name",
+      "email": "Enter email",
+      "selectRole": "Select a role"
+    },
+    "roles": {
+      "user": "User",
+      "admin": "Administrator"
+    },
+    "messages": {
+      "createSuccess": "User created successfully",
+      "createError": "Failed to create user"
+    },
+    "buttons": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
+  },
+  "adminUserInfoModal": {
+    "close": "Close"
+  },
+  "adminUserEditForm": {
+    "validation": {
+      "nameRequired": "User name is required",
+      "validEmailRequired": "Valid email is required",
+      "roleRequired": "Role is required"
+    },
+    "formLabels": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role"
+    },
+    "formPlaceholders": {
+      "selectRole": "Select a role"
+    },
+    "roles": {
+      "user": "User",
+      "admin": "Administrator"
+    },
+    "messages": {
+      "updateSuccess": "User updated",
+      "updateFailed": "User update failed"
+    },
+    "buttons": {
+      "update": "Update",
+      "updating": "Updating..."
+    }
+  },
+  "chartMetricsCard": {
+    "count": "Count",
+    "mean": "Mean",
+    "stdev": "Stdev",
+    "median": "Median",
+    "min": "Min",
+    "max": "Max"
+  },
+  "formDatasetSelect": {
+    "selectDataset": "Select a dataset",
+    "loadingDatasets": "Loading datasets...",
+    "errorLoading": "Error loading datasets.",
+    "noDatasets": "No datasets found."
+  },
+  "projectAdhocAnalysis": {
+    "tabs": {
+      "chart": "Chart",
+      "variable": "Variable",
+      "stats": "Statistics"
+    },
+    "errors": {
+      "fetchStats": "Error loading dataset statistics"
+    }
+  },
   "account": {
     "delete": {
       "button": "Delete Account",
+      "error": "Failed to delete account. Please try again.",
       "confirm": {
         "cancel": "Cancel",
         "confirm": "Yes, delete my account",
@@ -9,7 +167,6 @@
         "title": "Are you sure you want to delete your account?"
       },
       "description": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
-      "error": "Failed to delete account.",
       "returnHome": "Return to Homepage",
       "success": "Your account has been deleted.",
       "successMessage": "Your account and all associated data have been permanently deleted.",
@@ -267,11 +424,6 @@
       "users": "Users"
     },
     "sections": "Sections"
-  },
-  "appProjectAdhoc": {
-    "theme": "Theme",
-    "themePlaceholder": "Select theme...",
-    "title": "Ad hoc analysis"
   },
   "appSidebar": {
     "menu": "Menu",
@@ -620,6 +772,18 @@
       }
     },
     "title": "Sign Up"
+  },
+  "themeSelector": {
+    "colorThemes": "Colors",
+    "label": "Theme",
+    "labelSelect": "Theme:",
+    "placeholder": "Select a theme"
+  },
+  "themeToggle": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System",
+    "toggleTheme": "Toggle theme"
   },
   "user": {
     "actions": {

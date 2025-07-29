@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { type Resolver, useForm } from "react-hook-form";
@@ -11,28 +12,42 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const createFormSchema = (t: any) =>
+type CreateUserTranslations = {
+  (key: `validation.${"nameRequired" | "validEmailRequired"}`): string;
+  (key: `roles.${"user" | "admin"}`): string;
+};
+
+const createFormSchema = (t: CreateUserTranslations) =>
   z.object({
     name: z.string().min(1, {
-      error: t("user.form.errors.required"),
+      message: t("validation.nameRequired"),
     }),
     email: z.email({
-      error: t("user.form.errors.email"),
+      message: t("validation.validEmailRequired"),
     }),
     role: z.enum(["user", "admin"]).default("user"),
   });
 
 type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
+type Role = {
+  value: string;
+  label: string;
+};
+
+const getRoles = (t: CreateUserTranslations): Role[] => [
+  { value: "user", label: t("roles.user") },
+  { value: "admin", label: t("roles.admin") },
+];
+
 export function CreateUserForm() {
   const router = useRouter();
-  const t = useTranslations();
+  const t = useTranslations("adminUserCreateForm");
+  const roles = getRoles(t as unknown as CreateUserTranslations);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(createFormSchema(t)) as unknown as Resolver<FormValues>,
+    resolver: zodResolver(createFormSchema(t as unknown as CreateUserTranslations)) as unknown as Resolver<FormValues>,
     defaultValues: {
       name: "",
       email: "",
@@ -52,10 +67,10 @@ export function CreateUserForm() {
         banReason: null,
         banExpires: null,
       });
-      toast.success(t("user.form.success.created"));
+      toast.success(t("messages.createSuccess"));
       router.push("/admin/users");
-    } catch (error: unknown) {
-      toast.error(t("user.form.error"));
+    } catch (error) {
+      toast.error(t("messages.createError"));
       console.error(error);
       return;
     }
@@ -70,9 +85,9 @@ export function CreateUserForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("user.form.name")}</FormLabel>
+                <FormLabel>{t("formLabels.name")}</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder={t("user.form.name")} data-testid="admin.users.new.form.name" />
+                  <Input {...field} placeholder={t("formPlaceholders.name")} data-testid="admin.users.new.form.name" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -83,12 +98,12 @@ export function CreateUserForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("user.form.email")}</FormLabel>
+                <FormLabel>{t("formLabels.email")}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
                     {...field}
-                    placeholder={t("user.form.email")}
+                    placeholder={t("formPlaceholders.email")}
                     data-testid="admin.users.new.form.email"
                   />
                 </FormControl>
@@ -101,16 +116,19 @@ export function CreateUserForm() {
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("user.form.role")}</FormLabel>
+                <FormLabel>{t("formLabels.role")}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.new.form.role">
-                      <SelectValue placeholder={t("user.form.role")} />
+                      <SelectValue placeholder={t("formPlaceholders.selectRole")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="admin">Administrator</SelectItem>
+                    {roles.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -119,21 +137,18 @@ export function CreateUserForm() {
           />
         </div>
         <div className="flex justify-start gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-            disabled={form.formState.isSubmitting}
-            className="cursor-pointer">
-            {t("user.form.cancel")}
+          <Button type="button" variant="outline" onClick={() => router.back()} disabled={form.formState.isSubmitting}>
+            {t("buttons.cancel")}
           </Button>
-          <Button
-            type="submit"
-            className="cursor-pointer"
-            data-testid="admin.users.new.form.submit"
-            disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {form.formState.isSubmitting ? t("user.form.save") : t("user.form.save")}
+          <Button type="submit" disabled={form.formState.isSubmitting} data-testid="admin.users.new.form.submit">
+            {form.formState.isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t("buttons.saving")}
+              </>
+            ) : (
+              t("buttons.save")
+            )}
           </Button>
         </div>
       </form>

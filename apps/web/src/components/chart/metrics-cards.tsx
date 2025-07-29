@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getVariableStats } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
@@ -16,6 +17,7 @@ function formatDecimal(value?: number) {
 }
 
 export function MetricsCards({ variable, stats, ...props }: BarAdhocProps) {
+  const t = useTranslations("chartMetricsCard");
   const variableStats = getVariableStats(variable, stats);
   return (
     <Card className="shadow-xs" {...props}>
@@ -25,37 +27,37 @@ export function MetricsCards({ variable, stats, ...props }: BarAdhocProps) {
       <CardContent className="grid grid-cols-3 gap-2">
         <Card>
           <CardHeader>
-            <CardDescription>Count</CardDescription>
+            <CardDescription>{t("count")}</CardDescription>
             <CardTitle>{variableStats?.count}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Mean</CardDescription>
+            <CardDescription>{t("mean")}</CardDescription>
             <CardTitle>{formatDecimal(variableStats?.mean)}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Stdev</CardDescription>
+            <CardDescription>{t("stdev")}</CardDescription>
             <CardTitle>{formatDecimal(variableStats?.std)}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Median</CardDescription>
+            <CardDescription>{t("median")}</CardDescription>
             <CardTitle>{variableStats?.median}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Min</CardDescription>
+            <CardDescription>{t("min")}</CardDescription>
             <CardTitle>{variableStats?.min}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Max</CardDescription>
+            <CardDescription>{t("max")}</CardDescription>
             <CardTitle>{variableStats?.max}</CardTitle>
           </CardHeader>
         </Card>

@@ -24,8 +24,6 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
   const [selectedVariable, setSelectedVariable] = useState<DatasetVariable | null>(null);
 
-  const t = useTranslations("appProjectAdhoc");
-
   function supportsChart(chartType: AnalysisChartType, variable: DatasetVariable): boolean {
     const supportedCharts: AnalysisChartType[] = [];
     const valueKeys = Object.keys(variable.valueLabels);
@@ -52,9 +50,11 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     return false;
   }
 
+  const t = useTranslations("projectAdhocAnalysis");
+
   const { data, mutate } = useDatasetStats(selectedDataset || "", {
     onError: (error) => {
-      console.error("Error fetching dataset stats:", error);
+      console.error(t("errors.fetchStats"), error);
     },
   });
 
@@ -74,7 +74,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   return (
     <div className="theme-container flex gap-4">
       <div className="flex w-64 max-w-64 min-w-64 flex-col gap-4">
-        <ThemeSelector placeholder={t("themePlaceholder")} label={t("theme")} className="w-full" />
+        <ThemeSelector className="w-full" />
         <DatasetSelect
           projectId={project.id}
           onValueChange={(value) => {
@@ -86,9 +86,9 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       {selectedDataset && selectedVariable && data && (
         <Tabs defaultValue="chart" className="w-full">
           <TabsList>
-            <TabsTrigger value="chart">Chart</TabsTrigger>
-            <TabsTrigger value="variable">Variable</TabsTrigger>
-            <TabsTrigger value="stats">Stats</TabsTrigger>
+            <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
+            <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
+            <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
           </TabsList>
           <TabsContent value="chart" className="flex flex-col gap-4">
             {supportsChart("bar", selectedVariable) && (

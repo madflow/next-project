@@ -40,7 +40,9 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
                   <ArrowRightCircle />
                 </Button>
                 <span className="text-sm">
-                  {variable.label} ({variable.name})
+                  {variable.label} {"("}
+                  {variable.name}
+                  {")"}
                 </span>
               </div>
             ))}

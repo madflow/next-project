@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -11,13 +12,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const formSchema = z.object({
-  name: z.string().min(1, { message: "User name is required" }),
-  email: z.email({ message: "Valid email is required" }),
-  role: z.string().min(1, { message: "Role is required" }),
+type EditUserTranslations = {
+  (key: `validation.${'nameRequired' | 'validEmailRequired' | 'roleRequired'}`): string;
+  (key: `roles.${'user' | 'admin'}`): string;
+};
+
+const createFormSchema = (t: EditUserTranslations) => z.object({
+  name: z.string().min(1, { message: t('validation.nameRequired') }),
+  email: z.string().email({ message: t('validation.validEmailRequired') }),
+  role: z.string().min(1, { message: t('validation.roleRequired') }),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
 type FormEditProps = {
   user: {
@@ -28,16 +34,23 @@ type FormEditProps = {
   };
 };
 
-const ROLES = [
-  { value: "user", label: "User" },
-  { value: "admin", label: "Administrator" },
+type Role = {
+  value: string;
+  label: string;
+};
+
+const getRoles = (t: EditUserTranslations): Role[] => [
+  { value: "user", label: t('roles.user') },
+  { value: "admin", label: t('roles.admin') },
 ];
 
 export function EditUserForm({ user }: FormEditProps) {
   const router = useRouter();
+  const t = useTranslations("adminUserEditForm");
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    // @ts-expect-error - The types are correct but there's a mismatch between the expected types
+    resolver: zodResolver(createFormSchema(t as unknown as EditUserTranslations)) as unknown as Resolver<FormValues>,
     defaultValues: {
       name: user.name,
       email: user.email,
@@ -48,10 +61,10 @@ export function EditUserForm({ user }: FormEditProps) {
   const onSubmit = async (formData: FormValues) => {
     try {
       await update(user.id, formData);
-      toast.success("User updated");
+      toast.success(t('messages.updateSuccess'));
       router.push("/admin/users");
     } catch (error: unknown) {
-      toast.error("User update failed");
+      toast.error(t('messages.updateFailed'));
       console.error(error);
       return;
     }
@@ -65,7 +78,7 @@ export function EditUserForm({ user }: FormEditProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>{t('formLabels.name')}</FormLabel>
               <FormControl>
                 <Input {...field} data-testid="admin.users.edit.form.name" />
               </FormControl>
@@ -78,7 +91,7 @@ export function EditUserForm({ user }: FormEditProps) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t('formLabels.email')}</FormLabel>
               <FormControl>
                 <Input {...field} data-testid="admin.users.edit.form.email" />
               </FormControl>
@@ -91,15 +104,15 @@ export function EditUserForm({ user }: FormEditProps) {
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Role</FormLabel>
+              <FormLabel>{t('formLabels.role')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.edit.form.role">
-                    <SelectValue placeholder="Select a role" />
+                    <SelectValue placeholder={t('formPlaceholders.selectRole')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {ROLES.map((role) => (
+                  {getRoles(t as unknown as EditUserTranslations).map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
                     </SelectItem>
@@ -115,7 +128,7 @@ export function EditUserForm({ user }: FormEditProps) {
           className="cursor-pointer"
           data-testid="admin.users.edit.form.submit"
           disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Updating..." : "Update"}
+          {form.formState.isSubmitting ? t('buttons.updating') : t('buttons.update')}
         </Button>
       </form>
     </Form>
