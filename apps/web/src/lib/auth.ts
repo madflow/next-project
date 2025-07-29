@@ -153,6 +153,25 @@ export const auth = betterAuth({
   plugins: [
     adminPlugin(),
     organizationPlugin({
+      async sendInvitationEmail(data) {
+        const inviteLink = `${env.BASE_URL}/auth/accept-invitation/${data.id}`;
+        const { heading, content, action } = getEmailMessage("emailInvitation", "en", {
+          inviteLink,
+        });
+        const html = await renderDefaultTemplateWithProps({
+          heading,
+          content,
+          action,
+          url: inviteLink,
+        });
+        await sendMail({
+          to: data.invitation.email,
+          from: env.MAIL_DEFAULT_SENDER,
+          subject: heading,
+          text: `${content}\n\n${action}: ${inviteLink}`,
+          html,
+        });
+      },
       allowUserToCreateOrganization: async () => {
         return false;
       },

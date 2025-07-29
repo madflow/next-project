@@ -20,6 +20,13 @@ const emailTemplates = {
         `You have requested to change your email to ${newEmail}. Please verify this change by clicking the link below.`,
       action: "Verify Email Change",
     },
+    emailInvitation: {
+      subject: "You have been invited",
+      heading: "You have been invited",
+      content: (inviteLink: string) =>
+        `You have been invited. Click the link below to accept the invitation. ${inviteLink}`,
+      action: "Accept invitation",
+    },
   },
   de: {
     emailVerification: {
@@ -41,6 +48,13 @@ const emailTemplates = {
         `Sie haben beantragt, Ihre E-Mail-Adresse auf ${newEmail} zu ändern. Bitte bestätigen Sie diese Änderung, indem Sie auf den untenstehenden Link klicken.`,
       action: "E-Mail-Änderung bestätigen",
     },
+    emailInvitation: {
+      subject: "Sie wurden eingeladen",
+      heading: "Sie wurden eingeladen",
+      content: (inviteLink: string) =>
+        `Sie wurden von eingeladen. Klicken Sie auf den untenstehenden Link, um die Einladung anzunehmen. ${inviteLink}`,
+      action: "Einladung annehmen",
+    },
   },
 } as const;
 
@@ -54,7 +68,11 @@ type Locale = keyof typeof emailTemplates;
  * @param data Additional data for message interpolation
  * @returns Localized email message with content as a string
  */
-export function getEmailMessage(type: EmailType, locale: string = "en", data?: { newEmail?: string }) {
+export function getEmailMessage(
+  type: EmailType,
+  locale: string = "en",
+  data?: { newEmail?: string; inviteLink?: string }
+) {
   // Default to 'en' if locale is not supported
   const lang: Locale = locale in emailTemplates ? (locale as Locale) : "en";
   const template = emailTemplates[lang][type] || emailTemplates.en[type];
