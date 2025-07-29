@@ -2,6 +2,7 @@
 
 import { PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
 import { createHash, randomUUID } from "crypto";
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import {
@@ -11,6 +12,7 @@ import {
   datasetProject,
   datasetVariable,
   insertDatasetVariableSchema,
+  UpdateDatasetData,
 } from "@repo/database/schema";
 import { deleteDataset } from "@/dal/dataset";
 import { env } from "@/env";
@@ -214,4 +216,20 @@ export async function uploadDataset({
 
 export async function remove(datasetId: string) {
   await deleteDataset(datasetId);
+}
+
+export async function update(datasetId: string, values: UpdateDatasetData) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new ServerActionNotAuthorizedException("Unauthorized");
+  }
+
+  if (session.user.role !== USER_ADMIN_ROLE) {
+    throw new ServerActionNotAuthorizedException("Unauthorized");
+  }
+
+  await db.update(dataset).set(values).where(eq(dataset.id, datasetId));
 }

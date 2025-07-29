@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Download } from "lucide-react";
+import { Download, Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -76,6 +76,12 @@ export const columns: ColumnDef<Dataset>[] = [
 
       return (
         <div className="flex justify-end gap-2">
+          <Button variant="outline" size="icon" asChild title={t("tableActions.edit")}>
+            <Link href={`/admin/datasets/edit/${dataset.id}`}>
+              <Pencil className="h-4 w-4" />
+              <span className="sr-only">{t("tableActions.edit")}</span>
+            </Link>
+          </Button>
           <Button variant="outline" size="icon" asChild title={t("tableActions.download")}>
             <a href={`/api/datasets/${dataset.id}/download`} target="_blank" rel="noopener noreferrer">
               <Download className="h-4 w-4" />
