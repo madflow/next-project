@@ -2,11 +2,24 @@
   "name": "@repo/cli",
   "type": "module",
   "private": true,
+  "main": "./dist/index.mjs",
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint ."
+  },
   "dependencies": {
+    "@repo/database": "*",
     "chalk": "^5.0.0",
     "commander": "^14.0.0"
   },
-  "exports": {
-    ".": "./src/index.ts"
-  }
+  "exports": "./dist/index.mjs",
+  "bin": "./dist/index.mjs",
+  "devDependencies": {
+    "unbuild": "^3.6.0"
+  },
+  "files": [
+    "dist"
+  ]
 }

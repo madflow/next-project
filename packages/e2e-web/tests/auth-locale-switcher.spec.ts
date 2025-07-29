@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { baseUrl } from "../config";
 
 test.describe("Locale Switcher on Login Page", () => {
   test.beforeEach(async ({ page }) => {

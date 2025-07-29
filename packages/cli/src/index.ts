@@ -1,20 +1,11 @@
-import chalk from "chalk";
-import { Command } from "commander";
+import { createAdminCommand } from "./commands/create-admin.js";
+import { makeCommand } from "./utils.js";
 
-export function makeCommand(name: string) {
-  return new Command(name);
-}
+process.on("SIGINT", () => process.exit(0));
+process.on("SIGTERM", () => process.exit(0));
 
-export function printLint(line: string) {
-  console.log(line);
-}
+const command = makeCommand("cli");
 
-export function printSuccessLine(line: string) {
-  const formattedLine = chalk.bgGreen.white(line);
-  console.log(formattedLine);
-}
+command.addCommand(createAdminCommand);
 
-export function printErrorLine(line: string) {
-  const formattedLine = chalk.bgRed.white(line);
-  console.log(formattedLine);
-}
+command.parse();
