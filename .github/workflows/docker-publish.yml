@@ -34,6 +34,10 @@ jobs:
             suffix: analysis
             dockerfile: ./apps/analysis/Dockerfile
             context: ./apps/analysis
+          - app: cli
+            suffix: cli
+            dockerfile: ./packages/cli/Dockerfile
+            context: .
           - app: db
             suffix: db
             dockerfile: ./packages/database/Dockerfile

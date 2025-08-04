@@ -43,6 +43,16 @@ services:
       - DOCKER_RUN_MIGRATIONS=1
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
 
+  cli:
+    build:
+      context: .
+      dockerfile: ./apps/cli/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
+
   analysis:
     build:
       context: ./apps/analysis
