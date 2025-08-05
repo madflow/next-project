@@ -3,10 +3,6 @@ import { testUsers } from "../config";
 import { extractLinkFromMessage, loginUser, logoutUser } from "../utils";
 import { smtpServerApi } from "../utils";
 
-test.afterAll(async () => {
-  await smtpServerApi.deleteMessages();
-});
-
 const orgWithPermission = "Test Organization 3";
 
 async function inviteUser(page: Page, userEmail: string) {
@@ -36,10 +32,11 @@ async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
   const message = searchMessages.messages[0];
   const acceptLink = await extractLinkFromMessage(message, "accept-invitation");
   expect(acceptLink).toBeTruthy();
-  await smtpServerApi.deleteMessages();
+  await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
   await page.goto(acceptLink);
 }
 
+test.describe.configure({ mode: "parallel" });
 test.describe("User invitations", () => {
   test("an owner can invite a not existing user", async ({ page }) => {
     const userEmail = `e2e-test-user-not-registered-${Date.now()}@example.com`;

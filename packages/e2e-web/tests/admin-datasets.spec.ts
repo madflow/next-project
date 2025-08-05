@@ -30,6 +30,6 @@ test.describe("Admin Datasets", () => {
     await page.getByTestId("app.admin.editor.projects.tab").click();
     await page.getByTestId("project-dropdown").click();
     await page.getByTestId("project-dropdown-item-test-project").getByText("Test Project").click();
-    await page.getByRole("button", { name: "Add to project" }).click;
+    await page.getByRole("button", { name: "Add to project" }).click();
   });
 });

@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
+test.describe.configure({ mode: "parallel" });
 test.describe("Api organizations", () => {
   test("list not logged in", async ({ page }) => {
     const list = await page.request.get("/api/organizations");
