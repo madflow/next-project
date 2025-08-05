@@ -2,10 +2,6 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { extractLinkFromMessage, loginUser, logoutUser, smtpServerApi } from "../utils";
 
-test.afterAll(async () => {
-  await smtpServerApi.deleteMessages();
-});
-
 test.describe("User Account", () => {
   test.describe.configure({ mode: "serial" });
   test("should log in and navigate to account settings", async ({ page }) => {
@@ -136,6 +132,7 @@ test.describe("User Account", () => {
     });
 
     expect(newEmailMessages.messages.length).toBe(1);
+    smtpServerApi.deleteMessagesBySearch({ query: `to:"${newEmail}"` });
   });
 
   test("should upload and display a new avatar", async ({ page }) => {

@@ -48,6 +48,7 @@ const testCases: TestCase[] = [
   },
 ];
 
+test.describe.configure({ mode: "parallel" });
 test.describe("Organization members", () => {
   for (const testCase of testCases) {
     test(`user ${testCase.user} can navigate through organizations and projects`, async ({ page }) => {

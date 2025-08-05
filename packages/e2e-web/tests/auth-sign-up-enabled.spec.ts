@@ -16,7 +16,7 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
-  await smtpServerApi.deleteMessages();
+  await smtpServerApi.deleteMessagesBySearch({ query: `to:"${signUpUser.email}"` });
 });
 
 test("sign-up", async ({ page }) => {
