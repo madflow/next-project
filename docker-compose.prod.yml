@@ -70,7 +70,6 @@ services:
 
   migrations:
     image: ghcr.io/madflow/next-project-db:main
-    restart: unless-stopped
     environment:
       - DOCKER_RUN_MIGRATIONS=1
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -80,7 +79,6 @@ services:
 
   cli:
     image: ghcr.io/madflow/next-project-cli:main
-    restart: unless-stopped
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
