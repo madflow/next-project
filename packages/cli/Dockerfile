@@ -17,7 +17,7 @@ RUN turbo prune @repo/cli --docker
 FROM base AS runner
 
 COPY --from=builder /app/out/full/ .
-COPY --from=builder /app/packages/database/docker/entrypoint.sh /entrypoint.sh
+COPY --from=builder /app/packages/cli/docker/entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/sh"]
