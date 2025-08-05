@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { env } from "@/env";
 import { SignUpForm } from "./form";
 
 export const dynamic = "force-dynamic";
 
 export default function Page() {
-  const signUpDisabled = auth.options.emailAndPassword.disableSignUp;
+  const signUpDisabled = !!env.AUTH_DISABLE_SIGNUP;
 
   if (signUpDisabled) {
     return notFound();
