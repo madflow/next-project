@@ -74,6 +74,14 @@ services:
       postgres:
         condition: service_healthy
 
+  cli:
+    image: ghcr.io/madflow/next-project-cli:main
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   # https://hub.docker.com/_/postgres/
   postgres:
     image: "postgres:17-alpine"
