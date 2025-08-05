@@ -1,0 +1,55 @@
+name: Has Changed?
+description: Checks if a Turborepo Workspace has changed
+inputs:
+  workspace_name:
+    required: true
+    description: |-
+      Name of Turborepo workspace
+  from_ref:
+    required: true
+    description: |-
+      Github Ref to detect changes from
+  to_ref:
+    required: true
+    description: |-
+      Github ref to detect changes to
+  cache_dir:
+    required: false
+    default: .turbo
+    description: |-
+      Custom cache directory for turborepo
+  turbo_version:
+    required: false
+    default: 2.5.5
+    description: |-
+      Turborepo version
+  force:
+    required: false
+    default: false
+    description: |-
+      Used to force this action to return true
+
+outputs:
+  changed:
+    description: |-
+      'true' or 'false' value indicating whether the workspace changed
+    value: ${{ steps.turbo_check_changed.outputs.changed }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: 'npm'
+    - run: npm install -g turbo@${{ inputs.turbo_version }}
+      shell: bash
+    - id: turbo_check_changed
+      shell: bash
+      run: |
+        if [[ "${{ inputs.force }}" == 'true' ]]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          HAS_CHANGED=$(npx turbo build --cache-dir=${{ inputs.cache_dir }} --filter="${{ inputs.workspace_name }}...[${{ inputs.from_ref }}...${{ inputs.to_ref }}]" --dry-run=json | jq -r ".packages|any(. == \"${{ inputs.workspace_name }}\")")
+          echo "changed=${HAS_CHANGED}" >> $GITHUB_OUTPUT
+        fi

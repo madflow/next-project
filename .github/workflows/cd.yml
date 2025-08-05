@@ -1,0 +1,63 @@
+name: Continuous Deployment
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/test.yml
+
+  deploy-web:
+    runs-on: ubuntu-latest
+    needs: [ci]
+    env:
+      TURBO_TELEMETRY_DISABLED: 1
+      NEXT_TELEMETRY_DISABLED: 1
+      DO_NOT_TRACK: 1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - id: has-changed
+        uses: ./.github/actions/has-changed
+        with:
+          workspace_name: web
+          from_ref: ${{ github.ref_name }}
+          to_ref: HEAD^1
+          force: ${{ github.event_name == 'workflow_dispatch' }}
+
+      - name: Cache turborepo
+        if: steps.has-changed.outputs.changed == 'true'
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup Node
+        if: steps.has-changed.outputs.changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - run: npm ci
+        if: steps.has-changed.outputs.changed == 'true'
+
+      - run: npx turbo run build --cache-dir=.turbo
+        if: steps.has-changed.outputs.changed == 'true'
+
+      - name: Deploy web app
+        if: steps.has-changed.outputs.changed == 'true'
+        run: |
+          echo "Deploying web app..."
+          # Add your deployment commands here
