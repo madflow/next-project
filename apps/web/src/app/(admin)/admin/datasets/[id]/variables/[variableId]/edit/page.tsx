@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { DatasetVariable } from "@repo/database/schema";
 import { EditDatasetVariableForm } from "@/components/admin/dataset-editor/edit-dataset-variable-form";
 import { PageLayout } from "@/components/page/page-layout";
 import { find } from "@/dal/dataset-variable";
@@ -16,7 +17,7 @@ export default async function EditDatasetVariablePage(props: PageProps) {
   const { id: datasetId, variableId } = params;
   const t = await getTranslations("adminDatasetEditor");
 
-  const datasetVariable = await find(variableId);
+  const datasetVariable = (await find(variableId)) as DatasetVariable;
 
   if (!datasetVariable) {
     return notFound();
@@ -29,12 +30,7 @@ export default async function EditDatasetVariablePage(props: PageProps) {
 
   return (
     <PageLayout title={t("editVariable.title")} description={t("editVariable.description")}>
-      <EditDatasetVariableForm
-        datasetVariable={{
-          ...datasetVariable,
-          datasetId,
-        }}
-      />
+      <EditDatasetVariableForm datasetVariable={datasetVariable} />
     </PageLayout>
   );
 }

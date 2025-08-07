@@ -36,8 +36,7 @@ async function updateFn(id: string, data: UpdateDatasetData) {
 
 async function findFn(id: string) {
   const [result] = await db.select().from(entity).where(eq(entity.id, id)).limit(1);
-
-  return result || null;
+  return result;
 }
 
 export const find = withSessionCheck(findFn);

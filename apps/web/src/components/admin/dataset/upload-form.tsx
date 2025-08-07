@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { uploadDataset } from "@/actions/dataset";
 import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";

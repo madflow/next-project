@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { update } from "@/actions/dataset-variable";
 import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { updateDatasetVariableSchema } from "@/types/dataset-variable";
+import { DatasetVariable, updateDatasetVariableSchema } from "@/types/dataset-variable";
 
 // Define the form schema
 const formSchema = z.object({
@@ -24,15 +24,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 type EditDatasetVariableFormProps = {
-  datasetVariable: {
-    id: string;
-    name: string;
-    label: string | null;
-    type: string;
-    measure: string;
-    missingValues: string[] | null;
-    datasetId: string;
-  };
+  datasetVariable: DatasetVariable;
 };
 
 export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariableFormProps) {
@@ -45,7 +37,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     defaultValues: {
       id: datasetVariable.id,
       label: datasetVariable.label,
-      missingValues: datasetVariable.missingValues,
+      missingValues: (datasetVariable.missingValues as string[]) ?? null,
     },
   });
 

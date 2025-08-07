@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { createWithInvitation } from "@/actions/user";
 import { type SignUpSchema, signUpSchema } from "@/app/(auth)/auth/sign-up/schema";
 import { LocaleSwitcher } from "@/components/locale-switcher";
