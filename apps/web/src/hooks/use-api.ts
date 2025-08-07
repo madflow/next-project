@@ -6,7 +6,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import * as React from "react";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const apiQueryOrderSchema = z.array(
   z.object({ column: z.string(), direction: z.enum(["asc", "desc"]), nullsFirst: z.boolean().optional() })

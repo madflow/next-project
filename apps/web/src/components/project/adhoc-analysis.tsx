@@ -27,7 +27,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
 
   function supportsChart(chartType: AnalysisChartType, variable: DatasetVariable): boolean {
     const supportedCharts: AnalysisChartType[] = [];
-    const valueKeys = Object.keys(variable.valueLabels);
+    const valueKeys = Object.keys(variable.valueLabels ?? {});
     if (variable.measure === "nominal") {
       supportedCharts.push("horizontalBar");
       if (valueKeys.length <= 7) {

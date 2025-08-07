@@ -12,7 +12,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { organization } from "./auth.js";
 
 export const project = pgTable(
@@ -50,7 +50,7 @@ export const dataset = pgTable("datasets", {
   fileType: text("file_type").notNull(), // sav, xlsx, csv, parquet, ods
   fileSize: bigint("file_size", { mode: "number" }).notNull(), // Size in bytes
   fileHash: text("file_hash").notNull(), // SHA-256 hash for integrity and deduplication
-  missingValues: jsonb("missing_values").$type<string[] | null>(),
+  missingValues: jsonb("missing_values"),
   storageKey: text("s3_key").notNull(), // S3 object key/path
   uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().defaultNow(),
 
@@ -111,9 +111,9 @@ export const datasetVariable = pgTable(
     type: typeEnum().notNull(),
     measure: measureEnum().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    variableLabels: jsonb("variable_labels").$type<DatasetVariableLabel>(),
-    valueLabels: jsonb("value_labels").$type<DatasetVariableLabels | null>(),
-    missingValues: jsonb("missing_values").$type<string[] | null>(),
+    variableLabels: jsonb("variable_labels"),
+    valueLabels: jsonb("value_labels"),
+    missingValues: jsonb("missing_values"),
     datasetId: uuid("dataset_id")
       .notNull()
       .references(() => dataset.id, { onDelete: "cascade" }),
@@ -123,7 +123,9 @@ export const datasetVariable = pgTable(
 
 export const insertDatasetVariableSchema = createInsertSchema(datasetVariable);
 export const selectDatasetVariableSchema = createSelectSchema(datasetVariable);
-export const updateDatasetVariableSchema = createUpdateSchema(datasetVariable);
+export const updateDatasetVariableSchema = createUpdateSchema(datasetVariable, {
+  valueLabels: z.record(z.string(), z.record(z.string(), z.string())).optional(),
+});
 
 export type CreateDatasetVariableData = z.infer<typeof insertDatasetVariableSchema>;
 export type DatasetVariable = z.infer<typeof selectDatasetVariableSchema>;

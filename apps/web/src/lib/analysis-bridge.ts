@@ -17,12 +17,12 @@ export function getVariableStats(variableConfig: DatasetVariable, statsData: Sta
 }
 
 export function transformToRechartsBarData(variableConfig: DatasetVariable, statsData: StatsResponse) {
-  const valueLabels = variableConfig.valueLabels;
+  const valueLabels = variableConfig.valueLabels ?? {};
 
   const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
 
   const rechartsData = sortedFrequencyTable.map((item) => {
-    const valueKey = item.value.toString(); // Convert to string to match valueLabels keys
+    const valueKey = item.value.toString() as keyof typeof valueLabels; // Convert to string to match valueLabels keys
     const label = valueLabels[valueKey] || item.value; // Fallback if label not found
 
     return {
@@ -37,11 +37,11 @@ export function transformToRechartsBarData(variableConfig: DatasetVariable, stat
 }
 
 export function transformToRechartsPieData(variableConfig: DatasetVariable, statsData: StatsResponse) {
-  const valueLabels = variableConfig.valueLabels;
+  const valueLabels = variableConfig.valueLabels ?? {};
 
   const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
   const rechartsData = sortedFrequencyTable.map((item, index) => {
-    const valueKey = item.value.toString(); // Convert to string to match valueLabels keys
+    const valueKey = item.value.toString() as keyof typeof valueLabels; // Convert to string to match valueLabels keys
     const label = valueLabels[valueKey] || item.value; // Fallback if label not found
 
     return {

@@ -12,6 +12,6 @@ export default defineBuildConfig({
   clean: true,
   failOnWarn: false,
   sourcemap: true,
-  externals: ["drizzle-orm", "drizzle-zod", "zod/v4"],
+  externals: ["drizzle-orm", "drizzle-zod", "zod"],
   entries: ["./src/schema/index.ts", "./src/clients/index.ts"],
 });

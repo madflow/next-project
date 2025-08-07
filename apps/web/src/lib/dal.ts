@@ -3,7 +3,7 @@ import { SQL, and, asc, count, desc, eq, getTableColumns, ilike, or } from "driz
 import { AnyPgColumn, AnyPgTable } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { cache } from "react";
-import { ZodType, z } from "zod/v4";
+import { ZodType, z } from "zod";
 import { defaultClient as db } from "@repo/database/clients";
 import { USER_ADMIN_ROLE, auth } from "./auth";
 import { DalNotAuthorizedException } from "./exception";
