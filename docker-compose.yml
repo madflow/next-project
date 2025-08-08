@@ -46,7 +46,7 @@ services:
   cli:
     build:
       context: .
-      dockerfile: ./apps/cli/Dockerfile
+      dockerfile: ./packages/cli/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
