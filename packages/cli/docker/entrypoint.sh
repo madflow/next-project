@@ -8,3 +8,6 @@ if [ -n "${DATABASE_URL:-}" ]; then
     echo "DATABASE_URL=${DATABASE_URL}" > /app/packages/cli/.env
 fi
 
+# Run the command
+exec "$@"
+
