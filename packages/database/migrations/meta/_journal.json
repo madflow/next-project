@@ -8,6 +8,13 @@
       "when": 1753804337882,
       "tag": "0000_early_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1754834239155,
+      "tag": "0001_curious_night_thrasher",
+      "breakpoints": true
     }
   ]
 }

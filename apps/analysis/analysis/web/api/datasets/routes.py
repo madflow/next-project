@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from analysis.db.dependencies import get_db_session
-from analysis.db.models.models import Dataset
+from analysis.db.models.models import Dataset, DatasetVariable
 from analysis.services.s3_client import S3Client
 from analysis.services.stats import StatisticsService
 from analysis.settings import settings
@@ -34,6 +34,22 @@ async def _get_dataset_by_id(db: AsyncSession, dataset_id: str) -> Optional[Data
     """
     try:
         result = await db.execute(select(Dataset).filter(Dataset.id == dataset_id))
+        return result.scalar_one_or_none()
+    except ValueError:
+        # This handles cases where id is not a valid UUID
+        return None
+
+
+async def _get_dataset_variable_by_name(
+    db: AsyncSession, dataset_id: str, variable_name: str
+) -> Optional[DatasetVariable]:
+    try:
+        result = await db.execute(
+            select(DatasetVariable).filter(
+                DatasetVariable.dataset_id == dataset_id,
+                DatasetVariable.name == variable_name,
+            )
+        )
         return result.scalar_one_or_none()
     except ValueError:
         # This handles cases where id is not a valid UUID
@@ -209,8 +225,15 @@ async def get_dataset_stats(
         results = []
         for var_request in stats_request.variables:
             try:
+                dataset_variable = await _get_dataset_variable_by_name(
+                    db, dataset_id, var_request.variable
+                )
+                if not dataset_variable:
+                    raise ValueError(f"Variable {var_request.variable} not found")
                 stats = stats_service.describe_var(
-                    df, var_request.variable, missing_values=dataset.missing_values
+                    df,
+                    var_request.variable,
+                    missing_values=dataset_variable.missing_values,
                 )
                 results.append({"variable": var_request.variable, "stats": stats})
             except ValueError as e:

@@ -18,7 +18,6 @@ help:
 
 ## Start the development server (all apps)
 dev:
-	npm run stub
 	npm run dev
 
 ## Build all apps
@@ -72,6 +71,10 @@ shell:
 ## Run psql inside the postgres container
 psql:
 	docker-compose exec postgres psql -U postgres postgres
+
+## Seed 
+seed:
+	npm run seed
 
 ## Create stubs
 stubs:
