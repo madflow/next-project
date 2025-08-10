@@ -136,7 +136,6 @@ export async function uploadDataset({
         storageKey: s3Key,
         organizationId,
         description: description || undefined,
-        missingValues,
         uploadedAt: new Date(),
         updatedAt: new Date(),
         createdAt: new Date(),
@@ -184,6 +183,7 @@ export async function uploadDataset({
         variableLabels: columnLabels,
         valueLabels: columnValueLabels,
         datasetId: result[0].id,
+        missingValues: missingValues ?? null,
       } as CreateDatasetVariableData);
 
       insertValues.push(insertVariable);

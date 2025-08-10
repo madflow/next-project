@@ -1,0 +1,1 @@
+ALTER TABLE "datasets" DROP COLUMN "missing_values";

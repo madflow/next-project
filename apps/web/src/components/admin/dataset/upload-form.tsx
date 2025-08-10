@@ -263,7 +263,7 @@ export function DatasetUploadForm() {
             name="missingValues"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("formLabels.missingValues")}</FormLabel>
+                <FormLabel>{t("formLabels.defaultMissingValues")}</FormLabel>
                 <FormControl>
                   <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
                 </FormControl>

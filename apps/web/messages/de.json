@@ -288,8 +288,8 @@
       "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es später noch einmal."
     },
     "formLabels": {
+      "defaultMissingValues": "Fehlende Werte Vorbelegung",
       "description": "Beschreibung",
-      "missingValues": "Fehlende Werte",
       "name": "Datensatzname",
       "organization": "Organisation"
     },
