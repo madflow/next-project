@@ -45,6 +45,9 @@
     "start": {
       "dependsOn": ["^start"]
     },
+    "stub": {
+      "cache": false
+    },
     "test": {
       "cache": false
     }
