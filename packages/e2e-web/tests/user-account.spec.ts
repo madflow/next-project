@@ -39,9 +39,10 @@ test.describe("User Account", () => {
     const newName = `Test User ${Date.now()}`;
     await page.getByTestId("app.user.account.profile.name").fill(newName);
 
-    // Update locale to German
+// Update locale to German
     await page.getByTestId("app.user.account.profile.locale").click();
-    await page.getByRole("option", { name: "German" }).click();
+    await page.getByRole("option", { name: "Deutsch" }).waitFor({ state: "visible" });
+    await page.getByRole("option", { name: "Deutsch" }).click();
 
     // Submit the form
     await page.getByTestId("app.user.account.profile.update").click();
