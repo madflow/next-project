@@ -2,7 +2,26 @@ import { hashPassword } from "better-auth/crypto";
 import { adminClient, adminPool } from "@repo/database/clients";
 import { account, invitation, member, organization, project, rateLimit, session, user } from "@repo/database/schema";
 
+const ADMIN_USER_UID = "0198e599-eab0-7cb8-861f-72a8f6d7abb1";
+const REGULAR_USER_UID = "0198e59c-e576-78d2-8606-61f0275aca5a";
+const PROFILE_CHANGER_USER_UID = "0198e59e-c1c6-7c10-b6a4-c29b7f74a776";
+const EMAIL_CHANGER_USER_UID = "0198e59f-0edd-7a89-9e7b-cf0460bc9efd";
+const AVATAR_USER_UID = "0198e5a0-1cd3-78a5-9230-f4807fa7cb59";
+const ACCOUNT_DELETER_USER_UID = "0198e5a1-839c-7421-9c3a-f7b8a6f7c32e";
+const ACCOUNT_MULTIPLE_ORGS_USER_UID = "0198e5a0-66da-7e75-9dad-25c85825821a";
+const ACCOUNT_IN_NO_ORG_USER_UID = "0198e5a5-3095-7924-8da5-2b8b4562f759";
+const ADMIN_IN_NO_ORG_USER_UID = "0198e5a6-66eb-7351-b25b-df1a50bc53fa";
+
+const ORG_TEST_UID = "0198e5a9-39c8-70db-9c7d-e11ab6d9aea7";
+const ORG_TEST_2_UID = "0198e5a9-0dac-7b95-a7a5-c9aa87a7f5c4";
+const ORG_TEST_3_UID = "0198e5a9-66f2-7391-ba86-1c7ae2127625";
+const PROJECT_TEST_UID = "0198e5a9-a975-7ac3-9eec-a70e2a3df131";
+const PROJECT_TEST_2_UID = "0198e5ac-2685-7e65-9308-5c8c249eea09";
+const PROJECT_TEST_3_UID = "0198e5ac-510d-78b1-bc34-3a5e24ec7788";
+const PROJECT_TEST_4_UID = "0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59";
+
 interface CreateUserParams {
+  id: string;
   name: string;
   email: string;
   emailVerified: boolean;
@@ -10,7 +29,7 @@ interface CreateUserParams {
   password: string;
 }
 
-async function createUser({ name, email, emailVerified, role, password }: CreateUserParams) {
+async function createUser({ id, name, email, emailVerified, role, password }: CreateUserParams) {
   const now = new Date();
 
   try {
@@ -18,6 +37,7 @@ async function createUser({ name, email, emailVerified, role, password }: Create
     const createdUser = await adminClient
       .insert(user)
       .values({
+        id,
         name,
         email,
         emailVerified,
@@ -54,13 +74,14 @@ async function createUser({ name, email, emailVerified, role, password }: Create
   }
 }
 
-async function createOrganization(name: string, slug: string) {
+async function createOrganization(id: string, name: string, slug: string) {
   const now = new Date("1990-01-01");
 
   // Create organization
   const createdOrganization = await adminClient
     .insert(organization)
     .values({
+      id,
       name,
       createdAt: now,
       slug,
@@ -75,13 +96,14 @@ async function createOrganization(name: string, slug: string) {
   return createdOrganization[0];
 }
 
-async function createProject(name: string, slug: string, organizationId: string) {
+async function createProject(id: string, name: string, slug: string, organizationId: string) {
   const now = new Date();
 
   // Create project
   const createdProject = await adminClient
     .insert(project)
     .values({
+      id,
       name,
       slug,
       organizationId,
@@ -111,16 +133,17 @@ console.log("Tables truncated successfully\n");
 // Create seed data
 try {
   // Create organization
-  const org = await createOrganization("Test Organization", "test-organization");
+  const org = await createOrganization(ORG_TEST_UID, "Test Organization", "test-organization");
 
   // Create another organization
-  const org2 = await createOrganization("Test Organization 2", "test-organization-2");
+  const org2 = await createOrganization(ORG_TEST_2_UID, "Test Organization 2", "test-organization-2");
 
   // Create another organization
-  const org3 = await createOrganization("Test Organization 3", "test-organization-3");
+  const org3 = await createOrganization(ORG_TEST_3_UID, "Test Organization 3", "test-organization-3");
 
   // Create admin user and add to organization
   const adminUserId = await createUser({
+    id: ADMIN_USER_UID,
     name: "Admin User",
     email: "admin@example.com",
     emailVerified: true,
@@ -138,6 +161,7 @@ try {
 
   // Create regular user and add to organization
   const regularUserId = await createUser({
+    id: REGULAR_USER_UID,
     name: "Regular User",
     email: "user@example.com",
     emailVerified: true,
@@ -154,6 +178,7 @@ try {
   });
 
   const profileChangerUserId = await createUser({
+    id: PROFILE_CHANGER_USER_UID,
     name: "Profile Changer",
     email: "profile@example.com",
     emailVerified: true,
@@ -171,6 +196,7 @@ try {
 
   // Create email changer user
   const emailChangerUserId = await createUser({
+    id: EMAIL_CHANGER_USER_UID,
     name: "Email Changer",
     email: "emailchanger@example.com",
     emailVerified: true,
@@ -179,6 +205,7 @@ try {
   });
 
   const avatarUserId = await createUser({
+    id: AVATAR_USER_UID,
     name: "Avatar user",
     email: "avatar@example.com",
     emailVerified: true,
@@ -196,6 +223,7 @@ try {
 
   // Create account deleter user
   const accountDeleterUserId = await createUser({
+    id: ACCOUNT_DELETER_USER_UID,
     name: "Account Deleter",
     email: "accountdeleter@example.com",
     emailVerified: true,
@@ -204,6 +232,7 @@ try {
   });
 
   const accountMultipleOrgsUserId = await createUser({
+    id: ACCOUNT_MULTIPLE_ORGS_USER_UID,
     name: "Account Multiple Orgs",
     email: "accountmultipleorgs@example.com",
     emailVerified: true,
@@ -211,7 +240,8 @@ try {
     password: "Tester12345",
   });
 
-  const accountInNoOrgUserId = await createUser({
+  await createUser({
+    id: ACCOUNT_IN_NO_ORG_USER_UID,
     name: "Account In No Org",
     email: "account-in-no-org@example.com",
     emailVerified: true,
@@ -219,7 +249,8 @@ try {
     password: "Tester12345",
   });
 
-  const adminInNoOrgUserId = await createUser({
+  await createUser({
+    id: ADMIN_IN_NO_ORG_USER_UID,
     name: "Admin In No Org",
     email: "admin-in-no-org@example.com",
     emailVerified: true,
@@ -267,14 +298,14 @@ try {
   });
 
   // Create a test project in the organization
-  await createProject("Test Project", "test-project", org.id);
+  await createProject(PROJECT_TEST_UID, "Test Project", "test-project", org.id);
 
   // Create two projects in the second organization
-  await createProject("Test Project 2", "test-project-2", org2.id);
-  await createProject("Test Project 3", "test-project-3", org2.id);
+  await createProject(PROJECT_TEST_2_UID, "Test Project 2", "test-project-2", org2.id);
+  await createProject(PROJECT_TEST_3_UID, "Test Project 3", "test-project-3", org2.id);
 
   // Create a test project in the third organization
-  await createProject("Test Project 4", "test-project-4", org3.id);
+  await createProject(PROJECT_TEST_4_UID, "Test Project 4", "test-project-4", org3.id);
 
   await adminPool.end();
 
