@@ -11,8 +11,9 @@ import {
   withSessionCheck,
 } from "@/lib/dal";
 import { createListWithJoins } from "@/lib/dal-joins";
+import { DalNotAuthorizedException } from "@/lib/exception";
 
-export const find = withAdminCheck(createFind(entity, selectProjectSchema));
+export const find = withSessionCheck(createFind(entity, selectProjectSchema));
 
 export const findBySlug = withSessionCheck(createFindBySlug(entity, selectProjectSchema));
 
@@ -28,6 +29,13 @@ export const listWithOrganization = withAdminCheck(
     },
   ])
 );
+
+export async function assertAccess(projectId: string) {
+  const canAccess = await hasAccess(projectId);
+  if (!canAccess) {
+    throw new DalNotAuthorizedException("You do not have access to this project");
+  }
+}
 
 export async function hasAccess(projectId: string) {
   const user = await getSessionUser();

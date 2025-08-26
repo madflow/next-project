@@ -1,6 +1,6 @@
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
-import { find } from "@/dal/dataset";
+import { assertAccess, find } from "@/dal/dataset";
 import { env } from "@/env";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { getS3Client } from "@/lib/storage";
@@ -23,6 +23,7 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 
   try {
+    await assertAccess(id);
     const dataFile = await find(id);
 
     if (!dataFile) {

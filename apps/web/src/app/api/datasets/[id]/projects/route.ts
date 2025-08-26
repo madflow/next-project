@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { find } from "@/dal/dataset";
+import { assertAccess } from "@/dal/dataset";
 import { listByDataset } from "@/dal/dataset-project";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { processUrlParams } from "../../../handler";
@@ -19,9 +19,8 @@ export async function GET(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "ID is required" }, { status: 400 });
   }
 
-  await find(id);
-
   try {
+    await assertAccess(id);
     const { limit, offset, orderBy } = processUrlParams(new URL(request.url).searchParams);
 
     const result = await listByDataset({

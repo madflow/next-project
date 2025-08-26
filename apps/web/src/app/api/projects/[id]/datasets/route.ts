@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { processUrlParams } from "@/app/api/handler";
 import { listByProject } from "@/dal/dataset-project";
-import { find } from "@/dal/project";
+import { assertAccess } from "@/dal/project";
 import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
@@ -9,11 +9,8 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const entity = await find(id);
 
-    if (!entity) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
+    await assertAccess(id);
 
     try {
       const { limit, offset, search, orderBy } = processUrlParams(new URL(request.url).searchParams);

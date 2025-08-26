@@ -1,6 +1,25 @@
 import { hashPassword } from "better-auth/crypto";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 import { adminClient, adminPool } from "@repo/database/clients";
-import { account, invitation, member, organization, project, rateLimit, session, user } from "@repo/database/schema";
+import {
+  account,
+  dataset,
+  datasetProject,
+  invitation,
+  member,
+  organization,
+  project,
+  rateLimit,
+  session,
+  user,
+} from "@repo/database/schema";
+import { deleteDataset, putDataset } from "@/lib/storage";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const ADMIN_USER_UID = "0198e599-eab0-7cb8-861f-72a8f6d7abb1";
 const REGULAR_USER_UID = "0198e59c-e576-78d2-8606-61f0275aca5a";
@@ -19,6 +38,8 @@ const PROJECT_TEST_UID = "0198e5a9-a975-7ac3-9eec-a70e2a3df131";
 const PROJECT_TEST_2_UID = "0198e5ac-2685-7e65-9308-5c8c249eea09";
 const PROJECT_TEST_3_UID = "0198e5ac-510d-78b1-bc34-3a5e24ec7788";
 const PROJECT_TEST_4_UID = "0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59";
+
+const DATASET_TEST_UID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
 
 interface CreateUserParams {
   id: string;
@@ -128,6 +149,11 @@ await adminClient.delete(organization).execute();
 await adminClient.delete(account).execute();
 await adminClient.delete(user).execute();
 await adminClient.delete(rateLimit).execute();
+const datasets = await adminClient.select().from(dataset);
+for (const dataset of datasets) {
+  await deleteDataset(dataset.storageKey);
+}
+await adminClient.delete(dataset).execute();
 console.log("Tables truncated successfully\n");
 
 // Create seed data
@@ -306,6 +332,30 @@ try {
 
   // Create a test project in the third organization
   await createProject(PROJECT_TEST_4_UID, "Test Project 4", "test-project-4", org3.id);
+
+  const datasetBuffer = await readFile(join(__dirname, "./fixtures/demo.sav"));
+  const file = new File([new Uint8Array(datasetBuffer)], "demo.sav");
+  const contentType = "application/octet-stream";
+  const { s3Key, fileExtension, fileHash } = await putDataset(file, contentType, org.id);
+
+  // Create and assign a dataset
+  await adminClient.insert(dataset).values({
+    id: DATASET_TEST_UID,
+    name: "Test Dataset",
+    fileHash,
+    fileSize: datasetBuffer.byteLength,
+    fileType: fileExtension,
+    filename: file.name,
+    storageKey: s3Key,
+    uploadedAt: new Date(),
+    updatedAt: new Date(),
+    organizationId: org.id,
+  });
+
+  await adminClient.insert(datasetProject).values({
+    projectId: PROJECT_TEST_UID,
+    datasetId: DATASET_TEST_UID,
+  });
 
   await adminPool.end();
 
