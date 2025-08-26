@@ -1,7 +1,8 @@
 "use client";
 
+import { DownloadIcon } from "lucide-react";
 import { Pie, PieChart } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -10,9 +11,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
+import { Button } from "../ui/button";
 
 type PieAdhocProps = {
   variable: DatasetVariable;
@@ -20,6 +23,7 @@ type PieAdhocProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
+  const { ref, exportPNG } = useChartExport();
   const rechartsData = transformToRechartsPieData(variable, stats);
   const chartConfig: Record<string, ChartConfig> = {};
 
@@ -36,7 +40,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
         <CardTitle>{variable.label ?? variable.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel nameKey="label" />} />
             <Pie data={rechartsData} dataKey="count" />
@@ -48,6 +52,11 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
           </PieChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter>
+        <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
+          <DownloadIcon className="h-4 w-4" />
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
