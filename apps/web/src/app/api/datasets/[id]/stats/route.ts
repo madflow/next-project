@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { find } from "@/dal/dataset";
+import { assertAccess } from "@/dal/dataset";
 import { createAnalysisClient } from "@/lib/analysis-client";
 import { raiseExceptionResponse } from "@/lib/exception";
 
@@ -18,7 +18,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "ID is required" }, { status: 400 });
   }
 
-  await find(id);
+  await assertAccess(id);
 
   const body = await request.text();
 

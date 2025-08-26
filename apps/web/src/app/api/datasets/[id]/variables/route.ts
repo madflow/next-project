@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { assertAccess } from "@/dal/dataset";
 import { listByDataset } from "@/dal/dataset-variable";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { processUrlParams } from "../../../handler";
@@ -19,18 +20,23 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 
   try {
-    const { limit, offset, search, orderBy, filters } = processUrlParams(new URL(request.url).searchParams);
+    await assertAccess(id);
+    try {
+      const { limit, offset, search, orderBy, filters } = processUrlParams(new URL(request.url).searchParams);
 
-    const result = await listByDataset(id, {
-      filters,
-      limit,
-      offset,
-      search,
-      searchColumns: ["name", "label"],
-      orderBy,
-    });
+      const result = await listByDataset(id, {
+        filters,
+        limit,
+        offset,
+        search,
+        searchColumns: ["name", "label"],
+        orderBy,
+      });
 
-    return NextResponse.json(result);
+      return NextResponse.json(result);
+    } catch (error: unknown) {
+      return raiseExceptionResponse(error);
+    }
   } catch (error: unknown) {
     return raiseExceptionResponse(error);
   }

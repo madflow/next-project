@@ -1,7 +1,6 @@
 "use server";
 
-import { PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
-import { createHash, randomUUID } from "crypto";
+import { S3ServiceException } from "@aws-sdk/client-s3";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
@@ -15,7 +14,6 @@ import {
   insertDatasetVariableSchema,
 } from "@repo/database/schema";
 import { deleteDataset } from "@/dal/dataset";
-import { env } from "@/env";
 import { createAnalysisClient } from "@/lib/analysis-client";
 import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 import {
@@ -23,7 +21,7 @@ import {
   ServerActionNotAuthorizedException,
   ServerActionValidationException,
 } from "@/lib/exception";
-import { getS3Client } from "@/lib/storage";
+import { putDataset } from "@/lib/storage";
 import { datasetReadResponseSchema } from "@/types/dataset";
 
 const ALLOWED_FILE_TYPES = [
@@ -97,32 +95,7 @@ export async function uploadDataset({
       throw new ServerActionValidationException(`File too large. Maximum size: ${MAX_FILE_SIZE / 1024 / 1024}MB`);
     }
 
-    const s3Client = getS3Client();
-    const fileExtension = file.name.split(".").pop()?.toLowerCase() || "";
-    const fileKey = `${randomUUID()}.${fileExtension}`;
-    const s3Key = `uploads/${fileKey}`;
-
-    // Read file content and compute MD5 hash
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const fileHash = createHash("md5").update(fileBuffer).digest("hex");
-
-    // Upload to S3
-    const uploadParams = {
-      Bucket: env.S3_BUCKET_NAME,
-      Key: s3Key,
-      Body: fileBuffer,
-      ContentType: contentType || "application/octet-stream",
-      Metadata: {
-        "original-filename": file.name,
-        "uploaded-by": session.user.id,
-        "organization-id": organizationId,
-        "content-type": contentType,
-        "file-hash": fileHash,
-      },
-    };
-
-    const command = new PutObjectCommand(uploadParams);
-    await s3Client.send(command);
+    const { fileHash, fileExtension, s3Key } = await putDataset(file, contentType, organizationId, session.user.id);
 
     // Save to database
     const result = await db
