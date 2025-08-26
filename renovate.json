@@ -9,6 +9,11 @@
   "packageRules": [
     {
       "automerge": true,
+      "matchPackageNames": ["lucide-react"],
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "automerge": true,
       "matchDepTypes": ["devDependencies"]
     },
     {
