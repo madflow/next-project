@@ -14,6 +14,7 @@ export const USER_ADMIN_ROLE = "admin";
 export const USER_ROLE = "user";
 
 export const auth = betterAuth({
+  telemetry: { enabled: false },
   secret: env.AUTH_SECRET,
   baseURL: env.AUTH_URL,
   database: drizzleAdapter(db, {

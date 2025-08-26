@@ -1,11 +1,14 @@
 "use client";
 
+import { DownloadIcon } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsBarData } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
+import { Button } from "../ui/button";
 
 const chartConfig = {
   count: {
@@ -20,13 +23,14 @@ type BarAdhocProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
+  const { ref, exportPNG } = useChartExport();
   return (
     <Card className="shadow-xs" {...props}>
       <CardHeader>
         <CardTitle>{variable.label ?? variable.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <BarChart
             layout="vertical"
             margin={{
@@ -51,6 +55,12 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
           </BarChart>
         </ChartContainer>
       </CardContent>
+
+      <CardFooter>
+        <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
+          <DownloadIcon className="h-4 w-4" />
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
