@@ -16,12 +16,12 @@ import { useDatasetsByProject } from "@/hooks/use-datasets-by-project";
 
 type DatasetSelectProps = {
   projectId: string;
-  onValueChange: (value: string) => void;
+  onValueChangeAction: (value: string) => void;
   defaultValue?: string;
   triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
 };
 
-export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerProps }: DatasetSelectProps) {
+export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, triggerProps }: DatasetSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data, isLoading, isError } = useDatasetsByProject(projectId);
   const t = useTranslations("formDatasetSelect");
@@ -60,7 +60,7 @@ export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerP
     <Select
       onValueChange={(value) => {
         setSelectedValue(value);
-        onValueChange(value);
+        onValueChangeAction(value);
       }}
       value={selectedValue}>
       <SelectTrigger data-testid="app.dropdown.dataset.trigger" className="w-full">

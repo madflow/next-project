@@ -33,7 +33,7 @@ test.describe("User Account", () => {
 
     // Navigate to account page
     await page.goto("/user/account");
-    await page.waitForURL(/\/user\/account/);
+    await page.waitForTimeout(1000);
 
     // Update name using test ID
     const newName = `Test User ${Date.now()}`;

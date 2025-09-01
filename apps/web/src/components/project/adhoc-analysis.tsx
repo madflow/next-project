@@ -79,7 +79,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         <ThemeSelector className="w-full" />
         <DatasetSelect
           projectId={project.id}
-          onValueChange={(value) => {
+          onValueChangeAction={(value) => {
             setSelectedDataset(value);
           }}
         />

@@ -13,6 +13,10 @@ export async function hasAccess(organizationId: string) {
     return false;
   }
 
+  if (user.role === "admin") {
+    return true;
+  }
+
   const db = await getAuthenticatedClient();
 
   const rows = await db

@@ -13,9 +13,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     await assertAccess(id);
 
     try {
-      const { limit, offset, search, orderBy } = processUrlParams(new URL(request.url).searchParams);
+      const { filters, limit, offset, search, orderBy } = processUrlParams(new URL(request.url).searchParams);
 
+      const filtersWithProjectId = [
+        ...filters,
+        {
+          column: "projectId",
+          operator: "eq",
+          value: id,
+        },
+      ];
       const result = await listByProject({
+        filters: filtersWithProjectId,
         limit,
         offset,
         search,
