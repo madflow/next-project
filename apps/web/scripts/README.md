@@ -19,6 +19,13 @@ This document outlines the data created by the `seed.ts` script, which populates
 | Test Project 3 | test-project-3 | Test Organization 2 | 0198e5ac-510d-78b1-bc34-3a5e24ec7788 |
 | Test Project 4 | test-project-4 | Test Organization 3 | 0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59 |
 
+## Datasets
+
+| Name           | Organization         | Project           | UUID                                 |
+| -------------- | ------------------- | ----------------- | ------------------------------------ |
+| Test Dataset   | Test Organization   | Test Project      | 0198e639-3e96-734b-b0db-af0c4350a2c4 |
+| Test Dataset 2 | Test Organization 3 | Test Project 4    | 0198e639-3e96-734b-b0db-af0c4350a2c5 |
+
 ## Users and Memberships
 
 | Name                  | Email                           | Role  | UUID                                 | Organizations                                                                           |
