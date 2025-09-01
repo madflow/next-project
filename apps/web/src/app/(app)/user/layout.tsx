@@ -1,5 +1,5 @@
-import { SiteHeader } from "@/components/site-header";
 import { SidebarLayout } from "@/components/sidebar-layout";
+import { SiteHeader } from "@/components/site-header";
 import { UserSidebar } from "@/components/user-sidebar";
 
 export default async function UserLayout({
@@ -8,11 +8,7 @@ export default async function UserLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarLayout
-      SidebarComponent={UserSidebar}
-      SiteHeaderComponent={SiteHeader}
-      siteHeaderTitle="User"
-    >
+    <SidebarLayout SidebarComponent={UserSidebar} SiteHeaderComponent={SiteHeader} siteHeaderTitle="User">
       {children}
     </SidebarLayout>
   );

@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
 import { SidebarLayout } from "@/components/sidebar-layout";
+import { SiteHeader } from "@/components/site-header";
 
 export default async function ProjectLayout({
   children,
@@ -8,11 +8,7 @@ export default async function ProjectLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarLayout
-      SidebarComponent={AppSidebar}
-      SiteHeaderComponent={SiteHeader}
-      siteHeaderTitle="Landing"
-    >
+    <SidebarLayout SidebarComponent={AppSidebar} SiteHeaderComponent={SiteHeader} siteHeaderTitle="Landing">
       {children}
     </SidebarLayout>
   );

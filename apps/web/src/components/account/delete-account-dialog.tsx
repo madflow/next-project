@@ -21,7 +21,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "../ui/input";
 
 export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const t = useTranslations('accountDeleteDialog');
+  const t = useTranslations("accountDeleteDialog");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,11 +47,11 @@ export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onO
         password: form.getValues("currentPassword"),
         fetchOptions: {
           onSuccess: () => {
-            toast.success(t('messages.success'));
+            toast.success(t("messages.success"));
             router.push("/goodbye");
           },
           onError: () => {
-            toast.error(t('messages.error'));
+            toast.error(t("messages.error"));
             setIsLoading(false);
           },
         },
@@ -67,8 +67,8 @@ export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onO
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('title')}</DialogTitle>
-          <DialogDescription>{t('description')}</DialogDescription>
+          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
 
           <Form {...form}>
             <form className="space-y-4">
@@ -78,7 +78,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onO
                   name="currentPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('formLabels.currentPassword')}</FormLabel>
+                      <FormLabel>{t("formLabels.currentPassword")}</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} data-testid="app.user.account.delete.password" />
                       </FormControl>
@@ -92,7 +92,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onO
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-            {t('buttons.cancel')}
+            {t("buttons.cancel")}
           </Button>
           <Button
             variant="destructive"
@@ -100,11 +100,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onO
             disabled={isLoading || !form.formState.isValid}
             className="cursor-pointer"
             data-testid="app.user.account.delete-account-confirm">
-            {isLoading ? (
-              <span className="animate-pulse">{t('buttons.confirmLoading')}</span>
-            ) : (
-              t('buttons.confirm')
-            )}
+            {isLoading ? <span className="animate-pulse">{t("buttons.confirmLoading")}</span> : t("buttons.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

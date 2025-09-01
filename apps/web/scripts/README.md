@@ -4,16 +4,16 @@ This document outlines the data created by the `seed.ts` script, which populates
 
 ## Organizations
 
-| Name                | Slug                | UUID                                   |
-| ------------------- | ------------------- | -------------------------------------- |
+| Name                | Slug                | UUID                                 |
+| ------------------- | ------------------- | ------------------------------------ |
 | Test Organization   | test-organization   | 0198e5a9-39c8-70db-9c7d-e11ab6d9aea7 |
 | Test Organization 2 | test-organization-2 | 0198e5a9-0dac-7b95-a7a5-c9aa87a7f5c4 |
 | Test Organization 3 | test-organization-3 | 0198e5a9-66f2-7391-ba86-1c7ae2127625 |
 
 ## Projects
 
-| Name           | Slug           | Organization        | UUID                                   |
-| -------------- | -------------- | ------------------- | -------------------------------------- |
+| Name           | Slug           | Organization        | UUID                                 |
+| -------------- | -------------- | ------------------- | ------------------------------------ |
 | Test Project   | test-project   | Test Organization   | 0198e5a9-a975-7ac3-9eec-a70e2a3df131 |
 | Test Project 2 | test-project-2 | Test Organization 2 | 0198e5ac-2685-7e65-9308-5c8c249eea09 |
 | Test Project 3 | test-project-3 | Test Organization 2 | 0198e5ac-510d-78b1-bc34-3a5e24ec7788 |
@@ -21,8 +21,8 @@ This document outlines the data created by the `seed.ts` script, which populates
 
 ## Users and Memberships
 
-| Name                  | Email                           | Role  | UUID                                   | Organizations                                                                           |
-| --------------------- | ------------------------------- | ----- | -------------------------------------- | --------------------------------------------------------------------------------------- |
+| Name                  | Email                           | Role  | UUID                                 | Organizations                                                                           |
+| --------------------- | ------------------------------- | ----- | ------------------------------------ | --------------------------------------------------------------------------------------- |
 | Admin User            | admin@example.com               | admin | 0198e599-eab0-7cb8-861f-72a8f6d7abb1 | Owner of Test Organization                                                              |
 | Regular User          | user@example.com                | user  | 0198e59c-e576-78d2-8606-61f0275aca5a | Member of Test Organization                                                             |
 | Profile Changer       | profile@example.com             | user  | 0198e59e-c1c6-7c10-b6a4-c29b7f74a776 | Member of Test Organization                                                             |

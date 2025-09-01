@@ -3,11 +3,11 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import type { Organization } from "@/types/organization";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { PaginationState, SortingState } from "@/types/index";
+import type { Organization } from "@/types/organization";
 
 interface Props {
   columns: ColumnDef<Organization, unknown>[];

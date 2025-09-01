@@ -26,4 +26,3 @@ trigger: always_on
 ## Rules for running commands
 
 - Do not run `npm run build` in order to test the project or to regenerate types. Run `npm run lint` and `npm run check-types` instead.
-

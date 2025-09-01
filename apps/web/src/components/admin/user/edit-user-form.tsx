@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,15 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type EditUserTranslations = {
-  (key: `validation.${'nameRequired' | 'validEmailRequired' | 'roleRequired'}`): string;
-  (key: `roles.${'user' | 'admin'}`): string;
+  (key: `validation.${"nameRequired" | "validEmailRequired" | "roleRequired"}`): string;
+  (key: `roles.${"user" | "admin"}`): string;
 };
 
-const createFormSchema = (t: EditUserTranslations) => z.object({
-  name: z.string().min(1, { message: t('validation.nameRequired') }),
-  email: z.string().email({ message: t('validation.validEmailRequired') }),
-  role: z.string().min(1, { message: t('validation.roleRequired') }),
-});
+const createFormSchema = (t: EditUserTranslations) =>
+  z.object({
+    name: z.string().min(1, { message: t("validation.nameRequired") }),
+    email: z.string().email({ message: t("validation.validEmailRequired") }),
+    role: z.string().min(1, { message: t("validation.roleRequired") }),
+  });
 
 type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
@@ -40,8 +41,8 @@ type Role = {
 };
 
 const getRoles = (t: EditUserTranslations): Role[] => [
-  { value: "user", label: t('roles.user') },
-  { value: "admin", label: t('roles.admin') },
+  { value: "user", label: t("roles.user") },
+  { value: "admin", label: t("roles.admin") },
 ];
 
 export function EditUserForm({ user }: FormEditProps) {
@@ -61,10 +62,10 @@ export function EditUserForm({ user }: FormEditProps) {
   const onSubmit = async (formData: FormValues) => {
     try {
       await update(user.id, formData);
-      toast.success(t('messages.updateSuccess'));
+      toast.success(t("messages.updateSuccess"));
       router.push("/admin/users");
     } catch (error: unknown) {
-      toast.error(t('messages.updateFailed'));
+      toast.error(t("messages.updateFailed"));
       console.error(error);
       return;
     }
@@ -78,7 +79,7 @@ export function EditUserForm({ user }: FormEditProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('formLabels.name')}</FormLabel>
+              <FormLabel>{t("formLabels.name")}</FormLabel>
               <FormControl>
                 <Input {...field} data-testid="admin.users.edit.form.name" />
               </FormControl>
@@ -91,7 +92,7 @@ export function EditUserForm({ user }: FormEditProps) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('formLabels.email')}</FormLabel>
+              <FormLabel>{t("formLabels.email")}</FormLabel>
               <FormControl>
                 <Input {...field} data-testid="admin.users.edit.form.email" />
               </FormControl>
@@ -104,11 +105,11 @@ export function EditUserForm({ user }: FormEditProps) {
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('formLabels.role')}</FormLabel>
+              <FormLabel>{t("formLabels.role")}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.edit.form.role">
-                    <SelectValue placeholder={t('formPlaceholders.selectRole')} />
+                    <SelectValue placeholder={t("formPlaceholders.selectRole")} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -128,7 +129,7 @@ export function EditUserForm({ user }: FormEditProps) {
           className="cursor-pointer"
           data-testid="admin.users.edit.form.submit"
           disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? t('buttons.updating') : t('buttons.update')}
+          {form.formState.isSubmitting ? t("buttons.updating") : t("buttons.update")}
         </Button>
       </form>
     </Form>

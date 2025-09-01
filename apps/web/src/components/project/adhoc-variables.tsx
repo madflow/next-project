@@ -17,7 +17,7 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
   const [perPage, setPerPage] = useState(10);
   const [search, setSearch] = useState("");
   type AdhocVariablesTranslations = {
-    (key: 'search' | 'loadMore'): string;
+    (key: "search" | "loadMore"): string;
   };
   const t = useTranslations("projectAdhocVariables") as unknown as AdhocVariablesTranslations;
   const { data } = useDatasetVariables(datasetId, {
@@ -56,7 +56,7 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
       <CardFooter className="px-3">
         <Button variant={"outline"} className="w-full gap-2" onClick={() => setPerPage(perPage + 10)}>
           <ArrowBigDownIcon className="h-4 w-4" />
-          <span>{t('loadMore')}</span>
+          <span>{t("loadMore")}</span>
         </Button>
       </CardFooter>
     </Card>

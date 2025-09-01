@@ -1,9 +1,9 @@
 import "server-only";
 import { eq } from "drizzle-orm";
+import { defaultClient as db } from "@repo/database/clients";
 import { member as entity, selectMemberSchema, user } from "@repo/database/schema";
 import { createFind, createList, withAdminCheck } from "@/lib/dal";
 import { createListWithJoins } from "@/lib/dal-joins";
-import { defaultClient as db } from "@repo/database/clients";
 
 export const find = withAdminCheck(createFind(entity, selectMemberSchema));
 

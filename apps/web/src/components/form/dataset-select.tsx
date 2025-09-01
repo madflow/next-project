@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 import {
   Select,
