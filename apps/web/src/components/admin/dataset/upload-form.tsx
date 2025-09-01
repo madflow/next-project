@@ -102,7 +102,7 @@ export function DatasetUploadForm() {
       files: [],
       name: "",
       organizationId: "",
-      missingValues: [],
+      missingValues: ["-999", "-998"],
       description: "",
     },
   });
