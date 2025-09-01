@@ -52,3 +52,15 @@ Allow each organisation to customize the colors used in charts (chart-1 through 
 - [x] Update Zod schemas for validation of the new themes array structure.
 - [x] Update the default organization settings function to return an array with a default theme.
 - [x] Ensure the structure remains flexible for future theme properties (e.g., fonts, logos).
+
+## Task 4: Implement Organization Settings Editor
+
+- [ ] Summary: Add UI and server flow to create/edit/persist organization themes (name + chart color map).
+- [ ] Details:
+  - Make `settings` editable in organization create/edit screens under `apps/web/src/app/(admin)`.
+  - Allow adding/removing themes. Each theme must include six colors named `chart-1` through `chart-6`.
+  - New themes and the suggested theme on organization creation must be prefilled with defaults from `getDefaultOrganizationSettings()`.
+- [ ] Acceptance criteria:
+  - Admins can add/edit/remove themes.
+  - Themes contain `chart-1`..`chart-6` with valid hex values and are persisted to `organizations.settings`.
+  - Organization create page suggests a "Default" theme prefilled with defaults.
