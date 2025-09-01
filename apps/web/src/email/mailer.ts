@@ -28,7 +28,6 @@ export async function sendMail({
   try {
     await transporter.verify();
   } catch (error) {
-    
     console.error("There was an error sending the email", error);
     return;
   }
@@ -39,6 +38,6 @@ export async function sendMail({
     text: text,
     html: html ? html : "",
   });
-  
+
   return info;
 }

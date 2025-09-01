@@ -1,5 +1,5 @@
-import { Toaster } from "@/components/ui/sonner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 interface SidebarLayoutProps {
   children: React.ReactNode;
@@ -21,8 +21,7 @@ export function SidebarLayout({
           "--sidebar-width": "calc(var(--spacing) * 72)",
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
-      }
-    >
+      }>
       <SidebarComponent variant="inset" />
       <SidebarInset>
         <SiteHeaderComponent title={siteHeaderTitle} />

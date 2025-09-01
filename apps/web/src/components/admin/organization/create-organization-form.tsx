@@ -1,17 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { insertOrganizationSchema } from "@/types/organization";
 import { create } from "@/actions/organization";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { insertOrganizationSchema } from "@/types/organization";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createFormSchema = (t: any) =>
@@ -116,7 +116,9 @@ export function CreateOrganizationForm() {
             className="cursor-pointer"
             data-testid="admin.organizations.new.form.submit">
             {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {form.formState.isSubmitting ? t("organization.form.submit.creating") : t("organization.form.submit.create")}
+            {form.formState.isSubmitting
+              ? t("organization.form.submit.creating")
+              : t("organization.form.submit.create")}
           </Button>
         </div>
       </form>

@@ -1,7 +1,7 @@
+import { getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { PageLayout } from "@/components/page/page-layout";
 import { findBySlug, hasAccess } from "@/dal/project";
-import { getTranslations } from "next-intl/server";
 
 type PageProps = {
   params: Promise<{
@@ -22,6 +22,6 @@ export default async function Page({ params }: PageProps) {
     redirect("/landing");
   }
 
-  const t = await getTranslations('pageProjectLanding');
-  return <PageLayout data-testid="app.project.landing">{t('title')}</PageLayout>;
+  const t = await getTranslations("pageProjectLanding");
+  return <PageLayout data-testid="app.project.landing">{t("title")}</PageLayout>;
 }

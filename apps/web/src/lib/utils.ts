@@ -30,14 +30,9 @@ export function formatFileSize(bytes: number, decimals = 2): string {
  * @param locale Locale string (default: "en-US")
  * @returns Formatted date string (e.g., "January 1, 2023")
  */
-export function formatDate(
-  date: Date | string | number,
-  locale = "en-US"
-): string {
-  const dateObj = typeof date === "string" || typeof date === "number" 
-    ? new Date(date) 
-    : date;
-    
+export function formatDate(date: Date | string | number, locale = "en-US"): string {
+  const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+
   return new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "long",

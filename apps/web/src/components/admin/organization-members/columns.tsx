@@ -1,11 +1,11 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { type Member } from "@/types/member";
-import { type User } from "@/types/user";
 import { removeMember } from "@/actions/member";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Badge } from "@/components/ui/badge";
+import { type Member } from "@/types/member";
+import { type User } from "@/types/user";
 import { RemoveMemberDialog } from "./remove-member-dialog";
 
 export const columns: ColumnDef<{ users: User; members: Member }, unknown>[] = [

@@ -7,8 +7,8 @@ import Link from "next/link";
 import { remove } from "@/actions/project";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
-import { type Project } from "@/types/project";
 import { type Organization } from "@/types/organization";
+import { type Project } from "@/types/project";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 
 interface ProjectWithOrganization {

@@ -201,11 +201,7 @@ export function AvatarUpload() {
                 onClick={handleRemoveAvatar}
                 disabled={isPending}
                 data-testid="app.user.account.avatar-remove-button">
-                {isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="mr-2 h-4 w-4" />
-                )}
+                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
                 {isPending ? t("removing") : t("remove")}
               </Button>
             </>

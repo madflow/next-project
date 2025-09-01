@@ -1,6 +1,5 @@
-
-import { useTranslations } from "next-intl";
 import { InfoIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Code } from "@/components/ui/code";
 import {
@@ -19,7 +18,7 @@ type InfoDatasetModalProps = {
   dataset: Dataset;
 };
 export const InfoDatasetModal = ({ dataset }: InfoDatasetModalProps) => {
-  const t = useTranslations('adminDatasetInfoModal');
+  const t = useTranslations("adminDatasetInfoModal");
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -35,7 +34,7 @@ export const InfoDatasetModal = ({ dataset }: InfoDatasetModalProps) => {
         <Code>{JSON.stringify(dataset, null, 2)}</Code>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">{t('buttons.close')}</Button>
+            <Button variant="outline">{t("buttons.close")}</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

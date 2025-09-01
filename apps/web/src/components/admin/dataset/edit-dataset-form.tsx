@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -18,7 +18,7 @@ import { type Dataset, updateDatasetSchema } from "@/types/dataset";
 const createFormSchema = (t: any) => {
   return z.object({
     id: z.string().min(1),
-    name: z.string().min(1, { message: t('form.name.errors.required') }),
+    name: z.string().min(1, { message: t("form.name.errors.required") }),
     description: z.string(),
     updatedAt: z.date(),
   });
@@ -56,10 +56,10 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
     const updateData = updateDatasetSchema.parse(formData);
     try {
       await update(dataset.id, updateData);
-      toast.success(t('messages.updateSuccess'));
+      toast.success(t("messages.updateSuccess"));
       router.push("/admin/datasets");
     } catch (error: unknown) {
-      toast.error(t('messages.error.generic'));
+      toast.error(t("messages.error.generic"));
       console.error(error);
       return;
     }
@@ -73,11 +73,11 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('form.name.label')}</FormLabel>
+              <FormLabel>{t("form.name.label")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder={t('form.name.placeholder')}
+                  placeholder={t("form.name.placeholder")}
                   data-testid="admin.datasets.edit.form.name"
                 />
               </FormControl>
@@ -90,11 +90,11 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('form.description.label')}</FormLabel>
+              <FormLabel>{t("form.description.label")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder={t('form.description.placeholder')}
+                  placeholder={t("form.description.placeholder")}
                   data-testid="admin.datasets.edit.form.description"
                 />
               </FormControl>
@@ -108,7 +108,7 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
             disabled={form.formState.isSubmitting}
             className="cursor-pointer"
             data-testid="admin.datasets.edit.form.submit">
-            {form.formState.isSubmitting ? t('form.submit.updating') : t('form.submit.update')}
+            {form.formState.isSubmitting ? t("form.submit.updating") : t("form.submit.update")}
           </Button>
         </div>
       </form>

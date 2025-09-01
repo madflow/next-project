@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import { invitation, member } from "@repo/database/schema";
-import { auth } from "@/lib/auth";
 import { create as createMember } from "@/dal/member";
+import { auth } from "@/lib/auth";
 
 export async function acceptInvitationAfterSignup(invitationId: string) {
   try {
@@ -19,11 +19,7 @@ export async function acceptInvitationAfterSignup(invitationId: string) {
     }
 
     // Verify the invitation exists and is for this user's email
-    const [existingInvitation] = await db
-      .select()
-      .from(invitation)
-      .where(eq(invitation.id, invitationId))
-      .limit(1);
+    const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, invitationId)).limit(1);
 
     if (!existingInvitation) {
       throw new Error("Invitation not found");
@@ -37,12 +33,7 @@ export async function acceptInvitationAfterSignup(invitationId: string) {
     const [existingMember] = await db
       .select()
       .from(member)
-      .where(
-        and(
-          eq(member.organizationId, existingInvitation.organizationId),
-          eq(member.userId, session.user.id)
-        )
-      )
+      .where(and(eq(member.organizationId, existingInvitation.organizationId), eq(member.userId, session.user.id)))
       .limit(1);
 
     if (existingMember) {
@@ -58,10 +49,7 @@ export async function acceptInvitationAfterSignup(invitationId: string) {
     });
 
     // Mark invitation as accepted
-    await db
-      .update(invitation)
-      .set({ status: "accepted" })
-      .where(eq(invitation.id, invitationId));
+    await db.update(invitation).set({ status: "accepted" }).where(eq(invitation.id, invitationId));
 
     revalidatePath("/");
     return { success: true, message: "Invitation accepted successfully" };

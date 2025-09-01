@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 import {
   Select,
@@ -69,7 +69,10 @@ export function OrganizationSelect({ onValueChangeAction, defaultValue, triggerP
         <SelectGroup key="organization-group">
           <SelectLabel key="organization-label">{t("formOrganizationSelect.selectOrganization")}</SelectLabel>
           {organizations.map((organization) => (
-            <SelectItem key={organization.id} value={organization.id} data-testid={`organization-dropdown-item-${organization.slug}`}>
+            <SelectItem
+              key={organization.id}
+              value={organization.id}
+              data-testid={`organization-dropdown-item-${organization.slug}`}>
               {organization.name}
             </SelectItem>
           ))}
