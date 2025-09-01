@@ -40,6 +40,7 @@ const PROJECT_TEST_3_UID = "0198e5ac-510d-78b1-bc34-3a5e24ec7788";
 const PROJECT_TEST_4_UID = "0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59";
 
 const DATASET_TEST_UID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
+const DATASET_TEST_2_UID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
 
 interface CreateUserParams {
   id: string;
@@ -138,6 +139,32 @@ async function createProject(id: string, name: string, slug: string, organizatio
 
   console.log(`Project created: ${name}`);
   return createdProject[0];
+}
+
+async function createDataset(id: string, name: string, organizationId: string, projectId: string) {
+  const datasetBuffer = await readFile(join(__dirname, "./fixtures/demo.sav"));
+  const file = new File([new Uint8Array(datasetBuffer)], "demo.sav");
+  const contentType = "application/octet-stream";
+  const { s3Key, fileExtension, fileHash } = await putDataset(file, contentType, organizationId);
+
+  // Create and assign a dataset
+  await adminClient.insert(dataset).values({
+    id,
+    name,
+    fileHash,
+    fileSize: datasetBuffer.byteLength,
+    fileType: fileExtension,
+    filename: file.name,
+    storageKey: s3Key,
+    uploadedAt: new Date(),
+    updatedAt: new Date(),
+    organizationId,
+  });
+
+  await adminClient.insert(datasetProject).values({
+    projectId,
+    datasetId: id,
+  });
 }
 
 // Truncate tables in the correct order to respect foreign key constraints
@@ -333,29 +360,8 @@ try {
   // Create a test project in the third organization
   await createProject(PROJECT_TEST_4_UID, "Test Project 4", "test-project-4", org3.id);
 
-  const datasetBuffer = await readFile(join(__dirname, "./fixtures/demo.sav"));
-  const file = new File([new Uint8Array(datasetBuffer)], "demo.sav");
-  const contentType = "application/octet-stream";
-  const { s3Key, fileExtension, fileHash } = await putDataset(file, contentType, org.id);
-
-  // Create and assign a dataset
-  await adminClient.insert(dataset).values({
-    id: DATASET_TEST_UID,
-    name: "Test Dataset",
-    fileHash,
-    fileSize: datasetBuffer.byteLength,
-    fileType: fileExtension,
-    filename: file.name,
-    storageKey: s3Key,
-    uploadedAt: new Date(),
-    updatedAt: new Date(),
-    organizationId: org.id,
-  });
-
-  await adminClient.insert(datasetProject).values({
-    projectId: PROJECT_TEST_UID,
-    datasetId: DATASET_TEST_UID,
-  });
+  await createDataset(DATASET_TEST_UID, "Test Dataset", org.id, PROJECT_TEST_UID);
+  await createDataset(DATASET_TEST_2_UID, "Test Dataset 2", org3.id, PROJECT_TEST_4_UID);
 
   await adminPool.end();
 

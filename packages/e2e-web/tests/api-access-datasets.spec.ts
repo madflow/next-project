@@ -37,10 +37,12 @@ test.describe("Api access datasets", () => {
     expect(list.status()).toBe(401);
   });
 
-  test("list  project datasets as regular user", async ({ page }) => {
+  test("list project datasets as regular user", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
     const list = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
+    const body = await list.json();
+    expect(body.count).toBe(2);
     expect(list.status()).toBe(200);
   });
 });
