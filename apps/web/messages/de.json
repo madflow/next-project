@@ -658,6 +658,25 @@
       "updateSuccess": "Organisation erfolgreich aktualisiert"
     },
     "searchPlaceholder": "Organisationen durchsuchen...",
+    "settings": {
+      "title": "Organisationseinstellungen",
+      "description": "Konfigurieren Sie Diagrammfarben und Themen für Ihre Organisation",
+      "theme": {
+        "add": "Thema hinzufügen",
+        "addFirst": "Erstes Thema hinzufügen",
+        "empty": "Noch keine Themen konfiguriert",
+        "namePlaceholder": "Themenname eingeben",
+        "newTheme": "Neues Thema"
+      },
+      "chart": {
+        "chart-1": "Diagrammfarbe 1",
+        "chart-2": "Diagrammfarbe 2",
+        "chart-3": "Diagrammfarbe 3",
+        "chart-4": "Diagrammfarbe 4",
+        "chart-5": "Diagrammfarbe 5",
+        "chart-6": "Diagrammfarbe 6"
+      }
+    },
     "title": "Organisationen"
   },
   "organizationMembers": {

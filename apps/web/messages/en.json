@@ -658,6 +658,25 @@
       "updateSuccess": "Organization updated successfully"
     },
     "searchPlaceholder": "Search organizations...",
+    "settings": {
+      "title": "Organization Settings",
+      "description": "Configure chart colors and themes for your organization",
+      "theme": {
+        "add": "Add Theme",
+        "addFirst": "Add First Theme",
+        "empty": "No themes configured yet",
+        "namePlaceholder": "Enter theme name",
+        "newTheme": "New Theme"
+      },
+      "chart": {
+        "chart-1": "Chart Color 1",
+        "chart-2": "Chart Color 2",
+        "chart-3": "Chart Color 3",
+        "chart-4": "Chart Color 4",
+        "chart-5": "Chart Color 5",
+        "chart-6": "Chart Color 6"
+      }
+    },
     "title": "Organizations"
   },
   "organizationMembers": {
