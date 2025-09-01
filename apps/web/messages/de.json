@@ -301,7 +301,7 @@
     "upload": {
       "clickToUpload": "Zum Hochladen klicken",
       "orDragAndDrop": "oder per Drag & Drop ablegen",
-      "supportedFormats": "Unterstützte Formate: CSV, Excel, JSON (max. 100 MB)"
+      "supportedFormats": "Unterstützte Formate: .sav (SPSS) (max. 100 MB)"
     },
     "validation": {
       "files": {
@@ -452,7 +452,7 @@
   "chartMetricsCard": {
     "count": "Anzahl",
     "max": "Maximum",
-    "mean": "Mittelwert",
+    "mean": "Arithmetisches Mittel",
     "median": "Median",
     "min": "Minimum",
     "stdev": "Standardabweichung"

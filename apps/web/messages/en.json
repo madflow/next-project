@@ -301,7 +301,7 @@
     "upload": {
       "clickToUpload": "Click to upload",
       "orDragAndDrop": "or drag and drop",
-      "supportedFormats": "Supported formats: CSV, Excel, JSON (max 100MB)"
+      "supportedFormats": "Supported formats: .sav (SPSS) (max 100MB)"
     },
     "validation": {
       "files": {
