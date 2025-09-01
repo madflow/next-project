@@ -49,7 +49,7 @@ export function transformToRechartsPieData(variableConfig: DatasetVariable, stat
       value: item.value,
       count: item.counts,
       percentage: item.percentages,
-      fill: `var(--chart-${index + 1})`,
+      fill: `hsl(var(--chart-${(index % 6) + 1}))`,
     };
   });
 

@@ -658,6 +658,17 @@
       "updateSuccess": "Organisation erfolgreich aktualisiert"
     },
     "searchPlaceholder": "Organisationen durchsuchen...",
+    "settings": {
+      "description": "Konfigurieren Sie Diagrammfarben und Themen für Ihre Organisation",
+      "theme": {
+        "add": "Thema hinzufügen",
+        "addFirst": "Erstes Thema hinzufügen",
+        "empty": "Noch keine Themen konfiguriert",
+        "namePlaceholder": "Themenname eingeben",
+        "newTheme": "Neues Thema"
+      },
+      "title": "Organisationseinstellungen"
+    },
     "title": "Organisationen"
   },
   "organizationMembers": {
@@ -866,6 +877,7 @@
     "colorThemes": "Farben",
     "label": "Design",
     "labelSelect": "Design:",
+    "organizationThemes": "Organisationsthemes",
     "placeholder": "Design auswählen"
   },
   "themeToggle": {

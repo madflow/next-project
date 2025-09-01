@@ -658,6 +658,17 @@
       "updateSuccess": "Organization updated successfully"
     },
     "searchPlaceholder": "Search organizations...",
+    "settings": {
+      "description": "Configure chart colors and themes for your organization",
+      "theme": {
+        "add": "Add Theme",
+        "addFirst": "Add First Theme",
+        "empty": "No themes configured yet",
+        "namePlaceholder": "Enter theme name",
+        "newTheme": "New Theme"
+      },
+      "title": "Organization Settings"
+    },
     "title": "Organizations"
   },
   "organizationMembers": {
@@ -866,6 +877,7 @@
     "colorThemes": "Colors",
     "label": "Theme",
     "labelSelect": "Theme:",
+    "organizationThemes": "Organization Themes",
     "placeholder": "Select a theme"
   },
   "themeToggle": {

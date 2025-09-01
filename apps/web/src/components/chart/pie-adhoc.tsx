@@ -25,12 +25,15 @@ type PieAdhocProps = {
 export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
   const { ref, exportPNG } = useChartExport();
   const rechartsData = transformToRechartsPieData(variable, stats);
-  const chartConfig: Record<string, ChartConfig> = {};
+  const chartConfig: ChartConfig = {};
 
-  rechartsData.forEach((item) => {
+  // Create dynamic configuration that uses the chart color variables
+  rechartsData.forEach((item, index) => {
     const key: string = item.label;
+    const colorIndex = (index % 6) + 1; // Cycle through chart-1 to chart-6
     chartConfig[key] = {
       label: item.label,
+      color: `hsl(var(--chart-${colorIndex}))`,
     };
   });
 
@@ -43,7 +46,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel nameKey="label" />} />
-            <Pie data={rechartsData} dataKey="count" />
+            <Pie data={rechartsData} dataKey="count" nameKey="label" />
             <ChartLegend
               fontSize={10}
               content={<ChartLegendContent nameKey="label" />}

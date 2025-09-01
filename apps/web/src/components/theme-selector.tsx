@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useThemeConfig } from "@/components/active-theme";
+import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -73,6 +74,23 @@ export type ThemeSelectorProps = React.ComponentProps<"div">;
 export function ThemeSelector({ ...props }: ThemeSelectorProps) {
   const t = useTranslations("themeSelector");
   const { activeTheme, setActiveTheme } = useThemeConfig();
+  const { availableThemes } = useOrganizationTheme();
+  
+  // Get organization-specific themes (exclude the default ones that are duplicated)
+  const organizationThemes = availableThemes.filter(theme => {
+    const isDefaultTheme = DEFAULT_THEMES.some(defaultTheme => 
+      defaultTheme.name.toLowerCase() === theme.name.toLowerCase()
+    );
+    return !isDefaultTheme;
+  });
+
+  // Helper function to get display colors for org themes
+  const getThemeColors = (theme: typeof organizationThemes[0]) => {
+    if (!theme.chartColors) return null;
+    const colors = Object.values(theme.chartColors).slice(0, 3);
+    return colors.length > 0 ? colors : null;
+  };
+
   return (
     <div className={cn("flex w-full items-center gap-2", props.className)}>
       <Label htmlFor="theme-selector" className="sr-only">
@@ -98,10 +116,46 @@ export function ThemeSelector({ ...props }: ThemeSelectorProps) {
             <SelectLabel>{t("colorThemes")}</SelectLabel>
             {COLOR_THEMES.map((theme) => (
               <SelectItem key={theme.name} value={theme.value} className="data-[state=checked]:opacity-50">
-                {theme.name}
+                <div className="flex items-center gap-2">
+                  <div className={cn("h-3 w-3 rounded-full", theme.exampleClassName)} />
+                  {theme.name}
+                </div>
               </SelectItem>
             ))}
           </SelectGroup>
+          {organizationThemes.length > 0 && (
+            <>
+              <SelectSeparator />
+              <SelectGroup>
+                <SelectLabel>{t("organizationThemes")}</SelectLabel>
+                {organizationThemes.map((theme) => {
+                  const colors = getThemeColors(theme);
+                  return (
+                    <SelectItem 
+                      key={theme.name} 
+                      value={theme.name.toLowerCase()} 
+                      className="data-[state=checked]:opacity-50"
+                    >
+                      <div className="flex items-center gap-2">
+                        {colors && (
+                          <div className="flex gap-1">
+                            {colors.map((color, index) => (
+                              <div 
+                                key={index}
+                                className="h-3 w-3 rounded-full border border-gray-200" 
+                                style={{ backgroundColor: color }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                        {theme.name}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </>
+          )}
         </SelectContent>
       </Select>
     </div>

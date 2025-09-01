@@ -4,6 +4,7 @@ import {
   boolean,
   check,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -14,6 +15,15 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
+
+export type ThemeItem = {
+  name: string;
+  chartColors?: Record<string, string>;
+};
+
+export type OrganizationSettings = {
+  themes?: ThemeItem[];
+};
 
 export const user = pgTable(
   "users",
@@ -76,6 +86,7 @@ export const organization = pgTable(
     logo: text("logo"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
     metadata: text("metadata"),
+    settings: jsonb("settings").$type<OrganizationSettings>(),
   },
   (table) => [
     check("organization_slug_check", sql`${table.slug} ~ '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'`),
@@ -152,6 +163,18 @@ export const updateOrganizationSchema = createUpdateSchema(organization);
 export type CreateOrganizationData = z.infer<typeof insertOrganizationSchema>;
 export type Organization = z.infer<typeof selectOrganizationSchema>;
 export type UpdateOrganizationData = z.infer<typeof updateOrganizationSchema>;
+
+// Organization settings schemas
+export const themeItemSchema = z.object({
+  name: z.string(),
+  chartColors: z.record(z.string(), z.string()).optional(),
+});
+
+export const organizationSettingsSchema = z
+  .object({
+    themes: z.array(themeItemSchema).optional(),
+  })
+  .optional();
 
 export const insertMemberSchema = createInsertSchema(member);
 export const selectMemberSchema = createSelectSchema(member);
