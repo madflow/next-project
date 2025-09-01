@@ -13,7 +13,7 @@ import { Button } from "../ui/button";
 const chartConfig = {
   count: {
     label: "Anzahl",
-    color: "var(--chart-1)",
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
 

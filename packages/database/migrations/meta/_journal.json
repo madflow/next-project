@@ -15,6 +15,13 @@
       "when": 1754834239155,
       "tag": "0001_curious_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756798112089,
+      "tag": "0002_remarkable_hellcat",
+      "breakpoints": true
     }
   ]
 }
