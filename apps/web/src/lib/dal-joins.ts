@@ -36,18 +36,6 @@ export function createListWithJoins<TSchema extends ZodSchema>(
     // Create the base query with joins
     let query: DrizzleSelect = db.select().from(table).$dynamic();
 
-    if (filters) {
-      for (const filter of filters) {
-        const column = getTableColumns(table)[filter.column];
-        if (!column) {
-          continue;
-        }
-        if (filter.operator === "=" || filter.operator === "eq") {
-          query = query.where(eq(column, filter.value));
-        }
-      }
-    }
-
     // Apply joins
     for (const join of joins) {
       query = query.innerJoin(join.table, join.condition) as DrizzleSelect;
@@ -59,6 +47,19 @@ export function createListWithJoins<TSchema extends ZodSchema>(
     // Apply the same joins to the count query
     for (const join of joins) {
       countQuery = countQuery.innerJoin(join.table, join.condition) as DrizzleSelect;
+    }
+
+    if (filters) {
+      for (const filter of filters) {
+        const column = getTableColumns(table)[filter.column];
+        if (!column) {
+          continue;
+        }
+        if (filter.operator === "=" || filter.operator === "eq") {
+          query = query.where(eq(column, filter.value));
+          countQuery = countQuery.where(eq(column, filter.value));
+        }
+      }
     }
 
     // Apply search filters if provided

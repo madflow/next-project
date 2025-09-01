@@ -43,6 +43,10 @@ export async function hasAccess(projectId: string) {
     return false;
   }
 
+  if (user.role === "admin") {
+    return true;
+  }
+
   const db = await getAuthenticatedClient();
 
   const rows = await db
