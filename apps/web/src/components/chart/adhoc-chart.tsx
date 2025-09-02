@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartBarBigIcon, ChartColumnBigIcon, ChartPieIcon, DownloadIcon, BarChart3Icon } from "lucide-react";
+import { ChartBarBigIcon, ChartColumnBigIcon, ChartPieIcon, DownloadIcon, BarChart3Icon, SheetIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from "recharts";
@@ -20,6 +20,7 @@ import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
 import { MetricsCards } from "./metrics-cards";
+import { MeanBarAdhoc } from "./mean-bar-adhoc";
 
 type AdhocChartProps = {
   variable: DatasetVariable;
@@ -52,6 +53,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
       }
       availableCharts.push("metrics");
     } else if (variable.measure === "scale") {
+      availableCharts.push("meanBar");
       availableCharts.push("metrics");
     }
     
@@ -61,6 +63,8 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
   const availableChartTypes = getAvailableChartTypes(variable, stats);
   const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
     if (availableChartTypes.includes("horizontalBar")) return "horizontalBar";
+    if (availableChartTypes.includes("meanBar")) return "meanBar";
+    if (availableChartTypes.includes("metrics")) return "metrics";
     return availableChartTypes[0] || "horizontalBar";
   });
 
@@ -159,7 +163,10 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
       
       case "metrics":
         return <MetricsCards variable={variable} stats={stats} />;
-      
+
+      case "meanBar":
+        return <MeanBarAdhoc variable={variable} stats={stats} />;
+
       default:
         return null;
     }
@@ -174,49 +181,51 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
       case "pie":
         return <ChartPieIcon className="h-4 w-4" />;
       case "metrics":
-        return <BarChart3Icon className="h-4 w-4" />;
+        return <SheetIcon className="h-4 w-4" />;
+      case "meanBar":
+        return <ChartBarBigIcon className="h-4 w-4" />;
       default:
         return <BarChart3Icon className="h-4 w-4" />;
     }
   };
 
-  const getChartLabel = (chartType: AnalysisChartType) => {
-    switch (chartType) {
-      case "bar":
-        return "Bar";
-      case "horizontalBar":
-        return "Horizontal";
-      case "pie":
-        return "Pie";
-      case "metrics":
-        return "Metrics";
-      default:
-        return chartType;
-    }
-  };
-
-  if (selectedChartType === "metrics") {
+  if (selectedChartType === "metrics" || selectedChartType === "meanBar") {
     return (
-      <div {...props}>
-        {availableChartTypes.length > 1 && (
-          <div className="mb-4">
-            <ToggleGroup
-              type="single"
-              value={selectedChartType}
-              onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-              className="justify-start"
-            >
-              {availableChartTypes.map((chartType) => (
-                <ToggleGroupItem key={chartType} value={chartType} size="sm">
-                  {getChartIcon(chartType)}
-                  <span className="ml-2">{getChartLabel(chartType)}</span>
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
+      <Card className="shadow-xs" {...props}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>{variable.label ?? variable.name}</CardTitle>
+            {availableChartTypes.length > 1 && (
+              <ToggleGroup
+                type="single"
+                value={selectedChartType}
+                onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
+                size="sm"
+              >
+                {availableChartTypes.map((chartType) => (
+                  <ToggleGroupItem key={chartType} value={chartType}>
+                    {getChartIcon(chartType)}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            )}
           </div>
+        </CardHeader>
+        <CardContent>
+          {selectedChartType === "metrics" ? (
+            <MetricsCards variable={variable} stats={stats} renderAsContent />
+          ) : (
+            <MeanBarAdhoc variable={variable} stats={stats} renderAsContent />
+          )}
+        </CardContent>
+        {selectedChartType === "meanBar" && (
+          <CardFooter>
+            <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
+              <DownloadIcon className="h-4 w-4" />
+            </Button>
+          </CardFooter>
         )}
-        <MetricsCards variable={variable} stats={stats} />
-      </div>
+      </Card>
     );
   }
 
