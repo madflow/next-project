@@ -9,6 +9,7 @@ class StatisticsService:
         variable_name: str,
         include: list[str] | None = None,
         missing_values: list[str | int | float] | None = None,
+        value_labels: dict[str, str] | None = None,
     ):
         """
         Generates descriptive statistics for a single variable in a DataFrame based on a list of requested metrics.
@@ -23,6 +24,8 @@ class StatisticsService:
                      Possible values for all data types: 'mode', 'count'.
                      If None, a default set of statistics will be calculated based on the data type.
             missing_values: A list of values to replace with NaN.
+            value_labels: A dictionary mapping values to labels. All keys from this dict (except those in missing_values)
+                         will be included in the frequency table, even if they have 0 counts.
 
         Returns:
             A dictionary containing the requested descriptive statistics.
@@ -116,20 +119,86 @@ class StatisticsService:
 
             # Convert to records while preserving original string representation
             frequency_records = []
-            for _, row in frequency_table_df.iterrows():
-                value = row["value"]
-
-                # Always preserve as string to maintain exact format (e.g., "1.0" stays "1.0")
-                value = str(value) if pd.notna(value) == True else value
-
-                frequency_records.append(
-                    {
-                        "value": value,
+            
+            # If value_labels are provided, ensure all valid labels are included
+            if value_labels is not None:
+                # Get the missing values for filtering
+                missing_set = set()
+                if missing_values is not None:
+                    # Convert missing values to their various string representations for comparison
+                    numeric_missing_values = self._convert_to_numeric_missing_values(missing_values)
+                    for mv in numeric_missing_values:
+                        # Add both integer and float string representations
+                        missing_set.add(str(mv))
+                        missing_set.add(str(float(mv)))
+                        if isinstance(mv, int):
+                            missing_set.add(f"{mv}.0")
+                        elif isinstance(mv, float) and mv.is_integer():
+                            missing_set.add(str(int(mv)))
+                
+                # Create a set of all valid label keys (excluding missing values)
+                valid_label_keys = set()
+                for key in value_labels.keys():
+                    if key not in missing_set:
+                        valid_label_keys.add(key)
+                
+                # Create a mapping from actual values
+                value_to_data = {}
+                
+                # First, add all values that appear in the data
+                for _, row in frequency_table_df.iterrows():
+                    value = row["value"]
+                    try:
+                        value_str = str(value) if pd.notna(value).item() else value
+                    except (AttributeError, ValueError):
+                        value_str = str(value)
+                    
+                    value_to_data[value_str] = {
                         "counts": int(row["counts"]),
-                        "percentages": float(row["percentages"]),
+                        "percentages": float(row["percentages"])
                     }
-                )
+                
+                # Then, add all valid label keys with 0 counts if they don't exist
+                for label_key in valid_label_keys:
+                    if label_key not in value_to_data:
+                        value_to_data[label_key] = {
+                            "counts": 0,
+                            "percentages": 0.0
+                        }
+                
+                # Convert to frequency records
+                for value_str, data in value_to_data.items():
+                    frequency_records.append({
+                        "value": value_str,
+                        "counts": data["counts"],
+                        "percentages": data["percentages"],
+                    })
+            else:
+                # Original behavior when no value_labels are provided
+                for _, row in frequency_table_df.iterrows():
+                    value = row["value"]
+                    # Always preserve as string to maintain exact format (e.g., "1.0" stays "1.0")
+                    try:
+                        value = str(value) if pd.notna(value).item() else value
+                    except (AttributeError, ValueError):
+                        value = str(value)
 
+                    frequency_records.append(
+                        {
+                            "value": value,
+                            "counts": int(row["counts"]),
+                            "percentages": float(row["percentages"]),
+                        }
+                    )
+            
+            # Sort frequency records by value (numeric first, then string)
+            def sort_key(item):
+                try:
+                    return (0, float(item["value"]))  # Numeric values get priority
+                except (ValueError, TypeError):
+                    return (1, str(item["value"]))   # String values come after numbers
+            
+            frequency_records.sort(key=sort_key)
             stats["frequency_table"] = frequency_records
 
         return stats

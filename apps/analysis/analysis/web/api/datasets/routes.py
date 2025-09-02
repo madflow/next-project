@@ -233,7 +233,8 @@ async def get_dataset_stats(
                 stats = stats_service.describe_var(
                     df,
                     var_request.variable,
-                    missing_values=dataset_variable.missing_values,
+                    missing_values=dataset_variable.missing_values,  # type: ignore
+                    value_labels=dataset_variable.value_labels,  # type: ignore
                 )
                 results.append({"variable": var_request.variable, "stats": stats})
             except ValueError as e:

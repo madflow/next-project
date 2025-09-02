@@ -223,3 +223,173 @@ def test_variable_not_found(stats_service):
     df = pd.DataFrame({"a": [1, 2, 3]})
     with pytest.raises(ValueError, match="Variable 'b' not found in the DataFrame."):
         stats_service.describe_var(df, "b")
+
+
+def test_frequency_table_with_value_labels_includes_all_valid_labels(stats_service):
+    """Test that frequency table includes all value labels except missing values."""
+    # Create test data with only some of the labeled values present
+    df = pd.DataFrame({
+        "rating": [1.0, 2.0, 2.0, 3.0, -998.0, -999.0]  # Missing 4.0 and 5.0
+    })
+    
+    value_labels = {
+        "1.0": "sehr gut",
+        "2.0": "gut", 
+        "3.0": "mittelmäßig",
+        "4.0": "schlecht",      # This value is not present in data
+        "5.0": "sehr schlecht", # This value is not present in data
+        "-998.0": "keine Angabe",
+        "-999.0": "Frage nicht gesehen"
+    }
+    
+    missing_values = ["-999", "-998"]
+    
+    result = stats_service.describe_var(
+        df, 
+        "rating", 
+        include=["frequencies"],
+        missing_values=missing_values,
+        value_labels=value_labels
+    )
+    
+    frequency_table = result["frequency_table"]
+    
+    # Extract values from frequency table
+    frequency_values = {item["value"] for item in frequency_table}
+    
+    # Should include all valid labels (1.0, 2.0, 3.0, 4.0, 5.0) but not missing values
+    expected_values = {"1.0", "2.0", "3.0", "4.0", "5.0"}
+    
+    # Check that all expected values are present
+    assert expected_values.issubset(frequency_values), f"Missing expected values. Got: {frequency_values}"
+    
+    # Check that missing values are not included
+    assert "-998.0" not in frequency_values, "Missing value -998.0 should not be in frequency table"
+    assert "-999.0" not in frequency_values, "Missing value -999.0 should not be in frequency table"
+    
+    # Check specific counts and percentages
+    freq_dict = {item["value"]: item for item in frequency_table}
+    
+    # Values present in data should have correct counts
+    assert freq_dict["1.0"]["counts"] == 1
+    assert freq_dict["2.0"]["counts"] == 2
+    assert freq_dict["3.0"]["counts"] == 1
+    
+    # Values not present in data should have 0 counts
+    assert freq_dict["4.0"]["counts"] == 0
+    assert freq_dict["5.0"]["counts"] == 0
+    
+    # Check percentages (based on 4 valid values: 1.0, 2.0, 2.0, 3.0)
+    assert freq_dict["1.0"]["percentages"] == pytest.approx(25.0)  # 1/4 * 100
+    assert freq_dict["2.0"]["percentages"] == pytest.approx(50.0)  # 2/4 * 100
+    assert freq_dict["3.0"]["percentages"] == pytest.approx(25.0)  # 1/4 * 100
+    assert freq_dict["4.0"]["percentages"] == pytest.approx(0.0)
+    assert freq_dict["5.0"]["percentages"] == pytest.approx(0.0)
+
+
+def test_frequency_table_includes_values_not_in_labels(stats_service):
+    """Test that frequency table includes values present in data but not in value_labels."""
+    # Create test data with a value not in labels
+    df = pd.DataFrame({
+        "rating": [1.0, 2.0, 6.0]  # 6.0 is not in value_labels
+    })
+    
+    value_labels = {
+        "1.0": "sehr gut",
+        "2.0": "gut",
+        "3.0": "mittelmäßig"  # 3.0 is not present in data
+    }
+    
+    result = stats_service.describe_var(
+        df, 
+        "rating", 
+        include=["frequencies"],
+        value_labels=value_labels
+    )
+    
+    frequency_table = result["frequency_table"]
+    frequency_values = {item["value"] for item in frequency_table}
+    
+    # Should include all labeled values and the extra value from data
+    expected_values = {"1.0", "2.0", "3.0", "6.0"}
+    assert frequency_values == expected_values
+    
+    # Check counts
+    freq_dict = {item["value"]: item for item in frequency_table}
+    assert freq_dict["1.0"]["counts"] == 1
+    assert freq_dict["2.0"]["counts"] == 1
+    assert freq_dict["3.0"]["counts"] == 0  # Not in data but in labels
+    assert freq_dict["6.0"]["counts"] == 1  # In data but not in labels
+
+
+def test_frequency_table_without_value_labels_unchanged(stats_service):
+    """Test that frequency table behavior is unchanged when value_labels is None."""
+    df = pd.DataFrame({
+        "rating": [1.0, 2.0, 2.0, 3.0]
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "rating", 
+        include=["frequencies"]
+    )
+    
+    frequency_table = result["frequency_table"]
+    frequency_values = {item["value"] for item in frequency_table}
+    
+    # Should only include values present in data
+    expected_values = {"1.0", "2.0", "3.0"}
+    assert frequency_values == expected_values
+    
+    # Check that all entries have non-zero counts
+    for item in frequency_table:
+        assert item["counts"] > 0
+
+
+def test_frequency_table_is_sorted_by_value_ascending(stats_service):
+    """Test that frequency table is sorted by value in ascending order."""
+    df = pd.DataFrame({
+        "rating": [5.0, 1.0, 3.0, 2.0, 1.0]  # Unsorted data
+    })
+    
+    value_labels = {
+        "1.0": "sehr gut",
+        "2.0": "gut", 
+        "3.0": "mittelmäßig",
+        "4.0": "schlecht",      # Not present in data
+        "5.0": "sehr schlecht"
+    }
+    
+    result = stats_service.describe_var(
+        df, 
+        "rating", 
+        include=["frequencies"],
+        value_labels=value_labels
+    )
+    
+    frequency_table = result["frequency_table"]
+    values = [item["value"] for item in frequency_table]
+    
+    # Should be sorted: 1.0, 2.0, 3.0, 4.0, 5.0
+    expected_order = ["1.0", "2.0", "3.0", "4.0", "5.0"]
+    assert values == expected_order, f"Expected {expected_order}, got {values}"
+
+
+def test_frequency_table_sorted_without_value_labels(stats_service):
+    """Test that frequency table is sorted even without value_labels."""
+    df = pd.DataFrame({
+        "rating": [5.0, 1.0, 3.0, 2.0]  # Unsorted data
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "rating", 
+        include=["frequencies"]
+    )
+    
+    frequency_table = result["frequency_table"]
+    values = [item["value"] for item in frequency_table]
+    
+    # Should be sorted: 1.0, 2.0, 3.0, 5.0
+    expected_order = ["1.0", "2.0", "3.0", "5.0"]
+    assert values == expected_order, f"Expected {expected_order}, got {values}"
