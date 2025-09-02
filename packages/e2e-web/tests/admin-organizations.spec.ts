@@ -25,7 +25,7 @@ test.describe("Admin organizations", () => {
     await expect(page.getByTestId("admin.organizations.new.page")).toBeVisible();
     await page.getByTestId("admin.organizations.new.form.name").fill(newOrganization.name);
     await page.getByTestId("admin.organizations.new.form.slug").fill(newOrganization.slug);
-    await page.getByTestId("theme-name-0").fill("Company Theme");
+    await page.getByTestId("theme-name-0").fill("CompanyTheme");
     await page.getByTestId("theme-color-0-chart-1").fill("#eeeeee");
 
     // Submit the form and wait for the response
@@ -34,7 +34,7 @@ test.describe("Admin organizations", () => {
     await expect(page.getByTestId("admin.organizations.page")).toBeVisible();
     await page.getByTestId(`admin.organizations.list.edit-${newOrganization.slug}`).click();
     await expect(page.getByTestId("admin.organizations.edit.page")).toBeVisible();
-    await expect(page.getByTestId("theme-name-0")).toHaveValue("Company Theme");
+    await expect(page.getByTestId("theme-name-0")).toHaveValue("CompanyTheme");
     await expect(page.getByTestId("theme-color-0-chart-1")).toHaveValue("#eeeeee");
     await page.getByTestId("admin.organizations.edit.form.name").fill(editOrganization.name);
     await page.getByTestId("admin.organizations.edit.form.slug").fill(editOrganization.slug);
