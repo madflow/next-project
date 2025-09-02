@@ -28,7 +28,7 @@ export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, tr
 
   if (isLoading) {
     return (
-      <Select disabled>
+      <Select disabled value={selectedValue}>
         <SelectTrigger {...triggerProps} data-testid="app.dropdown.dataset.loading">
           <SelectValue placeholder={t("loadingDatasets")} />
         </SelectTrigger>
@@ -38,7 +38,7 @@ export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, tr
 
   if (isError) {
     return (
-      <Select disabled>
+      <Select disabled value={selectedValue}>
         <SelectTrigger data-testid="app.dropdown.dataset.error">
           <SelectValue placeholder={t("errorLoading")} />
         </SelectTrigger>
@@ -48,7 +48,7 @@ export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, tr
 
   if (!data?.rows || data.rows.length === 0) {
     return (
-      <Select disabled>
+      <Select disabled value={selectedValue}>
         <SelectTrigger data-testid="app.dropdown.dataset.empty">
           <SelectValue placeholder={t("noDatasets")} />
         </SelectTrigger>
