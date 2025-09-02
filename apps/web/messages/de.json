@@ -455,6 +455,7 @@
     "mean": "Arithmetisches Mittel",
     "median": "Median",
     "min": "Minimum",
+    "percent": "Prozent",
     "stdev": "Standardabweichung"
   },
   "dataset": {

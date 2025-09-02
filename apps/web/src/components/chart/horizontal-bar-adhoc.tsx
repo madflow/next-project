@@ -1,6 +1,7 @@
 "use client";
 
 import { DownloadIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -10,20 +11,22 @@ import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
 
-const chartConfig = {
-  count: {
-    label: "Anzahl",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig;
-
 type BarAdhocProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
+  const t = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
+  
+  const chartConfig = {
+    percentage: {
+      label: t("percent"),
+      color: "hsl(var(--chart-1))",
+    },
+  } satisfies ChartConfig;
+
   return (
     <Card className="shadow-xs" {...props}>
       <CardHeader>
@@ -40,7 +43,7 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
             accessibilityLayer
             data={transformToRechartsBarData(variable, stats)}>
             <CartesianGrid vertical={true} horizontal={false} />
-            <XAxis dataKey="count" type="number" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
+            <XAxis domain={[0, 100]} dataKey="percentage" type="number" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} tickFormatter={(value) => `${value}%`} />
             <YAxis
               dataKey="label"
               type="category"
@@ -50,7 +53,7 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
               fontSize={10}
               width={200}
             />
-            <Bar dataKey="count" fill="var(--color-count)" radius={5} />
+            <Bar dataKey="percentage" fill="var(--color-percentage)" radius={5} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
           </BarChart>
         </ChartContainer>

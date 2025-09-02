@@ -455,6 +455,7 @@
     "mean": "Mean",
     "median": "Median",
     "min": "Min",
+    "percent": "Percent",
     "stdev": "Stdev"
   },
   "dataset": {

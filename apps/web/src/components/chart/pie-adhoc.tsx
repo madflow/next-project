@@ -47,8 +47,8 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
       <CardContent>
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel nameKey="label" />} />
-            <Pie data={rechartsData} dataKey="count" nameKey="label" startAngle={90} endAngle={-270} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
+            <Pie data={rechartsData} dataKey="percentage" nameKey="label" startAngle={90} endAngle={-270} />
             <ChartLegend
               fontSize={10}
               content={<ChartLegendContent nameKey="label" />}
