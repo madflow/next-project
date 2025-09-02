@@ -665,6 +665,7 @@
         "addFirst": "Add First Theme",
         "empty": "No themes configured yet",
         "namePlaceholder": "Enter theme name",
+        "nameHelp": "Only letters, numbers, hyphens (-), and underscores (_) are allowed. Spaces will be converted to hyphens.",
         "newTheme": "New Theme"
       },
       "title": "Organization Settings"
