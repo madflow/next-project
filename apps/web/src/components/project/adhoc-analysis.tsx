@@ -7,12 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
-import { AnalysisChartType, StatsRequest } from "@/types/stats";
-import { BarAdhoc } from "../chart/bar-adhoc";
+import { StatsRequest } from "@/types/stats";
+import { AdhocChart } from "../chart/adhoc-chart";
 import BarSkeleton from "../chart/bar-skeleton";
-import { HorizontalBarAdhoc } from "../chart/horizontal-bar-adhoc";
-import { MetricsCards } from "../chart/metrics-cards";
-import { PieAdhoc } from "../chart/pie-adhoc";
 import { ThemeSelector } from "../theme-selector";
 import { Code } from "../ui/code";
 import { AdHocVariables } from "./adhoc-variables";
@@ -24,32 +21,6 @@ type AdHocAnalysisProps = {
 export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
   const [selectedVariable, setSelectedVariable] = useState<DatasetVariable | null>(null);
-
-  function supportsChart(chartType: AnalysisChartType, variable: DatasetVariable): boolean {
-    const supportedCharts: AnalysisChartType[] = [];
-    const valueKeys = Object.keys(variable.valueLabels ?? {});
-    if (variable.measure === "nominal") {
-      supportedCharts.push("horizontalBar");
-      if (valueKeys.length <= 7) {
-        supportedCharts.push("bar");
-        supportedCharts.push("pie");
-      }
-    } else if (variable.measure === "ordinal") {
-      supportedCharts.push("horizontalBar");
-      if (valueKeys.length <= 7) {
-        supportedCharts.push("bar");
-        supportedCharts.push("pie");
-      }
-      supportedCharts.push("metrics");
-    } else if (variable.measure === "scale") {
-      supportedCharts.push("metrics");
-    }
-    if (supportedCharts.includes(chartType)) {
-      return true;
-    }
-
-    return false;
-  }
 
   const t = useTranslations("projectAdhocAnalysis");
 
@@ -94,18 +65,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
           </TabsList>
           <TabsContent value="chart" className="flex flex-col gap-4">
-            {supportsChart("bar", selectedVariable) && (
-              <BarAdhoc className="w-[600px]" variable={selectedVariable} stats={data} />
-            )}
-            {supportsChart("horizontalBar", selectedVariable) && (
-              <HorizontalBarAdhoc className="w-[600px]" variable={selectedVariable} stats={data} />
-            )}
-            {supportsChart("pie", selectedVariable) && (
-              <PieAdhoc className="w-[600px]" variable={selectedVariable} stats={data} />
-            )}
-            {supportsChart("metrics", selectedVariable) && (
-              <MetricsCards className="w-[600px]" variable={selectedVariable} stats={data} />
-            )}
+            <AdhocChart className="w-[600px]" variable={selectedVariable} stats={data} />
           </TabsContent>
           <TabsContent value="variable">
             <Code>{JSON.stringify(selectedVariable, null, 2)}</Code>
