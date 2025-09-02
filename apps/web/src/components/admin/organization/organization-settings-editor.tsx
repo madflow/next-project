@@ -31,7 +31,7 @@ export function OrganizationSettingsEditor({
 
   const addTheme = () => {
     const newTheme: ThemeItem = {
-      name: `${t("organization.settings.theme.newTheme")} ${themes.length + 1}`,
+      name: `new-theme-${themes.length + 1}`,
       chartColors: { ...DEFAULT_THEME.chartColors },
     };
     updateSettings([...themes, newTheme]);
@@ -50,7 +50,11 @@ export function OrganizationSettingsEditor({
   const updateThemeName = (index: number, name: string) => {
     const theme = themes[index];
     if (theme) {
-      updateTheme(index, { ...theme, name });
+      // Allow A-Za-z0-9, hyphens, and underscores. Replace spaces with hyphens and remove other invalid characters
+      const sanitizedName = name
+        .replace(/\s+/g, '-')           // Replace spaces with hyphens
+        .replace(/[^A-Za-z0-9\-_]/g, ''); // Remove any characters that aren't A-Za-z0-9, -, or _
+      updateTheme(index, { ...theme, name: sanitizedName });
     }
   };
 
@@ -91,13 +95,18 @@ export function OrganizationSettingsEditor({
                   {readOnly ? (
                     theme.name
                   ) : (
-                    <Input
-                      value={theme.name}
-                      onChange={(e) => updateThemeName(themeIndex, e.target.value)}
-                      placeholder={t("organization.settings.theme.namePlaceholder")}
-                      className="max-w-xs"
-                      data-testid={`theme-name-${themeIndex}`}
-                    />
+                    <div className="space-y-1">
+                      <Input
+                        value={theme.name}
+                        onChange={(e) => updateThemeName(themeIndex, e.target.value)}
+                        placeholder={t("organization.settings.theme.namePlaceholder")}
+                        className="max-w-xs"
+                        data-testid={`theme-name-${themeIndex}`}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {t("organization.settings.theme.nameHelp")}
+                      </p>
+                    </div>
                   )}
                 </CardTitle>
                 {!readOnly && themes.length > 1 && (

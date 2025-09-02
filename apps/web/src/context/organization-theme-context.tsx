@@ -140,7 +140,13 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
 
   const availableThemes = useMemo(() => {
     const organizationThemes = organizationWithSettings?.settings?.themes || [];
-    return [...DEFAULT_THEMES, ...organizationThemes];
+    const sanitizedOrganizationThemes = organizationThemes.map(theme => ({
+      ...theme,
+      name: theme.name
+        .replace(/\s+/g, '-')           // Replace spaces with hyphens
+        .replace(/[^A-Za-z0-9\-_]/g, '') // Remove any characters that aren't A-Za-z0-9, -, or _
+    }));
+    return [...DEFAULT_THEMES, ...sanitizedOrganizationThemes];
   }, [organizationWithSettings?.settings?.themes]);
 
   const getThemeByName = (name: string): ThemeItem | null => {
@@ -158,18 +164,36 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
   const getColorThemes = () => COLOR_THEME_MAPPINGS;
 
   const resolveTheme = (activeThemeName: string) => {
-    // First check if it's an organization theme
+    const sanitizedActiveThemeName = activeThemeName
+      .replace(/\s+/g, '-')           // Replace spaces with hyphens
+      .replace(/[^A-Za-z0-9\-_]/g, ''); // Remove any characters that aren't A-Za-z0-9, -, or _
+    
+    // First check if it's an organization theme (try both original and sanitized names)
     const orgTheme = organizationWithSettings?.settings?.themes?.find(
-      (theme: ThemeItem) => theme.name.toLowerCase() === activeThemeName.toLowerCase()
+      (theme: ThemeItem) => {
+        const themeName = theme.name
+          .replace(/\s+/g, '-')
+          .replace(/[^A-Za-z0-9\-_]/g, '');
+        return themeName === sanitizedActiveThemeName || 
+               theme.name.toLowerCase() === activeThemeName.toLowerCase();
+      }
     );
     
     if (orgTheme) {
-      return { theme: orgTheme, isOrganizationTheme: true };
+      return { 
+        theme: { 
+          ...orgTheme, 
+          name: orgTheme.name
+            .replace(/\s+/g, '-')
+            .replace(/[^A-Za-z0-9\-_]/g, '')
+        }, 
+        isOrganizationTheme: true 
+      };
     }
 
     // Check default themes
     const defaultTheme = DEFAULT_THEMES.find(
-      theme => theme.name.toLowerCase() === activeThemeName.toLowerCase()
+      theme => theme.name.toLowerCase() === sanitizedActiveThemeName.toLowerCase()
     );
     
     if (defaultTheme) {
@@ -177,7 +201,7 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
     }
 
     // Check color theme mappings
-    const colorTheme = COLOR_THEME_MAPPINGS[activeThemeName];
+    const colorTheme = COLOR_THEME_MAPPINGS[sanitizedActiveThemeName.toLowerCase()];
     if (colorTheme) {
       return { theme: colorTheme, isOrganizationTheme: false };
     }

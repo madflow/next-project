@@ -665,6 +665,7 @@
         "addFirst": "Erstes Thema hinzufügen",
         "empty": "Noch keine Themen konfiguriert",
         "namePlaceholder": "Themenname eingeben",
+        "nameHelp": "Nur Buchstaben, Zahlen, Bindestriche (-) und Unterstriche (_) sind erlaubt. Leerzeichen werden in Bindestriche umgewandelt.",
         "newTheme": "Neues Thema"
       },
       "title": "Organisationseinstellungen"
