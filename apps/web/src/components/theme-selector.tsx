@@ -12,7 +12,6 @@ import {
   SelectLabel,
   SelectSeparator,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
@@ -91,6 +90,23 @@ export function ThemeSelector({ ...props }: ThemeSelectorProps) {
     return colors.length > 0 ? colors : null;
   };
 
+  // Helper function to get the display name for the selected theme
+  const getSelectedThemeName = () => {
+    // Check default themes
+    const defaultTheme = DEFAULT_THEMES.find(theme => theme.value === activeTheme);
+    if (defaultTheme) return defaultTheme.name;
+    
+    // Check color themes
+    const colorTheme = COLOR_THEMES.find(theme => theme.value === activeTheme);
+    if (colorTheme) return colorTheme.name;
+    
+    // Check organization themes
+    const orgTheme = organizationThemes.find(theme => theme.name.toLowerCase() === activeTheme);
+    if (orgTheme) return orgTheme.name;
+    
+    return null;
+  };
+
   return (
     <div className={cn("flex w-full items-center gap-2", props.className)}>
       <Label htmlFor="theme-selector" className="sr-only">
@@ -100,7 +116,7 @@ export function ThemeSelector({ ...props }: ThemeSelectorProps) {
         <SelectTrigger id="theme-selector" className="w-full">
           <div className="flex justify-start gap-2">
             <span className="font-light">{t("labelSelect")}</span>
-            <SelectValue placeholder={t("placeholder")} />
+            <span>{getSelectedThemeName() || t("placeholder")}</span>
           </div>
         </SelectTrigger>
         <SelectContent align="end">
