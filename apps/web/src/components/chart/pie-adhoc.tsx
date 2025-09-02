@@ -37,6 +37,8 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
     };
   });
 
+  console.log(rechartsData);
+
   return (
     <Card className="shadow-xs" {...props}>
       <CardHeader>
@@ -46,7 +48,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel nameKey="label" />} />
-            <Pie data={rechartsData} dataKey="count" nameKey="label" />
+            <Pie data={rechartsData} dataKey="count" nameKey="label" startAngle={90} endAngle={-270} />
             <ChartLegend
               fontSize={10}
               content={<ChartLegendContent nameKey="label" />}
