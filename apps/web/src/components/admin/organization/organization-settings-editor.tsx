@@ -7,40 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-// Types from database schema
-type ThemeItem = {
-  name: string;
-  chartColors?: Record<string, string>;
-};
-
-type OrganizationSettings = {
-  themes?: ThemeItem[];
-};
+import { type OrganizationSettings, ThemeItem } from "@/types/organization";
+import { DEFAULT_THEME } from "./defaults";
 
 type OrganizationSettingsEditorProps = {
-  initialSettings?: OrganizationSettings;
-  onChangeAction?: (settings: OrganizationSettings) => void;
+  initialSettings?: OrganizationSettings | null;
+  onChangeAction: (settings: OrganizationSettings) => void;
   readOnly?: boolean;
 };
-
-const defaultChartColors: Record<string, string> = {
-  "chart-1": "#3b82f6",
-  "chart-2": "#ef4444", 
-  "chart-3": "#10b981",
-  "chart-4": "#f59e0b",
-  "chart-5": "#8b5cf6",
-  "chart-6": "#ec4899",
-};
-
-const getDefaultOrganizationSettings = (): OrganizationSettings => ({
-  themes: [
-    {
-      name: "Default",
-      chartColors: { ...defaultChartColors },
-    },
-  ],
-});
 
 export function OrganizationSettingsEditor({
   initialSettings,
@@ -48,19 +22,17 @@ export function OrganizationSettingsEditor({
   readOnly = false,
 }: OrganizationSettingsEditorProps) {
   const t = useTranslations();
-  const [themes, setThemes] = useState<ThemeItem[]>(
-    initialSettings?.themes || getDefaultOrganizationSettings().themes || []
-  );
+  const [themes, setThemes] = useState<ThemeItem[]>(initialSettings?.themes || [DEFAULT_THEME] || []);
 
   const updateSettings = (newThemes: ThemeItem[]) => {
     setThemes(newThemes);
-    onChangeAction?.({ themes: newThemes });
+    onChangeAction({ themes: newThemes });
   };
 
   const addTheme = () => {
     const newTheme: ThemeItem = {
       name: `${t("organization.settings.theme.newTheme")} ${themes.length + 1}`,
-      chartColors: { ...defaultChartColors },
+      chartColors: { ...DEFAULT_THEME.chartColors },
     };
     updateSettings([...themes, newTheme]);
   };
@@ -100,13 +72,11 @@ export function OrganizationSettingsEditor({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-medium">{t("organization.settings.title")}</h3>
-          <p className="text-sm text-muted-foreground">
-            {t("organization.settings.description")}
-          </p>
+          <p className="text-muted-foreground text-sm">{t("organization.settings.description")}</p>
         </div>
         {!readOnly && (
           <Button onClick={addTheme} size="sm" className="cursor-pointer">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             {t("organization.settings.theme.add")}
           </Button>
         )}
@@ -126,6 +96,7 @@ export function OrganizationSettingsEditor({
                       onChange={(e) => updateThemeName(themeIndex, e.target.value)}
                       placeholder={t("organization.settings.theme.namePlaceholder")}
                       className="max-w-xs"
+                      data-testid={`theme-name-${themeIndex}`}
                     />
                   )}
                 </CardTitle>
@@ -141,13 +112,13 @@ export function OrganizationSettingsEditor({
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {colorKeys.map((colorKey) => {
-                  const currentColor = theme.chartColors?.[colorKey] || defaultChartColors[colorKey];
+                  const currentColor = theme.chartColors?.[colorKey] || DEFAULT_THEME.chartColors?.[colorKey];
                   return (
                     <div key={colorKey} className="space-y-2">
                       <Label htmlFor={`${themeIndex}-${colorKey}`} className="text-sm font-medium">
-                        {t(`organization.settings.chart.${colorKey}` as any)}
+                        {colorKey}
                       </Label>
                       <div className="flex items-center space-x-2">
                         <input
@@ -156,10 +127,11 @@ export function OrganizationSettingsEditor({
                           value={currentColor}
                           onChange={(e) => updateThemeColor(themeIndex, colorKey, e.target.value)}
                           disabled={readOnly}
-                          className="h-8 w-8 rounded border border-input cursor-pointer disabled:cursor-not-allowed"
+                          className="border-input h-8 w-8 cursor-pointer rounded border disabled:cursor-not-allowed"
                         />
                         <Input
                           value={currentColor}
+                          data-testid={`theme-color-${themeIndex}-${colorKey}`}
                           onChange={(e) => updateThemeColor(themeIndex, colorKey, e.target.value)}
                           placeholder="#000000"
                           className="flex-1 font-mono text-sm"
@@ -178,12 +150,10 @@ export function OrganizationSettingsEditor({
       {themes.length === 0 && (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">
-              {t("organization.settings.theme.empty")}
-            </p>
+            <p className="text-muted-foreground">{t("organization.settings.theme.empty")}</p>
             {!readOnly && (
               <Button onClick={addTheme} className="mt-4 cursor-pointer">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="mr-2 h-4 w-4" />
                 {t("organization.settings.theme.addFirst")}
               </Button>
             )}

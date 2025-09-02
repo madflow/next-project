@@ -162,6 +162,17 @@ export const auth = betterAuth({
   plugins: [
     adminPlugin(),
     organizationPlugin({
+      schema: {
+        organization: {
+          additionalFields: {
+            settings: {
+              type: "string",
+              required: false,
+              input: false,
+            },
+          },
+        },
+      },
       async sendInvitationEmail(data) {
         const inviteLink = `${env.BASE_URL}/auth/accept-invitation/${data.invitation.id}`;
         const { heading, content, action } = getEmailMessage("emailInvitation", "en", {

@@ -16,7 +16,6 @@ import {
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Organization settings types
 export type ThemeItem = {
   name: string;
   chartColors?: Record<string, string>;
@@ -171,26 +170,11 @@ export const themeItemSchema = z.object({
   chartColors: z.record(z.string(), z.string()).optional(),
 });
 
-export const organizationSettingsSchema = z.object({
-  themes: z.array(themeItemSchema).optional(),
-}).optional();
-
-// Default organization settings
-export const getDefaultOrganizationSettings = (): OrganizationSettings => ({
-  themes: [
-    {
-      name: "Default",
-      chartColors: {
-        "chart-1": "#3b82f6", // blue-500
-        "chart-2": "#ef4444", // red-500  
-        "chart-3": "#10b981", // emerald-500
-        "chart-4": "#f59e0b", // amber-500
-        "chart-5": "#8b5cf6", // violet-500
-        "chart-6": "#ec4899", // pink-500
-      },
-    },
-  ],
-});
+export const organizationSettingsSchema = z
+  .object({
+    themes: z.array(themeItemSchema).optional(),
+  })
+  .optional();
 
 export const insertMemberSchema = createInsertSchema(member);
 export const selectMemberSchema = createSelectSchema(member);
