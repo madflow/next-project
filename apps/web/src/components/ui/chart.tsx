@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
-import { cn } from "@/lib/utils";
-import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { ChartThemeContext } from "@/components/active-theme";
+import { useOrganizationTheme } from "@/context/organization-theme-context";
+import { cn } from "@/lib/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -66,13 +66,13 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const { resolveTheme } = useOrganizationTheme();
   const activeThemeName = React.useContext(ChartThemeContext);
   const { theme: activeTheme } = resolveTheme(activeThemeName);
-  
+
   const colorConfig = Object.entries(config).filter(([, config]) => config.theme || config.color);
 
   // Convert hex to hsl for CSS variables
   const hexToHsl = (hex: string) => {
-    if (!hex.startsWith('#')) return hex; // Return as-is if not hex
-    
+    if (!hex.startsWith("#")) return hex; // Return as-is if not hex
+
     const r = parseInt(hex.slice(1, 3), 16) / 255;
     const g = parseInt(hex.slice(3, 5), 16) / 255;
     const b = parseInt(hex.slice(5, 7), 16) / 255;
@@ -88,9 +88,15 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
       switch (max) {
-        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / d + 2; break;
-        case b: h = (r - g) / d + 4; break;
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
       }
       h! /= 6;
     }
@@ -107,37 +113,43 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${[
   // Default chart colors (chart-1 to chart-6) - can be overridden by organization themes
-  ...(theme === 'light' ? [
-    `  --chart-1: ${activeTheme?.chartColors?.['chart-1'] ? hexToHsl(activeTheme.chartColors['chart-1']) : '220 70% 50%'};`,
-    `  --chart-2: ${activeTheme?.chartColors?.['chart-2'] ? hexToHsl(activeTheme.chartColors['chart-2']) : '160 60% 45%'};`,
-    `  --chart-3: ${activeTheme?.chartColors?.['chart-3'] ? hexToHsl(activeTheme.chartColors['chart-3']) : '30 80% 55%'};`,
-    `  --chart-4: ${activeTheme?.chartColors?.['chart-4'] ? hexToHsl(activeTheme.chartColors['chart-4']) : '280 65% 60%'};`,
-    `  --chart-5: ${activeTheme?.chartColors?.['chart-5'] ? hexToHsl(activeTheme.chartColors['chart-5']) : '340 75% 55%'};`,
-    `  --chart-6: ${activeTheme?.chartColors?.['chart-6'] ? hexToHsl(activeTheme.chartColors['chart-6']) : '200 65% 50%'};`,
-  ] : [
-    `  --chart-1: ${activeTheme?.chartColors?.['chart-1'] ? hexToHsl(activeTheme.chartColors['chart-1']) : '220 70% 50%'};`,
-    `  --chart-2: ${activeTheme?.chartColors?.['chart-2'] ? hexToHsl(activeTheme.chartColors['chart-2']) : '160 84% 39%'};`,
-    `  --chart-3: ${activeTheme?.chartColors?.['chart-3'] ? hexToHsl(activeTheme.chartColors['chart-3']) : '30 80% 55%'};`,
-    `  --chart-4: ${activeTheme?.chartColors?.['chart-4'] ? hexToHsl(activeTheme.chartColors['chart-4']) : '280 65% 60%'};`,
-    `  --chart-5: ${activeTheme?.chartColors?.['chart-5'] ? hexToHsl(activeTheme.chartColors['chart-5']) : '340 75% 55%'};`,
-    `  --chart-6: ${activeTheme?.chartColors?.['chart-6'] ? hexToHsl(activeTheme.chartColors['chart-6']) : '200 65% 50%'};`,
-  ]),
-  // Config-specific colors (--color-{key}) 
-  ...colorConfig.map(([key, itemConfig]) => {
-    let color: string | undefined;
-    
-    if (itemConfig.theme) {
-      color = itemConfig.theme[theme as keyof typeof itemConfig.theme];
-    } else if (itemConfig.color) {
-      color = itemConfig.color;
-    } else if (activeTheme?.chartColors?.[key]) {
-      // Use organization theme color for this key
-      color = activeTheme.chartColors[key];
-    }
-    
-    return color ? `  --color-${key}: ${color};` : null;
-  }).filter(Boolean)
-].filter(Boolean).join('\n')}
+  ...(theme === "light"
+    ? [
+        `  --chart-1: ${activeTheme?.chartColors?.["chart-1"] ? hexToHsl(activeTheme.chartColors["chart-1"]) : "220 70% 50%"};`,
+        `  --chart-2: ${activeTheme?.chartColors?.["chart-2"] ? hexToHsl(activeTheme.chartColors["chart-2"]) : "160 60% 45%"};`,
+        `  --chart-3: ${activeTheme?.chartColors?.["chart-3"] ? hexToHsl(activeTheme.chartColors["chart-3"]) : "30 80% 55%"};`,
+        `  --chart-4: ${activeTheme?.chartColors?.["chart-4"] ? hexToHsl(activeTheme.chartColors["chart-4"]) : "280 65% 60%"};`,
+        `  --chart-5: ${activeTheme?.chartColors?.["chart-5"] ? hexToHsl(activeTheme.chartColors["chart-5"]) : "340 75% 55%"};`,
+        `  --chart-6: ${activeTheme?.chartColors?.["chart-6"] ? hexToHsl(activeTheme.chartColors["chart-6"]) : "200 65% 50%"};`,
+      ]
+    : [
+        `  --chart-1: ${activeTheme?.chartColors?.["chart-1"] ? hexToHsl(activeTheme.chartColors["chart-1"]) : "220 70% 50%"};`,
+        `  --chart-2: ${activeTheme?.chartColors?.["chart-2"] ? hexToHsl(activeTheme.chartColors["chart-2"]) : "160 84% 39%"};`,
+        `  --chart-3: ${activeTheme?.chartColors?.["chart-3"] ? hexToHsl(activeTheme.chartColors["chart-3"]) : "30 80% 55%"};`,
+        `  --chart-4: ${activeTheme?.chartColors?.["chart-4"] ? hexToHsl(activeTheme.chartColors["chart-4"]) : "280 65% 60%"};`,
+        `  --chart-5: ${activeTheme?.chartColors?.["chart-5"] ? hexToHsl(activeTheme.chartColors["chart-5"]) : "340 75% 55%"};`,
+        `  --chart-6: ${activeTheme?.chartColors?.["chart-6"] ? hexToHsl(activeTheme.chartColors["chart-6"]) : "200 65% 50%"};`,
+      ]),
+  // Config-specific colors (--color-{key})
+  ...colorConfig
+    .map(([key, itemConfig]) => {
+      let color: string | undefined;
+
+      if (itemConfig.theme) {
+        color = itemConfig.theme[theme as keyof typeof itemConfig.theme];
+      } else if (itemConfig.color) {
+        color = itemConfig.color;
+      } else if (activeTheme?.chartColors?.[key]) {
+        // Use organization theme color for this key
+        color = activeTheme.chartColors[key];
+      }
+
+      return color ? `  --color-${key}: ${color};` : null;
+    })
+    .filter(Boolean),
+]
+  .filter(Boolean)
+  .join("\n")}
 }
 `
           )
@@ -252,7 +264,7 @@ function ChartTooltipContent({
                     )}>
                     <div className="grid gap-1.5">
                       {nestLabel ? tooltipLabel : null}
-                      <span className="text-muted-foreground">{itemConfig?.label || item.name}</span>
+                      <span className="text-muted-foreground mr-2">{itemConfig?.label || item.name}</span>
                     </div>
                     {item.value && (
                       <span className="text-foreground font-mono font-medium tabular-nums">
