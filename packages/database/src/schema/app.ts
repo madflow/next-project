@@ -1,7 +1,10 @@
 import { sql } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import {
   bigint,
   check,
+  index,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -151,3 +154,59 @@ export const updateDatasetProjectSchema = createUpdateSchema(datasetProject);
 export type CreateDatasetProjectData = z.infer<typeof insertDatasetProjectSchema>;
 export type DatasetProject = z.infer<typeof selectDatasetProjectSchema>;
 export type UpdateDatasetProjectData = z.infer<typeof updateDatasetProjectSchema>;
+
+export const datasetVariableset = pgTable(
+  "dataset_variablesets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    description: text("description"),
+    parentId: uuid("parent_id").references((): AnyPgColumn => datasetVariableset.id, { 
+      onDelete: "cascade" 
+    }),
+    datasetId: uuid("dataset_id")
+      .notNull()
+      .references(() => dataset.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    orderIndex: integer("order_index").notNull().default(0),
+  },
+  (table) => [
+    uniqueIndex("dataset_variableset_name_dataset_idx").on(table.name, table.datasetId),
+    index("dataset_variablesets_dataset_id_idx").on(table.datasetId),
+    index("dataset_variablesets_parent_id_idx").on(table.parentId),
+  ]
+);
+
+export const insertDatasetVariablesetSchema = createInsertSchema(datasetVariableset);
+export const selectDatasetVariablesetSchema = createSelectSchema(datasetVariableset);
+export const updateDatasetVariablesetSchema = createUpdateSchema(datasetVariableset);
+
+export type CreateDatasetVariablesetData = z.infer<typeof insertDatasetVariablesetSchema>;
+export type DatasetVariableset = z.infer<typeof selectDatasetVariablesetSchema>;
+export type UpdateDatasetVariablesetData = z.infer<typeof updateDatasetVariablesetSchema>;
+
+export const datasetVariablesetItem = pgTable(
+  "dataset_variableset_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    variablesetId: uuid("variableset_id")
+      .notNull()
+      .references(() => datasetVariableset.id, { onDelete: "cascade" }),
+    variableId: uuid("variable_id")
+      .notNull()
+      .references(() => datasetVariable.id, { onDelete: "cascade" }),
+    orderIndex: integer("order_index").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("dataset_variableset_items_unique_idx").on(table.variablesetId, table.variableId),
+    index("dataset_variableset_items_variableset_id_idx").on(table.variablesetId),
+  ]
+);
+
+export const insertDatasetVariablesetItemSchema = createInsertSchema(datasetVariablesetItem);
+export const selectDatasetVariablesetItemSchema = createSelectSchema(datasetVariablesetItem);
+
+export type CreateDatasetVariablesetItemData = z.infer<typeof insertDatasetVariablesetItemSchema>;
+export type DatasetVariablesetItem = z.infer<typeof selectDatasetVariablesetItemSchema>;
