@@ -6,10 +6,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  createVariableset,
-  updateVariableset,
-} from "@/actions/dataset-variableset";
+import { createVariableset, updateVariableset } from "@/actions/dataset-variableset";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,22 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 
@@ -97,7 +81,7 @@ export function VariablesetForm({
   const onSubmit = async (data: FormData) => {
     try {
       const parentId = data.parentId === NO_PARENT_VALUE ? null : data.parentId || null;
-      
+
       if (isEditing) {
         await updateVariableset(variableset.id, {
           name: data.name,
@@ -115,7 +99,7 @@ export function VariablesetForm({
         });
         toast.success(t("form.createSuccess"));
       }
-      
+
       onOpenChange(false);
       form.reset({
         name: "",
@@ -153,12 +137,8 @@ export function VariablesetForm({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? t("editSet") : t("createSet")}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditing ? t("form.editDescription") : t("form.createDescription")}
-          </DialogDescription>
+          <DialogTitle>{isEditing ? t("editSet") : t("createSet")}</DialogTitle>
+          <DialogDescription>{isEditing ? t("form.editDescription") : t("form.createDescription")}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -170,10 +150,7 @@ export function VariablesetForm({
                 <FormItem>
                   <FormLabel>{t("form.name")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("form.namePlaceholder")}
-                      {...field}
-                    />
+                    <Input placeholder={t("form.namePlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -187,11 +164,7 @@ export function VariablesetForm({
                 <FormItem>
                   <FormLabel>{t("form.description")}</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder={t("form.descriptionPlaceholder")}
-                      rows={3}
-                      {...field}
-                    />
+                    <Textarea placeholder={t("form.descriptionPlaceholder")} rows={3} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -204,10 +177,7 @@ export function VariablesetForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("form.parent")}</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t("form.selectParent")} />
@@ -217,7 +187,8 @@ export function VariablesetForm({
                       <SelectItem value={NO_PARENT_VALUE}>{t("form.noParent")}</SelectItem>
                       {filteredParents.map((parent) => (
                         <SelectItem key={parent.id} value={parent.id}>
-                          {"  ".repeat(parent.level)}{parent.name}
+                          {"  ".repeat(parent.level)}
+                          {parent.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -234,21 +205,11 @@ export function VariablesetForm({
                   variant="outline"
                   onClick={() => handleOpenChange(false)}
                   disabled={form.formState.isSubmitting}
-                  className="w-full sm:w-auto"
-                >
+                  className="w-full sm:w-auto">
                   {t("form.cancel")}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={form.formState.isSubmitting}
-                  className="w-full sm:w-auto"
-                >
-                  {form.formState.isSubmitting
-                    ? t("form.saving")
-                    : isEditing
-                    ? t("form.update")
-                    : t("form.create")
-                  }
+                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
+                  {form.formState.isSubmitting ? t("form.saving") : isEditing ? t("form.update") : t("form.create")}
                 </Button>
               </div>
             </DialogFooter>

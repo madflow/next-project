@@ -65,9 +65,7 @@ export function DeleteVariablesetDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{t("deleteDialog.title")}</DialogTitle>
-          <DialogDescription>
-            {t("deleteDialog.description", { name: variablesetName })}
-          </DialogDescription>
+          <DialogDescription>{t("deleteDialog.description", { name: variablesetName })}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:gap-0">
           <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">

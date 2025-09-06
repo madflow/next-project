@@ -112,6 +112,7 @@
 ### SQL Query Analysis
 
 When debugging database issues:
+
 - Use `docker compose logs postgres` to view executed SQL queries
 - Look for query execution times and potential slow queries
 - Check for SQL errors or constraint violations in the logs
@@ -120,6 +121,7 @@ When debugging database issues:
 ### Playwright Debugging
 
 When running end-to-end tests:
+
 - **Run tests in headed mode**: Add `--headed` flag to see browser actions
 - **Debug specific test**: Use `--debug` flag to step through tests
 - **View test results**: Check test output and screenshots in test results

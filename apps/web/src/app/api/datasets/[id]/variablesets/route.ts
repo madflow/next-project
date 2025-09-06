@@ -21,7 +21,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
   try {
     await assertAccess(id);
-    
+
     const url = new URL(request.url);
     const hierarchical = url.searchParams.get("hierarchical") === "true";
 

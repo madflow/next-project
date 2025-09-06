@@ -31,9 +31,7 @@ export function ActiveThemeProvider({ children, initialTheme }: { children: Reac
 
   return (
     <ThemeContext.Provider value={{ activeTheme, setActiveTheme }}>
-      <ChartThemeContext.Provider value={activeTheme}>
-        {children}
-      </ChartThemeContext.Provider>
+      <ChartThemeContext.Provider value={activeTheme}>{children}</ChartThemeContext.Provider>
     </ThemeContext.Provider>
   );
 }

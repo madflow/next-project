@@ -76,15 +76,15 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-medium">{t("title")}</h2>
-          <p className="text-sm text-muted-foreground">{t("description")}</p>
+          <p className="text-muted-foreground text-sm">{t("description")}</p>
         </div>
         <Button onClick={handleCreateSet}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           {t("createSet")}
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Variable Sets Tree */}
         <Card className="h-fit rounded-md shadow-xs">
           <CardHeader>
@@ -94,7 +94,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
           <CardContent className="p-4">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-sm text-muted-foreground">{"Loading..."}</div>
+                <div className="text-muted-foreground text-sm">{"Loading..."}</div>
               </div>
             ) : (
               <VariablesetTree
@@ -116,11 +116,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
           </CardHeader>
           <Separator />
           <CardContent className="p-4">
-            <VariableAssignment
-              datasetId={datasetId}
-              selectedSetId={selectedSetId}
-              onRefresh={handleRefresh}
-            />
+            <VariableAssignment datasetId={datasetId} selectedSetId={selectedSetId} onRefresh={handleRefresh} />
           </CardContent>
         </Card>
       </div>
