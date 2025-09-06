@@ -4,8 +4,7 @@ import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 import { VariableAssignment } from "../dataset-variableset/variable-assignment";
@@ -75,7 +74,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-medium">{t("title")}</h2>
+          <h2 className="text-base font-medium mt-6">{t("title")}</h2>
           <p className="text-muted-foreground text-sm">{t("description")}</p>
         </div>
         <Button onClick={handleCreateSet}>
@@ -88,9 +87,9 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
         {/* Variable Sets Tree */}
         <Card className="h-fit rounded-md shadow-xs">
           <CardHeader>
-            <CardTitle>{t("title")}</CardTitle>
+            <CardTitle>{t("editTitle")}</CardTitle>
+            <CardDescription>{t("editDescription")}</CardDescription>
           </CardHeader>
-          <Separator />
           <CardContent className="p-4">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -113,8 +112,8 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
         <Card className="h-fit rounded-md shadow-xs">
           <CardHeader>
             <CardTitle>{t("assignVariables")}</CardTitle>
+            <CardDescription>{t("assignment.description")}</CardDescription>
           </CardHeader>
-          <Separator />
           <CardContent className="p-4">
             <VariableAssignment datasetId={datasetId} selectedSetId={selectedSetId} onRefresh={handleRefresh} />
           </CardContent>

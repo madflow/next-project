@@ -81,9 +81,9 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
 
         <div className="flex h-4 w-4 items-center justify-center">
           {hasChildren && isExpanded ? (
-            <FolderOpen className="h-4 w-4 text-blue-500" />
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <Folder className="h-4 w-4 text-blue-500" />
+            <Folder className="h-4 w-4 text-muted-foreground" />
           )}
         </div>
 
