@@ -67,7 +67,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
 
     setIsAssigning(variableId);
     try {
-      await addVariableToVariableset(selectedSetId, variableId, datasetId);
+      await addVariableToVariableset(selectedSetId, variableId);
       toast.success(t("assignment.addToSet"));
       refetchUnassigned();
       refetchAssigned();
@@ -85,7 +85,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
 
     setIsRemoving(variableId);
     try {
-      await removeVariableFromVariableset(selectedSetId, variableId, datasetId);
+      await removeVariableFromVariableset(selectedSetId, variableId);
       toast.success(t("assignment.removeFromSet"));
       refetchUnassigned();
       refetchAssigned();

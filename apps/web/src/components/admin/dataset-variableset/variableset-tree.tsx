@@ -109,7 +109,6 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
           <DeleteVariablesetDialog
             variablesetId={node.id}
             variablesetName={node.name}
-            datasetId={datasetId}
             onSuccess={onRefresh}
           />
         </div>

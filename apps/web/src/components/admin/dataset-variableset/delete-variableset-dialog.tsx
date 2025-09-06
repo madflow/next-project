@@ -18,14 +18,12 @@ import {
 interface DeleteVariablesetDialogProps {
   variablesetId: string;
   variablesetName: string;
-  datasetId: string;
   onSuccess?: () => void;
 }
 
 export function DeleteVariablesetDialog({
   variablesetId,
   variablesetName,
-  datasetId,
   onSuccess,
 }: DeleteVariablesetDialogProps) {
   const t = useTranslations("adminDatasetVariableset");
@@ -35,7 +33,7 @@ export function DeleteVariablesetDialog({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await deleteVariableset(variablesetId, datasetId);
+      await deleteVariableset(variablesetId);
       setOpen(false);
       toast.success(t("deleteDialog.success"));
       onSuccess?.();
