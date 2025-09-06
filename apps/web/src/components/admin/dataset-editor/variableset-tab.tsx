@@ -77,7 +77,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
           <h2 className="text-base font-medium mt-6">{t("title")}</h2>
           <p className="text-muted-foreground text-sm">{t("description")}</p>
         </div>
-        <Button onClick={handleCreateSet}>
+        <Button onClick={handleCreateSet} data-testid="admin.dataset.variableset.create">
           <Plus className="mr-2 h-4 w-4" />
           {t("createSet")}
         </Button>

@@ -56,7 +56,8 @@ export function DeleteVariablesetDialog({
           setOpen(true);
         }}
         className="cursor-pointer"
-        type="button">
+        type="button"
+        data-testid="admin.dataset.variableset.delete.trigger">
         <Trash className="h-4 w-4" />
         <span className="sr-only">{t("deleteSet")}</span>
       </Button>
@@ -71,14 +72,16 @@ export function DeleteVariablesetDialog({
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isDeleting}
-              className="w-full cursor-pointer sm:w-auto">
+              className="w-full cursor-pointer sm:w-auto"
+              data-testid="admin.dataset.variableset.delete.cancel">
               {t("deleteDialog.cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="w-full cursor-pointer sm:w-auto">
+              className="w-full cursor-pointer sm:w-auto"
+              data-testid="admin.dataset.variableset.delete.confirm">
               {isDeleting ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
             </Button>
           </div>
