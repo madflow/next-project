@@ -259,7 +259,8 @@
     "editor": {
       "projects": "Projects",
       "title": "Dataset Editor for {name}",
-      "variables": "Variables"
+      "variables": "Variables",
+      "variablesets": "Variable Sets"
     },
     "error": "Error",
     "fetchProjectsError": "Failed to fetch projects.",
@@ -272,6 +273,69 @@
       "delete": "Delete",
       "edit": "Edit"
     }
+  },
+  "adminDatasetVariableset": {
+    "title": "Variable Sets",
+    "description": "Organize variables into hierarchical groups",
+    "createSet": "Create Set",
+    "editSet": "Edit Set",
+    "deleteSet": "Delete Set",
+    "assignVariables": "Assign Variables",
+    "noSets": "No variable sets found",
+    "createFirstSet": "Create your first variable set to organize variables",
+    "form": {
+      "name": "Set Name",
+      "namePlaceholder": "Enter set name",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter optional description",
+      "parent": "Parent Set",
+      "selectParent": "Select parent set",
+      "noParent": "No Parent (Root Level)",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update",
+      "saving": "Saving...",
+      "createDescription": "Create a new variable set to group related variables",
+      "editDescription": "Edit the variable set details",
+      "createSuccess": "Variable set created successfully",
+      "updateSuccess": "Variable set updated successfully",
+      "createError": "Failed to create variable set",
+      "updateError": "Failed to update variable set"
+    },
+    "tree": {
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "moveSet": "Move Set",
+      "variableCount": "{count, plural, =0 {no variables} =1 {1 variable} other {# variables}}",
+      "rootLevel": "Root Level"
+    },
+    "assignment": {
+      "available": "Available Variables",
+      "assigned": "Assigned Variables",
+      "search": "Search variables...",
+      "addToSet": "Add to Set",
+      "removeFromSet": "Remove from Set",
+      "noVariables": "No variables available",
+      "noAssigned": "No variables assigned to this set",
+      "selectSet": "Select a set to view its variables"
+    },
+    "deleteDialog": {
+      "title": "Delete Variable Set",
+      "description": "Are you sure you want to delete the set \"{name}\"? This will also remove all variable assignments from this set.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "error": "Failed to delete variable set",
+      "success": "Variable set deleted successfully"
+    },
+    "columns": {
+      "name": "Name",
+      "description": "Description",
+      "variableCount": "Variables",
+      "parent": "Parent",
+      "actions": "Actions"
+    },
+    "searchPlaceholder": "Search variable sets"
   },
   "adminDatasetInfoModal": {
     "buttons": {
