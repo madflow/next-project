@@ -16,7 +16,8 @@ import {
   session,
   user,
 } from "@repo/database/schema";
-import { deleteDataset, putDataset } from "@/lib/storage";
+import { deleteDataset } from "@/lib/storage";
+import { createDataset as createDatasetService } from "@/lib/dataset-service";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -145,21 +146,19 @@ async function createDataset(id: string, name: string, organizationId: string, p
   const datasetBuffer = await readFile(join(__dirname, "./fixtures/demo.sav"));
   const file = new File([new Uint8Array(datasetBuffer)], "demo.sav");
   const contentType = "application/octet-stream";
-  const { s3Key, fileExtension, fileHash } = await putDataset(file, contentType, organizationId);
-
-  // Create and assign a dataset
-  await adminClient.insert(dataset).values({
-    id,
+  
+  const result = await createDatasetService({
+    file,
     name,
-    fileHash,
-    fileSize: datasetBuffer.byteLength,
-    fileType: fileExtension,
-    filename: file.name,
-    storageKey: s3Key,
-    uploadedAt: new Date(),
-    updatedAt: new Date(),
     organizationId,
+    contentType,
+    missingValues: null,
+    id, // Pass the predefined ID
   });
+
+  if (!result.success) {
+    throw new Error(`Failed to create dataset: ${result.error}`);
+  }
 
   await adminClient.insert(datasetProject).values({
     projectId,
