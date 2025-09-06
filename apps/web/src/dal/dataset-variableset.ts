@@ -149,7 +149,18 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
 async function getUnassignedVariablesFn(datasetId: string, options: ListOptions = {}) {
   // Get variables that are not assigned to any variableset
   const query = db
-    .select()
+    .select({
+      id: datasetVariable.id,
+      name: datasetVariable.name,
+      label: datasetVariable.label,
+      type: datasetVariable.type,
+      measure: datasetVariable.measure,
+      datasetId: datasetVariable.datasetId,
+      createdAt: datasetVariable.createdAt,
+      variableLabels: datasetVariable.variableLabels,
+      valueLabels: datasetVariable.valueLabels,
+      missingValues: datasetVariable.missingValues,
+    })
     .from(datasetVariable)
     .leftJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
     .where(
@@ -161,12 +172,11 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
     .orderBy(datasetVariable.name);
 
   const results = await query;
-  const variables = results.map(result => result.dataset_variables);
   
   return {
-    rows: variables,
-    count: variables.length,
-    limit: options.limit || variables.length,
+    rows: results,
+    count: results.length,
+    limit: options.limit || results.length,
     offset: options.offset || 0,
   };
 }
