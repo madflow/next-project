@@ -93,10 +93,14 @@
 
 ## Debugging the Web Application
 
-### Admin User Credentials
+### Local Development Setup
 
-- **Email**: `admin@example.com`
-- **Password**: `Tester12345`
+- **Web Application URL**: `http://localhost:3000`
+- **Development Server**: The Next.js development server should be running on port 3000 (not in Docker)
+- **Database**: PostgreSQL runs in Docker Compose
+- **Admin User Credentials**:
+  - Email: `admin@example.com`
+  - Password: `Tester12345`
 
 ### Database Query Debugging
 
@@ -124,7 +128,11 @@ When running end-to-end tests:
 
 ### Debugging Workflow for AI Agents
 
-1. **Check database logs**: Use `docker compose logs postgres` to view SQL queries
-2. **Run Playwright tests**: Execute relevant tests to verify functionality
-3. **Inspect test failures**: Check test output and browser screenshots
-4. **Verify data persistence**: Check if data is properly saved in the database
+1. **Ensure development server is running**: The Next.js app should be running on `http://localhost:3000` (not in Docker)
+2. **Check database logs**: Use `docker compose logs postgres` to view SQL queries
+3. **Access the web app**: Navigate to `http://localhost:3000`
+4. **Login as admin**: Use `admin@example.com` / `Tester12345`
+5. **Test the feature**: Navigate to the specific functionality being debugged
+6. **Run Playwright tests**: Execute relevant tests to verify functionality
+7. **Inspect test failures**: Check test output and browser screenshots
+8. **Verify data persistence**: Check if data is properly saved in the database

@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -70,11 +71,28 @@ export function VariablesetForm({
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: variableset?.name || "",
-      description: variableset?.description || "",
-      parentId: variableset?.parentId || NO_PARENT_VALUE,
+      name: "",
+      description: "",
+      parentId: NO_PARENT_VALUE,
     },
   });
+
+  // Update form values when variableset prop changes
+  useEffect(() => {
+    if (variableset) {
+      form.reset({
+        name: variableset.name,
+        description: variableset.description || "",
+        parentId: variableset.parentId || NO_PARENT_VALUE,
+      });
+    } else {
+      form.reset({
+        name: "",
+        description: "",
+        parentId: NO_PARENT_VALUE,
+      });
+    }
+  }, [variableset, form]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -99,7 +117,11 @@ export function VariablesetForm({
       }
       
       onOpenChange(false);
-      form.reset();
+      form.reset({
+        name: "",
+        description: "",
+        parentId: NO_PARENT_VALUE,
+      });
       onSuccess?.();
     } catch (error) {
       console.error(error);
@@ -109,7 +131,11 @@ export function VariablesetForm({
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
-      form.reset();
+      form.reset({
+        name: "",
+        description: "",
+        parentId: NO_PARENT_VALUE,
+      });
     }
     onOpenChange(newOpen);
   };
@@ -180,7 +206,7 @@ export function VariablesetForm({
                   <FormLabel>{t("form.parent")}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
