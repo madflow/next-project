@@ -21,7 +21,7 @@ export function MeanBarAdhoc({ variable, stats, renderAsContent, ...props }: Mea
   const { ref, exportPNG } = useChartExport();
 
   // Find the stats for this variable
-  const variableStats = stats.find(item => item.variable === variable.name)?.stats;
+  const variableStats = stats.find((item) => item.variable === variable.name)?.stats;
   if (!variableStats) return null;
 
   // Create data for mean and median bars
@@ -90,9 +90,7 @@ export function MeanBarAdhoc({ variable, stats, renderAsContent, ...props }: Mea
       <CardHeader>
         <CardTitle>{variable.label ?? variable.name}</CardTitle>
       </CardHeader>
-      <CardContent>
-        {chartContent}
-      </CardContent>
+      <CardContent>{chartContent}</CardContent>
 
       <CardFooter>
         <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>

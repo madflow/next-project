@@ -2,7 +2,7 @@
 
 import { ReactNode, createContext, useContext, useMemo } from "react";
 import { useAppContext } from "@/context/app-context";
-import { type ThemeItem, type Organization } from "@/types/organization";
+import { type Organization, type ThemeItem } from "@/types/organization";
 
 // Default themes that are always available
 const DEFAULT_THEMES: ThemeItem[] = [
@@ -10,7 +10,7 @@ const DEFAULT_THEMES: ThemeItem[] = [
     name: "Default",
     chartColors: {
       "chart-1": "#3b82f6",
-      "chart-2": "#ef4444", 
+      "chart-2": "#ef4444",
       "chart-3": "#10b981",
       "chart-4": "#f59e0b",
       "chart-5": "#8b5cf6",
@@ -22,7 +22,7 @@ const DEFAULT_THEMES: ThemeItem[] = [
     chartColors: {
       "chart-1": "#2563eb",
       "chart-2": "#dc2626",
-      "chart-3": "#059669", 
+      "chart-3": "#059669",
       "chart-4": "#d97706",
       "chart-5": "#7c3aed",
       "chart-6": "#db2777",
@@ -55,7 +55,7 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
     },
   },
   green: {
-    name: "Green", 
+    name: "Green",
     chartColors: {
       "chart-1": "#10b981",
       "chart-2": "#059669",
@@ -110,7 +110,7 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
     },
   },
   teal: {
-    name: "Teal", 
+    name: "Teal",
     chartColors: {
       "chart-1": "#14b8a6",
       "chart-2": "#0d9488",
@@ -140,62 +140,53 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
 
   const availableThemes = useMemo(() => {
     const organizationThemes = organizationWithSettings?.settings?.themes || [];
-    const sanitizedOrganizationThemes = organizationThemes.map(theme => ({
+    const sanitizedOrganizationThemes = organizationThemes.map((theme) => ({
       ...theme,
       name: theme.name
-        .replace(/\s+/g, '-')           // Replace spaces with hyphens
-        .replace(/[^A-Za-z0-9\-_]/g, '') // Remove any characters that aren't A-Za-z0-9, -, or _
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^A-Za-z0-9\-_]/g, ""), // Remove any characters that aren't A-Za-z0-9, -, or _
     }));
     return [...DEFAULT_THEMES, ...sanitizedOrganizationThemes];
   }, [organizationWithSettings?.settings?.themes]);
 
   const getThemeByName = (name: string): ThemeItem | null => {
-    const foundTheme = availableThemes.find(theme => 
-      theme.name.toLowerCase() === name.toLowerCase()
-    );
+    const foundTheme = availableThemes.find((theme) => theme.name.toLowerCase() === name.toLowerCase());
     if (foundTheme) return foundTheme;
-    
+
     const colorTheme = COLOR_THEME_MAPPINGS[name];
     return colorTheme !== undefined ? colorTheme : null;
   };
 
   const getDefaultThemes = () => DEFAULT_THEMES;
-  
+
   const getColorThemes = () => COLOR_THEME_MAPPINGS;
 
   const resolveTheme = (activeThemeName: string) => {
     const sanitizedActiveThemeName = activeThemeName
-      .replace(/\s+/g, '-')           // Replace spaces with hyphens
-      .replace(/[^A-Za-z0-9\-_]/g, ''); // Remove any characters that aren't A-Za-z0-9, -, or _
-    
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/[^A-Za-z0-9\-_]/g, ""); // Remove any characters that aren't A-Za-z0-9, -, or _
+
     // First check if it's an organization theme (try both original and sanitized names)
-    const orgTheme = organizationWithSettings?.settings?.themes?.find(
-      (theme: ThemeItem) => {
-        const themeName = theme.name
-          .replace(/\s+/g, '-')
-          .replace(/[^A-Za-z0-9\-_]/g, '');
-        return themeName === sanitizedActiveThemeName || 
-               theme.name.toLowerCase() === activeThemeName.toLowerCase();
-      }
-    );
-    
+    const orgTheme = organizationWithSettings?.settings?.themes?.find((theme: ThemeItem) => {
+      const themeName = theme.name.replace(/\s+/g, "-").replace(/[^A-Za-z0-9\-_]/g, "");
+      return themeName === sanitizedActiveThemeName || theme.name.toLowerCase() === activeThemeName.toLowerCase();
+    });
+
     if (orgTheme) {
-      return { 
-        theme: { 
-          ...orgTheme, 
-          name: orgTheme.name
-            .replace(/\s+/g, '-')
-            .replace(/[^A-Za-z0-9\-_]/g, '')
-        }, 
-        isOrganizationTheme: true 
+      return {
+        theme: {
+          ...orgTheme,
+          name: orgTheme.name.replace(/\s+/g, "-").replace(/[^A-Za-z0-9\-_]/g, ""),
+        },
+        isOrganizationTheme: true,
       };
     }
 
     // Check default themes
     const defaultTheme = DEFAULT_THEMES.find(
-      theme => theme.name.toLowerCase() === sanitizedActiveThemeName.toLowerCase()
+      (theme) => theme.name.toLowerCase() === sanitizedActiveThemeName.toLowerCase()
     );
-    
+
     if (defaultTheme) {
       return { theme: defaultTheme, isOrganizationTheme: false };
     }
@@ -207,22 +198,21 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
     }
 
     // Fallback to default theme
-    return { 
-      theme: DEFAULT_THEMES[0]!, 
-      isOrganizationTheme: false 
+    return {
+      theme: DEFAULT_THEMES[0]!,
+      isOrganizationTheme: false,
     };
   };
 
   return (
-    <OrganizationThemeContext.Provider 
-      value={{ 
-        availableThemes, 
+    <OrganizationThemeContext.Provider
+      value={{
+        availableThemes,
         getThemeByName,
         getDefaultThemes,
         getColorThemes,
-        resolveTheme
-      }}
-    >
+        resolveTheme,
+      }}>
       {children}
     </OrganizationThemeContext.Provider>
   );

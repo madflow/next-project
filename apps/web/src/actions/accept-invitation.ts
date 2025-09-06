@@ -1,7 +1,6 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import { invitation, member } from "@repo/database/schema";
@@ -51,7 +50,6 @@ export async function acceptInvitationAfterSignup(invitationId: string) {
     // Mark invitation as accepted
     await db.update(invitation).set({ status: "accepted" }).where(eq(invitation.id, invitationId));
 
-    revalidatePath("/");
     return { success: true, message: "Invitation accepted successfully" };
   } catch (error) {
     console.error("Error accepting invitation:", error);

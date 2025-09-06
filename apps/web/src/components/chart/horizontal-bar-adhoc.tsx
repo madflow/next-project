@@ -19,7 +19,7 @@ type BarAdhocProps = {
 export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
   const t = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
-  
+
   const chartConfig = {
     percentage: {
       label: t("percent"),
@@ -43,7 +43,16 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
             accessibilityLayer
             data={transformToRechartsBarData(variable, stats)}>
             <CartesianGrid vertical={true} horizontal={false} />
-            <XAxis domain={[0, 100]} dataKey="percentage" type="number" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} tickFormatter={(value) => `${value}%`} />
+            <XAxis
+              domain={[0, 100]}
+              dataKey="percentage"
+              type="number"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              fontSize={10}
+              tickFormatter={(value) => `${value}%`}
+            />
             <YAxis
               dataKey="label"
               type="category"

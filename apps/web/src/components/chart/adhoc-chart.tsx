@@ -1,6 +1,13 @@
 "use client";
 
-import { ChartBarBigIcon, ChartColumnBigIcon, ChartPieIcon, DownloadIcon, BarChart3Icon, SheetIcon } from "lucide-react";
+import {
+  BarChart3Icon,
+  ChartBarBigIcon,
+  ChartColumnBigIcon,
+  ChartPieIcon,
+  DownloadIcon,
+  SheetIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from "recharts";
@@ -19,8 +26,8 @@ import { transformToRechartsBarData, transformToRechartsPieData } from "@/lib/an
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
-import { MetricsCards } from "./metrics-cards";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
+import { MetricsCards } from "./metrics-cards";
 
 type AdhocChartProps = {
   variable: DatasetVariable;
@@ -34,7 +41,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
   function getAvailableChartTypes(variable: DatasetVariable, stats: StatsResponse): AnalysisChartType[] {
     const availableCharts: AnalysisChartType[] = [];
     const frequencyTableLength = stats[0]?.stats?.frequency_table?.length || 0;
-    
+
     if (variable.measure === "nominal") {
       availableCharts.push("horizontalBar");
       if (frequencyTableLength <= 5) {
@@ -56,7 +63,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
       availableCharts.push("meanBar");
       availableCharts.push("metrics");
     }
-    
+
     return availableCharts;
   }
 
@@ -84,19 +91,19 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
               <CartesianGrid vertical={false} />
               <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-              <YAxis 
-                domain={[0, 100]} 
-                tickLine={false} 
-                tickMargin={10} 
-                axisLine={false} 
-                fontSize={10} 
-                tickFormatter={(value) => `${value}%`} 
+              <YAxis
+                domain={[0, 100]}
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                fontSize={10}
+                tickFormatter={(value) => `${value}%`}
               />
               <Bar dataKey="percentage" fill="var(--color-percentage)" radius={5} />
             </BarChart>
           </ChartContainer>
         );
-      
+
       case "horizontalBar":
         return (
           <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
@@ -105,18 +112,17 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
               margin={{ left: 0 }}
               barCategoryGap={1}
               accessibilityLayer
-              data={transformToRechartsBarData(variable, stats)}
-            >
+              data={transformToRechartsBarData(variable, stats)}>
               <CartesianGrid vertical={true} horizontal={false} />
-              <XAxis 
-                domain={[0, 100]} 
-                dataKey="percentage" 
-                type="number" 
-                tickLine={false} 
-                tickMargin={10} 
-                axisLine={false} 
-                fontSize={10} 
-                tickFormatter={(value) => `${value}%`} 
+              <XAxis
+                domain={[0, 100]}
+                dataKey="percentage"
+                type="number"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                fontSize={10}
+                tickFormatter={(value) => `${value}%`}
               />
               <YAxis
                 dataKey="label"
@@ -132,11 +138,11 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
             </BarChart>
           </ChartContainer>
         );
-      
+
       case "pie": {
         const pieData = transformToRechartsPieData(variable, stats);
         const pieChartConfig: ChartConfig = {};
-        
+
         pieData.forEach((item, index) => {
           const key: string = item.label;
           const colorIndex = (index % 6) + 1;
@@ -145,7 +151,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
             color: `hsl(var(--chart-${colorIndex}))`,
           };
         });
-        
+
         return (
           <ChartContainer config={pieChartConfig} ref={ref} data-export-filename={variable.name}>
             <PieChart>
@@ -160,7 +166,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
           </ChartContainer>
         );
       }
-      
+
       case "metrics":
         return <MetricsCards variable={variable} stats={stats} />;
 
@@ -200,8 +206,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
                 type="single"
                 value={selectedChartType}
                 onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-                size="sm"
-              >
+                size="sm">
                 {availableChartTypes.map((chartType) => (
                   <ToggleGroupItem key={chartType} value={chartType}>
                     {getChartIcon(chartType)}
@@ -239,8 +244,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
               type="single"
               value={selectedChartType}
               onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-              size="sm"
-            >
+              size="sm">
               {availableChartTypes.map((chartType) => (
                 <ToggleGroupItem key={chartType} value={chartType}>
                   {getChartIcon(chartType)}
@@ -250,9 +254,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        {renderChart()}
-      </CardContent>
+      <CardContent>{renderChart()}</CardContent>
       <CardFooter>
         <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
           <DownloadIcon className="h-4 w-4" />

@@ -1,7 +1,6 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { defaultClient as db } from "@repo/database/clients";
 import { UpdateDatasetData, datasetVariable as entity } from "@repo/database/schema";
 import { update as dalUpdate } from "@/dal/dataset-variable";
@@ -14,8 +13,6 @@ export async function update(id: string, data: UpdateDatasetData) {
   if (!updatedVariable) {
     throw new ServerActionFailureException("Failed to update dataset variable");
   }
-
-  revalidatePath(`/admin/datasets/${updatedVariable.datasetId}/editor`);
 
   return updatedVariable;
 }

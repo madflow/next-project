@@ -21,10 +21,10 @@ This document outlines the data created by the `seed.ts` script, which populates
 
 ## Datasets
 
-| Name           | Organization         | Project           | UUID                                 |
-| -------------- | ------------------- | ----------------- | ------------------------------------ |
-| Test Dataset   | Test Organization   | Test Project      | 0198e639-3e96-734b-b0db-af0c4350a2c4 |
-| Test Dataset 2 | Test Organization 3 | Test Project 4    | 0198e639-3e96-734b-b0db-af0c4350a2c5 |
+| Name           | Organization        | Project        | UUID                                 |
+| -------------- | ------------------- | -------------- | ------------------------------------ |
+| Test Dataset   | Test Organization   | Test Project   | 0198e639-3e96-734b-b0db-af0c4350a2c4 |
+| Test Dataset 2 | Test Organization 3 | Test Project 4 | 0198e639-3e96-734b-b0db-af0c4350a2c5 |
 
 ## Users and Memberships
 

@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { useThemeConfig } from "@/components/active-theme";
-import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -13,6 +12,7 @@ import {
   SelectSeparator,
   SelectTrigger,
 } from "@/components/ui/select";
+import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_THEMES = [
@@ -74,17 +74,17 @@ export function ThemeSelector({ ...props }: ThemeSelectorProps) {
   const t = useTranslations("themeSelector");
   const { activeTheme, setActiveTheme } = useThemeConfig();
   const { availableThemes } = useOrganizationTheme();
-  
+
   // Get organization-specific themes (exclude the default ones that are duplicated)
-  const organizationThemes = availableThemes.filter(theme => {
-    const isDefaultTheme = DEFAULT_THEMES.some(defaultTheme => 
-      defaultTheme.name.toLowerCase() === theme.name.toLowerCase()
+  const organizationThemes = availableThemes.filter((theme) => {
+    const isDefaultTheme = DEFAULT_THEMES.some(
+      (defaultTheme) => defaultTheme.name.toLowerCase() === theme.name.toLowerCase()
     );
     return !isDefaultTheme;
   });
 
   // Helper function to get display colors for org themes
-  const getThemeColors = (theme: typeof organizationThemes[0]) => {
+  const getThemeColors = (theme: (typeof organizationThemes)[0]) => {
     if (!theme.chartColors) return null;
     const colors = Object.values(theme.chartColors).slice(0, 3);
     return colors.length > 0 ? colors : null;
@@ -93,17 +93,17 @@ export function ThemeSelector({ ...props }: ThemeSelectorProps) {
   // Helper function to get the display name for the selected theme
   const getSelectedThemeName = () => {
     // Check default themes
-    const defaultTheme = DEFAULT_THEMES.find(theme => theme.value === activeTheme);
+    const defaultTheme = DEFAULT_THEMES.find((theme) => theme.value === activeTheme);
     if (defaultTheme) return defaultTheme.name;
-    
+
     // Check color themes
-    const colorTheme = COLOR_THEMES.find(theme => theme.value === activeTheme);
+    const colorTheme = COLOR_THEMES.find((theme) => theme.value === activeTheme);
     if (colorTheme) return colorTheme.name;
-    
+
     // Check organization themes
-    const orgTheme = organizationThemes.find(theme => theme.name.toLowerCase() === activeTheme);
+    const orgTheme = organizationThemes.find((theme) => theme.name.toLowerCase() === activeTheme);
     if (orgTheme) return orgTheme.name;
-    
+
     return null;
   };
 
@@ -147,18 +147,17 @@ export function ThemeSelector({ ...props }: ThemeSelectorProps) {
                 {organizationThemes.map((theme) => {
                   const colors = getThemeColors(theme);
                   return (
-                    <SelectItem 
-                      key={theme.name} 
-                      value={theme.name.toLowerCase()} 
-                      className="data-[state=checked]:opacity-50"
-                    >
+                    <SelectItem
+                      key={theme.name}
+                      value={theme.name.toLowerCase()}
+                      className="data-[state=checked]:opacity-50">
                       <div className="flex items-center gap-2">
                         {colors && (
                           <div className="flex gap-1">
                             {colors.map((color, index) => (
-                              <div 
+                              <div
                                 key={index}
-                                className="h-3 w-3 rounded-full border border-gray-200" 
+                                className="h-3 w-3 rounded-full border border-gray-200"
                                 style={{ backgroundColor: color }}
                               />
                             ))}
