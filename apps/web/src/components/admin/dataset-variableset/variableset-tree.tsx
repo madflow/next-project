@@ -61,7 +61,8 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
           isSelected ? "bg-accent" : ""
         }`}
         style={{ paddingLeft: `${node.level * 20 + 8}px` }}
-        onClick={handleSelect}>
+        onClick={handleSelect}
+        data-testid={`admin.dataset.variableset.tree.item.${node.id}`}>
         <div
           className="flex h-4 w-4 items-center justify-center"
           onClick={(e) => {
@@ -87,7 +88,7 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
           )}
         </div>
 
-        <span className="flex-1 truncate text-sm font-medium">{node.name}</span>
+        <span className="flex-1 truncate text-sm font-medium" data-testid={`admin.dataset.variableset.tree.name.${node.id}`}>{node.name}</span>
 
         <Badge variant="secondary" className="text-xs">
           {node.variableCount}
