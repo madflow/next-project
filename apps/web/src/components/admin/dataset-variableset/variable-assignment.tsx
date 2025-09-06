@@ -47,7 +47,7 @@ export function VariableAssignment({
     isLoading: isLoadingUnassigned,
     refetch: refetchUnassigned,
   } = useQueryApi<ApiResponse>({
-    endpoint: `/api/datasets/${datasetId}/variablesets/dummy/variables?unassigned=true`,
+    endpoint: `/api/datasets/${datasetId}/variables/unassigned`,
     pagination: { pageIndex: 0, pageSize: 100 },
     sorting: [],
     search: availableSearch,
@@ -150,30 +150,14 @@ export function VariableAssignment({
                 {unassignedResponse?.rows.map((variable) => (
                   <div
                     key={variable.id}
-                    className="flex items-center justify-between rounded-md p-2 hover:bg-muted"
+                    className="flex items-start gap-2 rounded-md p-2 hover:bg-muted"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{variable.name}</p>
-                      {variable.label && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {variable.label}
-                        </p>
-                      )}
-                      <div className="flex gap-1 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {variable.type}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {variable.measure}
-                        </Badge>
-                      </div>
-                    </div>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleAssignVariable(variable.id)}
                       disabled={isAssigning === variable.id}
-                      className="ml-2 shrink-0"
+                      className="shrink-0 h-6 w-6 p-0 mt-0.5"
                     >
                       {isAssigning === variable.id ? (
                         "..."
@@ -181,6 +165,22 @@ export function VariableAssignment({
                         <Plus className="h-3 w-3" />
                       )}
                     </Button>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <p className="text-sm font-medium truncate mb-1">{variable.name}</p>
+                      {variable.label && (
+                        <p className="text-xs text-muted-foreground truncate mb-1">
+                          {variable.label}
+                        </p>
+                      )}
+                      <div className="flex gap-1 flex-wrap">
+                        <Badge variant="outline" className="text-xs shrink-0">
+                          {variable.type}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs shrink-0">
+                          {variable.measure}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -219,30 +219,14 @@ export function VariableAssignment({
                 {assignedResponse?.rows.map((variable) => (
                   <div
                     key={variable.id}
-                    className="flex items-center justify-between rounded-md p-2 hover:bg-muted"
+                    className="flex items-start gap-2 rounded-md p-2 hover:bg-muted"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{variable.name}</p>
-                      {variable.label && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {variable.label}
-                        </p>
-                      )}
-                      <div className="flex gap-1 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {variable.type}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {variable.measure}
-                        </Badge>
-                      </div>
-                    </div>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleRemoveVariable(variable.id)}
                       disabled={isRemoving === variable.id}
-                      className="ml-2 shrink-0"
+                      className="shrink-0 h-6 w-6 p-0 mt-0.5"
                     >
                       {isRemoving === variable.id ? (
                         "..."
@@ -250,6 +234,22 @@ export function VariableAssignment({
                         <X className="h-3 w-3" />
                       )}
                     </Button>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <p className="text-sm font-medium truncate mb-1">{variable.name}</p>
+                      {variable.label && (
+                        <p className="text-xs text-muted-foreground truncate mb-1">
+                          {variable.label}
+                        </p>
+                      )}
+                      <div className="flex gap-1 flex-wrap">
+                        <Badge variant="outline" className="text-xs shrink-0">
+                          {variable.type}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs shrink-0">
+                          {variable.measure}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
