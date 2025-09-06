@@ -31,7 +31,6 @@ async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
 }
 
 async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]> {
-  console.log(`[DEBUG] getHierarchy called for dataset: ${datasetId}`);
 
   // Get all variablesets for the dataset with variable counts
   const variablesets = await db
@@ -48,8 +47,6 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
     .where(eq(entity.datasetId, datasetId))
     .groupBy(entity.id, entity.name, entity.description, entity.parentId, entity.orderIndex)
     .orderBy(entity.orderIndex, entity.name);
-
-  console.log(`[DEBUG] Raw variablesets from DB:`, JSON.stringify(variablesets, null, 2));
 
   // Build hierarchy tree
   const nodeMap = new Map<string, VariablesetTreeNode>();
@@ -85,7 +82,6 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
     }
   }
 
-  console.log(`[DEBUG] Final rootNodes:`, JSON.stringify(rootNodes, null, 2));
   return rootNodes;
 }
 
