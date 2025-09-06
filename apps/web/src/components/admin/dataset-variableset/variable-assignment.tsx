@@ -1,19 +1,16 @@
 "use client";
 
-import { Search, Plus, X } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  addVariableToVariableset,
-  removeVariableFromVariableset,
-} from "@/actions/dataset-variableset";
+import { addVariableToVariableset, removeVariableFromVariableset } from "@/actions/dataset-variableset";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariable } from "@/types/dataset-variable";
 
@@ -30,11 +27,7 @@ interface ApiResponse {
   offset: number;
 }
 
-export function VariableAssignment({
-  datasetId,
-  selectedSetId,
-  onRefresh,
-}: VariableAssignmentProps) {
+export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: VariableAssignmentProps) {
   const t = useTranslations("adminDatasetVariableset");
   const [availableSearch, setAvailableSearch] = useState("");
   const [assignedSearch, setAssignedSearch] = useState("");
@@ -61,9 +54,7 @@ export function VariableAssignment({
     isLoading: isLoadingAssigned,
     refetch: refetchAssigned,
   } = useQueryApi<ApiResponse>({
-    endpoint: selectedSetId
-      ? `/api/datasets/${datasetId}/variablesets/${selectedSetId}/variables`
-      : "",
+    endpoint: selectedSetId ? `/api/datasets/${datasetId}/variablesets/${selectedSetId}/variables` : "",
     pagination: { pageIndex: 0, pageSize: 100 },
     sorting: [],
     search: assignedSearch,
@@ -109,23 +100,23 @@ export function VariableAssignment({
 
   if (!selectedSetId) {
     return (
-      <div className="flex items-center justify-center h-96">
+      <div className="flex h-96 items-center justify-center">
         <div className="text-center">
-          <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">{t("assignment.selectSet")}</p>
+          <Search className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+          <p className="text-muted-foreground text-sm">{t("assignment.selectSet")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+    <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
       {/* Available Variables */}
-      <Card>
+      <Card className="rounded-md shadow-xs">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">{t("assignment.available")}</CardTitle>
+          <CardTitle>{t("assignment.available")}</CardTitle>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder={t("assignment.search")}
               value={availableSearch}
@@ -138,45 +129,31 @@ export function VariableAssignment({
         <CardContent className="p-0">
           <ScrollArea className="h-96">
             {isLoadingUnassigned ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                {"Loading..."}
-              </div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
             ) : unassignedResponse?.rows.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                {t("assignment.noVariables")}
-              </div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noVariables")}</div>
             ) : (
               <div className="space-y-1 p-2">
                 {unassignedResponse?.rows.map((variable) => (
-                  <div
-                    key={variable.id}
-                    className="flex items-start gap-2 rounded-md p-2 hover:bg-muted"
-                  >
+                  <div key={variable.id} className="hover:bg-muted flex items-start gap-2 rounded-md p-2">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleAssignVariable(variable.id)}
                       disabled={isAssigning === variable.id}
-                      className="shrink-0 h-6 w-6 p-0 mt-0.5"
-                    >
-                      {isAssigning === variable.id ? (
-                        "..."
-                      ) : (
-                        <Plus className="h-3 w-3" />
-                      )}
+                      className="mt-0.5 h-6 w-6 shrink-0 p-0">
+                      {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
                     </Button>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <p className="text-sm font-medium truncate mb-1">{variable.name}</p>
+                    <div className="min-w-0 flex-1 overflow-hidden">
+                      <p className="mb-1 truncate text-sm font-medium">{variable.name}</p>
                       {variable.label && (
-                        <p className="text-xs text-muted-foreground truncate mb-1">
-                          {variable.label}
-                        </p>
+                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.label}</p>
                       )}
-                      <div className="flex gap-1 flex-wrap">
-                        <Badge variant="outline" className="text-xs shrink-0">
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="shrink-0 text-xs">
                           {variable.type}
                         </Badge>
-                        <Badge variant="outline" className="text-xs shrink-0">
+                        <Badge variant="outline" className="shrink-0 text-xs">
                           {variable.measure}
                         </Badge>
                       </div>
@@ -190,11 +167,11 @@ export function VariableAssignment({
       </Card>
 
       {/* Assigned Variables */}
-      <Card>
+      <Card className="rounded-md shadow-xs">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">{t("assignment.assigned")}</CardTitle>
+          <CardTitle>{t("assignment.assigned")}</CardTitle>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder={t("assignment.search")}
               value={assignedSearch}
@@ -207,45 +184,31 @@ export function VariableAssignment({
         <CardContent className="p-0">
           <ScrollArea className="h-96">
             {isLoadingAssigned ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                {"Loading..."}
-              </div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
             ) : assignedResponse?.rows.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                {t("assignment.noAssigned")}
-              </div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAssigned")}</div>
             ) : (
               <div className="space-y-1 p-2">
                 {assignedResponse?.rows.map((variable) => (
-                  <div
-                    key={variable.id}
-                    className="flex items-start gap-2 rounded-md p-2 hover:bg-muted"
-                  >
+                  <div key={variable.id} className="hover:bg-muted flex items-start gap-2 rounded-md p-2">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleRemoveVariable(variable.id)}
                       disabled={isRemoving === variable.id}
-                      className="shrink-0 h-6 w-6 p-0 mt-0.5"
-                    >
-                      {isRemoving === variable.id ? (
-                        "..."
-                      ) : (
-                        <X className="h-3 w-3" />
-                      )}
+                      className="mt-0.5 h-6 w-6 shrink-0 p-0">
+                      {isRemoving === variable.id ? "..." : <X className="h-3 w-3" />}
                     </Button>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <p className="text-sm font-medium truncate mb-1">{variable.name}</p>
+                    <div className="min-w-0 flex-1 overflow-hidden">
+                      <p className="mb-1 truncate text-sm font-medium">{variable.name}</p>
                       {variable.label && (
-                        <p className="text-xs text-muted-foreground truncate mb-1">
-                          {variable.label}
-                        </p>
+                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.label}</p>
                       )}
-                      <div className="flex gap-1 flex-wrap">
-                        <Badge variant="outline" className="text-xs shrink-0">
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="shrink-0 text-xs">
                           {variable.type}
                         </Badge>
-                        <Badge variant="outline" className="text-xs shrink-0">
+                        <Badge variant="outline" className="shrink-0 text-xs">
                           {variable.measure}
                         </Badge>
                       </div>
@@ -260,3 +223,4 @@ export function VariableAssignment({
     </div>
   );
 }
+
