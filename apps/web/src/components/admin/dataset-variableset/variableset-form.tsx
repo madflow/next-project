@@ -205,10 +205,11 @@ export function VariablesetForm({
                   variant="outline"
                   onClick={() => handleOpenChange(false)}
                   disabled={form.formState.isSubmitting}
-                  className="w-full sm:w-auto">
+                  className="w-full sm:w-auto"
+                  data-testid="admin.dataset.variableset.form.cancel">
                   {t("form.cancel")}
                 </Button>
-                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
+                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto" data-testid="admin.dataset.variableset.form.submit">
                   {form.formState.isSubmitting ? t("form.saving") : isEditing ? t("form.update") : t("form.create")}
                 </Button>
               </div>

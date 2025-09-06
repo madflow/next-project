@@ -101,7 +101,8 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
             onClick={(e) => {
               e.stopPropagation();
               handleEdit();
-            }}>
+            }}
+            data-testid="admin.dataset.variableset.tree.edit">
             <Edit className="h-3 w-3" />
             <span className="sr-only">{"Edit"}</span>
           </Button>

@@ -141,7 +141,8 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                       variant="outline"
                       onClick={() => handleAssignVariable(variable.id)}
                       disabled={isAssigning === variable.id}
-                      className="mt-0.5 h-6 w-6 shrink-0 p-0">
+                      className="mt-0.5 h-6 w-6 shrink-0 p-0"
+                      data-testid="admin.dataset.variableset.assignment.add">
                       {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
                     </Button>
                     <div className="min-w-0 flex-1 overflow-hidden">
@@ -196,7 +197,8 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                       variant="outline"
                       onClick={() => handleRemoveVariable(variable.id)}
                       disabled={isRemoving === variable.id}
-                      className="mt-0.5 h-6 w-6 shrink-0 p-0">
+                      className="mt-0.5 h-6 w-6 shrink-0 p-0"
+                      data-testid="admin.dataset.variableset.assignment.remove">
                       {isRemoving === variable.id ? "..." : <X className="h-3 w-3" />}
                     </Button>
                     <div className="min-w-0 flex-1 overflow-hidden">
