@@ -258,8 +258,9 @@
     },
     "editor": {
       "projects": "Projekte",
-      "title": "Datensatz Editor für {name}",
-      "variables": "Variablen"
+      "title": "Datensatz-Editor für {name}",
+      "variables": "Variablen",
+      "variablesets": "Variablen-Sets"
     },
     "error": "Fehler",
     "fetchProjectsError": "Fehler beim Abrufen der Projekte.",
@@ -272,6 +273,69 @@
       "delete": "Löschen",
       "edit": "Bearbeiten"
     }
+  },
+  "adminDatasetVariableset": {
+    "title": "Variablen-Sets",
+    "description": "Organisieren Sie Variablen in hierarchischen Gruppen",
+    "createSet": "Set erstellen",
+    "editSet": "Set bearbeiten",
+    "deleteSet": "Set löschen",
+    "assignVariables": "Variablen zuweisen",
+    "noSets": "Keine Variablen-Sets gefunden",
+    "createFirstSet": "Erstellen Sie Ihr erstes Variablen-Set um Variablen zu organisieren",
+    "form": {
+      "name": "Set-Name",
+      "namePlaceholder": "Set-Name eingeben",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung eingeben",
+      "parent": "Übergeordnetes Set",
+      "selectParent": "Übergeordnetes Set auswählen",
+      "noParent": "Kein übergeordnetes Set (Hauptebene)",
+      "cancel": "Abbrechen",
+      "create": "Erstellen",
+      "update": "Aktualisieren",
+      "saving": "Wird gespeichert...",
+      "createDescription": "Erstellen Sie ein neues Variablen-Set um verwandte Variablen zu gruppieren",
+      "editDescription": "Bearbeiten Sie die Details des Variablen-Sets",
+      "createSuccess": "Variablen-Set erfolgreich erstellt",
+      "updateSuccess": "Variablen-Set erfolgreich aktualisiert",
+      "createError": "Fehler beim Erstellen des Variablen-Sets",
+      "updateError": "Fehler beim Aktualisieren des Variablen-Sets"
+    },
+    "tree": {
+      "expand": "Erweitern",
+      "collapse": "Einklappen",
+      "moveSet": "Set verschieben",
+      "variableCount": "{count, plural, =0 {keine Variablen} =1 {1 Variable} other {# Variablen}}",
+      "rootLevel": "Hauptebene"
+    },
+    "assignment": {
+      "available": "Verfügbare Variablen",
+      "assigned": "Zugewiesene Variablen",
+      "search": "Variablen suchen...",
+      "addToSet": "Zu Set hinzufügen",
+      "removeFromSet": "Aus Set entfernen",
+      "noVariables": "Keine Variablen verfügbar",
+      "noAssigned": "Keine Variablen diesem Set zugewiesen",
+      "selectSet": "Wählen Sie ein Set aus um dessen Variablen anzuzeigen"
+    },
+    "deleteDialog": {
+      "title": "Variablen-Set löschen",
+      "description": "Sind Sie sicher, dass Sie das Set \"{name}\" löschen möchten? Dies entfernt auch alle Variablenzuweisungen aus diesem Set.",
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "error": "Fehler beim Löschen des Variablen-Sets",
+      "success": "Variablen-Set erfolgreich gelöscht"
+    },
+    "columns": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "variableCount": "Variablen",
+      "parent": "Übergeordnet",
+      "actions": "Aktionen"
+    },
+    "searchPlaceholder": "Variablen-Sets suchen"
   },
   "adminDatasetInfoModal": {
     "buttons": {
