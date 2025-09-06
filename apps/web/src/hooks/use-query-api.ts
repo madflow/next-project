@@ -58,10 +58,10 @@ export const useQueryApi = <T>(options: UseQueryApiOptions<T>): QueryObserverRes
     }
 
     // Handle endpoints that already have query parameters
-    const url = new URL(endpoint, 'http://localhost'); // Use base URL for parsing
+    const url = new URL(endpoint, "http://localhost"); // Use base URL for parsing
     const hasExistingParams = url.search;
-    const separator = hasExistingParams ? '&' : '?';
-    
+    const separator = hasExistingParams ? "&" : "?";
+
     const response = await fetch(`${endpoint}${separator}${params.toString()}`, { signal });
 
     if (!response.ok) {

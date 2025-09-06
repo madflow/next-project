@@ -20,7 +20,7 @@ function formatDecimal(value?: number) {
 export function MetricsCards({ variable, stats, renderAsContent, ...props }: BarAdhocProps) {
   const t = useTranslations("chartMetricsCard");
   const variableStats = getVariableStats(variable, stats);
-  
+
   const content = (
     <div className="grid grid-cols-3 gap-2">
       <Card>
@@ -71,9 +71,7 @@ export function MetricsCards({ variable, stats, renderAsContent, ...props }: Bar
       <CardHeader>
         <CardTitle>{variable.label ?? variable.name}</CardTitle>
       </CardHeader>
-      <CardContent>
-        {content}
-      </CardContent>
+      <CardContent>{content}</CardContent>
     </Card>
   );
 }

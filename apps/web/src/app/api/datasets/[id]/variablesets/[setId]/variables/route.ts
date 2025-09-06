@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { assertAccess } from "@/dal/dataset";
-import { getVariablesInSet, getUnassignedVariables } from "@/dal/dataset-variableset";
+import { getUnassignedVariables, getVariablesInSet } from "@/dal/dataset-variableset";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { processUrlParams } from "../../../../../handler";
 
@@ -22,7 +22,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
   try {
     await assertAccess(id);
-    
+
     const url = new URL(request.url);
     const unassigned = url.searchParams.get("unassigned") === "true";
 

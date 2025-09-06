@@ -19,7 +19,7 @@ type BarAdhocProps = {
 export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
   const t = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
-  
+
   const chartConfig = {
     percentage: {
       label: t("percent"),
@@ -38,7 +38,14 @@ export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
             <CartesianGrid vertical={false} />
             <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <YAxis domain={[0, 100]} tickLine={false} tickMargin={10} axisLine={false} fontSize={10} tickFormatter={(value) => `${value}%`} />
+            <YAxis
+              domain={[0, 100]}
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              fontSize={10}
+              tickFormatter={(value) => `${value}%`}
+            />
             <Bar dataKey="percentage" fill="var(--color-percentage)" radius={5} />
           </BarChart>
         </ChartContainer>

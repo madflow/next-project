@@ -3,8 +3,8 @@
 import { ChevronDown, ChevronRight, Edit, Folder, FolderOpen } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 import { DeleteVariablesetDialog } from "./delete-variableset-dialog";
 
@@ -26,14 +26,7 @@ interface TreeNodeProps {
   onRefresh: () => void;
 }
 
-function TreeNode({
-  node,
-  datasetId,
-  selectedSetId,
-  onSelectSet,
-  onEditSet,
-  onRefresh,
-}: TreeNodeProps) {
+function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRefresh }: TreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const hasChildren = node.children.length > 0;
   const isSelected = selectedSetId === node.id;
@@ -64,24 +57,22 @@ function TreeNode({
   return (
     <div className="select-none">
       <div
-        className={`group flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted cursor-pointer ${
+        className={`group hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 ${
           isSelected ? "bg-accent" : ""
         }`}
         style={{ paddingLeft: `${node.level * 20 + 8}px` }}
-        onClick={handleSelect}
-      >
+        onClick={handleSelect}>
         <div
           className="flex h-4 w-4 items-center justify-center"
           onClick={(e) => {
             e.stopPropagation();
             handleToggle();
-          }}
-        >
+          }}>
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              <ChevronDown className="text-muted-foreground h-3 w-3" />
             ) : (
-              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+              <ChevronRight className="text-muted-foreground h-3 w-3" />
             )
           ) : (
             <div className="h-3 w-3" />
@@ -110,12 +101,11 @@ function TreeNode({
             onClick={(e) => {
               e.stopPropagation();
               handleEdit();
-            }}
-          >
+            }}>
             <Edit className="h-3 w-3" />
             <span className="sr-only">{"Edit"}</span>
           </Button>
-          
+
           <DeleteVariablesetDialog
             variablesetId={node.id}
             variablesetName={node.name}
@@ -157,9 +147,9 @@ export function VariablesetTree({
   if (nodes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
-        <Folder className="h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-sm text-muted-foreground mb-2">{t("noSets")}</p>
-        <p className="text-xs text-muted-foreground">{t("createFirstSet")}</p>
+        <Folder className="text-muted-foreground mb-4 h-12 w-12" />
+        <p className="text-muted-foreground mb-2 text-sm">{t("noSets")}</p>
+        <p className="text-muted-foreground text-xs">{t("createFirstSet")}</p>
       </div>
     );
   }

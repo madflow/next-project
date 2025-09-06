@@ -161,8 +161,8 @@ export const datasetVariableset = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     description: text("description"),
-    parentId: uuid("parent_id").references((): AnyPgColumn => datasetVariableset.id, { 
-      onDelete: "cascade" 
+    parentId: uuid("parent_id").references((): AnyPgColumn => datasetVariableset.id, {
+      onDelete: "cascade",
     }),
     datasetId: uuid("dataset_id")
       .notNull()

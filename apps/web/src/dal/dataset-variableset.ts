@@ -6,8 +6,8 @@ import {
   CreateDatasetVariablesetItemData,
   UpdateDatasetVariablesetData,
   datasetVariable,
-  datasetVariableset as entity,
   datasetVariablesetItem,
+  datasetVariableset as entity,
   insertDatasetVariablesetSchema,
   selectDatasetVariablesetSchema,
   updateDatasetVariablesetSchema,
@@ -22,14 +22,17 @@ async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
   const listOptions: ListOptions = {
     ...options,
     filters: [...(options.filters || []), { column: "datasetId", operator: "eq", value: datasetId }],
-    orderBy: [{ column: "orderIndex", direction: "asc" }, { column: "name", direction: "asc" }],
+    orderBy: [
+      { column: "orderIndex", direction: "asc" },
+      { column: "name", direction: "asc" },
+    ],
   };
   return baseList(listOptions);
 }
 
 async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]> {
   console.log(`[DEBUG] getHierarchy called for dataset: ${datasetId}`);
-  
+
   // Get all variablesets for the dataset with variable counts
   const variablesets = await db
     .select({
@@ -94,7 +97,7 @@ async function findFn(id: string) {
 async function createFn(data: CreateDatasetVariablesetData) {
   const insertData = insertDatasetVariablesetSchema.parse(data);
   const [created] = await db.insert(entity).values(insertData).returning();
-  
+
   if (!created) {
     throw new DalException("Failed to create dataset variableset");
   }
@@ -163,16 +166,11 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
     })
     .from(datasetVariable)
     .leftJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
-    .where(
-      and(
-        eq(datasetVariable.datasetId, datasetId),
-        isNull(datasetVariablesetItem.variableId)
-      )
-    )
+    .where(and(eq(datasetVariable.datasetId, datasetId), isNull(datasetVariablesetItem.variableId)))
     .orderBy(datasetVariable.name);
 
   const results = await query;
-  
+
   return {
     rows: results,
     count: results.length,
@@ -187,10 +185,7 @@ async function addVariableToSetFn(variablesetId: string, variableId: string, ord
     .select()
     .from(datasetVariablesetItem)
     .where(
-      and(
-        eq(datasetVariablesetItem.variablesetId, variablesetId),
-        eq(datasetVariablesetItem.variableId, variableId)
-      )
+      and(eq(datasetVariablesetItem.variablesetId, variablesetId), eq(datasetVariablesetItem.variableId, variableId))
     )
     .limit(1);
 
@@ -204,7 +199,7 @@ async function addVariableToSetFn(variablesetId: string, variableId: string, ord
       .select({ maxOrder: sql<number>`COALESCE(MAX(${datasetVariablesetItem.orderIndex}), -1)` })
       .from(datasetVariablesetItem)
       .where(eq(datasetVariablesetItem.variablesetId, variablesetId));
-    
+
     orderIndex = (maxOrder[0]?.maxOrder ?? -1) + 1;
   }
 
@@ -221,10 +216,7 @@ async function removeVariableFromSetFn(variablesetId: string, variableId: string
   await db
     .delete(datasetVariablesetItem)
     .where(
-      and(
-        eq(datasetVariablesetItem.variablesetId, variablesetId),
-        eq(datasetVariablesetItem.variableId, variableId)
-      )
+      and(eq(datasetVariablesetItem.variablesetId, variablesetId), eq(datasetVariablesetItem.variableId, variableId))
     );
 }
 

@@ -19,10 +19,10 @@ export async function GET(request: Request, { params }: RouteParams) {
 
   try {
     await assertAccess(id);
-    
+
     const url = new URL(request.url);
     const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams);
-    
+
     const result = await getUnassignedVariables(id, {
       filters,
       limit,
@@ -31,7 +31,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       searchColumns: ["name", "label"],
       orderBy,
     });
-    
+
     return NextResponse.json(result);
   } catch (error: unknown) {
     return raiseExceptionResponse(error);

@@ -52,8 +52,8 @@ export function OrganizationSettingsEditor({
     if (theme) {
       // Allow A-Za-z0-9, hyphens, and underscores. Replace spaces with hyphens and remove other invalid characters
       const sanitizedName = name
-        .replace(/\s+/g, '-')           // Replace spaces with hyphens
-        .replace(/[^A-Za-z0-9\-_]/g, ''); // Remove any characters that aren't A-Za-z0-9, -, or _
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^A-Za-z0-9\-_]/g, ""); // Remove any characters that aren't A-Za-z0-9, -, or _
       updateTheme(index, { ...theme, name: sanitizedName });
     }
   };
@@ -103,9 +103,7 @@ export function OrganizationSettingsEditor({
                         className="max-w-xs"
                         data-testid={`theme-name-${themeIndex}`}
                       />
-                      <p className="text-xs text-muted-foreground">
-                        {t("organization.settings.theme.nameHelp")}
-                      </p>
+                      <p className="text-muted-foreground text-xs">{t("organization.settings.theme.nameHelp")}</p>
                     </div>
                   )}
                 </CardTitle>
