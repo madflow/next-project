@@ -90,3 +90,41 @@
 - Log errors appropriately in development/production
 - When throwing errors in a server action, dal action or server page, use the Exception classes from `@/lib/exceptions.ts`.
 - When an Exception class is missing, create it and add it to the `@/lib/exceptions.ts` and map it to an HTTP status code.
+
+## Debugging the Web Application
+
+### Admin User Credentials
+
+- **Email**: `admin@example.com`
+- **Password**: `Tester12345`
+
+### Database Query Debugging
+
+- **View PostgreSQL logs**: `docker compose logs postgres`
+- **Follow PostgreSQL logs in real-time**: `docker compose logs -f postgres`
+- **View last 100 log lines**: `docker compose logs --tail=100 postgres`
+- **View database logs with timestamps**: `docker compose logs -t postgres`
+
+### SQL Query Analysis
+
+When debugging database issues:
+- Use `docker compose logs postgres` to view executed SQL queries
+- Look for query execution times and potential slow queries
+- Check for SQL errors or constraint violations in the logs
+- Monitor query patterns to identify N+1 problems or inefficient queries
+
+### Playwright Debugging
+
+When running end-to-end tests:
+- **Run tests in headed mode**: Add `--headed` flag to see browser actions
+- **Debug specific test**: Use `--debug` flag to step through tests
+- **View test results**: Check test output and screenshots in test results
+- **Inspect network requests**: Use browser DevTools during test execution
+- **Check test data**: Verify test data setup and cleanup between tests
+
+### Debugging Workflow for AI Agents
+
+1. **Check database logs**: Use `docker compose logs postgres` to view SQL queries
+2. **Run Playwright tests**: Execute relevant tests to verify functionality
+3. **Inspect test failures**: Check test output and browser screenshots
+4. **Verify data persistence**: Check if data is properly saved in the database
