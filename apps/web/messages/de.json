@@ -277,6 +277,8 @@
   "adminDatasetVariableset": {
     "title": "Variablen-Sets",
     "description": "Organisieren Sie Variablen in hierarchischen Gruppen",
+    "editTitle": "Variablen-Sets bearbeiten",
+    "editDescription": "Erstellen und bearbeiten Sie Variablen-Sets um Variablen zu organisieren",
     "createSet": "Set erstellen",
     "editSet": "Set bearbeiten",
     "deleteSet": "Set löschen",
@@ -310,6 +312,7 @@
       "rootLevel": "Hauptebene"
     },
     "assignment": {
+      "description": "Wählen Sie ein Variablen-Set aus und verwalten Sie dessen zugewiesene Variablen",
       "available": "Verfügbare Variablen",
       "assigned": "Zugewiesene Variablen",
       "search": "Variablen suchen...",

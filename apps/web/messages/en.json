@@ -277,6 +277,8 @@
   "adminDatasetVariableset": {
     "title": "Variable Sets",
     "description": "Organize variables into hierarchical groups",
+    "editTitle": "Edit Variable Sets",
+    "editDescription": "Create and edit variable sets to organize variables",
     "createSet": "Create Set",
     "editSet": "Edit Set",
     "deleteSet": "Delete Set",
@@ -310,6 +312,7 @@
       "rootLevel": "Root Level"
     },
     "assignment": {
+      "description": "Select a variable set and manage its assigned variables",
       "available": "Available Variables",
       "assigned": "Assigned Variables",
       "search": "Search variables...",
