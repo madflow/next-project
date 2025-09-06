@@ -54,7 +54,7 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
 
   if (isError) {
     return (
-      <Card>
+      <Card className="rounded-md shadow-xs">
         <CardHeader>
           <CardTitle>{t("error")}</CardTitle>
           <CardDescription>{t("fetchProjectsError")}</CardDescription>
@@ -64,7 +64,7 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
   }
 
   return (
-    <Card>
+    <Card className="rounded-md shadow-xs">
       <CardHeader>
         <CardTitle>{t("projects")}</CardTitle>
         <CardDescription>{t("datasetProjectsDescription")}</CardDescription>

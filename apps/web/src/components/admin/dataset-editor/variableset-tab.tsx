@@ -75,7 +75,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">{t("title")}</h2>
+          <h2 className="text-base font-medium">{t("title")}</h2>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
         <Button onClick={handleCreateSet}>
@@ -86,9 +86,9 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Variable Sets Tree */}
-        <Card className="h-fit">
+        <Card className="h-fit rounded-md shadow-xs">
           <CardHeader>
-            <CardTitle className="text-base">{t("title")}</CardTitle>
+            <CardTitle>{t("title")}</CardTitle>
           </CardHeader>
           <Separator />
           <CardContent className="p-4">
@@ -110,9 +110,9 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
         </Card>
 
         {/* Variable Assignment */}
-        <Card className="h-fit">
+        <Card className="h-fit rounded-md shadow-xs">
           <CardHeader>
-            <CardTitle className="text-base">{t("assignVariables")}</CardTitle>
+            <CardTitle>{t("assignVariables")}</CardTitle>
           </CardHeader>
           <Separator />
           <CardContent className="p-4">
