@@ -5,6 +5,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 const nextConfig = {
   output: "standalone",
   transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
+  typedRoutes: true,
   experimental: {
     serverActions: {
       bodySizeLimit: "100mb",
