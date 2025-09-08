@@ -61,10 +61,11 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
       if (frequencyTableLength === 2) {
         availableCharts.push("bar");
       }
-      availableCharts.push("metrics");
     } else if (variable.measure === "scale") {
       availableCharts.push("meanBar");
-      availableCharts.push("metrics");
+      if (variable.type === "double") {
+        availableCharts.push("metrics");
+      }
     }
 
     return availableCharts;
