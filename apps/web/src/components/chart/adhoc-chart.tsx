@@ -3,6 +3,7 @@
 import {
   BarChart3Icon,
   ChartBarBigIcon,
+  ChartBarStackedIcon,
   ChartColumnBigIcon,
   ChartPieIcon,
   DownloadIcon,
@@ -75,7 +76,6 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
 
   const availableChartTypes = getAvailableChartTypes(variable, stats);
   const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
-    if (availableChartTypes.includes("horizontalStackedBar")) return "horizontalStackedBar";
     if (availableChartTypes.includes("horizontalBar")) return "horizontalBar";
     if (availableChartTypes.includes("meanBar")) return "meanBar";
     if (availableChartTypes.includes("metrics")) return "metrics";
@@ -255,7 +255,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
       case "horizontalBar":
         return <ChartBarBigIcon className="h-4 w-4" />;
       case "horizontalStackedBar":
-        return <BarChart3Icon className="h-4 w-4" />;
+        return <ChartBarStackedIcon className="h-4 w-4" />;
       case "pie":
         return <ChartPieIcon className="h-4 w-4" />;
       case "metrics":
