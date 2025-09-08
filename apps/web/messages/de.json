@@ -974,7 +974,8 @@
   "user": {
     "actions": {
       "delete": "Löschen",
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "impersonate": "Verkörpern"
     },
     "columns": {
       "actions": "Aktionen",
@@ -1032,6 +1033,24 @@
     "search": {
       "placeholder": "Benutzer suchen..."
     },
-    "title": "Benutzer"
+    "title": "Benutzer",
+    "impersonation": {
+      "banner": {
+        "message": "Sie verkörpern {userName}",
+        "stopButton": "Verkörperung beenden"
+      },
+      "button": {
+        "impersonate": "Verkörpern",
+        "impersonating": "Verkörpere...",
+        "stopImpersonating": "Verkörperung beenden",
+        "stopping": "Beende..."
+      },
+      "messages": {
+        "impersonateError": "Verkörperung fehlgeschlagen",
+        "impersonateSuccess": "Verkörperung erfolgreich gestartet",
+        "stopError": "Beenden der Verkörperung fehlgeschlagen",
+        "stopSuccess": "Verkörperung beendet"
+      }
+    }
   }
 }

@@ -974,7 +974,8 @@
   "user": {
     "actions": {
       "delete": "Delete",
-      "edit": "Edit"
+      "edit": "Edit",
+      "impersonate": "Impersonate"
     },
     "columns": {
       "actions": "Actions",
@@ -1032,6 +1033,24 @@
     "search": {
       "placeholder": "Search users..."
     },
-    "title": "Users"
+    "title": "Users",
+    "impersonation": {
+      "banner": {
+        "message": "You are impersonating {userName}",
+        "stopButton": "Stop Impersonating"
+      },
+      "button": {
+        "impersonate": "Impersonate",
+        "impersonating": "Impersonating...",
+        "stopImpersonating": "Stop Impersonating",
+        "stopping": "Stopping..."
+      },
+      "messages": {
+        "impersonateError": "Failed to impersonate user",
+        "impersonateSuccess": "Successfully impersonating user",
+        "stopError": "Failed to stop impersonating",
+        "stopSuccess": "Stopped impersonating user"
+      }
+    }
   }
 }

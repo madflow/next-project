@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, MoreVertical, User } from "lucide-react";
+import { LogOut, MoreVertical, User, UserX } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { signOut, useSession } from "@/lib/auth-client";
+import { useIsImpersonating } from "@/hooks/use-is-impersonating";
+import { useStopImpersonating } from "@/hooks/use-stop-impersonating";
 
 export function NavUser() {
   const isMobile = useSidebar();
@@ -24,7 +26,10 @@ export function NavUser() {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const t = useTranslations("navUser");
+  const tUser = useTranslations("user.impersonation");
   const user = session.data?.user;
+  const { isImpersonating } = useIsImpersonating();
+  const { stopImpersonating, isLoading: isStoppingImpersonation } = useStopImpersonating();
 
   const handleSignOut = async () => {
     try {
@@ -43,6 +48,10 @@ export function NavUser() {
     } finally {
       setIsSigningOut(false);
     }
+  };
+
+  const handleStopImpersonating = async () => {
+    await stopImpersonating();
   };
 
   if (!user) return null;
@@ -97,6 +106,16 @@ export function NavUser() {
                 <Link href="/user/account">{t("account")}</Link>
               </SidebarMenuButton>
             </DropdownMenuItem>
+            {isImpersonating && (
+              <DropdownMenuItem
+                onClick={handleStopImpersonating}
+                disabled={isStoppingImpersonation}
+                className="cursor-pointer text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200"
+              >
+                <UserX className="mr-2 size-4" />
+                {isStoppingImpersonation ? tUser("button.stopping") : tUser("button.stopImpersonating")}
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleSignOut}
