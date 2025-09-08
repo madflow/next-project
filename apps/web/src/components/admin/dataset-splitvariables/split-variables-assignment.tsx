@@ -109,11 +109,11 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
         </CardHeader>
         <Separator />
         <CardContent className="p-0">
-          <ScrollArea className="h-96">
+          <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.available.section">
             {isLoadingAvailable ? (
               <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
             ) : availableResponse?.rows.length === 0 ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAvailable")}</div>
+              <div className="text-muted-foreground p-4 text-center text-sm" data-testid="admin.dataset.splitvariables.available.empty">{t("assignment.noAvailable")}</div>
             ) : (
               <div className="space-y-1 p-2" data-testid="admin.dataset.splitvariables.available.variables.list">
                  {availableResponse?.rows.map((variable) => (
@@ -165,11 +165,11 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
         </CardHeader>
         <Separator />
         <CardContent className="p-0">
-          <ScrollArea className="h-96">
+          <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.assigned.section">
             {isLoadingAssigned ? (
               <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
             ) : assignedResponse?.rows.length === 0 ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAssigned")}</div>
+              <div className="text-muted-foreground p-4 text-center text-sm" data-testid="admin.dataset.splitvariables.assigned.empty">{t("assignment.noAssigned")}</div>
              ) : (
                <div className="space-y-1 p-2" data-testid="admin.dataset.splitvariables.assigned.variables.list">
                   {assignedResponse?.rows.map((variable) => (
