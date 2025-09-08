@@ -3,16 +3,14 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { DatasetSelect } from "@/components/form/dataset-select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
-import { DatasetVariable } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
-import { StatsRequest } from "@/types/stats";
-import { AdhocChart } from "../chart/adhoc-chart";
+import { StatsRequest, StatsResponse } from "@/types/stats";
+import { MultiVariableCharts } from "../chart/multi-variable-charts";
 import BarSkeleton from "../chart/bar-skeleton";
 import { ThemeSelector } from "../theme-selector";
-import { Code } from "../ui/code";
-import { AdHocVariables } from "./adhoc-variables";
+import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-selector";
+import { VariablesetDescription } from "./variableset-description";
 
 type AdHocAnalysisProps = {
   project: Project;
@@ -20,29 +18,51 @@ type AdHocAnalysisProps = {
 
 export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
-  const [selectedVariable, setSelectedVariable] = useState<DatasetVariable | null>(null);
+  const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
+  const [statsData, setStatsData] = useState<Record<string, StatsResponse>>({});
 
   const t = useTranslations("projectAdhocAnalysis");
 
-  const { data, mutate, isPending } = useDatasetStats(selectedDataset || "", {
+  const { mutate, isPending } = useDatasetStats(selectedDataset || "", {
     onError: (error) => {
       console.error(t("errors.fetchStats"), error);
     },
   });
 
   useEffect(() => {
-    if (selectedVariable) {
-      const request: StatsRequest = {
-        variables: selectedVariable ? [{ variable: selectedVariable.name }] : [],
-      };
+    if (currentSelection) {
+      const variables = currentSelection.type === "variable" && currentSelection.variable 
+        ? [currentSelection.variable]
+        : currentSelection.variables || [];
 
-      mutate(request);
+      if (variables.length > 0) {
+        const request: StatsRequest = {
+          variables: variables.map(v => ({ variable: v.name })),
+        };
+
+        mutate(request, {
+          onSuccess: (data) => {
+            const newStatsData: Record<string, StatsResponse> = {};
+            variables.forEach((variable, index) => {
+              if (data[index]) {
+                newStatsData[variable.name] = [data[index]];
+              }
+            });
+            setStatsData(newStatsData);
+          },
+        });
+      }
     }
-  }, [selectedVariable, mutate]);
+  }, [currentSelection, mutate]);
 
-  const handleAddVariable = (variable: DatasetVariable) => {
-    setSelectedVariable(variable);
+  const handleSelectionChange = (selection: SelectionItem) => {
+    setCurrentSelection(selection);
+    setStatsData({});
   };
+
+  const selectedVariables = currentSelection?.type === "variable" && currentSelection.variable
+    ? [currentSelection.variable]
+    : currentSelection?.variables || [];
 
   return (
     <div className="theme-container flex gap-4">
@@ -52,28 +72,32 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           projectId={project.id}
           onValueChangeAction={(value) => {
             setSelectedDataset(value);
+            setCurrentSelection(null);
+            setStatsData({});
           }}
         />
-        {selectedDataset && <AdHocVariables datasetId={selectedDataset} onAddVariable={handleAddVariable} />}
+        {selectedDataset && (
+          <AdHocVariablesetSelector 
+            datasetId={selectedDataset} 
+            onSelectionChangeAction={handleSelectionChange} 
+          />
+        )}
+        {currentSelection?.type === "set" && currentSelection.variableset && (
+          <VariablesetDescription 
+            variableset={currentSelection.variableset}
+            variables={currentSelection.variables}
+          />
+        )}
       </div>
+      
       {isPending && <BarSkeleton />}
-      {selectedDataset && selectedVariable && data && (
-        <Tabs defaultValue="chart" className="w-full">
-          <TabsList>
-            <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
-            <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
-            <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="chart" className="flex flex-col gap-4">
-            <AdhocChart className="w-[600px]" variable={selectedVariable} stats={data} />
-          </TabsContent>
-          <TabsContent value="variable">
-            <Code>{JSON.stringify(selectedVariable, null, 2)}</Code>
-          </TabsContent>
-          <TabsContent value="stats">
-            <Code>{JSON.stringify(data, null, 2)}</Code>
-          </TabsContent>
-        </Tabs>
+      
+      {selectedDataset && currentSelection && selectedVariables.length > 0 && (
+        <MultiVariableCharts 
+          variables={selectedVariables}
+          statsData={statsData}
+          variableset={currentSelection?.type === "set" ? currentSelection.variableset : undefined}
+        />
       )}
     </div>
   );

@@ -20,12 +20,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
+import { Code } from "../ui/code";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
 
@@ -35,7 +37,8 @@ type AdhocChartProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
-  const t = useTranslations("chartMetricsCard");
+  const t = useTranslations("projectAdhocAnalysis");
+  const tChart = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
 
   function getAvailableChartTypes(variable: DatasetVariable, stats: StatsResponse): AnalysisChartType[] {
@@ -77,7 +80,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
 
   const chartConfig = {
     percentage: {
-      label: t("percent"),
+      label: tChart("percent"),
       color: "hsl(var(--chart-1))",
     },
   } satisfies ChartConfig;
@@ -197,69 +200,131 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
 
   if (selectedChartType === "metrics" || selectedChartType === "meanBar") {
     return (
-      <Card className="shadow-xs" {...props}>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{variable.label ?? variable.name}</CardTitle>
-            {availableChartTypes.length > 1 && (
-              <ToggleGroup
-                type="single"
-                value={selectedChartType}
-                onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-                size="sm">
-                {availableChartTypes.map((chartType) => (
-                  <ToggleGroupItem key={chartType} value={chartType}>
-                    {getChartIcon(chartType)}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {selectedChartType === "metrics" ? (
-            <MetricsCards variable={variable} stats={stats} renderAsContent />
-          ) : (
-            <MeanBarAdhoc variable={variable} stats={stats} renderAsContent />
-          )}
-        </CardContent>
-        {selectedChartType === "meanBar" && (
-          <CardFooter>
-            <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
-              <DownloadIcon className="h-4 w-4" />
-            </Button>
-          </CardFooter>
-        )}
-      </Card>
+      <div {...props}>
+        <Tabs defaultValue="chart" className="w-full">
+          <TabsList>
+            <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
+            <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
+            <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="chart">
+            <Card className="shadow-xs">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                  {availableChartTypes.length > 1 && (
+                    <ToggleGroup
+                      type="single"
+                      value={selectedChartType}
+                      onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
+                      size="sm">
+                      {availableChartTypes.map((chartType) => (
+                        <ToggleGroupItem key={chartType} value={chartType}>
+                          {getChartIcon(chartType)}
+                        </ToggleGroupItem>
+                      ))}
+                    </ToggleGroup>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {selectedChartType === "metrics" ? (
+                  <MetricsCards variable={variable} stats={stats} renderAsContent />
+                ) : (
+                  <MeanBarAdhoc variable={variable} stats={stats} renderAsContent />
+                )}
+              </CardContent>
+              {selectedChartType === "meanBar" && (
+                <CardFooter>
+                  <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
+                    <DownloadIcon className="h-4 w-4" />
+                  </Button>
+                </CardFooter>
+              )}
+            </Card>
+          </TabsContent>
+          <TabsContent value="variable">
+            <Card className="shadow-xs">
+              <CardHeader>
+                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Code>{JSON.stringify(variable, null, 2)}</Code>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="stats">
+            <Card className="shadow-xs">
+              <CardHeader>
+                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Code>{JSON.stringify(stats, null, 2)}</Code>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     );
   }
 
   return (
-    <Card className="shadow-xs" {...props}>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>{variable.label ?? variable.name}</CardTitle>
-          {availableChartTypes.length > 1 && (
-            <ToggleGroup
-              type="single"
-              value={selectedChartType}
-              onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-              size="sm">
-              {availableChartTypes.map((chartType) => (
-                <ToggleGroupItem key={chartType} value={chartType}>
-                  {getChartIcon(chartType)}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>{renderChart()}</CardContent>
-      <CardFooter>
-        <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
-          <DownloadIcon className="h-4 w-4" />
-        </Button>
-      </CardFooter>
-    </Card>
+    <div {...props}>
+      <Tabs defaultValue="chart" className="w-full">
+        <TabsList>
+          <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
+          <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
+          <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="chart">
+          <Card className="shadow-xs">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                {availableChartTypes.length > 1 && (
+                  <ToggleGroup
+                    type="single"
+                    value={selectedChartType}
+                    onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
+                    size="sm">
+                    {availableChartTypes.map((chartType) => (
+                      <ToggleGroupItem key={chartType} value={chartType}>
+                        {getChartIcon(chartType)}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>{renderChart()}</CardContent>
+            <CardFooter>
+              <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
+                <DownloadIcon className="h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        <TabsContent value="variable">
+          <Card className="shadow-xs">
+            <CardHeader>
+              <CardTitle>{variable.label ?? variable.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Code>{JSON.stringify(variable, null, 2)}</Code>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="stats">
+          <Card className="shadow-xs">
+            <CardHeader>
+              <CardTitle>{variable.label ?? variable.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Code>{JSON.stringify(stats, null, 2)}</Code>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
