@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql, ilike, or } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariablesetData,
@@ -117,6 +117,25 @@ async function removeFn(id: string) {
 }
 
 async function getVariablesInSetFn(variablesetId: string, options: ListOptions = {}) {
+  const { search } = options;
+  
+  // Build where conditions
+  const whereConditions = [eq(datasetVariablesetItem.variablesetId, variablesetId)];
+  
+  // Add search if provided
+  if (search) {
+    const searchConditions = [
+      ilike(datasetVariable.name, `%${search}%`),
+      ilike(datasetVariable.label, `%${search}%`)
+    ];
+    const searchOr = or(...searchConditions);
+    if (searchOr) {
+      whereConditions.push(searchOr);
+    }
+  }
+
+  const whereCondition = whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions);
+
   const query = db
     .select({
       id: datasetVariable.id,
@@ -133,7 +152,7 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
     })
     .from(datasetVariable)
     .innerJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
-    .where(eq(datasetVariablesetItem.variablesetId, variablesetId))
+    .where(whereCondition)
     .orderBy(datasetVariablesetItem.orderIndex, datasetVariable.name);
 
   const results = await query;
@@ -146,6 +165,28 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
 }
 
 async function getUnassignedVariablesFn(datasetId: string, options: ListOptions = {}) {
+  const { search } = options;
+  
+  // Build where conditions
+  const whereConditions = [
+    eq(datasetVariable.datasetId, datasetId), 
+    isNull(datasetVariablesetItem.variableId)
+  ];
+  
+  // Add search if provided
+  if (search) {
+    const searchConditions = [
+      ilike(datasetVariable.name, `%${search}%`),
+      ilike(datasetVariable.label, `%${search}%`)
+    ];
+    const searchOr = or(...searchConditions);
+    if (searchOr) {
+      whereConditions.push(searchOr);
+    }
+  }
+
+  const whereCondition = whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions);
+
   // Get variables that are not assigned to any variableset
   const query = db
     .select({
@@ -162,7 +203,7 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
     })
     .from(datasetVariable)
     .leftJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
-    .where(and(eq(datasetVariable.datasetId, datasetId), isNull(datasetVariablesetItem.variableId)))
+    .where(whereCondition)
     .orderBy(datasetVariable.name);
 
   const results = await query;

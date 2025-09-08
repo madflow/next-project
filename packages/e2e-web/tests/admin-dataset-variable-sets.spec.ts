@@ -274,12 +274,100 @@ test.describe("Admin Dataset Variable Sets", () => {
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
     await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
     
-    // Test search in available variables
+    // Wait for variables to load and count initial available variables
+    await page.waitForTimeout(1000);
+    const initialVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    expect(initialVariableCount).toBeGreaterThan(0);
+    
+    // Test search in available variables section
     const searchInput = page.getByPlaceholder(/search/i).first();
     await searchInput.fill("age");
     
-    // Verify search results are filtered
+    // Verify search input value
     await expect(searchInput).toHaveValue("age");
+    
+    // Wait for search results to update
+    await page.waitForTimeout(500);
+    
+    // Verify that search results are filtered (should be fewer variables)
+    const filteredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    expect(filteredVariableCount).toBeLessThanOrEqual(initialVariableCount);
+    
+    // Clear search and verify variables list is restored
+    await searchInput.clear();
+    await page.waitForTimeout(500);
+    const restoredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    expect(restoredVariableCount).toBe(initialVariableCount);
+    
+    // Test search with no results
+    await searchInput.fill("nonexistentvariablename123");
+    await page.waitForTimeout(500);
+    const noResultsCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    expect(noResultsCount).toBe(0);
+  });
+
+  test("should test search functionality in both available and assigned variables", async ({ page }) => {
+    const setName = `Search Both Sections ${Date.now()}`;
+    
+    // Create a variable set and assign some variables to it
+    await page.getByTestId("admin.dataset.variableset.create").click();
+    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.submit").click();
+    await expect(page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })).toBeVisible();
+    
+    // Select the set
+    await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
+    await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
+    
+    // Assign a few variables to the set first
+    const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
+    const buttonCount = await addButtons.count();
+    if (buttonCount > 0) {
+      await addButtons.first().click();
+      await expect(page.getByTestId("admin.dataset.variableset.assignment.remove").first()).toBeVisible();
+    }
+    if (buttonCount > 1) {
+      await addButtons.first().click(); // Add another variable
+      await page.waitForTimeout(500);
+    }
+    
+    // Test search in assigned variables section
+    const assignedSearchInput = page.getByPlaceholder(/search/i).last(); // Second search input (assigned section)
+    
+    // Wait for assigned variables to load
+    await page.waitForTimeout(1000);
+    const initialAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
+    
+    if (initialAssignedCount > 0) {
+      // Test search in assigned section
+      await assignedSearchInput.fill("nonexistent");
+      await page.waitForTimeout(500);
+      const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
+      expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
+      
+      // Clear search in assigned section
+      await assignedSearchInput.clear();
+      await page.waitForTimeout(500);
+      const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
+      expect(restoredAssignedCount).toBe(initialAssignedCount);
+    }
+    
+    // Test search in available variables section
+    const availableSearchInput = page.getByPlaceholder(/search/i).first(); // First search input (available section)
+    const initialAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    
+    if (initialAvailableCount > 0) {
+      await availableSearchInput.fill("age");
+      await page.waitForTimeout(500);
+      const filteredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+      expect(filteredAvailableCount).toBeLessThanOrEqual(initialAvailableCount);
+      
+      // Clear search in available section
+      await availableSearchInput.clear();
+      await page.waitForTimeout(500);
+      const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+      expect(restoredAvailableCount).toBe(initialAvailableCount);
+    }
   });
 
   test("should preserve variable set state during navigation", async ({ page }) => {
