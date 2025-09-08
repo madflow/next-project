@@ -1,10 +1,10 @@
 "use client";
 
-import { Plus } from "lucide-react";
+
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 import { VariableAssignment } from "../dataset-variableset/variable-assignment";
@@ -72,15 +72,9 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-medium mt-6">{t("title")}</h2>
-          <p className="text-muted-foreground text-sm">{t("description")}</p>
-        </div>
-        <Button onClick={handleCreateSet} data-testid="admin.dataset.variableset.create">
-          <Plus className="mr-2 h-4 w-4" />
-          {t("createSet")}
-        </Button>
+      <div>
+        <h2 className="text-base font-medium mt-6">{t("title")}</h2>
+        <p className="text-muted-foreground text-sm">{t("description")}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -89,6 +83,11 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
           <CardHeader>
             <CardTitle>{t("editTitle")}</CardTitle>
             <CardDescription>{t("editDescription")}</CardDescription>
+            <CardAction>
+              <Button onClick={handleCreateSet} data-testid="admin.dataset.variableset.create" className="cursor-pointer">
+                {t("createSet")}
+              </Button>
+            </CardAction>
           </CardHeader>
           <CardContent className="p-4">
             {isLoading ? (

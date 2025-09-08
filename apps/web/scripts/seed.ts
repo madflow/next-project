@@ -16,8 +16,8 @@ import {
   session,
   user,
 } from "@repo/database/schema";
-import { deleteDataset } from "@/lib/storage";
 import { createDataset as createDatasetService } from "@/lib/dataset-service";
+import { deleteDataset } from "@/lib/storage";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -146,7 +146,7 @@ async function createDataset(id: string, name: string, organizationId: string, p
   const datasetBuffer = await readFile(join(__dirname, "./fixtures/demo.sav"));
   const file = new File([new Uint8Array(datasetBuffer)], "demo.sav");
   const contentType = "application/octet-stream";
-  
+
   const result = await createDatasetService({
     file,
     name,
@@ -365,6 +365,7 @@ try {
   await adminPool.end();
 
   console.log("Seed completed successfully");
+  process.exit(0);
 } catch (error) {
   console.error("Error during seed:", error);
   process.exit(1);
