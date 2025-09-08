@@ -260,7 +260,8 @@
       "projects": "Projects",
       "title": "Dataset Editor for {name}",
       "variables": "Variables",
-      "variablesets": "Variable Sets"
+      "variablesets": "Variable Sets",
+      "splitvariables": "Split Variables"
     },
     "error": "Error",
     "fetchProjectsError": "Failed to fetch projects.",
@@ -339,6 +340,21 @@
       "actions": "Actions"
     },
     "searchPlaceholder": "Search variable sets"
+  },
+  "adminDatasetSplitVariables": {
+    "title": "Split Variables",
+    "description": "Variables that can be used to split analysis of other variables",
+    "assignment": {
+      "available": "Available Variables",
+      "assigned": "Split Variables",
+      "search": "Search variables...",
+      "addSuccess": "Variable added as split variable",
+      "addError": "Failed to add split variable",
+      "removeSuccess": "Split variable removed",
+      "removeError": "Failed to remove split variable",
+      "noAvailable": "No variables available",
+      "noAssigned": "No split variables assigned"
+    }
   },
   "adminDatasetInfoModal": {
     "buttons": {
