@@ -260,7 +260,8 @@
       "projects": "Projekte",
       "title": "Datensatz-Editor für {name}",
       "variables": "Variablen",
-      "variablesets": "Variablen-Sets"
+      "variablesets": "Variablen-Sets",
+      "splitvariables": "Split-Variablen"
     },
     "error": "Fehler",
     "fetchProjectsError": "Fehler beim Abrufen der Projekte.",
@@ -339,6 +340,21 @@
       "actions": "Aktionen"
     },
     "searchPlaceholder": "Variablen-Sets suchen"
+  },
+  "adminDatasetSplitVariables": {
+    "title": "Split-Variablen",
+    "description": "Variablen, die zur Aufteilung der Analyse anderer Variablen verwendet werden können",
+    "assignment": {
+      "available": "Verfügbare Variablen",
+      "assigned": "Split-Variablen",
+      "search": "Variablen suchen...",
+      "addSuccess": "Variable als Split-Variable hinzugefügt",
+      "addError": "Fehler beim Hinzufügen der Split-Variable",
+      "removeSuccess": "Split-Variable entfernt",
+      "removeError": "Fehler beim Entfernen der Split-Variable",
+      "noAvailable": "Keine Variablen verfügbar",
+      "noAssigned": "Keine Split-Variablen zugewiesen"
+    }
   },
   "adminDatasetInfoModal": {
     "buttons": {
