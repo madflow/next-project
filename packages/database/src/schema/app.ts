@@ -210,3 +210,29 @@ export const selectDatasetVariablesetItemSchema = createSelectSchema(datasetVari
 
 export type CreateDatasetVariablesetItemData = z.infer<typeof insertDatasetVariablesetItemSchema>;
 export type DatasetVariablesetItem = z.infer<typeof selectDatasetVariablesetItemSchema>;
+
+export const datasetSplitVariable = pgTable(
+  "dataset_splitvariables",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    datasetId: uuid("dataset_id")
+      .notNull()
+      .references(() => dataset.id, { onDelete: "cascade" }),
+    variableId: uuid("variable_id")
+      .notNull()
+      .references(() => datasetVariable.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("dataset_splitvariables_unique_idx").on(table.datasetId, table.variableId),
+    index("dataset_splitvariables_dataset_id_idx").on(table.datasetId),
+  ]
+);
+
+export const insertDatasetSplitVariableSchema = createInsertSchema(datasetSplitVariable);
+export const selectDatasetSplitVariableSchema = createSelectSchema(datasetSplitVariable);
+export const updateDatasetSplitVariableSchema = createUpdateSchema(datasetSplitVariable);
+
+export type CreateDatasetSplitVariableData = z.infer<typeof insertDatasetSplitVariableSchema>;
+export type DatasetSplitVariable = z.infer<typeof selectDatasetSplitVariableSchema>;
+export type UpdateDatasetSplitVariableData = z.infer<typeof updateDatasetSplitVariableSchema>;
