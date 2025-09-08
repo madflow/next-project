@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { type AuthUser } from "@/types/user";
 import { DeleteUserDialog } from "./delete-user-dialog";
+import { ImpersonateUserButton } from "./impersonate-user-button";
 import { InfoUserModal } from "./info-user-modal";
 
 export const columns: ColumnDef<AuthUser>[] = [
@@ -48,24 +49,25 @@ export const columns: ColumnDef<AuthUser>[] = [
       const id = row.original.id;
       const email = row.original.email;
 
-      return (
-        <div className="flex flex-row gap-2">
-          <InfoUserModal user={row.original} />
-          <Button
-            asChild
-            variant="outline"
-            title={t("actions.edit")}
-            role="button"
-            className="cursor-pointer"
-            data-testid={`admin.users.list.edit-${email}`}>
-            <Link href={`/admin/users/edit/${id}`}>
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">{t("actions.edit")}</span>
-            </Link>
-          </Button>
-          <DeleteUserDialog userId={id} userName={row.original.name || row.original.email} onDelete={remove} />
-        </div>
-      );
+       return (
+         <div className="flex flex-row gap-2">
+           <InfoUserModal user={row.original} />
+           <ImpersonateUserButton userId={id} userRole={row.original.role as string} />
+           <Button
+             asChild
+             variant="outline"
+             title={t("actions.edit")}
+             role="button"
+             className="cursor-pointer"
+             data-testid={`admin.users.list.edit-${email}`}>
+             <Link href={`/admin/users/edit/${id}`}>
+               <Pencil className="h-4 w-4" />
+               <span className="sr-only">{t("actions.edit")}</span>
+             </Link>
+           </Button>
+           <DeleteUserDialog userId={id} userName={row.original.name || row.original.email} onDelete={remove} />
+         </div>
+       );
     },
   },
 ];
