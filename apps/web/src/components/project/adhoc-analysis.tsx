@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { DatasetSelect } from "@/components/form/dataset-select";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
 import { type Project } from "@/types/project";
@@ -23,7 +23,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
 
   const t = useTranslations("projectAdhocAnalysis");
 
-  const { mutate, isPending } = useDatasetStats(selectedDataset || "", {
+  const { mutate } = useDatasetStats(selectedDataset || "", {
     onError: (error) => {
       console.error(t("errors.fetchStats"), error);
     },
@@ -90,14 +90,14 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         )}
       </div>
       
-      {isPending && <BarSkeleton />}
-      
       {selectedDataset && currentSelection && selectedVariables.length > 0 && (
-        <MultiVariableCharts 
-          variables={selectedVariables}
-          statsData={statsData}
-          variableset={currentSelection?.type === "set" ? currentSelection.variableset : undefined}
-        />
+        <Suspense fallback={<BarSkeleton />}>
+          <MultiVariableCharts 
+            variables={selectedVariables}
+            statsData={statsData}
+            variableset={currentSelection?.type === "set" ? currentSelection.variableset : undefined}
+          />
+        </Suspense>
       )}
     </div>
   );
