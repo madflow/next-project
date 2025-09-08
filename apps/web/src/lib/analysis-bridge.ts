@@ -55,3 +55,26 @@ export function transformToRechartsPieData(variableConfig: DatasetVariable, stat
 
   return rechartsData;
 }
+
+export function transformToRechartsStackedBarData(variableConfig: DatasetVariable, statsData: StatsResponse) {
+  const valueLabels = variableConfig.valueLabels ?? {};
+  const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
+
+  // For stacked bar, we create one entry per category with percentage as the stack
+  const rechartsData = sortedFrequencyTable.map((item, index) => {
+    const valueKey = item.value.toString() as keyof typeof valueLabels;
+    const label = valueLabels[valueKey] || item.value;
+
+    return {
+      label: label,
+      value: item.value,
+      count: item.counts,
+      percentage: item.percentages,
+      // Add individual percentage for stacking
+      stackValue: item.percentages,
+      fill: `hsl(var(--chart-${(index % 6) + 1}))`,
+    };
+  });
+
+  return rechartsData;
+}
