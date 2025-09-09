@@ -124,7 +124,7 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
       if (!isNaN(numA) && !isNaN(numB)) {
         return numA - numB; // Numeric sort
       }
-    } catch (e) {
+    } catch {
       // Fall back to string sort
     }
     return a.localeCompare(b); // String sort

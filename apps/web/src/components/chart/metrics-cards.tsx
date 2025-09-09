@@ -2,13 +2,15 @@
 
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getVariableStats } from "@/lib/analysis-bridge";
+import { useQueryApi } from "@/hooks/use-query-api";
+import { getVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 
 type BarAdhocProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
+  datasetId?: string;
   renderAsContent?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
@@ -17,9 +19,44 @@ function formatDecimal(value?: number) {
   return new Intl.NumberFormat("de-DE", { style: "decimal" }).format(value);
 }
 
-export function MetricsCards({ variable, stats, renderAsContent, ...props }: BarAdhocProps) {
+export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...props }: BarAdhocProps) {
   const t = useTranslations("chartMetricsCard");
   const variableStats = getVariableStats(variable, stats);
+
+  // Fetch split variables when datasetId is provided
+  const { data: splitVariablesResponse } = useQueryApi<{rows: DatasetVariable[]}>({
+    endpoint: `/api/datasets/${datasetId}/splitvariables`,
+    pagination: { pageIndex: 0, pageSize: 100 },
+    sorting: [],
+    search: "",
+    queryKey: ["dataset-split-variables", datasetId],
+    enabled: !!datasetId,
+  });
+
+  const allVariables = splitVariablesResponse?.rows || [];
+
+  // Helper function to get split variable description
+  function getSplitVariableDescription(variable: DatasetVariable, stats: StatsResponse): string | null {
+    // Find the stats for this variable
+    const targetVariable = stats.find((item) => item.variable === variable.name);
+    if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
+      return null;
+    }
+    
+    const splitVariableName = targetVariable.stats.split_variable;
+    
+    // Try to find the split variable in allVariables to get its label
+    if (allVariables.length > 0) {
+      const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
+      if (splitVariable) {
+        const splitVariableLabel = splitVariable.label ?? splitVariable.name;
+        return `Split by ${splitVariableLabel}`;
+      }
+    }
+    
+    // Fallback to variable name if no label found
+    return `Split by ${splitVariableName}`;
+  }
 
   const content = (
     <div className="grid grid-cols-3 gap-2">
@@ -70,6 +107,9 @@ export function MetricsCards({ variable, stats, renderAsContent, ...props }: Bar
     <Card className="shadow-xs" {...props}>
       <CardHeader>
         <CardTitle>{variable.label ?? variable.name}</CardTitle>
+        {getSplitVariableDescription(variable, stats) && (
+          <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+        )}
       </CardHeader>
       <CardContent>{content}</CardContent>
     </Card>
