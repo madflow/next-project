@@ -6,6 +6,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
+import { extractVariableStats } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -20,8 +21,8 @@ export function MeanBarAdhoc({ variable, stats, renderAsContent, ...props }: Mea
   const t = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
 
-  // Find the stats for this variable
-  const variableStats = stats.find((item) => item.variable === variable.name)?.stats;
+  // Find the stats for this variable using the helper function
+  const variableStats = extractVariableStats(variable, stats);
   if (!variableStats) return null;
 
   // Create data for mean and median bars
