@@ -69,7 +69,7 @@ export function MultiVariableCharts({
             }
           />
         </div>
-        <AdhocChart variable={variable} stats={stats} className="w-[600px]" />
+        <AdhocChart variable={variable} stats={stats} datasetId={datasetId} className="w-[600px]" />
       </div>
     );
   }
@@ -98,6 +98,7 @@ export function MultiVariableCharts({
             <AdhocChart
               variable={variable}
               stats={stats}
+              datasetId={datasetId}
               className="w-[600px]"
             />
           </div>

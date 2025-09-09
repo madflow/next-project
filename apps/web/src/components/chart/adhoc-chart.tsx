@@ -12,7 +12,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from "recharts";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -24,7 +24,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useChartExport } from "@/hooks/use-chart-export";
-import { transformToRechartsBarData, transformToRechartsPieData, extractVariableStats } from "@/lib/analysis-bridge";
+import { useQueryApi } from "@/hooks/use-query-api";
+import { transformToRechartsBarData, transformToRechartsPieData, extractVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -36,12 +37,48 @@ import { MetricsCards } from "./metrics-cards";
 type AdhocChartProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
+  datasetId?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
+export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const tChart = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
+
+  // Fetch split variables when datasetId is provided
+  const { data: splitVariablesResponse } = useQueryApi<{rows: DatasetVariable[]}>({
+    endpoint: `/api/datasets/${datasetId}/splitvariables`,
+    pagination: { pageIndex: 0, pageSize: 100 },
+    sorting: [],
+    search: "",
+    queryKey: ["dataset-split-variables", datasetId],
+    enabled: !!datasetId,
+  });
+
+  const allVariables = splitVariablesResponse?.rows || [];
+
+  // Helper function to get split variable description
+  function getSplitVariableDescription(variable: DatasetVariable, stats: StatsResponse): string | null {
+    // Find the stats for this variable
+    const targetVariable = stats.find((item) => item.variable === variable.name);
+    if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
+      return null;
+    }
+    
+    const splitVariableName = targetVariable.stats.split_variable;
+    
+    // Try to find the split variable in allVariables to get its label
+    if (allVariables.length > 0) {
+      const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
+      if (splitVariable) {
+        const splitVariableLabel = splitVariable.label ?? splitVariable.name;
+        return `Split by ${splitVariableLabel}`;
+      }
+    }
+    
+    // Fallback to variable name if no label found
+    return `Split by ${splitVariableName}`;
+  }
 
   function getAvailableChartTypes(variable: DatasetVariable, stats: StatsResponse): AnalysisChartType[] {
     const availableCharts: AnalysisChartType[] = [];
@@ -196,10 +233,10 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
       }
 
       case "metrics":
-        return <MetricsCards variable={variable} stats={stats} />;
+        return <MetricsCards variable={variable} stats={stats} datasetId={datasetId} />;
 
       case "meanBar":
-        return <MeanBarAdhoc variable={variable} stats={stats} />;
+        return <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} />;
 
       default:
         return null;
@@ -237,9 +274,12 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
           <TabsContent value="chart">
             <Card className="shadow-xs">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{variable.label ?? variable.name}</CardTitle>
-                  {availableChartTypes.length > 1 && (
+                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                {getSplitVariableDescription(variable, stats) && (
+                  <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+                )}
+                {availableChartTypes.length > 1 && (
+                  <CardAction>
                     <ToggleGroup
                       type="single"
                       value={selectedChartType}
@@ -251,14 +291,14 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
                         </ToggleGroupItem>
                       ))}
                     </ToggleGroup>
-                  )}
-                </div>
+                  </CardAction>
+                )}
               </CardHeader>
               <CardContent>
                 {selectedChartType === "metrics" ? (
-                  <MetricsCards variable={variable} stats={stats} renderAsContent />
+                  <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
                 ) : (
-                  <MeanBarAdhoc variable={variable} stats={stats} renderAsContent />
+                  <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
                 )}
               </CardContent>
               {selectedChartType === "meanBar" && (
@@ -274,6 +314,9 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
             <Card className="shadow-xs">
               <CardHeader>
                 <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                {getSplitVariableDescription(variable, stats) && (
+                  <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+                )}
               </CardHeader>
               <CardContent>
                 <Code>{JSON.stringify(variable, null, 2)}</Code>
@@ -284,6 +327,9 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
             <Card className="shadow-xs">
               <CardHeader>
                 <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                {getSplitVariableDescription(variable, stats) && (
+                  <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+                )}
               </CardHeader>
               <CardContent>
                 <Code>{JSON.stringify(stats, null, 2)}</Code>
@@ -306,9 +352,12 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
         <TabsContent value="chart">
           <Card className="shadow-xs">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>{variable.label ?? variable.name}</CardTitle>
-                {availableChartTypes.length > 1 && (
+              <CardTitle>{variable.label ?? variable.name}</CardTitle>
+              {getSplitVariableDescription(variable, stats) && (
+                <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+              )}
+              {availableChartTypes.length > 1 && (
+                <CardAction>
                   <ToggleGroup
                     type="single"
                     value={selectedChartType}
@@ -320,8 +369,8 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
                       </ToggleGroupItem>
                     ))}
                   </ToggleGroup>
-                )}
-              </div>
+                </CardAction>
+              )}
             </CardHeader>
             <CardContent>{renderChart()}</CardContent>
             <CardFooter>
@@ -335,6 +384,9 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
           <Card className="shadow-xs">
             <CardHeader>
               <CardTitle>{variable.label ?? variable.name}</CardTitle>
+              {getSplitVariableDescription(variable, stats) && (
+                <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+              )}
             </CardHeader>
             <CardContent>
               <Code>{JSON.stringify(variable, null, 2)}</Code>
@@ -345,6 +397,9 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
           <Card className="shadow-xs">
             <CardHeader>
               <CardTitle>{variable.label ?? variable.name}</CardTitle>
+              {getSplitVariableDescription(variable, stats) && (
+                <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+              )}
             </CardHeader>
             <CardContent>
               <Code>{JSON.stringify(stats, null, 2)}</Code>
