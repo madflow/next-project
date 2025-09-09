@@ -36,6 +36,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         : currentSelection.variables || [];
 
       if (variables.length > 0) {
+        // Initialize stats data for all variables without split variables
+        // Individual split variable requests will be handled by MultiVariableCharts
         const request: StatsRequest = {
           variables: variables.map(v => ({ variable: v.name })),
         };
@@ -58,6 +60,26 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const handleSelectionChange = (selection: SelectionItem) => {
     setCurrentSelection(selection);
     setStatsData({});
+  };
+
+  const handleStatsRequest = (variableName: string, splitVariable?: string) => {
+    if (currentSelection) {
+      const request: StatsRequest = {
+        variables: [{ variable: variableName, split_variable: splitVariable }],
+      };
+
+      mutate(request, {
+        onSuccess: (data) => {
+          const responseItem = data[0];
+          if (responseItem) {
+            setStatsData(prev => ({
+              ...prev,
+              [variableName]: [responseItem]
+            }));
+          }
+        },
+      });
+    }
   };
 
   const selectedVariables = currentSelection?.type === "variable" && currentSelection.variable
@@ -96,6 +118,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             variables={selectedVariables}
             statsData={statsData}
             variableset={currentSelection?.type === "set" ? currentSelection.variableset : undefined}
+            datasetId={selectedDataset}
+            onStatsRequestAction={handleStatsRequest}
           />
         </Suspense>
       )}

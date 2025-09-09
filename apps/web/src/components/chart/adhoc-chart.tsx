@@ -24,7 +24,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useChartExport } from "@/hooks/use-chart-export";
-import { transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
+import { transformToRechartsBarData, transformToRechartsPieData, extractVariableStats } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -45,7 +45,8 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
 
   function getAvailableChartTypes(variable: DatasetVariable, stats: StatsResponse): AnalysisChartType[] {
     const availableCharts: AnalysisChartType[] = [];
-    const frequencyTableLength = stats[0]?.stats?.frequency_table?.length || 0;
+    const variableStats = extractVariableStats(variable, stats);
+    const frequencyTableLength = variableStats?.frequency_table?.length || 0;
 
     if (variable.measure === "nominal") {
       availableCharts.push("horizontalBar");
