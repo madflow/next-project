@@ -24,10 +24,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useChartExport } from "@/hooks/use-chart-export";
-import { transformToRechartsBarData, transformToRechartsPieData, transformToRechartsStackedBarData } from "@/lib/analysis-bridge";
+import { transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
+import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { Code } from "../ui/code";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
@@ -146,68 +147,8 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
           </ChartContainer>
         );
 
-      case "horizontalStackedBar": {
-        const stackedData = transformToRechartsStackedBarData(variable, stats);
-        const stackedChartConfig: ChartConfig = {};
-        
-        // Create one horizontal bar with multiple segments
-        const singleBarData = [{
-          label: variable.label ?? variable.name,
-          ...stackedData.reduce((acc, item, index) => {
-            const key = `segment${index}`;
-            stackedChartConfig[key] = {
-              label: item.label,
-              color: `hsl(var(--chart-${(index % 6) + 1}))`,
-            };
-            acc[key] = item.percentage;
-            return acc;
-          }, {} as Record<string, number>)
-        }];
-
-        return (
-          <ChartContainer config={stackedChartConfig} ref={ref} data-export-filename={variable.name}>
-            <BarChart
-              layout="vertical"
-              margin={{ left: 0 }}
-              accessibilityLayer
-              data={singleBarData}>
-              <CartesianGrid vertical={true} horizontal={false} />
-              <XAxis
-                domain={[0, 100]}
-                type="number"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                fontSize={10}
-                tickFormatter={(value) => `${value}%`}
-              />
-              <YAxis
-                dataKey="label"
-                type="category"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                fontSize={10}
-                width={100}
-              />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              {stackedData.map((_, index) => (
-                <Bar
-                  key={`segment${index}`}
-                  dataKey={`segment${index}`}
-                  stackId="categories"
-                  fill={`var(--color-segment${index})`}
-                  radius={index === 0 ? [5, 0, 0, 5] : index === stackedData.length - 1 ? [0, 5, 5, 0] : [0, 0, 0, 0]}
-                />
-              ))}
-              <ChartLegend
-                content={<ChartLegendContent />}
-                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-              />
-            </BarChart>
-          </ChartContainer>
-        );
-      }
+      case "horizontalStackedBar":
+        return <HorizontalStackedBarAdhoc variable={variable} stats={stats} ref={ref} />;
 
       case "pie": {
         const pieData = transformToRechartsPieData(variable, stats);
