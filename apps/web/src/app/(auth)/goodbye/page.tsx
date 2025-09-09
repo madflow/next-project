@@ -8,7 +8,7 @@ export default async function GoodbyePage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-xs">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">{t("account.delete.successTitle")}</CardTitle>
           <CardDescription>{t("account.delete.successMessage")}</CardDescription>
