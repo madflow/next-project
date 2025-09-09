@@ -49,6 +49,7 @@
 - Use Shadcn UI for components.
 - Use Tailwind utility classes directly in JSX
 - Follow mobile-first responsive patterns
+- Always apply `shadow-xs` class to all Shadcn UI Card components for consistent styling
 
 ## Forms
 

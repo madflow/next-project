@@ -16,7 +16,7 @@ export default async function AccountPage() {
 
         <div className="space-y-6">
           {/* Avatar Upload Section */}
-          <Card className="w-full">
+          <Card className="w-full shadow-xs">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">{t("account.profile.avatar.title")}</CardTitle>
               <CardDescription>{t("account.profile.avatar.description")}</CardDescription>
@@ -27,7 +27,7 @@ export default async function AccountPage() {
           </Card>
 
           {/* Name Update Section */}
-          <Card className="w-full">
+          <Card className="w-full shadow-xs">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">{t("account.profile.nameTitle")}</CardTitle>
               <CardDescription>{t("account.profile.nameDescription")}</CardDescription>
@@ -38,7 +38,7 @@ export default async function AccountPage() {
           </Card>
 
           {/* Email Update Section */}
-          <Card className="w-full">
+          <Card className="w-full shadow-xs">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">{t("account.profile.emailTitle")}</CardTitle>
               <CardDescription>{t("account.profile.emailDescription")}</CardDescription>
@@ -49,7 +49,7 @@ export default async function AccountPage() {
           </Card>
 
           {/* Password Update Section */}
-          <Card className="w-full">
+          <Card className="w-full shadow-xs">
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">{t("account.password.title")}</CardTitle>
               <CardDescription>{t("account.password.description")}</CardDescription>

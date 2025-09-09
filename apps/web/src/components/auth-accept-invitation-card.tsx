@@ -41,7 +41,7 @@ export function AuthAcceptInvitationCard({ invitationId, userId }: { invitationI
 
   if (session.data === null) {
     return (
-      <Card className="w-full max-w-md" data-testid="auth-accept-invitation-card-not-signed-in">
+      <Card className="w-full max-w-md shadow-xs" data-testid="auth-accept-invitation-card-not-signed-in">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
@@ -52,7 +52,7 @@ export function AuthAcceptInvitationCard({ invitationId, userId }: { invitationI
 
   if (session.data?.user.id !== userId) {
     return (
-      <Card className="w-full max-w-md" data-testid="auth-accept-invitation-card-not-authorized">
+      <Card className="w-full max-w-md shadow-xs" data-testid="auth-accept-invitation-card-not-authorized">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
@@ -62,7 +62,7 @@ export function AuthAcceptInvitationCard({ invitationId, userId }: { invitationI
   }
 
   return (
-    <Card className="w-full max-w-md" data-testid="auth-accept-invitation-card">
+    <Card className="w-full max-w-md shadow-xs" data-testid="auth-accept-invitation-card">
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>

@@ -14,7 +14,7 @@ export function DeleteAccountSection() {
   const t = useTranslations();
 
   return (
-    <Card className="border-destructive w-full">
+    <Card className="border-destructive w-full shadow-xs">
       <CardHeader>
         <CardTitle className="text-destructive text-lg sm:text-xl">{t("account.delete.title")}</CardTitle>
         <CardDescription>{t("account.delete.description")}</CardDescription>
