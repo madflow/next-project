@@ -152,7 +152,7 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
         
         // Create one horizontal bar with multiple segments
         const singleBarData = [{
-          label: "Categories",
+          label: variable.label ?? variable.name,
           ...stackedData.reduce((acc, item, index) => {
             const key = `segment${index}`;
             stackedChartConfig[key] = {
