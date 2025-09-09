@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -49,47 +48,40 @@ export function SplitVariableSelector({
   };
 
   return (
-    <Card className="shadow-xs">
-      <CardHeader className="px-3 py-2">
-        <CardTitle className="text-sm font-medium">
-          {"Split Variable"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="px-3 py-2">
-        <div className="space-y-2">
-          <Label htmlFor="split-variable-select" className="text-xs">
-            {"Select split variable"}
-          </Label>
-          <Select
-            value={selectedSplitVariable || "none"}
-            onValueChange={handleValueChange}
-          >
-            <SelectTrigger id="split-variable-select" className="h-8">
-              <SelectValue placeholder={"Choose split variable..."} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">
-                {"None"}
+    <div className="space-y-1">
+      <div className="flex items-center gap-2">
+        <Label htmlFor="split-variable-select" className="text-sm font-medium min-w-fit">
+          {"Split Variable:"}
+        </Label>
+        <Select
+          value={selectedSplitVariable || "none"}
+          onValueChange={handleValueChange}
+        >
+          <SelectTrigger id="split-variable-select" className="h-8 flex-1">
+            <SelectValue placeholder={"Choose split variable..."} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">
+              {"None"}
+            </SelectItem>
+            {isLoading && (
+              <SelectItem value="loading" disabled>
+                {"Loading..."}
               </SelectItem>
-              {isLoading && (
-                <SelectItem value="loading" disabled>
-                  {"Loading..."}
-                </SelectItem>
-              )}
-              {splitVariables.map((variable) => (
-                <SelectItem key={variable.id} value={variable.name}>
-                  {variable.label} {"("}{variable.name}{")"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {selectedSplitVariable && (
-            <p className="text-xs text-muted-foreground">
-              {"Charts will be split by categories of this variable."}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            )}
+            {splitVariables.map((variable) => (
+              <SelectItem key={variable.id} value={variable.name}>
+                {variable.label} {"("}{variable.name}{")"}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {selectedSplitVariable && (
+        <p className="text-xs text-muted-foreground ml-0">
+          {"Charts will be split by categories of this variable."}
+        </p>
+      )}
+    </div>
   );
 }

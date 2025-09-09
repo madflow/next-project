@@ -104,12 +104,13 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             onSelectionChangeAction={handleSelectionChange} 
           />
         )}
-        {currentSelection?.type === "set" && currentSelection.variableset && (
+        {(currentSelection?.type === "set" && currentSelection.variableset) || 
+         (currentSelection?.type === "variable" && currentSelection.parentVariableset) ? (
           <VariablesetDescription 
-            variableset={currentSelection.variableset}
-            variables={currentSelection.variables}
+            variableset={currentSelection.type === "set" ? currentSelection.variableset! : currentSelection.parentVariableset!}
+            variables={currentSelection.type === "set" ? currentSelection.variables : [currentSelection.variable!]}
           />
-        )}
+        ) : null}
       </div>
       
       {selectedDataset && currentSelection && selectedVariables.length > 0 && (
@@ -117,7 +118,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           <MultiVariableCharts 
             variables={selectedVariables}
             statsData={statsData}
-            variableset={currentSelection?.type === "set" ? currentSelection.variableset : undefined}
+            variableset={currentSelection?.type === "set" ? currentSelection.variableset : currentSelection?.parentVariableset}
             datasetId={selectedDataset}
             onStatsRequestAction={handleStatsRequest}
           />
