@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderIcon, VariableIcon } from "lucide-react";
+import { FolderIcon } from "lucide-react";
 import type { DatasetVariable } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -45,4 +45,3 @@ export function VariablesetDescription({ variableset, variables }: VariablesetDe
     </Card>
   );
 }
-
