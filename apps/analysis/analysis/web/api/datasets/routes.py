@@ -22,10 +22,13 @@ router = APIRouter(tags=["datasets"])
 
 class StatsVariable(BaseModel):
     variable: str
+    split_variable: Optional[str] = None
 
 
 class StatsRequest(BaseModel):
     variables: List[StatsVariable]
+    # Keep global split_variable for backward compatibility
+    split_variable: Optional[str] = None
 
 
 async def _get_dataset_by_id(db: AsyncSession, dataset_id: str) -> Optional[Dataset]:
@@ -172,7 +175,7 @@ async def get_dataset_metadata(
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
 
-    if not dataset.s3_key:
+    if dataset.s3_key is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Dataset has no associated S3 key",
@@ -180,7 +183,7 @@ async def get_dataset_metadata(
 
     try:
         # Read the SAV file from S3
-        data, metadata = _read_sav_from_s3(dataset.s3_key)
+        data, metadata = _read_sav_from_s3(str(dataset.s3_key))
 
         return MetadataResponse(
             status="success",
@@ -213,16 +216,17 @@ async def get_dataset_stats(
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
 
-    if not dataset.s3_key:
+    if dataset.s3_key is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Dataset has no associated S3 key",
         )
 
     try:
-        df = _read_dataframe_from_s3(dataset.s3_key)
+        df = _read_dataframe_from_s3(str(dataset.s3_key))
         stats_service = StatisticsService()
         results = []
+        
         for var_request in stats_request.variables:
             try:
                 dataset_variable = await _get_dataset_variable_by_name(
@@ -230,11 +234,37 @@ async def get_dataset_stats(
                 )
                 if not dataset_variable:
                     raise ValueError(f"Variable {var_request.variable} not found")
+                
+                # Use per-variable split_variable if provided, otherwise fall back to global
+                split_var = var_request.split_variable or stats_request.split_variable
+                
+                # Get split variable value labels if split variable is provided
+                split_variable_value_labels: dict[str, str] | None = None
+                split_variable_missing_values: list[str | int | float] | None = None
+                if split_var:
+                    split_variable_obj = await _get_dataset_variable_by_name(
+                        db, dataset_id, split_var
+                    )
+                    if not split_variable_obj:
+                        raise ValueError(f"Split variable {split_var} not found")
+                    # Cast JSONB to dict
+                    value_labels_raw = split_variable_obj.value_labels
+                    if isinstance(value_labels_raw, dict):
+                        split_variable_value_labels = {str(k): str(v) for k, v in value_labels_raw.items()}
+                    else:
+                        split_variable_value_labels = None
+                    
+                    # Get missing values for split variable
+                    split_variable_missing_values = split_variable_obj.missing_values  # type: ignore
+                
                 stats = stats_service.describe_var(
                     df,
                     var_request.variable,
                     missing_values=dataset_variable.missing_values,  # type: ignore
                     value_labels=dataset_variable.value_labels,  # type: ignore
+                    split_variable=split_var,
+                    split_variable_value_labels=split_variable_value_labels,
+                    split_variable_missing_values=split_variable_missing_values,
                 )
                 results.append({"variable": var_request.variable, "stats": stats})
             except ValueError as e:

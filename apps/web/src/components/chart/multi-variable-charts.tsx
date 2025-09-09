@@ -1,17 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import type { DatasetVariable } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
 import { AdhocChart } from "./adhoc-chart";
+import { SplitVariableSelector } from "../project/split-variable-selector";
 
 type MultiVariableChartsProps = {
   variables: DatasetVariable[];
   statsData: Record<string, StatsResponse>;
   variableset?: VariablesetTreeNode;
+  datasetId: string;
+  onStatsRequestAction: (variableName: string, splitVariable?: string) => void;
 };
 
-export function MultiVariableCharts({ variables, statsData, variableset }: MultiVariableChartsProps) {
+export function MultiVariableCharts({ 
+  variables, 
+  statsData, 
+  variableset, 
+  datasetId, 
+  onStatsRequestAction 
+}: MultiVariableChartsProps) {
+  const [splitVariables, setSplitVariables] = useState<Record<string, string | null>>({});
+
   if (variables.length === 0) {
     return <div className="text-muted-foreground">{"No variables selected"}</div>;
   }
@@ -22,6 +34,16 @@ export function MultiVariableCharts({ variables, statsData, variableset }: Multi
     // Create a suspended promise that will resolve when data is available
     throw new Promise(() => {}); // This will trigger Suspense
   }
+
+  const handleSplitVariableChange = (variableName: string, splitVariable: string | null) => {
+    setSplitVariables(prev => ({
+      ...prev,
+      [variableName]: splitVariable
+    }));
+    
+    // Request new stats with the split variable
+    onStatsRequestAction(variableName, splitVariable || undefined);
+  };
 
   if (variables.length === 1) {
     const variable = variables[0];
@@ -38,6 +60,15 @@ export function MultiVariableCharts({ variables, statsData, variableset }: Multi
             )}
           </div>
         )}
+        <div className="mb-4">
+          <SplitVariableSelector
+            datasetId={datasetId}
+            selectedSplitVariable={splitVariables[variable.name] || null}
+            onSplitVariableChangeAction={(splitVariable) => 
+              handleSplitVariableChange(variable.name, splitVariable)
+            }
+          />
+        </div>
         <AdhocChart variable={variable} stats={stats} className="w-[600px]" />
       </div>
     );
@@ -56,12 +87,20 @@ export function MultiVariableCharts({ variables, statsData, variableset }: Multi
       {variables.map((variable) => {
         const stats = statsData[variable.name]!; // We know it exists due to hasAllStats check
         return (
-          <AdhocChart
-            key={variable.id}
-            variable={variable}
-            stats={stats}
-            className="w-[600px]"
-          />
+          <div key={variable.id} className="flex flex-col gap-2">
+            <SplitVariableSelector
+              datasetId={datasetId}
+              selectedSplitVariable={splitVariables[variable.name] || null}
+              onSplitVariableChangeAction={(splitVariable) => 
+                handleSplitVariableChange(variable.name, splitVariable)
+              }
+            />
+            <AdhocChart
+              variable={variable}
+              stats={stats}
+              className="w-[600px]"
+            />
+          </div>
         );
       })}
     </div>

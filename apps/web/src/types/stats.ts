@@ -3,15 +3,18 @@ import { z } from "zod";
 // Schema for the request payload
 export const StatsVariableSchema = z.object({
   variable: z.string(),
+  split_variable: z.string().optional(),
 });
 
 export const StatsRequestSchema = z.object({
   variables: z.array(StatsVariableSchema),
+  // Keep global split_variable for backward compatibility
+  split_variable: z.string().optional(),
 });
 
 // Schema for the response
 export const FrequencyItemSchema = z.object({
-  value: z.number(),
+  value: z.union([z.string(), z.number()]),
   counts: z.number(),
   percentages: z.number(),
 });
@@ -30,7 +33,14 @@ export const VariableStatsSchema = z.object({
 
 export const StatsResponseItemSchema = z.object({
   variable: z.string(),
-  stats: VariableStatsSchema,
+  stats: z.union([
+    VariableStatsSchema,
+    z.object({
+      split_variable: z.string(),
+      categories: z.record(z.string(), VariableStatsSchema),
+      split_variable_labels: z.record(z.string(), z.string()).optional()
+    })
+  ])
 });
 
 export const StatsResponseSchema = z.array(StatsResponseItemSchema);
