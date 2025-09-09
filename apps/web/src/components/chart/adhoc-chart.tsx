@@ -10,7 +10,7 @@ import {
   SheetIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -75,13 +75,29 @@ export function AdhocChart({ variable, stats, ...props }: AdhocChartProps) {
     return availableCharts;
   }
 
-  const availableChartTypes = getAvailableChartTypes(variable, stats);
-  const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
+  function getDefaultChartType(availableChartTypes: AnalysisChartType[]): AnalysisChartType {
     if (availableChartTypes.includes("horizontalBar")) return "horizontalBar";
     if (availableChartTypes.includes("meanBar")) return "meanBar";
     if (availableChartTypes.includes("metrics")) return "metrics";
     return availableChartTypes[0] || "horizontalBar";
+  }
+
+  const availableChartTypes = getAvailableChartTypes(variable, stats);
+  const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
+    return getDefaultChartType(availableChartTypes);
   });
+  
+  const prevVariableIdRef = useRef(variable.id);
+
+  useEffect(() => {
+    // Only reset when variable actually changes
+    if (prevVariableIdRef.current !== variable.id) {
+      const newAvailableChartTypes = getAvailableChartTypes(variable, stats);
+      const defaultChartType = getDefaultChartType(newAvailableChartTypes);
+      setSelectedChartType(defaultChartType);
+      prevVariableIdRef.current = variable.id;
+    }
+  }, [variable.id, variable, stats]); // Include all dependencies used inside
 
   const chartConfig = {
     percentage: {
