@@ -18,6 +18,7 @@ export type SelectionItem = {
   variable?: DatasetVariable;
   variableset?: VariablesetTreeNode;
   variables?: DatasetVariable[];
+  parentVariableset?: VariablesetTreeNode; // Add this for individual variable selections from a variableset
 };
 
 type AdHocVariablesetSelectorProps = {
@@ -29,7 +30,7 @@ type VariablesetNodeProps = {
   node: VariablesetTreeNode;
   level: number;
   onSelectSet: (node: VariablesetTreeNode) => void;
-  onSelectVariable: (variable: DatasetVariable) => void;
+  onSelectVariable: (variable: DatasetVariable, parentVariableset?: VariablesetTreeNode) => void;
   expandedNodes: Set<string>;
   onToggleExpand: (nodeId: string) => void;
   search: string;
@@ -99,7 +100,7 @@ function VariablesetNode({
               key={variable.id}
               className="flex items-center gap-2 py-1"
               style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onSelectVariable(variable)}>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onSelectVariable(variable, node)}>
                 <PlayIcon className="h-4 w-4" />
               </Button>
 
@@ -117,7 +118,7 @@ function VariablesetNode({
               node={child}
               level={level + 1}
               onSelectSet={onSelectSet}
-              onSelectVariable={onSelectVariable}
+              onSelectVariable={(variable, childVariableset) => onSelectVariable(variable, childVariableset || node)}
               expandedNodes={expandedNodes}
               onToggleExpand={onToggleExpand}
               search={search}
@@ -158,10 +159,11 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
     }
   };
 
-  const handleSelectVariable = (variable: DatasetVariable) => {
+  const handleSelectVariable = (variable: DatasetVariable, parentVariableset?: VariablesetTreeNode) => {
     onSelectionChangeAction({
       type: "variable",
       variable,
+      parentVariableset,
     });
   };
 
