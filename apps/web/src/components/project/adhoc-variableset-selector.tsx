@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronRight, FolderIcon, PlayIcon, VariableIcon } from "lucide-react";
+import { ChevronDown, ChevronRight, PlayIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
+import { Spinner } from "../ui/spinner";
 
 export type SelectionItem = {
   type: "variable" | "set";
@@ -66,12 +67,7 @@ function VariablesetNode({
   return (
     <div className="select-none">
       <div className="flex items-center gap-2 py-1" style={{ paddingLeft: `${level * 16}px` }}>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0"
-          onClick={() => onToggleExpand(node.id)}
-        >
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onToggleExpand(node.id)}>
           {node.children.length > 0 || node.variableCount > 0 ? (
             isExpanded ? (
               <ChevronDown className="h-4 w-4" />
@@ -82,16 +78,18 @@ function VariablesetNode({
             <div className="h-4 w-4" />
           )}
         </Button>
-        
+
         <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onSelectSet(node)}>
           <PlayIcon className="h-4 w-4" />
         </Button>
-        
-        <FolderIcon className="h-4 w-4 text-muted-foreground" />
-        
+
         <span className="flex-1 text-sm font-medium">{node.name}</span>
-        
-        <span className="text-xs text-muted-foreground">{"("}{node.variableCount}{")"}</span>
+
+        <span className="text-muted-foreground text-xs">
+          {"("}
+          {node.variableCount}
+          {")"}
+        </span>
       </div>
 
       {isExpanded && (
@@ -100,21 +98,15 @@ function VariablesetNode({
             <div
               key={variable.id}
               className="flex items-center gap-2 py-1"
-              style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}
-            >
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={() => onSelectVariable(variable)}
-              >
+              style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onSelectVariable(variable)}>
                 <PlayIcon className="h-4 w-4" />
               </Button>
-              
-              <VariableIcon className="h-4 w-4 text-blue-500" />
-              
+
               <span className="text-sm">
-                {variable.label} {"("}{variable.name}{")"}
+                {variable.label} {"("}
+                {variable.name}
+                {")"}
               </span>
             </div>
           ))}
@@ -137,13 +129,10 @@ function VariablesetNode({
   );
 }
 
-export function AdHocVariablesetSelector({
-  datasetId,
-  onSelectionChangeAction,
-}: AdHocVariablesetSelectorProps) {
+export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }: AdHocVariablesetSelectorProps) {
   const [search, setSearch] = useState("");
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-  
+
   const t = useTranslations("projectAdhocVariables");
   const { data: variablesets, isLoading } = useDatasetVariablesets(datasetId);
 
@@ -179,16 +168,15 @@ export function AdHocVariablesetSelector({
   return (
     <Card className="shadow-xs">
       <CardHeader className="px-3">
-        <Input
-          type="text"
-          placeholder={t("search")}
-          onChange={(e) => setSearch(e.target.value)}
-          value={search}
-        />
+        <Input type="text" placeholder={t("search")} onChange={(e) => setSearch(e.target.value)} value={search} />
       </CardHeader>
       <CardContent className="px-3">
         <ScrollArea className="flex max-h-[500px] min-h-[300px] flex-col gap-2">
-          {isLoading && <div className="text-sm text-muted-foreground">{"Loading..."}</div>}
+          {isLoading && (
+            <div className="text-muted-foreground text-sm">
+              <Spinner />
+            </div>
+          )}
           {variablesets &&
             variablesets.map((node) => (
               <VariablesetNode
@@ -207,3 +195,4 @@ export function AdHocVariablesetSelector({
     </Card>
   );
 }
+

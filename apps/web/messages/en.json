@@ -258,10 +258,10 @@
     },
     "editor": {
       "projects": "Projects",
+      "splitvariables": "Split Variables",
       "title": "Dataset Editor for {name}",
       "variables": "Variables",
-      "variablesets": "Variable Sets",
-      "splitvariables": "Split Variables"
+      "variablesets": "Variable Sets"
     },
     "error": "Error",
     "fetchProjectsError": "Failed to fetch projects.",
@@ -275,91 +275,25 @@
       "edit": "Edit"
     }
   },
-  "adminDatasetVariableset": {
-    "title": "Variable Sets",
-    "description": "Organize variables into hierarchical groups",
-    "editTitle": "Edit Variable Sets",
-    "editDescription": "Create and edit variable sets to organize variables",
-    "createSet": "Create Set",
-    "editSet": "Edit Set",
-    "deleteSet": "Delete Set",
-    "assignVariables": "Assign Variables",
-    "noSets": "No variable sets found",
-    "createFirstSet": "Create your first variable set to organize variables",
-    "form": {
-      "name": "Set Name",
-      "namePlaceholder": "Enter set name",
-      "description": "Description",
-      "descriptionPlaceholder": "Enter optional description",
-      "parent": "Parent Set",
-      "selectParent": "Select parent set",
-      "noParent": "No Parent (Root Level)",
-      "cancel": "Cancel",
-      "create": "Create",
-      "update": "Update",
-      "saving": "Saving...",
-      "createDescription": "Create a new variable set to group related variables",
-      "editDescription": "Edit the variable set details",
-      "createSuccess": "Variable set created successfully",
-      "updateSuccess": "Variable set updated successfully",
-      "createError": "Failed to create variable set",
-      "updateError": "Failed to update variable set"
-    },
-    "tree": {
-      "expand": "Expand",
-      "collapse": "Collapse",
-      "moveSet": "Move Set",
-      "variableCount": "{count, plural, =0 {no variables} =1 {1 variable} other {# variables}}",
-      "rootLevel": "Root Level"
-    },
-    "assignment": {
-      "description": "Select a variable set and manage its assigned variables",
-      "available": "Available Variables",
-      "assigned": "Assigned Variables",
-      "search": "Search variables...",
-      "addToSet": "Add to Set",
-      "removeFromSet": "Remove from Set",
-      "noVariables": "No variables available",
-      "noAssigned": "No variables assigned to this set",
-      "selectSet": "Select a set to view its variables"
-    },
-    "deleteDialog": {
-      "title": "Delete Variable Set",
-      "description": "Are you sure you want to delete the set \"{name}\"? This will also remove all variable assignments from this set.",
-      "cancel": "Cancel",
-      "confirm": "Delete",
-      "deleting": "Deleting...",
-      "error": "Failed to delete variable set",
-      "success": "Variable set deleted successfully"
-    },
-    "columns": {
-      "name": "Name",
-      "description": "Description",
-      "variableCount": "Variables",
-      "parent": "Parent",
-      "actions": "Actions"
-    },
-    "searchPlaceholder": "Search variable sets"
-  },
-  "adminDatasetSplitVariables": {
-    "title": "Split Variables",
-    "description": "Variables that can be used to split analysis of other variables",
-    "assignment": {
-      "available": "Available Variables",
-      "assigned": "Split Variables",
-      "search": "Search variables...",
-      "addSuccess": "Variable added as split variable",
-      "addError": "Failed to add split variable",
-      "removeSuccess": "Split variable removed",
-      "removeError": "Failed to remove split variable",
-      "noAvailable": "No variables available",
-      "noAssigned": "No split variables assigned"
-    }
-  },
   "adminDatasetInfoModal": {
     "buttons": {
       "close": "Close"
     }
+  },
+  "adminDatasetSplitVariables": {
+    "assignment": {
+      "addError": "Failed to add split variable",
+      "addSuccess": "Variable added as split variable",
+      "assigned": "Split Variables",
+      "available": "Available Variables",
+      "noAssigned": "No split variables assigned",
+      "noAvailable": "No variables available",
+      "removeError": "Failed to remove split variable",
+      "removeSuccess": "Split variable removed",
+      "search": "Search variables..."
+    },
+    "description": "Variables that can be used to split analysis of other variables",
+    "title": "Split Variables"
   },
   "adminDatasetUploadForm": {
     "buttons": {
@@ -397,6 +331,72 @@
       "organizationId": {
         "required": "Organization selection is required"
       }
+    }
+  },
+  "adminDatasetVariableset": {
+    "assignVariables": "Assign Variables",
+    "assignment": {
+      "addToSet": "Add to Set",
+      "assigned": "Assigned Variables",
+      "available": "Available Variables",
+      "description": "Select a variable set and manage its assigned variables",
+      "noAssigned": "No variables assigned to this set",
+      "noVariables": "No variables available",
+      "removeFromSet": "Remove from Set",
+      "search": "Search variables...",
+      "selectSet": "Select a set to view its variables"
+    },
+    "columns": {
+      "actions": "Actions",
+      "description": "Description",
+      "name": "Name",
+      "parent": "Parent",
+      "variableCount": "Variables"
+    },
+    "createFirstSet": "Create your first variable set to organize variables",
+    "createSet": "Create Set",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete the set \"{name}\"? This will also remove all variable assignments from this set.",
+      "error": "Failed to delete variable set",
+      "success": "Variable set deleted successfully",
+      "title": "Delete Variable Set"
+    },
+    "deleteSet": "Delete Set",
+    "description": "Organize variables into hierarchical groups",
+    "editDescription": "Create and edit variable sets to organize variables",
+    "editSet": "Edit Set",
+    "editTitle": "Edit Variable Sets",
+    "form": {
+      "cancel": "Cancel",
+      "create": "Create",
+      "createDescription": "Create a new variable set to group related variables",
+      "createError": "Failed to create variable set",
+      "createSuccess": "Variable set created successfully",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter optional description",
+      "editDescription": "Edit the variable set details",
+      "name": "Set Name",
+      "namePlaceholder": "Enter set name",
+      "noParent": "No Parent (Root Level)",
+      "parent": "Parent Set",
+      "saving": "Saving...",
+      "selectParent": "Select parent set",
+      "update": "Update",
+      "updateError": "Failed to update variable set",
+      "updateSuccess": "Variable set updated successfully"
+    },
+    "noSets": "No variable sets found",
+    "searchPlaceholder": "Search variable sets",
+    "title": "Variable Sets",
+    "tree": {
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "moveSet": "Move Set",
+      "rootLevel": "Root Level",
+      "variableCount": "{count, plural, =0 {no variables} =1 {1 variable} other {# variables}}"
     }
   },
   "adminSidebar": {
@@ -748,8 +748,8 @@
         "add": "Add Theme",
         "addFirst": "Add First Theme",
         "empty": "No themes configured yet",
-        "namePlaceholder": "Enter theme name",
         "nameHelp": "Only letters, numbers, hyphens (-), and underscores (_) are allowed. Spaces will be converted to hyphens.",
+        "namePlaceholder": "Enter theme name",
         "newTheme": "New Theme"
       },
       "title": "Organization Settings"
@@ -921,7 +921,7 @@
   },
   "projectAdhocVariables": {
     "loadMore": "Load more variables",
-    "search": "Search variables..."
+    "search": "Search..."
   },
   "resetPassword": {
     "description": "Enter your new password below.",
@@ -1022,18 +1022,6 @@
         "updated": "User updated successfully"
       }
     },
-    "newUser": {
-      "description": "Create a new user",
-      "title": "Create User"
-    },
-    "role": {
-      "admin": "Admin",
-      "user": "User"
-    },
-    "search": {
-      "placeholder": "Search users..."
-    },
-    "title": "Users",
     "impersonation": {
       "banner": {
         "message": "You are impersonating {userName}",
@@ -1051,6 +1039,18 @@
         "stopError": "Failed to stop impersonating",
         "stopSuccess": "Stopped impersonating user"
       }
-    }
+    },
+    "newUser": {
+      "description": "Create a new user",
+      "title": "Create User"
+    },
+    "role": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "search": {
+      "placeholder": "Search users..."
+    },
+    "title": "Users"
   }
 }

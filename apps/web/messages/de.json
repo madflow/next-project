@@ -258,10 +258,10 @@
     },
     "editor": {
       "projects": "Projekte",
+      "splitvariables": "Split-Variablen",
       "title": "Datensatz-Editor für {name}",
       "variables": "Variablen",
-      "variablesets": "Variablen-Sets",
-      "splitvariables": "Split-Variablen"
+      "variablesets": "Variablen-Sets"
     },
     "error": "Fehler",
     "fetchProjectsError": "Fehler beim Abrufen der Projekte.",
@@ -275,91 +275,25 @@
       "edit": "Bearbeiten"
     }
   },
-  "adminDatasetVariableset": {
-    "title": "Variablen-Sets",
-    "description": "Organisieren Sie Variablen in hierarchischen Gruppen",
-    "editTitle": "Variablen-Sets bearbeiten",
-    "editDescription": "Erstellen und bearbeiten Sie Variablen-Sets um Variablen zu organisieren",
-    "createSet": "Set erstellen",
-    "editSet": "Set bearbeiten",
-    "deleteSet": "Set löschen",
-    "assignVariables": "Variablen zuweisen",
-    "noSets": "Keine Variablen-Sets gefunden",
-    "createFirstSet": "Erstellen Sie Ihr erstes Variablen-Set um Variablen zu organisieren",
-    "form": {
-      "name": "Set-Name",
-      "namePlaceholder": "Set-Name eingeben",
-      "description": "Beschreibung",
-      "descriptionPlaceholder": "Optionale Beschreibung eingeben",
-      "parent": "Übergeordnetes Set",
-      "selectParent": "Übergeordnetes Set auswählen",
-      "noParent": "Kein übergeordnetes Set (Hauptebene)",
-      "cancel": "Abbrechen",
-      "create": "Erstellen",
-      "update": "Aktualisieren",
-      "saving": "Wird gespeichert...",
-      "createDescription": "Erstellen Sie ein neues Variablen-Set um verwandte Variablen zu gruppieren",
-      "editDescription": "Bearbeiten Sie die Details des Variablen-Sets",
-      "createSuccess": "Variablen-Set erfolgreich erstellt",
-      "updateSuccess": "Variablen-Set erfolgreich aktualisiert",
-      "createError": "Fehler beim Erstellen des Variablen-Sets",
-      "updateError": "Fehler beim Aktualisieren des Variablen-Sets"
-    },
-    "tree": {
-      "expand": "Erweitern",
-      "collapse": "Einklappen",
-      "moveSet": "Set verschieben",
-      "variableCount": "{count, plural, =0 {keine Variablen} =1 {1 Variable} other {# Variablen}}",
-      "rootLevel": "Hauptebene"
-    },
-    "assignment": {
-      "description": "Wählen Sie ein Variablen-Set aus und verwalten Sie dessen zugewiesene Variablen",
-      "available": "Verfügbare Variablen",
-      "assigned": "Zugewiesene Variablen",
-      "search": "Variablen suchen...",
-      "addToSet": "Zu Set hinzufügen",
-      "removeFromSet": "Aus Set entfernen",
-      "noVariables": "Keine Variablen verfügbar",
-      "noAssigned": "Keine Variablen diesem Set zugewiesen",
-      "selectSet": "Wählen Sie ein Set aus um dessen Variablen anzuzeigen"
-    },
-    "deleteDialog": {
-      "title": "Variablen-Set löschen",
-      "description": "Sind Sie sicher, dass Sie das Set \"{name}\" löschen möchten? Dies entfernt auch alle Variablenzuweisungen aus diesem Set.",
-      "cancel": "Abbrechen",
-      "confirm": "Löschen",
-      "deleting": "Wird gelöscht...",
-      "error": "Fehler beim Löschen des Variablen-Sets",
-      "success": "Variablen-Set erfolgreich gelöscht"
-    },
-    "columns": {
-      "name": "Name",
-      "description": "Beschreibung",
-      "variableCount": "Variablen",
-      "parent": "Übergeordnet",
-      "actions": "Aktionen"
-    },
-    "searchPlaceholder": "Variablen-Sets suchen"
-  },
-  "adminDatasetSplitVariables": {
-    "title": "Split-Variablen",
-    "description": "Variablen, die zur Aufteilung der Analyse anderer Variablen verwendet werden können",
-    "assignment": {
-      "available": "Verfügbare Variablen",
-      "assigned": "Split-Variablen",
-      "search": "Variablen suchen...",
-      "addSuccess": "Variable als Split-Variable hinzugefügt",
-      "addError": "Fehler beim Hinzufügen der Split-Variable",
-      "removeSuccess": "Split-Variable entfernt",
-      "removeError": "Fehler beim Entfernen der Split-Variable",
-      "noAvailable": "Keine Variablen verfügbar",
-      "noAssigned": "Keine Split-Variablen zugewiesen"
-    }
-  },
   "adminDatasetInfoModal": {
     "buttons": {
       "close": "Schließen"
     }
+  },
+  "adminDatasetSplitVariables": {
+    "assignment": {
+      "addError": "Fehler beim Hinzufügen der Split-Variable",
+      "addSuccess": "Variable als Split-Variable hinzugefügt",
+      "assigned": "Split-Variablen",
+      "available": "Verfügbare Variablen",
+      "noAssigned": "Keine Split-Variablen zugewiesen",
+      "noAvailable": "Keine Variablen verfügbar",
+      "removeError": "Fehler beim Entfernen der Split-Variable",
+      "removeSuccess": "Split-Variable entfernt",
+      "search": "Variablen suchen..."
+    },
+    "description": "Variablen, die zur Aufteilung der Analyse anderer Variablen verwendet werden können",
+    "title": "Split-Variablen"
   },
   "adminDatasetUploadForm": {
     "buttons": {
@@ -397,6 +331,72 @@
       "organizationId": {
         "required": "Die Auswahl einer Organisation ist erforderlich"
       }
+    }
+  },
+  "adminDatasetVariableset": {
+    "assignVariables": "Variablen zuweisen",
+    "assignment": {
+      "addToSet": "Zu Set hinzufügen",
+      "assigned": "Zugewiesene Variablen",
+      "available": "Verfügbare Variablen",
+      "description": "Wählen Sie ein Variablen-Set aus und verwalten Sie dessen zugewiesene Variablen",
+      "noAssigned": "Keine Variablen diesem Set zugewiesen",
+      "noVariables": "Keine Variablen verfügbar",
+      "removeFromSet": "Aus Set entfernen",
+      "search": "Variablen suchen...",
+      "selectSet": "Wählen Sie ein Set aus um dessen Variablen anzuzeigen"
+    },
+    "columns": {
+      "actions": "Aktionen",
+      "description": "Beschreibung",
+      "name": "Name",
+      "parent": "Übergeordnet",
+      "variableCount": "Variablen"
+    },
+    "createFirstSet": "Erstellen Sie Ihr erstes Variablen-Set um Variablen zu organisieren",
+    "createSet": "Set erstellen",
+    "deleteDialog": {
+      "cancel": "Abbrechen",
+      "confirm": "Löschen",
+      "deleting": "Wird gelöscht...",
+      "description": "Sind Sie sicher, dass Sie das Set \"{name}\" löschen möchten? Dies entfernt auch alle Variablenzuweisungen aus diesem Set.",
+      "error": "Fehler beim Löschen des Variablen-Sets",
+      "success": "Variablen-Set erfolgreich gelöscht",
+      "title": "Variablen-Set löschen"
+    },
+    "deleteSet": "Set löschen",
+    "description": "Organisieren Sie Variablen in hierarchischen Gruppen",
+    "editDescription": "Erstellen und bearbeiten Sie Variablen-Sets um Variablen zu organisieren",
+    "editSet": "Set bearbeiten",
+    "editTitle": "Variablen-Sets bearbeiten",
+    "form": {
+      "cancel": "Abbrechen",
+      "create": "Erstellen",
+      "createDescription": "Erstellen Sie ein neues Variablen-Set um verwandte Variablen zu gruppieren",
+      "createError": "Fehler beim Erstellen des Variablen-Sets",
+      "createSuccess": "Variablen-Set erfolgreich erstellt",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung eingeben",
+      "editDescription": "Bearbeiten Sie die Details des Variablen-Sets",
+      "name": "Set-Name",
+      "namePlaceholder": "Set-Name eingeben",
+      "noParent": "Kein übergeordnetes Set (Hauptebene)",
+      "parent": "Übergeordnetes Set",
+      "saving": "Wird gespeichert...",
+      "selectParent": "Übergeordnetes Set auswählen",
+      "update": "Aktualisieren",
+      "updateError": "Fehler beim Aktualisieren des Variablen-Sets",
+      "updateSuccess": "Variablen-Set erfolgreich aktualisiert"
+    },
+    "noSets": "Keine Variablen-Sets gefunden",
+    "searchPlaceholder": "Variablen-Sets suchen",
+    "title": "Variablen-Sets",
+    "tree": {
+      "collapse": "Einklappen",
+      "expand": "Erweitern",
+      "moveSet": "Set verschieben",
+      "rootLevel": "Hauptebene",
+      "variableCount": "{count, plural, =0 {keine Variablen} =1 {1 Variable} other {# Variablen}}"
     }
   },
   "adminSidebar": {
@@ -748,8 +748,8 @@
         "add": "Thema hinzufügen",
         "addFirst": "Erstes Thema hinzufügen",
         "empty": "Noch keine Themen konfiguriert",
-        "namePlaceholder": "Themenname eingeben",
         "nameHelp": "Nur Buchstaben, Zahlen, Bindestriche (-) und Unterstriche (_) sind erlaubt. Leerzeichen werden in Bindestriche umgewandelt.",
+        "namePlaceholder": "Themenname eingeben",
         "newTheme": "Neues Thema"
       },
       "title": "Organisationseinstellungen"
@@ -921,7 +921,7 @@
   },
   "projectAdhocVariables": {
     "loadMore": "Weitere Variablen laden",
-    "search": "Variablen durchsuchen..."
+    "search": "Durchsuchen..."
   },
   "resetPassword": {
     "description": "Geben Sie unten Ihr neues Passwort ein.",
@@ -1022,18 +1022,6 @@
         "updated": "Benutzer erfolgreich aktualisiert"
       }
     },
-    "newUser": {
-      "description": "Einen neuen Benutzer erstellen",
-      "title": "Benutzer anlegen"
-    },
-    "role": {
-      "admin": "Administrator",
-      "user": "Benutzer"
-    },
-    "search": {
-      "placeholder": "Benutzer suchen..."
-    },
-    "title": "Benutzer",
     "impersonation": {
       "banner": {
         "message": "Sie verkörpern {userName}",
@@ -1051,6 +1039,18 @@
         "stopError": "Beenden der Verkörperung fehlgeschlagen",
         "stopSuccess": "Verkörperung beendet"
       }
-    }
+    },
+    "newUser": {
+      "description": "Einen neuen Benutzer erstellen",
+      "title": "Benutzer anlegen"
+    },
+    "role": {
+      "admin": "Administrator",
+      "user": "Benutzer"
+    },
+    "search": {
+      "placeholder": "Benutzer suchen..."
+    },
+    "title": "Benutzer"
   }
 }
