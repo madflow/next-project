@@ -36,6 +36,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         : currentSelection.variables || [];
 
       if (variables.length > 0) {
+        // Initialize stats data for all variables without split variables
+        // Individual split variable requests will be handled by MultiVariableCharts
         const request: StatsRequest = {
           variables: variables.map(v => ({ variable: v.name })),
         };
@@ -60,6 +62,26 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     setStatsData({});
   };
 
+  const handleStatsRequest = (variableName: string, splitVariable?: string) => {
+    if (currentSelection) {
+      const request: StatsRequest = {
+        variables: [{ variable: variableName, split_variable: splitVariable }],
+      };
+
+      mutate(request, {
+        onSuccess: (data) => {
+          const responseItem = data[0];
+          if (responseItem) {
+            setStatsData(prev => ({
+              ...prev,
+              [variableName]: [responseItem]
+            }));
+          }
+        },
+      });
+    }
+  };
+
   const selectedVariables = currentSelection?.type === "variable" && currentSelection.variable
     ? [currentSelection.variable]
     : currentSelection?.variables || [];
@@ -82,12 +104,13 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             onSelectionChangeAction={handleSelectionChange} 
           />
         )}
-        {currentSelection?.type === "set" && currentSelection.variableset && (
+        {(currentSelection?.type === "set" && currentSelection.variableset) || 
+         (currentSelection?.type === "variable" && currentSelection.parentVariableset) ? (
           <VariablesetDescription 
-            variableset={currentSelection.variableset}
-            variables={currentSelection.variables}
+            variableset={currentSelection.type === "set" ? currentSelection.variableset! : currentSelection.parentVariableset!}
+            variables={currentSelection.type === "set" ? currentSelection.variables : [currentSelection.variable!]}
           />
-        )}
+        ) : null}
       </div>
       
       {selectedDataset && currentSelection && selectedVariables.length > 0 && (
@@ -95,7 +118,9 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           <MultiVariableCharts 
             variables={selectedVariables}
             statsData={statsData}
-            variableset={currentSelection?.type === "set" ? currentSelection.variableset : undefined}
+            variableset={currentSelection?.type === "set" ? currentSelection.variableset : currentSelection?.parentVariableset}
+            datasetId={selectedDataset}
+            onStatsRequestAction={handleStatsRequest}
           />
         </Suspense>
       )}
