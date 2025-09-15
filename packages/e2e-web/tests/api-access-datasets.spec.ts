@@ -26,9 +26,9 @@ test.describe("Api access datasets", () => {
   test("list project datasets as admin user", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-    const list = await page.request.get("/api/projects/0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59/datasets");
+    const list = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
     const body = await list.json();
-    expect(body.count).toBe(1);
+    expect(body.count).toBe(2);
     expect(list.status()).toBe(200);
   });
 

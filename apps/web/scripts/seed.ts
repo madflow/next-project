@@ -3,11 +3,16 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import { eq } from "drizzle-orm";
 import { adminClient, adminPool } from "@repo/database/clients";
 import {
   account,
   dataset,
   datasetProject,
+  datasetVariable,
+  datasetVariableset,
+  datasetVariablesetItem,
+  datasetSplitVariable,
   invitation,
   member,
   organization,
@@ -142,12 +147,20 @@ async function createProject(id: string, name: string, slug: string, organizatio
   return createdProject[0];
 }
 
-async function createDataset(id: string, name: string, organizationId: string, projectId: string) {
-  const datasetBuffer = await readFile(join(__dirname, "./fixtures/demo.sav"));
-  const file = new File([new Uint8Array(datasetBuffer)], "demo.sav");
+async function createDataset(
+  id: string,
+  name: string,
+  organizationId: string,
+  projectId: string,
+  datasetFile: string,
+  description?: string
+) {
+  const datasetBuffer = await readFile(join(__dirname, "./fixtures/", datasetFile));
+  const file = new File([new Uint8Array(datasetBuffer)], datasetFile);
   const contentType = "application/octet-stream";
 
   const result = await createDatasetService({
+    description,
     file,
     name,
     organizationId,
@@ -164,6 +177,182 @@ async function createDataset(id: string, name: string, organizationId: string, p
     projectId,
     datasetId: id,
   });
+}
+
+async function createDatasetVariableSets(datasetId: string) {
+  console.log(`Creating variable sets for dataset: ${datasetId}`);
+  
+  // Fetch existing variables for the dataset
+  const variables = await adminClient
+    .select()
+    .from(datasetVariable)
+    .where(eq(datasetVariable.datasetId, datasetId));
+
+  if (variables.length === 0) {
+    console.log("No variables found for dataset");
+    return;
+  }
+
+  console.log(`Found ${variables.length} variables`);
+
+  // Create a map of variable names to IDs for easy lookup
+  const variableMap = new Map(variables.map(v => [v.name, v.id]));
+
+  // Define variable sets with their variables
+  const variableSets = [
+    {
+      name: "Demografische Daten",
+      description: "Grundlegende demografische Informationen der Befragten",
+      variables: ["id", "age", "agecat", "sex", "marital", "childs", "childcat"]
+    },
+    {
+      name: "Bildung und Beruf",
+      description: "Bildungsstand und berufliche Situation",
+      variables: ["educ", "degree", "wrkstat", "paeduc", "maeduc", "speduc", "howpaid"]
+    },
+    {
+      name: "Einkommen",
+      description: "Einkommensinformationen",
+      variables: ["income", "rincome"]
+    },
+    {
+      name: "Herkunft",
+      description: "Herkunft und ethnischer Hintergrund",
+      variables: ["race", "born", "parborn", "granborn", "ethnic", "eth1", "eth2", "eth3"]
+    },
+    {
+      name: "Politische Einstellungen",
+      description: "Politische Ansichten und Meinungen",
+      variables: ["polviews", "cappun"]
+    },
+    {
+      name: "Vertrauen in Institutionen",
+      description: "Vertrauen in verschiedene gesellschaftliche Institutionen",
+      variables: ["confinan", "conbus", "coneduc", "conpress", "conmedic", "contv"]
+    },
+    {
+      name: "Mediennutzung",
+      description: "Medienkonsum und Informationsquellen",
+      variables: ["news", "news1", "news2", "news3", "news4", "news5", "tvhours"]
+    },
+    {
+      name: "Lebensstil",
+      description: "Lebensstil und persönliche Einstellungen",
+      variables: ["happy", "hapmar", "postlife", "owngun"]
+    },
+    {
+      name: "Fahrzeuge",
+      description: "Fahrzeugbesitz und Präferenzen",
+      variables: ["car1", "car2", "car3"]
+    }
+  ];
+
+  // Create variable sets
+  for (let i = 0; i < variableSets.length; i++) {
+    const variableSet = variableSets[i];
+    if (!variableSet) continue;
+    
+    // Create the variable set
+    const createdVariableSet = await adminClient
+      .insert(datasetVariableset)
+      .values({
+        name: variableSet.name,
+        description: variableSet.description,
+        datasetId: datasetId,
+        orderIndex: i,
+      })
+      .returning();
+
+    const variableSetId = createdVariableSet[0]?.id;
+    if (!variableSetId) {
+      console.error(`Failed to create variable set: ${variableSet.name}`);
+      continue;
+    }
+
+    console.log(`Created variable set: ${variableSet.name}`);
+
+    // Add variables to the set
+    const variableSetItems = [];
+    for (let j = 0; j < variableSet.variables.length; j++) {
+      const variableName = variableSet.variables[j];
+      if (!variableName) continue;
+      
+      const variableId = variableMap.get(variableName);
+      
+      if (variableId) {
+        variableSetItems.push({
+          variablesetId: variableSetId,
+          variableId: variableId,
+          orderIndex: j,
+        });
+      } else {
+        console.warn(`Variable not found: ${variableName}`);
+      }
+    }
+
+    if (variableSetItems.length > 0) {
+      await adminClient.insert(datasetVariablesetItem).values(variableSetItems);
+      console.log(`Added ${variableSetItems.length} variables to ${variableSet.name}`);
+    }
+  }
+
+  // Create split variables for agecat, marital, and sex
+  const splitVariableNames = ["agecat", "marital", "sex"];
+  for (const variableName of splitVariableNames) {
+    const variableId = variableMap.get(variableName);
+    if (variableId) {
+      await adminClient.insert(datasetSplitVariable).values({
+        datasetId: datasetId,
+        variableId: variableId,
+      });
+      console.log(`Created split variable: ${variableName}`);
+    } else {
+      console.warn(`Split variable not found: ${variableName}`);
+    }
+  }
+
+  console.log("Variable sets creation completed");
+}
+
+// Function to update missing values for dataset variables
+async function updateMissingValues(datasetId: string) {
+  console.log(`Updating missing values for dataset: ${datasetId}`);
+
+  // Get all variables for this dataset
+  const variables = await adminClient
+    .select()
+    .from(datasetVariable)
+    .where(eq(datasetVariable.datasetId, datasetId));
+
+  console.log(`Found ${variables.length} variables to process`);
+
+  // Define common missing value labels that indicate missing data
+  const missingValueLabels = ["KA", "WN", "NZ", "NAP", "NA", "VERWEIGERT"];
+
+  for (const variable of variables) {
+    const missingValues: string[] = [];
+    
+    if (variable.valueLabels && typeof variable.valueLabels === 'object') {
+      // Check each value-label pair
+      for (const [value, label] of Object.entries(variable.valueLabels)) {
+        if (typeof label === 'string' && missingValueLabels.includes(label)) {
+          missingValues.push(value);
+        }
+      }
+    }
+
+    // Update the variable if we found missing values
+    if (missingValues.length > 0) {
+      await adminClient
+        .update(datasetVariable)
+        .set({ missingValues: missingValues })
+        .where(eq(datasetVariable.id, variable.id));
+      
+      console.log(`Updated missing values for ${variable.name}: [${missingValues.join(', ')}]`);
+    }
+  }
+
+  console.log("Missing values update completed");
 }
 
 // Truncate tables in the correct order to respect foreign key constraints
@@ -359,8 +548,28 @@ try {
   // Create a test project in the third organization
   await createProject(PROJECT_TEST_4_UID, "Test Project 4", "test-project-4", org3.id);
 
-  await createDataset(DATASET_TEST_UID, "Test Dataset", org.id, PROJECT_TEST_UID);
-  await createDataset(DATASET_TEST_2_UID, "Test Dataset 2", org3.id, PROJECT_TEST_4_UID);
+  await createDataset(
+    DATASET_TEST_UID,
+    "Test Dataset",
+    org.id,
+    PROJECT_TEST_UID,
+    "demo.sav",
+    "This is a hypothetical data file that concerns a purchased customer database, for the purpose of mailing monthly offers."
+  );
+  await createDataset(
+    DATASET_TEST_2_UID,
+    "SPSS Beispielumfrage",
+    org.id,
+    PROJECT_TEST_UID,
+    "survey_sample_de.sav",
+    "Diese Datei enthält Umfragedaten, einschließlich demografischer Daten und verschiedener Einstellungsmessungen."
+  );
+
+  // Create variable sets for the SPSS Beispielumfrage dataset
+  await createDatasetVariableSets(DATASET_TEST_2_UID);
+
+  // Update missing values for the SPSS Beispielumfrage dataset
+  await updateMissingValues(DATASET_TEST_2_UID);
 
   await adminPool.end();
 
