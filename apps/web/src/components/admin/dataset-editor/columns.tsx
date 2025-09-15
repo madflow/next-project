@@ -9,6 +9,7 @@ import { DataTableColumnHeader } from "@/components/datatable/components/column-
 import { Button } from "@/components/ui/button";
 import type { DatasetVariable } from "@/types/dataset-variable";
 import { DeleteDatasetVariableDialog } from "./delete-dataset-variable-dialog";
+import { InfoDatasetVariableModal } from "./info-dataset-variable-modal";
 
 export function useDatasetVariableColumns() {
   const t = useTranslations("adminDatasetEditor");
@@ -41,7 +42,7 @@ export function useDatasetVariableColumns() {
         return (
           <div className="flex justify-end gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               asChild
               data-testid={`app.admin.dataset-variable.edit-${datasetVariable.name}`}>
@@ -55,6 +56,7 @@ export function useDatasetVariableColumns() {
               datasetVariableName={datasetVariable.name}
               onDelete={remove}
             />
+            <InfoDatasetVariableModal datasetVariable={datasetVariable} />
           </div>
         );
       },
