@@ -55,59 +55,11 @@ This project uses the following technologies:
   - `i18n/` - Internationalization configuration and utilities.
   - `lib/` - General utility functions and helper modules.
 
-## Web app architecture (apps/web)
-
-### General rules
-
-- Follow Next.js patterns and use the App Router.
-- Correctly determine when to use server vs. client components in Next.js.
-- Use functional and declarative programming patterns; avoid classes.
-- Prefer iteration and modularization over code duplication.
-- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
-- Re-use code when possible.
-
-### Pages
-
-- Use Next.js App Router for routing.
-- page.tsx files are always server components. Never convert them to client components.
-
-### Creating new translations
-
-- Use the `next-intl` package to manage translations.
-- The translations files are located in the `messages` directory.
-- Use `next-intl`'s `useTranslation` hook to access translations in client components.
-- Use `getTranslations` in server components.
-
-### Naming conventions
-
-- Use lowercase with dashes for directories (e.g., components/auth-wizard).
-- Favor named exports for components.
-
-### TypeScript Best Practices
-
-- Use TypeScript for all code; prefer types over interfaces.
-- Avoid any and enums; use explicit types and maps instead.
-- Use functional components with TypeScript interfaces.
-- Enable strict mode in TypeScript for better type safety.
-- Do not use any.
-
-### Styling & UI
-
-- Use Tailwind CSS for styling.
-- Use Shadcn UI for components.
-- Use "Sonner" for toasts.
-
-### Data fetching & forms
-
-- Use TanStack Query (react-query) for frontend data fetching.
-- Use React Hook Form for form handling.
-- Use Zod for validation.
-
 ## Rules for running commands
 
-- Do not run `npm run build` in order to test the project or to regenerate types. Run `npm run lint` and `npm run check-types` instead.
+- Do not run `npm run build` in order to test the project or to regenerate types. Run `make-check`.
 
-## Writing tasks and specs
+## Writing tasks and specs for agentic coding
 
 - Write task list in this format:
 
