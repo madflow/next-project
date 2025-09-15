@@ -62,7 +62,7 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
               fontSize={10}
               width={200}
             />
-            <Bar dataKey="percentage" fill="var(--color-percentage)" radius={5} />
+            <Bar dataKey="percentage" fill="var(--color-percentage)" />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
           </BarChart>
         </ChartContainer>

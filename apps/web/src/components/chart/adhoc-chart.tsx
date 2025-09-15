@@ -12,7 +12,15 @@ import {
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from "recharts";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -25,12 +33,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
-import { transformToRechartsBarData, transformToRechartsPieData, extractVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
+import {
+  extractVariableStats,
+  isSplitVariableStats,
+  transformToRechartsBarData,
+  transformToRechartsPieData,
+} from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
-import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { Code } from "../ui/code";
+import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
 
@@ -46,7 +59,7 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
   const { ref, exportPNG } = useChartExport();
 
   // Fetch split variables when datasetId is provided
-  const { data: splitVariablesResponse } = useQueryApi<{rows: DatasetVariable[]}>({
+  const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariable[] }>({
     endpoint: `/api/datasets/${datasetId}/splitvariables`,
     pagination: { pageIndex: 0, pageSize: 100 },
     sorting: [],
@@ -64,9 +77,9 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
     if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
       return null;
     }
-    
+
     const splitVariableName = targetVariable.stats.split_variable;
-    
+
     // Try to find the split variable in allVariables to get its label
     if (allVariables.length > 0) {
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
@@ -75,7 +88,7 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
         return `Split by ${splitVariableLabel}`;
       }
     }
-    
+
     // Fallback to variable name if no label found
     return `Split by ${splitVariableName}`;
   }
@@ -134,7 +147,11 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
     return availableCharts;
   }
 
-  function getDefaultChartType(variable: DatasetVariable, stats: StatsResponse, availableChartTypes: AnalysisChartType[]): AnalysisChartType {
+  function getDefaultChartType(
+    variable: DatasetVariable,
+    stats: StatsResponse,
+    availableChartTypes: AnalysisChartType[]
+  ): AnalysisChartType {
     // Check if this variable has split variable stats
     const targetVariable = stats.find((item) => item.variable === variable.name);
     const hasSplitVariable = targetVariable && isSplitVariableStats(targetVariable.stats);
@@ -155,14 +172,11 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
     return availableChartTypes[0] || "horizontalBar";
   }
 
-  const availableChartTypes = useMemo(() => 
-    getAvailableChartTypes(variable, stats), 
-    [variable, stats]
-  );
+  const availableChartTypes = useMemo(() => getAvailableChartTypes(variable, stats), [variable, stats]);
   const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
     return getDefaultChartType(variable, stats, availableChartTypes);
   });
-  
+
   const prevVariableIdRef = useRef(variable.id);
   const prevHasSplitVariableRef = useRef<boolean>(false);
 
@@ -215,7 +229,7 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
                 fontSize={10}
                 tickFormatter={(value) => `${value}%`}
               />
-              <Bar dataKey="percentage" fill="var(--color-percentage)" radius={5} />
+              <Bar dataKey="percentage" fill="var(--color-percentage)" />
             </BarChart>
           </ChartContainer>
         );
@@ -249,7 +263,7 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
                 fontSize={10}
                 width={200}
               />
-              <Bar dataKey="percentage" fill="var(--color-percentage)" radius={5} />
+              <Bar dataKey="percentage" fill="var(--color-percentage)" />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             </BarChart>
           </ChartContainer>
