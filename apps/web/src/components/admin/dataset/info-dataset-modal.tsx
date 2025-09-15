@@ -22,7 +22,7 @@ export const InfoDatasetModal = ({ dataset }: InfoDatasetModalProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="cursor-pointer">
           <InfoIcon />
         </Button>
       </DialogTrigger>
