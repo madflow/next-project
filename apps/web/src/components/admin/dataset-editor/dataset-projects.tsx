@@ -54,43 +54,55 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
 
   if (isError) {
     return (
-      <Card className="rounded-md shadow-xs">
-        <CardHeader>
-          <CardTitle>{t("error")}</CardTitle>
-          <CardDescription>{t("fetchProjectsError")}</CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-base font-medium mt-6">{t("projects")}</h2>
+          <p className="text-muted-foreground text-sm">{t("datasetProjectsDescription")}</p>
+        </div>
+
+        <Card className="rounded-md shadow-xs">
+          <CardHeader>
+            <CardTitle>{t("error")}</CardTitle>
+            <CardDescription>{t("fetchProjectsError")}</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="rounded-md shadow-xs">
-      <CardHeader>
-        <CardTitle>{t("projects")}</CardTitle>
-        <CardDescription>{t("datasetProjectsDescription")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ProjectSelect onValueChange={setSelectedProject} organizationId={organizationId} />
-        <Button className="mt-4" onClick={handleAddToProject} disabled={!selectedProject || isAddingToProject}>
-          {isAddingToProject ? t("adding") : t("addToProject")}
-        </Button>
-        {isSuccess && (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">{t("name")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.rows.map((item) => (
-                <TableRow key={item.projects.id}>
-                  <TableCell className="font-medium">{item.projects.name}</TableCell>
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-base font-medium mt-6">{t("projects")}</h2>
+        <p className="text-muted-foreground text-sm">{t("datasetProjectsDescription")}</p>
+      </div>
+
+      <Card className="rounded-md shadow-xs">
+        <CardContent>
+          <div className="flex gap-2 items-center">
+            <ProjectSelect onValueChange={setSelectedProject} organizationId={organizationId} />
+            <Button onClick={handleAddToProject} disabled={!selectedProject || isAddingToProject}>
+              {isAddingToProject ? t("adding") : t("addToProject")}
+            </Button>
+          </div>
+          {isSuccess && (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">{t("name")}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {data.rows.map((item) => (
+                  <TableRow key={item.projects.id}>
+                    <TableCell className="font-medium">{item.projects.name}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
