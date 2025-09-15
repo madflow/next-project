@@ -10,7 +10,7 @@ import {
   SheetIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from "recharts";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -85,25 +85,46 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
     const variableStats = extractVariableStats(variable, stats);
     const frequencyTableLength = variableStats?.frequency_table?.length || 0;
 
+    // Check if this variable has split variable stats
+    const targetVariable = stats.find((item) => item.variable === variable.name);
+    const hasSplitVariable = targetVariable && isSplitVariableStats(targetVariable.stats);
+
     if (variable.measure === "nominal") {
-      availableCharts.push("horizontalBar");
-      if (frequencyTableLength <= 5) {
-        availableCharts.push("pie");
-        availableCharts.push("horizontalStackedBar");
-      }
-      if (frequencyTableLength === 2) {
-        availableCharts.push("bar");
+      if (hasSplitVariable) {
+        // For split variables: ONLY horizontal stacked bar chart
+        if (frequencyTableLength <= 5) {
+          availableCharts.push("horizontalStackedBar");
+        }
+      } else {
+        // EXACT CURRENT LOGIC for non-split variables (untouched)
+        availableCharts.push("horizontalBar");
+        if (frequencyTableLength <= 5) {
+          availableCharts.push("pie");
+          availableCharts.push("horizontalStackedBar");
+        }
+        if (frequencyTableLength === 2) {
+          availableCharts.push("bar");
+        }
       }
     } else if (variable.measure === "ordinal") {
-      availableCharts.push("horizontalBar");
-      if (frequencyTableLength <= 5) {
-        availableCharts.push("pie");
-        availableCharts.push("horizontalStackedBar");
-      }
-      if (frequencyTableLength === 2) {
-        availableCharts.push("bar");
+      if (hasSplitVariable) {
+        // For split variables: ONLY horizontal stacked bar chart
+        if (frequencyTableLength <= 5) {
+          availableCharts.push("horizontalStackedBar");
+        }
+      } else {
+        // EXACT CURRENT LOGIC for non-split variables (untouched)
+        availableCharts.push("horizontalBar");
+        if (frequencyTableLength <= 5) {
+          availableCharts.push("pie");
+          availableCharts.push("horizontalStackedBar");
+        }
+        if (frequencyTableLength === 2) {
+          availableCharts.push("bar");
+        }
       }
     } else if (variable.measure === "scale") {
+      // EXACT CURRENT LOGIC for scale variables (completely untouched)
       availableCharts.push("meanBar");
       if (variable.type === "double") {
         availableCharts.push("metrics");
@@ -113,29 +134,62 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
     return availableCharts;
   }
 
-  function getDefaultChartType(availableChartTypes: AnalysisChartType[]): AnalysisChartType {
-    if (availableChartTypes.includes("horizontalBar")) return "horizontalBar";
-    if (availableChartTypes.includes("meanBar")) return "meanBar";
-    if (availableChartTypes.includes("metrics")) return "metrics";
+  function getDefaultChartType(variable: DatasetVariable, stats: StatsResponse, availableChartTypes: AnalysisChartType[]): AnalysisChartType {
+    // Check if this variable has split variable stats
+    const targetVariable = stats.find((item) => item.variable === variable.name);
+    const hasSplitVariable = targetVariable && isSplitVariableStats(targetVariable.stats);
+
+    if (hasSplitVariable) {
+      // For split variables: default to horizontalStackedBar (which should be the only option)
+      if (availableChartTypes.includes("horizontalStackedBar")) return "horizontalStackedBar";
+    } else {
+      // For non-split variables: prefer horizontalBar first, then others
+      if (availableChartTypes.includes("horizontalBar")) return "horizontalBar";
+      if (availableChartTypes.includes("meanBar")) return "meanBar";
+      if (availableChartTypes.includes("metrics")) return "metrics";
+      if (availableChartTypes.includes("pie")) return "pie";
+      if (availableChartTypes.includes("bar")) return "bar";
+      if (availableChartTypes.includes("horizontalStackedBar")) return "horizontalStackedBar";
+    }
+
     return availableChartTypes[0] || "horizontalBar";
   }
 
-  const availableChartTypes = getAvailableChartTypes(variable, stats);
+  const availableChartTypes = useMemo(() => 
+    getAvailableChartTypes(variable, stats), 
+    [variable, stats]
+  );
   const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
-    return getDefaultChartType(availableChartTypes);
+    return getDefaultChartType(variable, stats, availableChartTypes);
   });
   
   const prevVariableIdRef = useRef(variable.id);
+  const prevHasSplitVariableRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // Only reset when variable actually changes
-    if (prevVariableIdRef.current !== variable.id) {
+    // Check if this variable has split variable stats
+    const targetVariable = stats.find((item) => item.variable === variable.name);
+    const hasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
+
+    // Reset chart type when:
+    // 1. Variable changes, OR
+    // 2. Split variable status changes (from split to non-split or vice versa)
+    const variableChanged = prevVariableIdRef.current !== variable.id;
+    const splitVariableStatusChanged = prevHasSplitVariableRef.current !== hasSplitVariable;
+
+    if (variableChanged || splitVariableStatusChanged) {
       const newAvailableChartTypes = getAvailableChartTypes(variable, stats);
-      const defaultChartType = getDefaultChartType(newAvailableChartTypes);
-      setSelectedChartType(defaultChartType);
+      const defaultChartType = getDefaultChartType(variable, stats, newAvailableChartTypes);
+
+      // Always reset to default when split variable status changes or current selection not available
+      if (splitVariableStatusChanged || !newAvailableChartTypes.includes(selectedChartType)) {
+        setSelectedChartType(defaultChartType);
+      }
+
       prevVariableIdRef.current = variable.id;
+      prevHasSplitVariableRef.current = hasSplitVariable;
     }
-  }, [variable.id, variable, stats]); // Include all dependencies used inside
+  }, [variable.id, variable, stats, selectedChartType]);
 
   const chartConfig = {
     percentage: {
