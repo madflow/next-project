@@ -24,7 +24,7 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
   const { ref, exportPNG } = useChartExport();
 
   // Fetch split variables when datasetId is provided
-  const { data: splitVariablesResponse } = useQueryApi<{rows: DatasetVariable[]}>({
+  const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariable[] }>({
     endpoint: `/api/datasets/${datasetId}/splitvariables`,
     pagination: { pageIndex: 0, pageSize: 100 },
     sorting: [],
@@ -42,9 +42,9 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
     if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
       return null;
     }
-    
+
     const splitVariableName = targetVariable.stats.split_variable;
-    
+
     // Try to find the split variable in allVariables to get its label
     if (allVariables.length > 0) {
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
@@ -53,7 +53,7 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
         return `Split by ${splitVariableLabel}`;
       }
     }
-    
+
     // Fallback to variable name if no label found
     return `Split by ${splitVariableName}`;
   }
@@ -113,7 +113,7 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
           fontSize={10}
           width={200}
         />
-        <Bar dataKey="value" fill="var(--color-value)" radius={5} />
+        <Bar dataKey="value" fill="var(--color-value)" />
         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
       </BarChart>
     </ChartContainer>

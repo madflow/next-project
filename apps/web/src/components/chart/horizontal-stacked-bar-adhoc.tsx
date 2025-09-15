@@ -10,7 +10,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { transformToRechartsStackedBarData, transformToSplitVariableStackedBarData, isSplitVariableStats } from "@/lib/analysis-bridge";
+import {
+  isSplitVariableStats,
+  transformToRechartsStackedBarData,
+  transformToSplitVariableStackedBarData,
+} from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 
@@ -42,23 +46,23 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
     if (hasSplitVariable) {
       // Handle split variable rendering - multiple bars
       const splitData = transformToSplitVariableStackedBarData(variable, stats) as SplitDataItem[];
-      
+
       // Create chart data with a bar for each split category
       const chartData = splitData.filter(Boolean).map((categoryData: SplitDataItem) => {
         const barData: Record<string, unknown> = {
           label: categoryData.category,
         };
-        
+
         // Calculate total and normalize to ensure sum equals exactly 100%
         const totalPercentage = categoryData.segments.reduce((sum, segment) => sum + segment.value, 0);
         const normalizationFactor = totalPercentage > 0 ? 100 / totalPercentage : 1;
-        
+
         // Add each segment as a separate field for stacking
         categoryData.segments.forEach((segment, index: number) => {
-          const normalizedValue = Math.round((segment.value * normalizationFactor) * 100) / 100;
+          const normalizedValue = Math.round(segment.value * normalizationFactor * 100) / 100;
           barData[`segment${index}`] = normalizedValue;
         });
-        
+
         return barData;
       });
 
@@ -75,11 +79,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
 
       return (
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
-          <BarChart
-            layout="vertical"
-            margin={{ left: 0 }}
-            accessibilityLayer
-            data={chartData}>
+          <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={chartData}>
             <CartesianGrid vertical={true} horizontal={false} />
             <XAxis
               domain={[0, 100]}
@@ -101,15 +101,16 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               width={100}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            {splitData.length > 0 && splitData[0] && splitData[0].segments.map((_, index) => (
-              <Bar
-                key={`segment${index}`}
-                dataKey={`segment${index}`}
-                stackId="categories"
-                fill={`var(--color-segment${index})`}
-                radius={index === 0 ? [5, 0, 0, 5] : index === (splitData[0]?.segments.length || 0) - 1 ? [0, 5, 5, 0] : [0, 0, 0, 0]}
-              />
-            ))}
+            {splitData.length > 0 &&
+              splitData[0] &&
+              splitData[0].segments.map((_, index) => (
+                <Bar
+                  key={`segment${index}`}
+                  dataKey={`segment${index}`}
+                  stackId="categories"
+                  fill={`var(--color-segment${index})`}
+                />
+              ))}
             <ChartLegend
               content={<ChartLegendContent />}
               className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
@@ -122,33 +123,34 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
     // Original single variable rendering
     const stackedData = transformToRechartsStackedBarData(variable, stats);
     const stackedChartConfig: ChartConfig = {};
-    
+
     // Calculate total and normalize to ensure sum equals exactly 100%
     const totalPercentage = stackedData.reduce((sum, item) => sum + item.percentage, 0);
     const normalizationFactor = totalPercentage > 0 ? 100 / totalPercentage : 1;
-    
+
     // Create one horizontal bar with multiple segments
-    const singleBarData = [{
-      label: variable.label ?? variable.name,
-      ...stackedData.reduce((acc, item, index) => {
-        const key = `segment${index}`;
-        stackedChartConfig[key] = {
-          label: item.label,
-          color: `hsl(var(--chart-${(index % 6) + 1}))`,
-        };
-        const normalizedValue = Math.round((item.percentage * normalizationFactor) * 100) / 100;
-        acc[key] = normalizedValue;
-        return acc;
-      }, {} as Record<string, number>)
-    }];
+    const singleBarData = [
+      {
+        label: variable.label ?? variable.name,
+        ...stackedData.reduce(
+          (acc, item, index) => {
+            const key = `segment${index}`;
+            stackedChartConfig[key] = {
+              label: item.label,
+              color: `hsl(var(--chart-${(index % 6) + 1}))`,
+            };
+            const normalizedValue = Math.round(item.percentage * normalizationFactor * 100) / 100;
+            acc[key] = normalizedValue;
+            return acc;
+          },
+          {} as Record<string, number>
+        ),
+      },
+    ];
 
     return (
       <ChartContainer config={stackedChartConfig} ref={ref} data-export-filename={variable.name}>
-        <BarChart
-          layout="vertical"
-          margin={{ left: 0 }}
-          accessibilityLayer
-          data={singleBarData}>
+        <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={singleBarData}>
           <CartesianGrid vertical={true} horizontal={false} />
           <XAxis
             domain={[0, 100]}
@@ -176,7 +178,6 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               dataKey={`segment${index}`}
               stackId="categories"
               fill={`var(--color-segment${index})`}
-              radius={index === 0 ? [5, 0, 0, 5] : index === stackedData.length - 1 ? [0, 5, 5, 0] : [0, 0, 0, 0]}
             />
           ))}
           <ChartLegend

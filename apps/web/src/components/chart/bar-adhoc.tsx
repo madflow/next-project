@@ -46,7 +46,7 @@ export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
               fontSize={10}
               tickFormatter={(value) => `${value}%`}
             />
-            <Bar dataKey="percentage" fill="var(--color-percentage)" radius={5} />
+            <Bar dataKey="percentage" fill="var(--color-percentage)" />
           </BarChart>
         </ChartContainer>
       </CardContent>
