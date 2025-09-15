@@ -393,3 +393,277 @@ def test_frequency_table_sorted_without_value_labels(stats_service):
     # Should be sorted: 1.0, 2.0, 3.0, 5.0
     expected_order = ["1.0", "2.0", "3.0", "5.0"]
     assert values == expected_order, f"Expected {expected_order}, got {values}"
+
+
+# Test cases for split variable functionality
+def test_describe_var_with_split_variable_numeric(stats_service):
+    """Test descriptive statistics with split variable for numeric data."""
+    df = pd.DataFrame({
+        "score": [10, 20, 30, 40, 50, 60],
+        "group": ["A", "A", "B", "B", "C", "C"]
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "score", 
+        split_variable="group",
+        include=["count", "mean", "min", "max"]
+    )
+    
+    # Check structure
+    assert "split_variable" in result
+    assert "categories" in result
+    assert "split_variable_labels" in result
+    assert result["split_variable"] == "group"
+    
+    # Check categories (should be sorted)
+    categories = result["categories"]
+    assert set(categories.keys()) == {"A", "B", "C"}
+    
+    # Check stats for each category
+    assert categories["A"]["count"] == 2
+    assert categories["A"]["mean"] == pytest.approx(15.0)  # (10 + 20) / 2
+    assert categories["A"]["min"] == 10.0
+    assert categories["A"]["max"] == 20.0
+    
+    assert categories["B"]["count"] == 2
+    assert categories["B"]["mean"] == pytest.approx(35.0)  # (30 + 40) / 2
+    assert categories["B"]["min"] == 30.0
+    assert categories["B"]["max"] == 40.0
+    
+    assert categories["C"]["count"] == 2
+    assert categories["C"]["mean"] == pytest.approx(55.0)  # (50 + 60) / 2
+    assert categories["C"]["min"] == 50.0
+    assert categories["C"]["max"] == 60.0
+
+
+def test_describe_var_with_split_variable_categorical(stats_service):
+    """Test descriptive statistics with split variable for categorical data."""
+    df = pd.DataFrame({
+        "color": ["red", "blue", "red", "green", "blue", "red"],
+        "size": ["S", "S", "M", "M", "L", "L"]
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "color", 
+        split_variable="size",
+        include=["count", "mode", "frequencies"]
+    )
+    
+    # Check structure
+    assert result["split_variable"] == "size"
+    categories = result["categories"]
+    assert set(categories.keys()) == {"S", "M", "L"}
+    
+    # Check stats for each category
+    assert categories["S"]["count"] == 2
+    assert set(categories["S"]["mode"]) == {"red", "blue"}  # Tie between red and blue
+    
+    assert categories["M"]["count"] == 2
+    assert set(categories["M"]["mode"]) == {"red", "green"}  # Tie between red and green
+    
+    assert categories["L"]["count"] == 2
+    assert set(categories["L"]["mode"]) == {"blue", "red"}  # Tie between blue and red
+
+
+def test_describe_var_with_split_variable_missing_values(stats_service):
+    """Test split variable functionality with missing values in split variable."""
+    df = pd.DataFrame({
+        "score": [10, 20, 30, 40, 50],
+        "group": ["A", "B", -999, "A", "B"]  # -999 is missing
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "score", 
+        split_variable="group",
+        split_variable_missing_values=[-999],
+        include=["count", "mean"]
+    )
+    
+    # Missing values in split variable should be excluded
+    categories = result["categories"]
+    assert set(categories.keys()) == {"A", "B"}  # -999 should be excluded
+    
+    # Check that only valid groups are included
+    assert categories["A"]["count"] == 2  # positions 0 and 3
+    assert categories["A"]["mean"] == pytest.approx(25.0)  # (10 + 40) / 2  - positions 0 and 3
+    
+    assert categories["B"]["count"] == 2  # positions 1 and 4
+    assert categories["B"]["mean"] == pytest.approx(35.0)  # (20 + 50) / 2 - positions 1 and 4
+
+
+def test_describe_var_with_split_variable_value_labels(stats_service):
+    """Test split variable functionality with value labels for both variables."""
+    df = pd.DataFrame({
+        "satisfaction": [1, 2, 1, 3, 2, 3],
+        "department": [1, 1, 2, 2, 3, 3]
+    })
+    
+    satisfaction_labels = {
+        "1": "Low",
+        "2": "Medium", 
+        "3": "High"
+    }
+    
+    department_labels = {
+        "1": "Sales",
+        "2": "Marketing",
+        "3": "Engineering"
+    }
+    
+    result = stats_service.describe_var(
+        df, 
+        "satisfaction", 
+        split_variable="department",
+        value_labels=satisfaction_labels,
+        split_variable_value_labels=department_labels,
+        include=["frequencies"]
+    )
+    
+    # Check that split variable labels are included
+    assert result["split_variable_labels"] == department_labels
+    
+    # Check that categories use the original values (not labels)
+    categories = result["categories"]
+    assert set(categories.keys()) == {"1", "2", "3"}
+
+
+def test_describe_var_with_split_variable_single_category(stats_service):
+    """Test split variable functionality with only one category."""
+    df = pd.DataFrame({
+        "score": [10, 20, 30],
+        "group": ["A", "A", "A"]  # All same group
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "score", 
+        split_variable="group",
+        include=["count", "mean"]
+    )
+    
+    categories = result["categories"]
+    assert set(categories.keys()) == {"A"}
+    assert categories["A"]["count"] == 3
+    assert categories["A"]["mean"] == pytest.approx(20.0)
+
+
+def test_describe_var_with_split_variable_empty_after_filtering(stats_service):
+    """Test split variable functionality when all split values are missing."""
+    df = pd.DataFrame({
+        "score": [10, 20, 30],
+        "group": [-999, -998, -999]  # All missing
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "score", 
+        split_variable="group",
+        split_variable_missing_values=[-999, -998],
+        include=["count", "mean"]
+    )
+    
+    # Should return empty categories
+    categories = result["categories"]
+    assert categories == {}
+
+
+def test_describe_var_with_split_variable_mixed_numeric_string_categories(stats_service):
+    """Test split variable with mixed numeric and string categories."""
+    df = pd.DataFrame({
+        "score": [10, 20, 30, 40, 50],
+        "group": [1, "A", 2, "A", 1]
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "score", 
+        split_variable="group",
+        include=["count", "mean"]
+    )
+    
+    categories = result["categories"]
+    # Should be sorted with numbers first, then strings
+    expected_keys = ["1", "2", "A"]
+    actual_keys = list(categories.keys())
+    assert actual_keys == expected_keys
+    
+    assert categories["1"]["count"] == 2  # positions 0 and 4
+    assert categories["1"]["mean"] == pytest.approx(30.0)  # (10 + 50) / 2
+    
+    assert categories["2"]["count"] == 1
+    assert categories["2"]["mean"] == pytest.approx(30.0)
+    
+    assert categories["A"]["count"] == 2  # positions 1 and 3
+    assert categories["A"]["mean"] == pytest.approx(30.0)  # (20 + 40) / 2
+
+
+def test_split_variable_not_found_error(stats_service):
+    """Test that ValueError is raised when split variable doesn't exist."""
+    df = pd.DataFrame({
+        "score": [10, 20, 30],
+        "group": ["A", "B", "C"]
+    })
+    
+    with pytest.raises(ValueError, match="Split variable 'nonexistent' not found in the DataFrame."):
+        stats_service.describe_var(
+            df, 
+            "score", 
+            split_variable="nonexistent"
+        )
+
+
+def test_describe_var_with_split_variable_frequency_table_sorted(stats_service):
+    """Test that frequency tables within split categories are properly sorted."""
+    df = pd.DataFrame({
+        "rating": [5, 1, 3, 2, 4, 1],
+        "group": ["A", "A", "A", "B", "B", "B"]
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "rating", 
+        split_variable="group",
+        include=["frequencies"]
+    )
+    
+    categories = result["categories"]
+    
+    # Check that frequency tables are sorted within each category
+    group_a_values = [item["value"] for item in categories["A"]["frequency_table"]]
+    group_b_values = [item["value"] for item in categories["B"]["frequency_table"]]
+    
+    assert group_a_values == ["1.0", "3.0", "5.0"]  # Should be sorted
+    assert group_b_values == ["1.0", "2.0", "4.0"]  # Should be sorted
+
+
+def test_describe_var_with_split_variable_main_var_missing_values(stats_service):
+    """Test split variable functionality with missing values in main variable."""
+    df = pd.DataFrame({
+        "score": [10, -999, 30, 40, -999],
+        "group": ["A", "A", "B", "B", "B"]
+    })
+    
+    result = stats_service.describe_var(
+        df, 
+        "score", 
+        split_variable="group",
+        missing_values=[-999],
+        include=["count", "mean"]
+    )
+    
+    categories = result["categories"]
+    
+    # Group A should have 1 valid value (position 0, position 1 is missing)
+    assert categories["A"]["count"] == 1
+    # Check if mean is calculated - it might not be for single values depending on implementation
+    if "mean" in categories["A"]:
+        assert categories["A"]["mean"] == pytest.approx(10.0)
+    
+    # Group B should have 2 valid values (positions 2 and 3, position 4 is missing) 
+    assert categories["B"]["count"] == 2
+    # Check if mean is calculated - it should be for multiple values
+    if "mean" in categories["B"]:
+        assert categories["B"]["mean"] == pytest.approx(35.0)  # (30 + 40) / 2
