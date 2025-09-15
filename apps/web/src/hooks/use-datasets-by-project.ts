@@ -16,7 +16,7 @@ export function useDatasetsByProject(projectId: string, options?: UseQueryApiOpt
       enabled: !!projectId,
       offset: 0,
       limit: 250,
-      order: [{ column: "name", direction: "asc" }],
+      order: [{ column: "datasets:name", direction: "asc" }],
     };
   } else {
     finalOptions = {
