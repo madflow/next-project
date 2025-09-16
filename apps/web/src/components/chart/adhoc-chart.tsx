@@ -46,6 +46,7 @@ import { Code } from "../ui/code";
 import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
+import { useAppContext } from "@/context/app-context";
 
 type AdhocChartProps = {
   variable: DatasetVariable;
@@ -57,6 +58,7 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
   const t = useTranslations("projectAdhocAnalysis");
   const tChart = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
+  const { debugMode } = useAppContext();
 
   // Fetch split variables when datasetId is provided
   const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariable[] }>({
@@ -334,11 +336,13 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
     return (
       <div {...props}>
         <Tabs defaultValue="chart" className="w-full">
-          <TabsList>
-            <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
-            <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
-            <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
-          </TabsList>
+          {debugMode && (
+            <TabsList>
+              <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
+              <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
+              <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
+            </TabsList>
+          )}
           <TabsContent value="chart">
             <Card className="shadow-xs">
               <CardHeader>
@@ -378,32 +382,36 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
               )}
             </Card>
           </TabsContent>
-          <TabsContent value="variable">
-            <Card className="shadow-xs">
-              <CardHeader>
-                <CardTitle>{variable.label ?? variable.name}</CardTitle>
-                {getSplitVariableDescription(variable, stats) && (
-                  <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <Code>{JSON.stringify(variable, null, 2)}</Code>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="stats">
-            <Card className="shadow-xs">
-              <CardHeader>
-                <CardTitle>{variable.label ?? variable.name}</CardTitle>
-                {getSplitVariableDescription(variable, stats) && (
-                  <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <Code>{JSON.stringify(stats, null, 2)}</Code>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {debugMode && (
+            <TabsContent value="variable">
+              <Card className="shadow-xs">
+                <CardHeader>
+                  <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                  {getSplitVariableDescription(variable, stats) && (
+                    <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <Code>{JSON.stringify(variable, null, 2)}</Code>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+          {debugMode && (
+            <TabsContent value="stats">
+              <Card className="shadow-xs">
+                <CardHeader>
+                  <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                  {getSplitVariableDescription(variable, stats) && (
+                    <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <Code>{JSON.stringify(stats, null, 2)}</Code>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     );
@@ -412,11 +420,13 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
   return (
     <div {...props}>
       <Tabs defaultValue="chart" className="w-full">
-        <TabsList>
-          <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
-          <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
-          <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
-        </TabsList>
+        {debugMode && (
+          <TabsList>
+            <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
+            <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
+            <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
+          </TabsList>
+        )}
         <TabsContent value="chart">
           <Card className="shadow-xs">
             <CardHeader>
@@ -448,32 +458,36 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
             </CardFooter>
           </Card>
         </TabsContent>
-        <TabsContent value="variable">
-          <Card className="shadow-xs">
-            <CardHeader>
-              <CardTitle>{variable.label ?? variable.name}</CardTitle>
-              {getSplitVariableDescription(variable, stats) && (
-                <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
-              )}
-            </CardHeader>
-            <CardContent>
-              <Code>{JSON.stringify(variable, null, 2)}</Code>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="stats">
-          <Card className="shadow-xs">
-            <CardHeader>
-              <CardTitle>{variable.label ?? variable.name}</CardTitle>
-              {getSplitVariableDescription(variable, stats) && (
-                <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
-              )}
-            </CardHeader>
-            <CardContent>
-              <Code>{JSON.stringify(stats, null, 2)}</Code>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {debugMode && (
+          <TabsContent value="variable">
+            <Card className="shadow-xs">
+              <CardHeader>
+                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                {getSplitVariableDescription(variable, stats) && (
+                  <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <Code>{JSON.stringify(variable, null, 2)}</Code>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+        {debugMode && (
+          <TabsContent value="stats">
+            <Card className="shadow-xs">
+              <CardHeader>
+                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                {getSplitVariableDescription(variable, stats) && (
+                  <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <Code>{JSON.stringify(stats, null, 2)}</Code>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

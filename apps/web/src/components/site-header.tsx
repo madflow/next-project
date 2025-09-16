@@ -2,6 +2,7 @@
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { DebugToggle } from "./debug-toggle";
 import { ImpersonationBanner } from "./impersonation-banner";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -18,7 +19,10 @@ export function SiteHeader({ title }: SiteHeaderProps) {
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
           <h1 className="text-lg font-semibold">{title}</h1>
-          <ThemeToggle className="ml-auto" />
+          <div className="flex items-center gap-1 ml-auto">
+            <DebugToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
     </>

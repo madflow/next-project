@@ -3,6 +3,7 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAppContext } from "@/context/app-context";
+import { DebugToggle } from "./debug-toggle";
 import { ThemeToggle } from "./theme-toggle";
 
 export function ProjectSiteHeader() {
@@ -13,7 +14,10 @@ export function ProjectSiteHeader() {
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
         <h1 className="text-lg font-semibold">{activeProject?.name}</h1>
-        <ThemeToggle className="ml-auto" />
+        <div className="flex items-center gap-1 ml-auto">
+          <DebugToggle />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

@@ -958,6 +958,11 @@
     },
     "title": "Sign Up"
   },
+  "debugMode": {
+    "label": "Debug Mode",
+    "enabled": "ON",
+    "disabled": "OFF"
+  },
   "themeSelector": {
     "colorThemes": "Colors",
     "label": "Theme",

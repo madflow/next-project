@@ -958,6 +958,11 @@
     },
     "title": "Registrieren"
   },
+  "debugMode": {
+    "label": "Debug-Modus",
+    "enabled": "AN",
+    "disabled": "AUS"
+  },
   "themeSelector": {
     "colorThemes": "Farben",
     "label": "Design",
