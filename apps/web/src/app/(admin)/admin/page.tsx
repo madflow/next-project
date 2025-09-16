@@ -7,7 +7,7 @@ export default async function Page() {
   const t = await getTranslations("adminDashboard");
 
   return (
-    <PageLayout data-testid="admin.page">
+    <PageLayout title={t("title")} description={t("description")} data-testid="admin.page">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="align-center flex flex-col justify-between shadow-xs">
           <CardHeader>

@@ -103,6 +103,8 @@
     "title": "Konto löschen"
   },
   "adminDashboard": {
+    "title": "Admin Dashboard",
+    "description": "Zugriff auf administrative Tools und Verwaltung der Anwendungseinstellungen.",
     "datasets": {
       "description": "Verwalten Sie Datensätze und deren Konfigurationen.",
       "link": "Datensätze anzeigen",

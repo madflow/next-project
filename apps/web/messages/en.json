@@ -103,6 +103,8 @@
     "title": "Delete Account"
   },
   "adminDashboard": {
+    "title": "Admin Dashboard",
+    "description": "Access administrative tools and manage system settings.",
     "datasets": {
       "description": "Manage datasets and their configurations.",
       "link": "View Datasets",
