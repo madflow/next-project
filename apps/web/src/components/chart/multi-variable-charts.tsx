@@ -5,7 +5,6 @@ import type { DatasetVariable } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
 import { AdhocChart } from "./adhoc-chart";
-import { SplitVariableSelector } from "../project/split-variable-selector";
 
 type MultiVariableChartsProps = {
   variables: DatasetVariable[];
@@ -60,16 +59,16 @@ export function MultiVariableCharts({
             )}
           </div>
         )}
-        <div className="mb-4">
-          <SplitVariableSelector
-            datasetId={datasetId}
-            selectedSplitVariable={splitVariables[variable.name] || null}
-            onSplitVariableChangeAction={(splitVariable) => 
-              handleSplitVariableChange(variable.name, splitVariable)
-            }
-          />
-        </div>
-        <AdhocChart variable={variable} stats={stats} datasetId={datasetId} className="w-[600px]" />
+        <AdhocChart 
+          variable={variable} 
+          stats={stats} 
+          datasetId={datasetId} 
+          className="w-[600px]"
+          selectedSplitVariable={splitVariables[variable.name] || null}
+          onSplitVariableChangeAction={(splitVariable: string | null) => 
+            handleSplitVariableChange(variable.name, splitVariable)
+          }
+        />
       </div>
     );
   }
@@ -87,21 +86,17 @@ export function MultiVariableCharts({
       {variables.map((variable) => {
         const stats = statsData[variable.name]!; // We know it exists due to hasAllStats check
         return (
-          <div key={variable.id} className="flex flex-col gap-2">
-            <SplitVariableSelector
-              datasetId={datasetId}
-              selectedSplitVariable={splitVariables[variable.name] || null}
-              onSplitVariableChangeAction={(splitVariable) => 
-                handleSplitVariableChange(variable.name, splitVariable)
-              }
-            />
-            <AdhocChart
-              variable={variable}
-              stats={stats}
-              datasetId={datasetId}
-              className="w-[600px]"
-            />
-          </div>
+          <AdhocChart
+            key={variable.id}
+            variable={variable}
+            stats={stats}
+            datasetId={datasetId}
+            className="w-[600px]"
+            selectedSplitVariable={splitVariables[variable.name] || null}
+            onSplitVariableChangeAction={(splitVariable: string | null) => 
+              handleSplitVariableChange(variable.name, splitVariable)
+            }
+          />
         );
       })}
     </div>
