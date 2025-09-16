@@ -1,7 +1,7 @@
 "use client";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { ChevronDown, ChevronRight, Palette, PlayIcon } from "lucide-react";
+import { ChevronDown, ChevronRight, Palette } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useThemeConfig } from "@/components/active-theme";
@@ -84,11 +84,12 @@ function VariablesetNode({
           )}
         </Button>
 
-        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onSelectSet(node)}>
-          <PlayIcon className="h-4 w-4" />
-        </Button>
-
-        <span className="flex-1 text-sm font-medium">{node.name}</span>
+        <button
+          className="flex-1 text-left text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer rounded px-1 py-0.5"
+          onClick={() => onSelectSet(node)}
+        >
+          {node.name}
+        </button>
 
         <span className="text-muted-foreground text-xs">
           {"("}
@@ -102,21 +103,16 @@ function VariablesetNode({
           {filteredVariables.map((variable) => (
             <div
               key={variable.id}
-              className="flex items-center gap-2 py-1"
+              className="flex items-center py-1"
               style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={() => onSelectVariable(variable, node)}>
-                <PlayIcon className="h-4 w-4" />
-              </Button>
-
-              <span className="text-sm">
+              <button
+                className="flex-1 text-left text-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer rounded px-1 py-0.5"
+                onClick={() => onSelectVariable(variable, node)}
+              >
                 {variable.label} {"("}
                 {variable.name}
                 {")"}
-              </span>
+              </button>
             </div>
           ))}
 
