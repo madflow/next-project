@@ -1,4 +1,4 @@
-import { type SQL, asc, count, desc, eq, getTableColumns, getTableName, ilike, or } from "drizzle-orm";
+import { type SQL, and, asc, count, desc, eq, getTableColumns, getTableName, ilike, or } from "drizzle-orm";
 import type { AnyPgTable, PgColumn, PgSelect, PgTable } from "drizzle-orm/pg-core";
 import type { z } from "zod";
 import { defaultClient as db } from "@repo/database/clients";
@@ -49,15 +49,31 @@ export function createListWithJoins<TSchema extends ZodSchema>(
       countQuery = countQuery.innerJoin(join.table, join.condition) as DrizzleSelect;
     }
 
+    // Apply filters if provided
+    const filterConditions: SQL<unknown>[] = [];
     if (filters) {
       for (const filter of filters) {
-        const column = getTableColumns(table)[filter.column];
+        const filterColumnParts = filter.column.split(":");
+        const [filterTable, filterColumn] = filterColumnParts;
+        let column: PgColumn | undefined;
+
+        if (filterColumnParts.length > 1 && filterTable && filterColumn) {
+          // Filter on joined table (e.g., "organizations:name")
+          const join = joins.find((j) => getTableName(j.table) === filterTable);
+          if (join) {
+            column = getTableColumns(join.table)[filterColumn];
+          }
+        } else {
+          // Filter on main table
+          column = getTableColumns(table)[filter.column];
+        }
+
         if (!column) {
           continue;
         }
+        
         if (filter.operator === "=" || filter.operator === "eq") {
-          query = query.where(eq(column, filter.value));
-          countQuery = countQuery.where(eq(column, filter.value));
+          filterConditions.push(eq(column, filter.value));
         }
       }
     }
@@ -91,9 +107,28 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         searchConditions.push(searchCondition);
       }
     }
+    
+    // Combine search and filter conditions
+    const allConditions: SQL<unknown>[] = [];
+    
+    // Add search conditions (OR logic for search)
     if (searchConditions.length > 0) {
-      query.where(or(...searchConditions));
-      countQuery.where(or(...searchConditions));
+      const searchCondition = or(...searchConditions);
+      if (searchCondition) {
+        allConditions.push(searchCondition);
+      }
+    }
+    
+    // Add filter conditions (AND logic for filters)
+    if (filterConditions.length > 0) {
+      allConditions.push(...filterConditions);
+    }
+    
+    // Apply all conditions
+    if (allConditions.length > 0) {
+      const finalCondition = allConditions.length === 1 ? allConditions[0] : and(...allConditions);
+      query = query.where(finalCondition) as DrizzleSelect;
+      countQuery = countQuery.where(finalCondition) as DrizzleSelect;
     }
 
     // Apply order by if provided
