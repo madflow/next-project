@@ -57,7 +57,8 @@ This project uses the following technologies:
 
 ## Rules for running commands
 
-- Do not run `npm run build` in order to test the project or to regenerate types. Run `make-check`.
+- Use `make check` (not `npm run build`) to test the project and regenerate types.
+- Always run `make check` after making significant changes to ensure code quality.
 
 ## Writing tasks and specs for agentic coding
 

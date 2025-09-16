@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Suspense, useEffect, useState } from "react";
 import { DatasetSelect } from "@/components/form/dataset-select";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
+import { useAdhocPersistence } from "@/hooks/use-adhoc-persistence";
 import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
 import { MultiVariableCharts } from "../chart/multi-variable-charts";
@@ -11,6 +12,7 @@ import BarSkeleton from "../chart/bar-skeleton";
 import { ThemeSelector } from "../theme-selector";
 import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-selector";
 import { VariablesetDescription } from "./variableset-description";
+import { useThemeConfig } from "@/components/active-theme";
 
 type AdHocAnalysisProps = {
   project: Project;
@@ -22,6 +24,22 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const [statsData, setStatsData] = useState<Record<string, StatsResponse>>({});
 
   const t = useTranslations("projectAdhocAnalysis");
+  const { setActiveTheme } = useThemeConfig();
+  const { restoreState, saveDataset, saveCurrentSelection } = useAdhocPersistence(project.id);
+
+  // Restore state from localStorage on mount
+  useEffect(() => {
+    const restoredState = restoreState();
+    if (restoredState) {
+      if (restoredState.selectedDataset) {
+        setSelectedDataset(restoredState.selectedDataset);
+      }
+      if (restoredState.selectedTheme && restoredState.selectedTheme !== "default") {
+        setActiveTheme(restoredState.selectedTheme);
+      }
+      // Note: currentSelection will be restored when dataset is set and variableset selector is rendered
+    }
+  }, [restoreState, setActiveTheme]);
 
   const { mutate } = useDatasetStats(selectedDataset || "", {
     onError: (error) => {
@@ -60,6 +78,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const handleSelectionChange = (selection: SelectionItem) => {
     setCurrentSelection(selection);
     setStatsData({});
+    saveCurrentSelection(selection);
   };
 
   const handleStatsRequest = (variableName: string, splitVariable?: string) => {
@@ -92,10 +111,17 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         <ThemeSelector className="w-full" />
         <DatasetSelect
           projectId={project.id}
+          defaultValue={selectedDataset || undefined}
           onValueChangeAction={(value) => {
-            setSelectedDataset(value);
+            setSelectedDataset(value || null);
             setCurrentSelection(null);
             setStatsData({});
+            saveDataset(value || null);
+            
+            // If value is empty (dataset was deleted), also clear the stored selection
+            if (!value) {
+              saveCurrentSelection(null);
+            }
           }}
         />
         {selectedDataset && (
