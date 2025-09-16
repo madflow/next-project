@@ -968,7 +968,8 @@
     "label": "Design",
     "labelSelect": "Design:",
     "organizationThemes": "Organisationsthemes",
-    "placeholder": "Design auswählen"
+    "placeholder": "Design auswählen",
+    "changeTheme": "Design ändern"
   },
   "themeToggle": {
     "dark": "Dunkel",

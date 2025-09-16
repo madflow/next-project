@@ -9,7 +9,6 @@ import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
 import { MultiVariableCharts } from "../chart/multi-variable-charts";
 import BarSkeleton from "../chart/bar-skeleton";
-import { ThemeSelector } from "../theme-selector";
 import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-selector";
 
 import { useThemeConfig } from "@/components/active-theme";
@@ -108,7 +107,6 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   return (
     <div className="theme-container flex gap-4">
       <div className="flex w-64 max-w-64 min-w-64 flex-col gap-4">
-        <ThemeSelector className="w-full" />
         <DatasetSelect
           projectId={project.id}
           defaultValue={selectedDataset || undefined}

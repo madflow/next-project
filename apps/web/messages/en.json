@@ -968,7 +968,8 @@
     "label": "Theme",
     "labelSelect": "Theme:",
     "organizationThemes": "Organization Themes",
-    "placeholder": "Select a theme"
+    "placeholder": "Select a theme",
+    "changeTheme": "Change theme"
   },
   "themeToggle": {
     "dark": "Dark",

@@ -1,16 +1,20 @@
 "use client";
 
-import { ChevronDown, ChevronRight, PlayIcon } from "lucide-react";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import { ChevronDown, ChevronRight, Palette, PlayIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { useThemeConfig } from "@/components/active-theme";
+import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
 import { useVariablesetVariables } from "@/hooks/use-variableset-variables";
 import type { DatasetVariable } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader } from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator } from "../ui/select";
 import { Spinner } from "../ui/spinner";
 
 export type SelectionItem = {
@@ -100,7 +104,11 @@ function VariablesetNode({
               key={variable.id}
               className="flex items-center gap-2 py-1"
               style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onSelectVariable(variable, node)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={() => onSelectVariable(variable, node)}>
                 <PlayIcon className="h-4 w-4" />
               </Button>
 
@@ -135,7 +143,42 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
   const t = useTranslations("projectAdhocVariables");
+  const tTheme = useTranslations("themeSelector");
   const { data: variablesets, isLoading } = useDatasetVariablesets(datasetId);
+  const { activeTheme, setActiveTheme } = useThemeConfig();
+  const { availableThemes } = useOrganizationTheme();
+
+  // Theme constants
+  const DEFAULT_THEMES = [
+    { name: "Default", value: "default" },
+    { name: "Scaled", value: "scaled" },
+    { name: "Mono", value: "mono" },
+  ];
+
+  const COLOR_THEMES = [
+    { name: "Blue", value: "blue", exampleClassName: "bg-blue-500" },
+    { name: "Green", value: "green", exampleClassName: "bg-green-500" },
+    { name: "Amber", value: "amber", exampleClassName: "bg-amber-500" },
+    { name: "Rose", value: "rose", exampleClassName: "bg-rose-500" },
+    { name: "Purple", value: "purple", exampleClassName: "bg-purple-500" },
+    { name: "Orange", value: "orange", exampleClassName: "bg-orange-500" },
+    { name: "Teal", value: "teal", exampleClassName: "bg-teal-500" },
+  ];
+
+  // Get organization-specific themes
+  const organizationThemes = availableThemes.filter((theme) => {
+    const isDefaultTheme = DEFAULT_THEMES.some(
+      (defaultTheme) => defaultTheme.name.toLowerCase() === theme.name.toLowerCase()
+    );
+    return !isDefaultTheme;
+  });
+
+  // Helper function to get display colors for org themes
+  const getThemeColors = (theme: (typeof organizationThemes)[0]) => {
+    if (!theme.chartColors) return null;
+    const colors = Object.values(theme.chartColors).slice(0, 3);
+    return colors.length > 0 ? colors : null;
+  };
 
   const handleToggleExpand = (nodeId: string) => {
     const newExpanded = new Set(expandedNodes);
@@ -194,7 +237,68 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
             ))}
         </ScrollArea>
       </CardContent>
+      <CardFooter className="flex justify-end px-2">
+        <Select value={activeTheme} onValueChange={setActiveTheme}>
+          <SelectPrimitive.Trigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title={tTheme("changeTheme")}>
+              <Palette className="h-4 w-4" />
+            </Button>
+          </SelectPrimitive.Trigger>
+          <SelectContent align="end">
+            <SelectGroup>
+              {DEFAULT_THEMES.map((theme) => (
+                <SelectItem key={theme.name} value={theme.value} className="data-[state=checked]:opacity-50">
+                  {theme.name}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+            <SelectSeparator />
+            <SelectGroup>
+              <SelectLabel>{"Colors"}</SelectLabel>
+              {COLOR_THEMES.map((theme) => (
+                <SelectItem key={theme.name} value={theme.value} className="data-[state=checked]:opacity-50">
+                  <div className="flex items-center gap-2">
+                    <div className={`h-3 w-3 rounded-full ${theme.exampleClassName}`} />
+                    {theme.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+            {organizationThemes.length > 0 && (
+              <>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>{"Organization"}</SelectLabel>
+                  {organizationThemes.map((theme) => {
+                    const colors = getThemeColors(theme);
+                    return (
+                      <SelectItem
+                        key={theme.name}
+                        value={theme.name.toLowerCase()}
+                        className="data-[state=checked]:opacity-50">
+                        <div className="flex items-center gap-2">
+                          {colors && (
+                            <div className="flex gap-1">
+                              {colors.map((color, index) => (
+                                <div
+                                  key={index}
+                                  className="h-3 w-3 rounded-full border border-gray-200"
+                                  style={{ backgroundColor: color }}
+                                />
+                              ))}
+                            </div>
+                          )}
+                          {theme.name}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </>
+            )}
+          </SelectContent>
+        </Select>
+      </CardFooter>
     </Card>
   );
 }
-
