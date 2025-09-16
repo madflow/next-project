@@ -26,6 +26,29 @@ export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, tr
   const { data, isLoading, isError } = useDatasetsByProject(projectId);
   const t = useTranslations("formDatasetSelect");
 
+  // Update selectedValue when defaultValue changes and validate it exists
+  React.useEffect(() => {
+    if (!defaultValue) {
+      setSelectedValue("");
+      return;
+    }
+
+    // If data is loaded, check if the defaultValue exists in available datasets
+    if (data?.rows) {
+      const datasetExists = data.rows.some(item => item.datasets.id === defaultValue);
+      if (datasetExists) {
+        setSelectedValue(defaultValue);
+      } else {
+        // Dataset no longer exists, clear the selection and notify parent
+        setSelectedValue("");
+        onValueChangeAction("");
+      }
+    } else {
+      // Data not loaded yet, set the value optimistically
+      setSelectedValue(defaultValue);
+    }
+  }, [defaultValue, data?.rows, onValueChangeAction]);
+
   if (isLoading) {
     return (
       <Select disabled value={selectedValue}>

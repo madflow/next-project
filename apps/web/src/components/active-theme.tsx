@@ -7,6 +7,7 @@ const DEFAULT_THEME = "default";
 type ThemeContextType = {
   activeTheme: string;
   setActiveTheme: (theme: string) => void;
+  onThemeChangeAction?: (theme: string) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -14,8 +15,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 // Export the chart theme context for use in chart components
 export const ChartThemeContext = createContext<string>("default");
 
-export function ActiveThemeProvider({ children, initialTheme }: { children: ReactNode; initialTheme?: string }) {
-  const [activeTheme, setActiveTheme] = useState<string>(() => initialTheme || DEFAULT_THEME);
+export function ActiveThemeProvider({ children, initialTheme, onThemeChangeAction }: { children: ReactNode; initialTheme?: string; onThemeChangeAction?: (theme: string) => void }) {
+  const [activeTheme, setActiveThemeState] = useState<string>(() => initialTheme || DEFAULT_THEME);
+
+  const setActiveTheme = (theme: string) => {
+    setActiveThemeState(theme);
+    onThemeChangeAction?.(theme);
+  };
 
   useEffect(() => {
     Array.from(document.body.classList)
@@ -30,7 +36,7 @@ export function ActiveThemeProvider({ children, initialTheme }: { children: Reac
   }, [activeTheme]);
 
   return (
-    <ThemeContext.Provider value={{ activeTheme, setActiveTheme }}>
+    <ThemeContext.Provider value={{ activeTheme, setActiveTheme, onThemeChangeAction }}>
       <ChartThemeContext.Provider value={activeTheme}>{children}</ChartThemeContext.Provider>
     </ThemeContext.Provider>
   );

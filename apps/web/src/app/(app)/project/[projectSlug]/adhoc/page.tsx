@@ -1,8 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { ActiveThemeProvider } from "@/components/active-theme";
 import { PageLayout } from "@/components/page/page-layout";
-import { AdHocAnalysis } from "@/components/project/adhoc-analysis";
+import { AdhocAnalysisWrapper } from "@/components/project/adhoc-analysis-wrapper";
 import { findBySlug, hasAccess } from "@/dal/project";
 
 type PageProps = {
@@ -28,9 +27,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageLayout data-testid="app.project.adhoc" title={t("title")}>
-      <ActiveThemeProvider>
-        <AdHocAnalysis project={project} />
-      </ActiveThemeProvider>
+      <AdhocAnalysisWrapper project={project} />
     </PageLayout>
   );
 }
