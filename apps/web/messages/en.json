@@ -913,6 +913,12 @@
     "errors": {
       "fetchStats": "Error loading dataset statistics"
     },
+    "splitVariable": {
+      "label": "Split Variable:",
+      "none": "None",
+      "placeholder": "Choose split variable...",
+      "tooltip": "Charts will be split by categories of this variable."
+    },
     "tabs": {
       "chart": "Chart",
       "stats": "Statistics",

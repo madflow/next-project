@@ -47,14 +47,17 @@ import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
 import { useAppContext } from "@/context/app-context";
+import { SplitVariableSelector } from "../project/split-variable-selector";
 
 type AdhocChartProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
   datasetId?: string;
+  selectedSplitVariable?: string | null;
+  onSplitVariableChangeAction?: (splitVariable: string | null) => void;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartProps) {
+export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, onSplitVariableChangeAction, ...props }: AdhocChartProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const tChart = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
@@ -374,7 +377,15 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
                 )}
               </CardContent>
               {selectedChartType === "meanBar" && (
-                <CardFooter>
+                <CardFooter className="flex justify-between items-center border-t">
+                  {datasetId && onSplitVariableChangeAction && (
+                    <SplitVariableSelector
+                      datasetId={datasetId}
+                      selectedSplitVariable={selectedSplitVariable || null}
+                      onSplitVariableChangeAction={onSplitVariableChangeAction}
+                      compact
+                    />
+                  )}
                   <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
                     <DownloadIcon className="h-4 w-4" />
                   </Button>
@@ -451,7 +462,15 @@ export function AdhocChart({ variable, stats, datasetId, ...props }: AdhocChartP
               )}
             </CardHeader>
             <CardContent>{renderChart()}</CardContent>
-            <CardFooter>
+            <CardFooter className="flex justify-between items-center border-t">
+              {datasetId && onSplitVariableChangeAction && (
+                <SplitVariableSelector
+                  datasetId={datasetId}
+                  selectedSplitVariable={selectedSplitVariable || null}
+                  onSplitVariableChangeAction={onSplitVariableChangeAction}
+                  compact
+                />
+              )}
               <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
                 <DownloadIcon className="h-4 w-4" />
               </Button>

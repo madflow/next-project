@@ -913,6 +913,12 @@
     "errors": {
       "fetchStats": "Fehler beim Laden der Statistiken"
     },
+    "splitVariable": {
+      "label": "Teilungsvariable:",
+      "none": "Keine",
+      "placeholder": "Teilungsvariable auswählen...",
+      "tooltip": "Diagramme werden nach Kategorien dieser Variable aufgeteilt."
+    },
     "tabs": {
       "chart": "Diagramm",
       "stats": "Statistiken",
