@@ -11,7 +11,7 @@ import { MultiVariableCharts } from "../chart/multi-variable-charts";
 import BarSkeleton from "../chart/bar-skeleton";
 import { ThemeSelector } from "../theme-selector";
 import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-selector";
-import { VariablesetDescription } from "./variableset-description";
+
 import { useThemeConfig } from "@/components/active-theme";
 
 type AdHocAnalysisProps = {
@@ -130,13 +130,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             onSelectionChangeAction={handleSelectionChange} 
           />
         )}
-        {(currentSelection?.type === "set" && currentSelection.variableset) || 
-         (currentSelection?.type === "variable" && currentSelection.parentVariableset) ? (
-          <VariablesetDescription 
-            variableset={currentSelection.type === "set" ? currentSelection.variableset! : currentSelection.parentVariableset!}
-            variables={currentSelection.type === "set" ? currentSelection.variables : [currentSelection.variable!]}
-          />
-        ) : null}
+
       </div>
       
       {selectedDataset && currentSelection && selectedVariables.length > 0 && (
