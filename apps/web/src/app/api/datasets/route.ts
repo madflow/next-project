@@ -7,14 +7,15 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
-    const { limit, offset, search, orderBy } = processUrlParams(new URL(request.url).searchParams);
+    const { limit, offset, search, orderBy, filters } = processUrlParams(new URL(request.url).searchParams);
 
     const result = await list({
       limit,
       offset,
       search,
-      searchColumns: ["name", "slug"],
+      searchColumns: ["name", "filename"],
       orderBy,
+      filters,
     });
 
     return NextResponse.json(result);
