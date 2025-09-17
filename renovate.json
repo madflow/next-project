@@ -1,11 +1,13 @@
 {
   "assignees": ["madflow"],
   "extends": ["config:recommended"],
+  "internalChecksFilter": "strict",
   "labels": ["dependencies"],
   "lockFileMaintenance": {
     "automerge": true,
     "enabled": true
   },
+  "minimumReleaseAge": "7 days",
   "packageRules": [
     {
       "automerge": true,
@@ -24,3 +26,4 @@
   ],
   "timezone": "Europe/Berlin"
 }
+
