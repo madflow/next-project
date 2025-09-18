@@ -8,6 +8,7 @@
     "enabled": true
   },
   "minimumReleaseAge": "7 days",
+  "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
       "automerge": true,
@@ -26,4 +27,3 @@
   ],
   "timezone": "Europe/Berlin"
 }
-
