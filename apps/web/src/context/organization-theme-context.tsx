@@ -140,7 +140,7 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
 
   const availableThemes = useMemo(() => {
     const organizationThemes = organizationWithSettings?.settings?.themes || [];
-    const sanitizedOrganizationThemes = organizationThemes.map((theme) => ({
+    const sanitizedOrganizationThemes = organizationThemes.map((theme: ThemeItem) => ({
       ...theme,
       name: theme.name
         .replace(/\s+/g, "-") // Replace spaces with hyphens

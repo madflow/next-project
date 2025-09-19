@@ -1,18 +1,18 @@
 import { hashPassword } from "better-auth/crypto";
+import { eq } from "drizzle-orm";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { eq } from "drizzle-orm";
 import { adminClient, adminPool } from "@repo/database/clients";
 import {
   account,
   dataset,
   datasetProject,
+  datasetSplitVariable,
   datasetVariable,
   datasetVariableset,
   datasetVariablesetItem,
-  datasetSplitVariable,
   invitation,
   member,
   organization,
@@ -181,12 +181,9 @@ async function createDataset(
 
 async function createDatasetVariableSets(datasetId: string) {
   console.log(`Creating variable sets for dataset: ${datasetId}`);
-  
+
   // Fetch existing variables for the dataset
-  const variables = await adminClient
-    .select()
-    .from(datasetVariable)
-    .where(eq(datasetVariable.datasetId, datasetId));
+  const variables = await adminClient.select().from(datasetVariable).where(eq(datasetVariable.datasetId, datasetId));
 
   if (variables.length === 0) {
     console.log("No variables found for dataset");
@@ -196,62 +193,63 @@ async function createDatasetVariableSets(datasetId: string) {
   console.log(`Found ${variables.length} variables`);
 
   // Create a map of variable names to IDs for easy lookup
-  const variableMap = new Map(variables.map(v => [v.name, v.id]));
+  // eslint-disable-next-line
+  const variableMap = new Map(variables.map((v: any) => [v.name, v.id]));
 
   // Define variable sets with their variables
   const variableSets = [
     {
       name: "Demografische Daten",
       description: "Grundlegende demografische Informationen der Befragten",
-      variables: ["id", "age", "agecat", "sex", "marital", "childs", "childcat"]
+      variables: ["id", "age", "agecat", "sex", "marital", "childs", "childcat"],
     },
     {
       name: "Bildung und Beruf",
       description: "Bildungsstand und berufliche Situation",
-      variables: ["educ", "degree", "wrkstat", "paeduc", "maeduc", "speduc", "howpaid"]
+      variables: ["educ", "degree", "wrkstat", "paeduc", "maeduc", "speduc", "howpaid"],
     },
     {
       name: "Einkommen",
       description: "Einkommensinformationen",
-      variables: ["income", "rincome"]
+      variables: ["income", "rincome"],
     },
     {
       name: "Herkunft",
       description: "Herkunft und ethnischer Hintergrund",
-      variables: ["race", "born", "parborn", "granborn", "ethnic", "eth1", "eth2", "eth3"]
+      variables: ["race", "born", "parborn", "granborn", "ethnic", "eth1", "eth2", "eth3"],
     },
     {
       name: "Politische Einstellungen",
       description: "Politische Ansichten und Meinungen",
-      variables: ["polviews", "cappun"]
+      variables: ["polviews", "cappun"],
     },
     {
       name: "Vertrauen in Institutionen",
       description: "Vertrauen in verschiedene gesellschaftliche Institutionen",
-      variables: ["confinan", "conbus", "coneduc", "conpress", "conmedic", "contv"]
+      variables: ["confinan", "conbus", "coneduc", "conpress", "conmedic", "contv"],
     },
     {
       name: "Mediennutzung",
       description: "Medienkonsum und Informationsquellen",
-      variables: ["news", "news1", "news2", "news3", "news4", "news5", "tvhours"]
+      variables: ["news", "news1", "news2", "news3", "news4", "news5", "tvhours"],
     },
     {
       name: "Lebensstil",
       description: "Lebensstil und persönliche Einstellungen",
-      variables: ["happy", "hapmar", "postlife", "owngun"]
+      variables: ["happy", "hapmar", "postlife", "owngun"],
     },
     {
       name: "Fahrzeuge",
       description: "Fahrzeugbesitz und Präferenzen",
-      variables: ["car1", "car2", "car3"]
-    }
+      variables: ["car1", "car2", "car3"],
+    },
   ];
 
   // Create variable sets
   for (let i = 0; i < variableSets.length; i++) {
     const variableSet = variableSets[i];
     if (!variableSet) continue;
-    
+
     // Create the variable set
     const createdVariableSet = await adminClient
       .insert(datasetVariableset)
@@ -276,9 +274,9 @@ async function createDatasetVariableSets(datasetId: string) {
     for (let j = 0; j < variableSet.variables.length; j++) {
       const variableName = variableSet.variables[j];
       if (!variableName) continue;
-      
+
       const variableId = variableMap.get(variableName);
-      
+
       if (variableId) {
         variableSetItems.push({
           variablesetId: variableSetId,
@@ -319,10 +317,7 @@ async function updateMissingValues(datasetId: string) {
   console.log(`Updating missing values for dataset: ${datasetId}`);
 
   // Get all variables for this dataset
-  const variables = await adminClient
-    .select()
-    .from(datasetVariable)
-    .where(eq(datasetVariable.datasetId, datasetId));
+  const variables = await adminClient.select().from(datasetVariable).where(eq(datasetVariable.datasetId, datasetId));
 
   console.log(`Found ${variables.length} variables to process`);
 
@@ -331,11 +326,11 @@ async function updateMissingValues(datasetId: string) {
 
   for (const variable of variables) {
     const missingValues: string[] = [];
-    
-    if (variable.valueLabels && typeof variable.valueLabels === 'object') {
+
+    if (variable.valueLabels && typeof variable.valueLabels === "object") {
       // Check each value-label pair
       for (const [value, label] of Object.entries(variable.valueLabels)) {
-        if (typeof label === 'string' && missingValueLabels.includes(label)) {
+        if (typeof label === "string" && missingValueLabels.includes(label)) {
           missingValues.push(value);
         }
       }
@@ -347,8 +342,8 @@ async function updateMissingValues(datasetId: string) {
         .update(datasetVariable)
         .set({ missingValues: missingValues })
         .where(eq(datasetVariable.id, variable.id));
-      
-      console.log(`Updated missing values for ${variable.name}: [${missingValues.join(', ')}]`);
+
+      console.log(`Updated missing values for ${variable.name}: [${missingValues.join(", ")}]`);
     }
   }
 

@@ -10,13 +10,16 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@repo/database": "*",
+    "@repo/database": "workspace:*",
     "chalk": "^5.0.0",
     "commander": "^14.0.0"
   },
   "exports": "./dist/index.mjs",
   "bin": "./dist/index.mjs",
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "eslint": "^9.29.0",
     "unbuild": "^3.6.0"
   },
   "files": [
