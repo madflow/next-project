@@ -10,7 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@repo/database": "*",
+    "@repo/database": "workspace:*",
     "chalk": "^5.0.0",
     "commander": "^14.0.0"
   },

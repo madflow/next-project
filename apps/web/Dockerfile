@@ -8,7 +8,7 @@ RUN apk add --no-cache libc6-compat
 
 # Set working directory
 WORKDIR /app
-RUN npm install --global turbo@^2
+RUN corepack enable pnpm && pnpm add --global turbo@^2
 COPY . .
 RUN turbo prune @app/web --docker
 
@@ -19,16 +19,18 @@ ENV TURBO_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max_old_space_size=4096
 RUN apk update
 RUN apk add --no-cache libc6-compat
+RUN corepack enable pnpm
 WORKDIR /app
 
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
-RUN npm install
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install --frozen-lockfile
 
 # Build the project
 COPY --from=builder /app/out/full/ .
 
-RUN npx turbo@^2 build
+RUN pnpm turbo build
 
 FROM base AS runner
 

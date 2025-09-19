@@ -1,13 +1,3 @@
-# Makefile for nextjs-better-auth
-#
-# This Makefile provides common development commands for the project.
-# It wraps npm scripts and docker-compose commands for convenience.
-#
-# Usage:
-#   make <target>
-#
-# Run `make help` to see all available commands.
-
 .PHONY: help dev build start lint migrate check-types format docker-up docker-down docker-ps docker-logs shell psql
 
 ## Show this help message
@@ -18,31 +8,31 @@ help:
 
 ## Start the development server (all apps)
 dev:
-	npm run dev
+	pnpm run dev
 
 ## Build all apps
 build:
-	npm run build
+	pnpm run build
 
 ## Start all apps in production mode
 start:
-	npm run start
+	pnpm run start
 
 ## Lint all apps
 lint:
-	npm run lint
+	pnpm run lint
 
 ## Run database migrations
 migrate:
-	npm run db:migrate
+	pnpm run db:migrate
 
 ## Check TypeScript types
 check-types:
-	npm run check-types
+	pnpm run check-types
 
 ## Format code with Prettier
 format:
-	npm run format
+	pnpm run format
 
 ## Start all Docker services (db, pgadmin, smtp)
 docker-up:
@@ -74,16 +64,16 @@ psql:
 
 ## Seed 
 seed:
-	npm run seed
+	pnpm run seed
 
 ## Create stubs
 stubs:
-	npm run stub
+	pnpm run stub
 
 ## Check 
 check:
-	npm run test
-	npm run check-translations
-	npm run check-types
-	npm run lint
+	pnpm run test
+	pnpm run check-translations
+	pnpm run check-types
+	pnpm run lint
 

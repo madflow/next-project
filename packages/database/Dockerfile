@@ -8,7 +8,7 @@ ENV TURBO_TELEMETRY_DISABLED=1
 
 FROM builder-base AS builder
 
-RUN npm install --global turbo@^2
+RUN corepack enable pnpm && pnpm add --global turbo@^2
 
 COPY . .
 
@@ -16,10 +16,13 @@ RUN turbo prune @repo/database --docker
 
 FROM base AS runner
 
+RUN corepack enable pnpm
+
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/packages/database/docker/entrypoint.sh /entrypoint.sh
-RUN npm install
-RUN npm run build
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install --frozen-lockfile
+RUN pnpm run build
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/sh"]

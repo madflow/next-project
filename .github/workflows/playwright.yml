@@ -36,13 +36,18 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     
-    - name: Cache node modules
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.17.0
+    
+    - name: Cache pnpm modules
       uses: actions/cache@v4
       with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
-          ${{ runner.os }}-node-
+          ${{ runner.os }}-pnpm-
     
     - name: Cache build artifacts
       uses: actions/cache@v4
@@ -50,16 +55,16 @@ jobs:
         path: |
           .next/cache
           apps/web/.next/cache
-        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
         restore-keys: |
-          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+          ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
           ${{ runner.os }}-nextjs-
     
     - name: Cache Playwright browsers
       uses: actions/cache@v4
       with:
         path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-playwright-
     
@@ -76,6 +81,7 @@ jobs:
     - uses: actions/setup-node@v5
       with:
         node-version: lts/*
+        cache: 'pnpm'
     - name: Start S3 service
       run: |
         docker compose -f docker-compose.actions.yml up -d
@@ -101,7 +107,7 @@ jobs:
     - name: Copy .env.dist
       run: cp ./apps/web/.env.dist ./apps/web/.env && cp ./packages/database/.env.dist ./packages/database/.env && cp ./apps/analysis/.env.dist ./apps/analysis/.env
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install --frozen-lockfile
     - name: Install Python deps 
       run: | 
           curl -sSL https://install.python-poetry.org | python3 -
@@ -111,14 +117,14 @@ jobs:
           poetry install
       shell: bash
     - name: Install e2e dependencies
-      run: npm run e2e:deps
+      run: pnpm run e2e:deps
     - name: Build
-      run: npm run build
+      run: pnpm run build
     - name: Migrate 
-      run: npm run db:migrate
+      run: pnpm run db:migrate
     - name: Run App
       run: |
-        npm run start | tee app.log 2>&1 &
+        pnpm run start | tee app.log 2>&1 &
         sleep 10  # Optional: gives some buffer for the app to start
         for attempt in {1..10}; do
           if [ $(curl -o /dev/null -s -w "%{http_code}" http://localhost:3000/api/health) -eq 200 ]; then
@@ -133,9 +139,9 @@ jobs:
           sleep 10
         done
     - name: Seed 
-      run: npm run seed
+      run: pnpm run seed
     - name: Run Playwright tests
-      run:  npm run e2e
+      run:  pnpm run e2e
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

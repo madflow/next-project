@@ -6,7 +6,7 @@
 
 - Only make changes in the directories explicitly specified by the user. If no specific directory is mentioned, assume changes should be confined to the most relevant directory based on the request, and confirm if unsure.
 - Never commit changes unless explicitly requested by the user.
-- Never delete node_modules or package-lock.json in order to solve conflicts.
+- Never delete node_modules or pnpm-lock.yaml in order to solve conflicts.
 
 ## General rules
 
@@ -19,7 +19,7 @@ This project uses the following technologies:
 
 - **Framework:** Next.js 15 with App Router
 - **Language:** TypeScript
-- **Package Manager:** npm
+- **Package Manager:** pnpm
 - **Runtime:** Node.js 22
 - **Monorepo Tool:** Turborepo
 - **Database:** PostgreSQL 17
@@ -57,7 +57,7 @@ This project uses the following technologies:
 
 ## Rules for running commands
 
-- **IMPORTANT:** Use `make check` (not `npm run build`) to test the project and regenerate types.
+- **IMPORTANT:** Use `make check` (not `pnpm run build`) to test the project and regenerate types.
 - Always run `make check` after making significant changes to ensure code quality.
 
 ## Writing tasks and specs for agentic coding
