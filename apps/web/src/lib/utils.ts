@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "@repo/overrides/clsx";
 
 export const APP_CONTEXT_KEY = "app_context";
 
