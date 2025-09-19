@@ -11,6 +11,6 @@ fi
 # Run migrations if requested
 if [ "${DOCKER_RUN_MIGRATIONS:-0}" = "1" ]; then
     echo "Running database migrations..."
-    npm run db:migrate
+    pnpm run db:migrate
 fi
 

@@ -65,7 +65,7 @@ async function getAvailableVariablesFn(datasetId: string, options: ListOptions =
     .from(entity)
     .where(eq(entity.datasetId, datasetId));
   
-  const existingVariableIds = existingSplitVariables.map(item => item.variableId);
+  const existingVariableIds = existingSplitVariables.map((item: { variableId: string }) => item.variableId);
   
   // Build where conditions
   const whereConditions = [eq(datasetVariable.datasetId, datasetId)];
