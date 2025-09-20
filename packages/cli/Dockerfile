@@ -10,7 +10,10 @@ ENV TURBO_TELEMETRY_DISABLED=1
 
 FROM builder-base AS builder
 
-RUN corepack enable pnpm && pnpm add --global turbo@^2
+RUN npm install --ignore-scripts -g corepack@latest 
+RUN corepack enable
+RUN corepack prepare pnpm@10.17.0 --activate
+
 
 COPY . .
 

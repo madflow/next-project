@@ -8,7 +8,12 @@ RUN apk add --no-cache libc6-compat
 
 # Set working directory
 WORKDIR /app
-RUN corepack enable pnpm && pnpm add --global turbo@^2
+
+RUN npm install --ignore-scripts -g corepack@latest 
+RUN corepack enable
+RUN corepack prepare pnpm@10.17.0 --activate
+
+RUN pnpm add --global turbo@^2
 COPY . .
 RUN turbo prune @app/web --docker
 
