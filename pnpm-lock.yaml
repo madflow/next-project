@@ -265,6 +265,9 @@ importers:
       drizzle-zod:
         specifier: ^0.8.2
         version: 0.8.3(drizzle-orm@0.44.5(@opentelemetry/api@1.9.0)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3))(zod@4.1.9)
+      eslint:
+        specifier: ^9.29.0
+        version: 9.35.0(jiti@2.5.1)
       tsx:
         specifier: ^4.20.3
         version: 4.20.5
