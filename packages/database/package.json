@@ -46,6 +46,8 @@
     "zod": "^4.0.15"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/pg": "^8.15.4",
     "drizzle-kit": "^0.31.4",
     "drizzle-zod": "^0.8.2",

@@ -228,6 +228,12 @@ importers:
         specifier: ^14.0.0
         version: 14.0.1
     devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       unbuild:
         specifier: ^3.6.0
         version: 3.6.1(typescript@5.9.2)
@@ -244,6 +250,12 @@ importers:
         specifier: ^4.0.15
         version: 4.1.9
     devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/pg':
         specifier: ^8.15.4
         version: 8.15.5
