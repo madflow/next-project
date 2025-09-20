@@ -6,7 +6,6 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { adminClient, adminPool } from "@repo/database/clients";
 import {
-  type DatasetVariable,
   account,
   dataset,
   datasetProject,
@@ -194,7 +193,8 @@ async function createDatasetVariableSets(datasetId: string) {
   console.log(`Found ${variables.length} variables`);
 
   // Create a map of variable names to IDs for easy lookup
-  const variableMap = new Map(variables.map((v: DatasetVariable) => [v.name, v.id]));
+  // eslint-disable-next-line
+  const variableMap = new Map(variables.map((v: any) => [v.name, v.id]));
 
   // Define variable sets with their variables
   const variableSets = [
