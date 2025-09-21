@@ -29,6 +29,7 @@ interface ApiResponse {
 
 export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: VariableAssignmentProps) {
   const t = useTranslations("adminDatasetVariableset");
+  const tCommon = useTranslations("common");
   const [availableSearch, setAvailableSearch] = useState("");
   const [assignedSearch, setAssignedSearch] = useState("");
   const [isAssigning, setIsAssigning] = useState<string | null>(null);
@@ -74,7 +75,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
       onRefresh();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to assign variable");
+      toast.error(tCommon("errors.failedToAssignVariable"));
     } finally {
       setIsAssigning(null);
     }
@@ -92,7 +93,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
       onRefresh();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to remove variable");
+      toast.error(tCommon("errors.failedToRemoveVariable"));
     } finally {
       setIsRemoving(null);
     }
@@ -129,7 +130,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
         <CardContent className="p-0">
           <ScrollArea className="h-96">
             {isLoadingUnassigned ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{tCommon("loading")}</div>
             ) : unassignedResponse?.rows.length === 0 ? (
               <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noVariables")}</div>
             ) : (
@@ -185,7 +186,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
         <CardContent className="p-0">
           <ScrollArea className="h-96">
             {isLoadingAssigned ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{tCommon("loading")}</div>
             ) : assignedResponse?.rows.length === 0 ? (
               <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAssigned")}</div>
              ) : (

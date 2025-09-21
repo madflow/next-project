@@ -21,6 +21,7 @@ interface HierarchyResponse {
 
 export function VariablesetTab({ datasetId }: VariablesetTabProps) {
   const t = useTranslations("adminDatasetVariableset");
+  const tCommon = useTranslations("common");
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingVariableset, setEditingVariableset] = useState<DatasetVariableset | undefined>();
@@ -92,7 +93,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
           <CardContent className="p-4">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-muted-foreground text-sm">{"Loading..."}</div>
+                <div className="text-muted-foreground text-sm">{tCommon("loading")}</div>
               </div>
             ) : (
               <VariablesetTree

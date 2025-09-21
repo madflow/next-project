@@ -1066,5 +1066,54 @@
       "placeholder": "Benutzer suchen..."
     },
     "title": "Benutzer"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "search": "Suchen",
+    "clearSearch": "Suche löschen",
+    "edit": "Bearbeiten",
+    "colors": "Farben",
+    "organization": "Organisation",
+    "value": "Wert",
+    "toggleSidebar": "Seitenleiste ein-/ausblenden",
+    "noDataSelected": "Keine Daten ausgewählt",
+    "noVariableSelected": "Keine Variable ausgewählt",
+    "noVariablesSelected": "Keine Variablen ausgewählt",
+    "splitBy": "Aufgeteilt nach",
+    "errors": {
+      "nameRequired": "Name ist erforderlich",
+      "nameTooLong": "Name ist zu lang",
+      "passwordsDoNotMatch": "Die Passwörter stimmen nicht überein",
+      "failedToAssignVariable": "Fehler beim Zuweisen der Variable",
+      "failedToRemoveVariable": "Fehler beim Entfernen der Variable",
+      "failedToSignOut": "Abmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "failedToSwitchProject": "Fehler beim Wechseln des Projekts",
+      "failedToSwitchOrganization": "Fehler beim Wechseln der Organisation",
+      "idRequired": "ID ist erforderlich",
+      "unauthorized": "Nicht autorisiert"
+    },
+    "fileSizes": {
+      "bytes": "Bytes",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB",
+      "tb": "TB"
+    },
+    "themes": {
+      "default": "Standard",
+      "scaled": "Skaliert",
+      "mono": "Monochrom",
+      "blue": "Blau",
+      "green": "Grün",
+      "orange": "Orange",
+      "pink": "Rosa",
+      "purple": "Lila",
+      "red": "Rot",
+      "yellow": "Gelb"
+    },
+    "accessibility": {
+      "enableDebugMode": "Debug-Modus aktivieren",
+      "disableDebugMode": "Debug-Modus deaktivieren"
+    }
   }
 }

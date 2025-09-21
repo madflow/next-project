@@ -140,6 +140,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
 
   const t = useTranslations("projectAdhocVariables");
   const tTheme = useTranslations("themeSelector");
+  const tCommon = useTranslations("common");
   const { data: variablesets, isLoading } = useDatasetVariablesets(datasetId);
   const { activeTheme, setActiveTheme } = useThemeConfig();
   const { availableThemes } = useOrganizationTheme();
@@ -250,7 +251,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
             </SelectGroup>
             <SelectSeparator />
             <SelectGroup>
-              <SelectLabel>{"Colors"}</SelectLabel>
+              <SelectLabel>{tCommon("colors")}</SelectLabel>
               {COLOR_THEMES.map((theme) => (
                 <SelectItem key={theme.name} value={theme.value} className="data-[state=checked]:opacity-50">
                   <div className="flex items-center gap-2">
@@ -264,7 +265,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
               <>
                 <SelectSeparator />
                 <SelectGroup>
-                  <SelectLabel>{"Organization"}</SelectLabel>
+                  <SelectLabel>{tCommon("organization")}</SelectLabel>
                   {organizationThemes.map((theme) => {
                     const colors = getThemeColors(theme);
                     return (

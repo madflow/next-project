@@ -60,6 +60,7 @@ type AdhocChartProps = {
 export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, onSplitVariableChangeAction, ...props }: AdhocChartProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const tChart = useTranslations("chartMetricsCard");
+  const tCommon = useTranslations("common");
   const { ref, exportPNG } = useChartExport();
   const { debugMode } = useAppContext();
 
@@ -90,12 +91,12 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
       if (splitVariable) {
         const splitVariableLabel = splitVariable.label ?? splitVariable.name;
-        return `Split by ${splitVariableLabel}`;
+        return `${tCommon("splitBy")} ${splitVariableLabel}`;
       }
     }
 
     // Fallback to variable name if no label found
-    return `Split by ${splitVariableName}`;
+    return `${tCommon("splitBy")} ${splitVariableName}`;
   }
 
   function getAvailableChartTypes(variable: DatasetVariable, stats: StatsResponse): AnalysisChartType[] {

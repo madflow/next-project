@@ -1066,5 +1066,54 @@
       "placeholder": "Search users..."
     },
     "title": "Users"
+  },
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "clearSearch": "Clear search",
+    "edit": "Edit",
+    "colors": "Colors",
+    "organization": "Organization",
+    "value": "Value",
+    "toggleSidebar": "Toggle Sidebar",
+    "noDataSelected": "No data selected",
+    "noVariableSelected": "No variable selected",
+    "noVariablesSelected": "No variables selected",
+    "splitBy": "Split by",
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name is too long",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "failedToAssignVariable": "Failed to assign variable",
+      "failedToRemoveVariable": "Failed to remove variable",
+      "failedToSignOut": "Failed to sign out. Please try again.",
+      "failedToSwitchProject": "Failed to switch project",
+      "failedToSwitchOrganization": "Failed to switch organization",
+      "idRequired": "ID is required",
+      "unauthorized": "Unauthorized"
+    },
+    "fileSizes": {
+      "bytes": "Bytes",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB",
+      "tb": "TB"
+    },
+    "themes": {
+      "default": "Default",
+      "scaled": "Scaled",
+      "mono": "Mono",
+      "blue": "Blue",
+      "green": "Green",
+      "orange": "Orange",
+      "pink": "Pink",
+      "purple": "Purple",
+      "red": "Red",
+      "yellow": "Yellow"
+    },
+    "accessibility": {
+      "enableDebugMode": "Enable debug mode",
+      "disableDebugMode": "Disable debug mode"
+    }
   }
 }

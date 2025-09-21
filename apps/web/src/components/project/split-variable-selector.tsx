@@ -35,6 +35,7 @@ export function SplitVariableSelector({
   compact = false,
 }: SplitVariableSelectorProps) {
   const t = useTranslations("projectAdhocAnalysis.splitVariable");
+  const tCommon = useTranslations("common");
   
   const { data: splitVariablesResponse, isLoading } = useQueryApi<ApiResponse>({
     endpoint: `/api/datasets/${datasetId}/splitvariables`,
@@ -90,7 +91,7 @@ export function SplitVariableSelector({
             </SelectItem>
             {isLoading && (
               <SelectItem value="loading" disabled>
-                {"Loading..."}
+                {tCommon("loading")}
               </SelectItem>
             )}
             {splitVariables.map((variable) => (

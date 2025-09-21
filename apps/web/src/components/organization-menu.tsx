@@ -35,6 +35,7 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
   const [openInvitationModal, setOpenInvitationModal] = useState(false);
   const { setActiveOrganization } = useAppContext();
   const t = useTranslations("appSidebar");
+  const tCommon = useTranslations("common");
 
   const { data: canCreateInvitations } = useQuery({
     enabled: !!activeOrganization,
@@ -59,7 +60,7 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
       router.refresh();
     } catch (error) {
       console.error("Failed to switch organization", error);
-      toast.error("Failed to switch organization");
+      toast.error(tCommon("errors.failedToSwitchOrganization"));
     } finally {
       setIsSwitching(false);
     }

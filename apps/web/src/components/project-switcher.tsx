@@ -28,6 +28,7 @@ export function ProjectSwitcher({ activeProject, organizationId, onSelect }: Pro
   const { data: projects = [], isLoading: isProjectsLoading } = useProjectsByOrg(organizationId);
   const [isSwitching, setIsSwitching] = useState(false);
   const t = useTranslations("appSidebar");
+  const tCommon = useTranslations("common");
 
   const handleSelect = async (project: Project) => {
     if (project.id === activeProject?.id) return;
@@ -37,7 +38,7 @@ export function ProjectSwitcher({ activeProject, organizationId, onSelect }: Pro
       onSelect(project);
     } catch (error) {
       console.error("Failed to switch project", error);
-      toast.error("Failed to switch project");
+      toast.error(tCommon("errors.failedToSwitchProject"));
     } finally {
       setIsSwitching(false);
     }

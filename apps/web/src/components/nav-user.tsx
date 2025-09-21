@@ -27,6 +27,7 @@ export function NavUser() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const t = useTranslations("navUser");
   const tUser = useTranslations("user.impersonation");
+  const tCommon = useTranslations("common");
   const user = session.data?.user;
   const { isImpersonating } = useIsImpersonating();
   const { stopImpersonating, isLoading: isStoppingImpersonation } = useStopImpersonating();
@@ -44,7 +45,7 @@ export function NavUser() {
       });
     } catch (error) {
       console.error("Error signing out:", error);
-      toast.error("Failed to sign out. Please try again.");
+      toast.error(tCommon("errors.failedToSignOut"));
     } finally {
       setIsSigningOut(false);
     }

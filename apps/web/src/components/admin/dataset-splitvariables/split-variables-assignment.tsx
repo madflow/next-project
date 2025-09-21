@@ -28,6 +28,7 @@ interface ApiResponse {
 
 export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariablesAssignmentProps) {
   const t = useTranslations("adminDatasetSplitVariables");
+  const tCommon = useTranslations("common");
   const [availableSearch, setAvailableSearch] = useState("");
   const [assignedSearch, setAssignedSearch] = useState("");
   const [isAssigning, setIsAssigning] = useState<string | null>(null);
@@ -111,7 +112,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
         <CardContent className="p-0">
           <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.available.section">
             {isLoadingAvailable ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{tCommon("loading")}</div>
             ) : availableResponse?.rows.length === 0 ? (
               <div className="text-muted-foreground p-4 text-center text-sm" data-testid="admin.dataset.splitvariables.available.empty">{t("assignment.noAvailable")}</div>
             ) : (
@@ -167,7 +168,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
         <CardContent className="p-0">
           <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.assigned.section">
             {isLoadingAssigned ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
+              <div className="text-muted-foreground p-4 text-center text-sm">{tCommon("loading")}</div>
             ) : assignedResponse?.rows.length === 0 ? (
               <div className="text-muted-foreground p-4 text-center text-sm" data-testid="admin.dataset.splitvariables.assigned.empty">{t("assignment.noAssigned")}</div>
              ) : (
