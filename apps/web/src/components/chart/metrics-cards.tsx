@@ -2,10 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { getVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
+import { CircleHelp } from "lucide-react";
 
 type BarAdhocProps = {
   variable: DatasetVariable;
@@ -17,6 +19,29 @@ type BarAdhocProps = {
 function formatDecimal(value?: number) {
   if (!value) return "";
   return new Intl.NumberFormat("de-DE", { style: "decimal" }).format(value);
+}
+
+function MetricHelp({ metricKey, children }: { metricKey: "count" | "mean" | "median" | "stdev" | "min" | "max"; children: React.ReactNode }) {
+  const tHelp = useTranslations("metricsHelp");
+  
+  return (
+    <div className="flex items-center gap-1">
+      {children}
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
+            <CircleHelp className="h-3 w-3" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80" align="start">
+          <div className="space-y-2">
+            <h4 className="font-medium">{tHelp(`${metricKey}.title`)}</h4>
+            <p className="text-sm text-muted-foreground">{tHelp(`${metricKey}.description`)}</p>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 }
 
 export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...props }: BarAdhocProps) {
@@ -62,37 +87,49 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
     <div className="grid grid-cols-3 gap-2">
       <Card>
         <CardHeader>
-          <CardDescription>{t("count")}</CardDescription>
+          <MetricHelp metricKey="count">
+            <CardDescription>{t("count")}</CardDescription>
+          </MetricHelp>
           <CardTitle>{variableStats?.count}</CardTitle>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardDescription>{t("mean")}</CardDescription>
+          <MetricHelp metricKey="mean">
+            <CardDescription>{t("mean")}</CardDescription>
+          </MetricHelp>
           <CardTitle>{formatDecimal(variableStats?.mean)}</CardTitle>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardDescription>{t("stdev")}</CardDescription>
+          <MetricHelp metricKey="stdev">
+            <CardDescription>{t("stdev")}</CardDescription>
+          </MetricHelp>
           <CardTitle>{formatDecimal(variableStats?.std)}</CardTitle>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardDescription>{t("median")}</CardDescription>
+          <MetricHelp metricKey="median">
+            <CardDescription>{t("median")}</CardDescription>
+          </MetricHelp>
           <CardTitle>{variableStats?.median}</CardTitle>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardDescription>{t("min")}</CardDescription>
+          <MetricHelp metricKey="min">
+            <CardDescription>{t("min")}</CardDescription>
+          </MetricHelp>
           <CardTitle>{variableStats?.min}</CardTitle>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardDescription>{t("max")}</CardDescription>
+          <MetricHelp metricKey="max">
+            <CardDescription>{t("max")}</CardDescription>
+          </MetricHelp>
           <CardTitle>{variableStats?.max}</CardTitle>
         </CardHeader>
       </Card>
