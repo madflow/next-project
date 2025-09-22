@@ -321,28 +321,28 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                   </CardAction>
                 )}
               </CardHeader>
-               <CardContent data-testid={`chart-content-${selectedChartType}`}>
-                 {selectedChartType === "metrics" ? (
-                   <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
-                 ) : (
-                   <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
-                 )}
-               </CardContent>
-              {selectedChartType === "meanBar" && (
-                <CardFooter className="flex justify-between items-center border-t">
-                  {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
-                    <SplitVariableSelector
-                      datasetId={datasetId}
-                      selectedSplitVariable={selectedSplitVariable || null}
-                      onSplitVariableChangeAction={onSplitVariableChangeAction}
-                      compact
-                    />
+                <CardContent data-testid={`chart-content-${selectedChartType}`}>
+                  {selectedChartType === "metrics" ? (
+                    <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
+                  ) : (
+                    <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
                   )}
+                </CardContent>
+                <CardFooter className="flex justify-between items-center border-t">
+                  <div>
+                    {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
+                      <SplitVariableSelector
+                        datasetId={datasetId}
+                        selectedSplitVariable={selectedSplitVariable || null}
+                        onSplitVariableChangeAction={onSplitVariableChangeAction}
+                        compact
+                      />
+                    )}
+                  </div>
                   <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
                     <DownloadIcon className="h-4 w-4" />
                   </Button>
                 </CardFooter>
-              )}
             </Card>
           </TabsContent>
           {debugMode && (
@@ -416,14 +416,16 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
             </CardHeader>
              <CardContent data-testid={`chart-content-${selectedChartType}`}>{renderChart()}</CardContent>
             <CardFooter className="flex justify-between items-center border-t">
-              {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
-                <SplitVariableSelector
-                  datasetId={datasetId}
-                  selectedSplitVariable={selectedSplitVariable || null}
-                  onSplitVariableChangeAction={onSplitVariableChangeAction}
-                  compact
-                />
-              )}
+              <div>
+                {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
+                  <SplitVariableSelector
+                    datasetId={datasetId}
+                    selectedSplitVariable={selectedSplitVariable || null}
+                    onSplitVariableChangeAction={onSplitVariableChangeAction}
+                    compact
+                  />
+                )}
+              </div>
               <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
                 <DownloadIcon className="h-4 w-4" />
               </Button>
