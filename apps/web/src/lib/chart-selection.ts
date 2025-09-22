@@ -4,7 +4,7 @@ import { extractVariableStats, isSplitVariableStats } from "./analysis-bridge";
 
 /**
  * Chart selection logic for ad hoc analysis
- * 
+ *
  * This module implements the business logic for determining:
  * 1. Which chart types are valid for a given variable
  * 2. Whether split variables can be used
@@ -39,17 +39,22 @@ export interface ChartSelectionResult {
  */
 const CHART_PRIORITY_ORDER: AnalysisChartType[] = [
   "horizontalBar",
-  "horizontalStackedBar", 
+  "horizontalStackedBar",
   "pie",
   "meanBar",
   "metrics",
-  "bar"
+  "bar",
 ];
 
 /**
  * Maximum number of values that can be displayed for categorical charts
  */
 const MAX_CATEGORICAL_VALUES = 6;
+
+/**
+ * Maximum number of values that can be displayed for categorical vertical bar chart
+ */
+const MAX_CATEGORICAL_VALUES_VERTICAL_BAR = 2;
 
 /**
  * Determines if a variable type is numeric (not string/unknown)
@@ -66,42 +71,44 @@ function getDistinctValueCount(variable: DatasetVariable, stats: StatsResponse):
   return variableStats?.frequency_table?.length || 0;
 }
 
-
-
 /**
  * Determines valid chart types for a variable without split variable
  */
 function getValidChartsWithoutSplit(variable: DatasetVariable, distinctValues: number): AnalysisChartType[] {
   const charts: AnalysisChartType[] = [];
-  
+
   switch (variable.measure) {
     case "nominal":
     case "ordinal":
       // All nominal/ordinal charts are valid regardless of value count
       charts.push("horizontalBar");
-      
+
       // Charts with max value limitations
       if (distinctValues <= MAX_CATEGORICAL_VALUES) {
-        charts.push("horizontalStackedBar", "pie", "bar");
+        charts.push("horizontalStackedBar", "pie");
       }
-      
+
+      if (distinctValues <= MAX_CATEGORICAL_VALUES_VERTICAL_BAR) {
+        charts.push("bar");
+      }
+
       // Mean bar is valid for ordinal variables
       if (variable.measure === "ordinal") {
         charts.push("meanBar");
       }
       break;
-      
+
     case "scale":
       // Scale measure variables
       charts.push("meanBar");
-      
+
       // Metrics card is only for specific numeric types
       if (["double", "float", "int8", "int16", "int32"].includes(variable.type)) {
         charts.push("metrics");
       }
       break;
   }
-  
+
   return charts;
 }
 
@@ -110,7 +117,7 @@ function getValidChartsWithoutSplit(variable: DatasetVariable, distinctValues: n
  */
 function getValidChartsWithSplit(variable: DatasetVariable, distinctValues: number): AnalysisChartType[] {
   const charts: AnalysisChartType[] = [];
-  
+
   switch (variable.measure) {
     case "nominal":
     case "ordinal":
@@ -119,12 +126,12 @@ function getValidChartsWithSplit(variable: DatasetVariable, distinctValues: numb
         charts.push("horizontalStackedBar");
       }
       break;
-      
+
     case "scale":
       // Scale variables don't support split variables currently
       break;
   }
-  
+
   return charts;
 }
 
@@ -135,16 +142,16 @@ function sortChartsByPriority(chartTypes: AnalysisChartType[]): AnalysisChartTyp
   return chartTypes.sort((a, b) => {
     const indexA = CHART_PRIORITY_ORDER.indexOf(a);
     const indexB = CHART_PRIORITY_ORDER.indexOf(b);
-    
+
     // If both are in priority order, sort by their position
     if (indexA !== -1 && indexB !== -1) {
       return indexA - indexB;
     }
-    
+
     // If only one is in priority order, prioritize it
     if (indexA !== -1) return -1;
     if (indexB !== -1) return 1;
-    
+
     // If neither is in priority order, maintain original order
     return 0;
   });
@@ -155,7 +162,7 @@ function sortChartsByPriority(chartTypes: AnalysisChartType[]): AnalysisChartTyp
  */
 export function determineChartSelection(criteria: ChartSelectionCriteria): ChartSelectionResult {
   const { variable, stats, hasSplitVariable = false } = criteria;
-  
+
   // Check if variable type is supported (numeric types only)
   if (!isNumericVariableType(variable.type)) {
     return {
@@ -163,10 +170,10 @@ export function determineChartSelection(criteria: ChartSelectionCriteria): Chart
       defaultChartType: "horizontalBar", // fallback
       canUseSplitVariable: false,
       showUnsupportedPlaceholder: true,
-      unsupportedReason: `Variable type '${variable.type}' is not supported. Only numeric variable types are supported.`
+      unsupportedReason: `Variable type '${variable.type}' is not supported. Only numeric variable types are supported.`,
     };
   }
-  
+
   // Check if measure is supported
   if (!["nominal", "ordinal", "scale"].includes(variable.measure)) {
     return {
@@ -174,16 +181,16 @@ export function determineChartSelection(criteria: ChartSelectionCriteria): Chart
       defaultChartType: "horizontalBar", // fallback
       canUseSplitVariable: false,
       showUnsupportedPlaceholder: true,
-      unsupportedReason: `Measurement scale '${variable.measure}' is not supported.`
+      unsupportedReason: `Measurement scale '${variable.measure}' is not supported.`,
     };
   }
-  
+
   const distinctValues = getDistinctValueCount(variable, stats);
-  
+
   // Determine if split variable is actually present in the data
   const targetVariable = stats.find((item) => item.variable === variable.name);
   const actuallyHasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
-  
+
   // Get available chart types based on whether split variable is present
   let availableChartTypes: AnalysisChartType[];
   if (actuallyHasSplitVariable) {
@@ -191,18 +198,17 @@ export function determineChartSelection(criteria: ChartSelectionCriteria): Chart
   } else {
     availableChartTypes = getValidChartsWithoutSplit(variable, distinctValues);
   }
-  
+
   // Sort by priority
   availableChartTypes = sortChartsByPriority(availableChartTypes);
-  
+
   // Determine if split variables can be used (only for nominal/ordinal with <= 6 values)
-  const canUseSplitVariable = (variable.measure === "nominal" || variable.measure === "ordinal") && 
-                              distinctValues <= MAX_CATEGORICAL_VALUES;
-  
+  const canUseSplitVariable =
+    (variable.measure === "nominal" || variable.measure === "ordinal") && distinctValues <= MAX_CATEGORICAL_VALUES;
+
   // Check if we should show unsupported placeholder
-  const showUnsupportedPlaceholder = hasSplitVariable && 
-                                   (!canUseSplitVariable || availableChartTypes.length === 0);
-  
+  const showUnsupportedPlaceholder = hasSplitVariable && (!canUseSplitVariable || availableChartTypes.length === 0);
+
   let unsupportedReason: string | undefined;
   if (showUnsupportedPlaceholder) {
     if (!canUseSplitVariable) {
@@ -217,16 +223,17 @@ export function determineChartSelection(criteria: ChartSelectionCriteria): Chart
       unsupportedReason = "No chart types are available for this variable with split variables.";
     }
   }
-  
+
   // Determine default chart type
-  const defaultChartType: AnalysisChartType = availableChartTypes.length > 0 ? availableChartTypes[0]! : "horizontalBar";
-  
+  const defaultChartType: AnalysisChartType =
+    availableChartTypes.length > 0 ? availableChartTypes[0]! : "horizontalBar";
+
   return {
     availableChartTypes,
     defaultChartType,
     canUseSplitVariable,
     showUnsupportedPlaceholder,
-    unsupportedReason
+    unsupportedReason,
   };
 }
 
@@ -245,3 +252,4 @@ export function getDefaultChartType(criteria: ChartSelectionCriteria): AnalysisC
   const result = determineChartSelection(criteria);
   return result.defaultChartType;
 }
+
