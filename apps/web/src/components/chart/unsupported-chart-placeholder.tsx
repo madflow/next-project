@@ -9,16 +9,18 @@ interface UnsupportedChartPlaceholderProps {
   variableLabel?: string;
   reason?: string;
   className?: string;
+  "data-testid"?: string;
 }
 
 export function UnsupportedChartPlaceholder({ 
   variableName, 
   variableLabel, 
   reason,
-  className 
+  className,
+  "data-testid": dataTestId
 }: UnsupportedChartPlaceholderProps) {
   return (
-    <div className={className}>
+    <div className={className} data-testid={dataTestId}>
       <Card className="shadow-xs">
         <CardHeader>
           <CardTitle>{variableLabel ?? variableName}</CardTitle>
@@ -28,13 +30,13 @@ export function UnsupportedChartPlaceholder({
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
           <div className="flex flex-col items-center gap-4">
-            <AlertTriangle className="h-12 w-12 text-muted-foreground" />
+            <AlertTriangle className="h-12 w-12 text-muted-foreground" data-testid="unsupported-icon" />
             <div className="space-y-2">
               <h3 className="text-lg font-medium text-muted-foreground">
                 {"Chart cannot be displayed"}
               </h3>
               {reason && (
-                <p className="text-sm text-muted-foreground max-w-md">
+                <p className="text-sm text-muted-foreground max-w-md" data-testid="unsupported-reason">
                   {reason}
                 </p>
               )}
