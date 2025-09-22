@@ -985,6 +985,32 @@
     "system": "System",
     "toggleTheme": "Design umschalten"
   },
+  "metricsHelp": {
+    "count": {
+      "title": "Anzahl",
+      "description": "Die Gesamtzahl der gültigen (nicht fehlenden) Beobachtungen im Datensatz."
+    },
+    "mean": {
+      "title": "Arithmetisches Mittel",
+      "description": "Das arithmetische Mittel (Durchschnitt) aller Werte. Wird berechnet, indem alle Werte addiert und durch die Anzahl geteilt werden."
+    },
+    "median": {
+      "title": "Median",
+      "description": "Der mittlere Wert, wenn alle Beobachtungen in aufsteigender Reihenfolge angeordnet sind. Bei einer geraden Anzahl von Beobachtungen ist es der Durchschnitt der beiden mittleren Werte."
+    },
+    "stdev": {
+      "title": "Standardabweichung",
+      "description": "Ein Maß dafür, wie weit die Datenpunkte vom Mittelwert entfernt sind. Eine höhere Standardabweichung zeigt mehr Variabilität in den Daten an."
+    },
+    "min": {
+      "title": "Minimum",
+      "description": "Der kleinste Wert im Datensatz."
+    },
+    "max": {
+      "title": "Maximum",
+      "description": "Der größte Wert im Datensatz."
+    }
+  },
   "user": {
     "actions": {
       "delete": "Löschen",

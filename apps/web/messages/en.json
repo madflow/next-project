@@ -985,6 +985,32 @@
     "system": "System",
     "toggleTheme": "Toggle theme"
   },
+  "metricsHelp": {
+    "count": {
+      "title": "Count",
+      "description": "The total number of valid (non-missing) observations in the dataset."
+    },
+    "mean": {
+      "title": "Mean",
+      "description": "The arithmetic mean (average) of all values. Calculated by summing all values and dividing by the count."
+    },
+    "median": {
+      "title": "Median",
+      "description": "The middle value when all observations are arranged in ascending order. For an even number of observations, it's the average of the two middle values."
+    },
+    "stdev": {
+      "title": "Standard Deviation",
+      "description": "A measure of how spread out the data points are from the mean. A higher standard deviation indicates more variability in the data."
+    },
+    "min": {
+      "title": "Minimum",
+      "description": "The smallest value in the dataset."
+    },
+    "max": {
+      "title": "Maximum",
+      "description": "The largest value in the dataset."
+    }
+  },
   "user": {
     "actions": {
       "delete": "Delete",
