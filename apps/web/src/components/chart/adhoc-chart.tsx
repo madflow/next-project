@@ -3,6 +3,7 @@
 import {
   BarChart3Icon,
   ChartBarBigIcon,
+  ChartBarDecreasingIcon,
   ChartBarStackedIcon,
   ChartColumnBigIcon,
   ChartPieIcon,
@@ -34,11 +35,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
 import {
-  extractVariableStats,
   isSplitVariableStats,
   transformToRechartsBarData,
   transformToRechartsPieData,
 } from "@/lib/analysis-bridge";
+import { determineChartSelection } from "@/lib/chart-selection";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -46,6 +47,7 @@ import { Code } from "../ui/code";
 import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
+import { UnsupportedChartPlaceholder } from "./unsupported-chart-placeholder";
 import { useAppContext } from "@/context/app-context";
 import { SplitVariableSelector } from "../project/split-variable-selector";
 
@@ -98,88 +100,21 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
     return `Split by ${splitVariableName}`;
   }
 
-  function getAvailableChartTypes(variable: DatasetVariable, stats: StatsResponse): AnalysisChartType[] {
-    const availableCharts: AnalysisChartType[] = [];
-    const variableStats = extractVariableStats(variable, stats);
-    const frequencyTableLength = variableStats?.frequency_table?.length || 0;
-
-    // Check if this variable has split variable stats
+  // Use new chart selection logic
+  const chartSelection = useMemo(() => {
+    // Check if split variable is present in the data
     const targetVariable = stats.find((item) => item.variable === variable.name);
-    const hasSplitVariable = targetVariable && isSplitVariableStats(targetVariable.stats);
+    const hasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
+    
+    return determineChartSelection({
+      variable,
+      stats,
+      hasSplitVariable
+    });
+  }, [variable, stats]);
 
-    if (variable.measure === "nominal") {
-      if (hasSplitVariable) {
-        // For split variables: ONLY horizontal stacked bar chart
-        if (frequencyTableLength <= 5) {
-          availableCharts.push("horizontalStackedBar");
-        }
-      } else {
-        // EXACT CURRENT LOGIC for non-split variables (untouched)
-        availableCharts.push("horizontalBar");
-        if (frequencyTableLength <= 5) {
-          availableCharts.push("pie");
-          availableCharts.push("horizontalStackedBar");
-        }
-        if (frequencyTableLength === 2) {
-          availableCharts.push("bar");
-        }
-      }
-    } else if (variable.measure === "ordinal") {
-      if (hasSplitVariable) {
-        // For split variables: ONLY horizontal stacked bar chart
-        if (frequencyTableLength <= 5) {
-          availableCharts.push("horizontalStackedBar");
-        }
-      } else {
-        // EXACT CURRENT LOGIC for non-split variables (untouched)
-        availableCharts.push("horizontalBar");
-        if (frequencyTableLength <= 5) {
-          availableCharts.push("pie");
-          availableCharts.push("horizontalStackedBar");
-        }
-        if (frequencyTableLength === 2) {
-          availableCharts.push("bar");
-        }
-      }
-    } else if (variable.measure === "scale") {
-      // EXACT CURRENT LOGIC for scale variables (completely untouched)
-      availableCharts.push("meanBar");
-      if (variable.type === "double") {
-        availableCharts.push("metrics");
-      }
-    }
-
-    return availableCharts;
-  }
-
-  function getDefaultChartType(
-    variable: DatasetVariable,
-    stats: StatsResponse,
-    availableChartTypes: AnalysisChartType[]
-  ): AnalysisChartType {
-    // Check if this variable has split variable stats
-    const targetVariable = stats.find((item) => item.variable === variable.name);
-    const hasSplitVariable = targetVariable && isSplitVariableStats(targetVariable.stats);
-
-    if (hasSplitVariable) {
-      // For split variables: default to horizontalStackedBar (which should be the only option)
-      if (availableChartTypes.includes("horizontalStackedBar")) return "horizontalStackedBar";
-    } else {
-      // For non-split variables: prefer horizontalBar first, then others
-      if (availableChartTypes.includes("horizontalBar")) return "horizontalBar";
-      if (availableChartTypes.includes("meanBar")) return "meanBar";
-      if (availableChartTypes.includes("metrics")) return "metrics";
-      if (availableChartTypes.includes("pie")) return "pie";
-      if (availableChartTypes.includes("bar")) return "bar";
-      if (availableChartTypes.includes("horizontalStackedBar")) return "horizontalStackedBar";
-    }
-
-    return availableChartTypes[0] || "horizontalBar";
-  }
-
-  const availableChartTypes = useMemo(() => getAvailableChartTypes(variable, stats), [variable, stats]);
   const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
-    return getDefaultChartType(variable, stats, availableChartTypes);
+    return chartSelection.defaultChartType;
   });
 
   const prevVariableIdRef = useRef(variable.id);
@@ -197,12 +132,15 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
     const splitVariableStatusChanged = prevHasSplitVariableRef.current !== hasSplitVariable;
 
     if (variableChanged || splitVariableStatusChanged) {
-      const newAvailableChartTypes = getAvailableChartTypes(variable, stats);
-      const defaultChartType = getDefaultChartType(variable, stats, newAvailableChartTypes);
+      const newChartSelection = determineChartSelection({
+        variable,
+        stats,
+        hasSplitVariable
+      });
 
       // Always reset to default when split variable status changes or current selection not available
-      if (splitVariableStatusChanged || !newAvailableChartTypes.includes(selectedChartType)) {
-        setSelectedChartType(defaultChartType);
+      if (splitVariableStatusChanged || !newChartSelection.availableChartTypes.includes(selectedChartType)) {
+        setSelectedChartType(newChartSelection.defaultChartType);
       }
 
       prevVariableIdRef.current = variable.id;
@@ -216,6 +154,18 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
       color: "hsl(var(--chart-1))",
     },
   } satisfies ChartConfig;
+
+  // Show unsupported chart placeholder if needed
+  if (chartSelection.showUnsupportedPlaceholder) {
+    return (
+      <UnsupportedChartPlaceholder
+        variableName={variable.name}
+        variableLabel={variable.label ?? undefined}
+        reason={chartSelection.unsupportedReason}
+        {...props}
+      />
+    );
+  }
 
   function renderChart() {
     switch (selectedChartType) {
@@ -321,7 +271,7 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
       case "bar":
         return <ChartColumnBigIcon className="h-4 w-4" />;
       case "horizontalBar":
-        return <ChartBarBigIcon className="h-4 w-4" />;
+        return <ChartBarDecreasingIcon className="h-4 w-4" />;
       case "horizontalStackedBar":
         return <ChartBarStackedIcon className="h-4 w-4" />;
       case "pie":
@@ -353,14 +303,14 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                 {getSplitVariableDescription(variable, stats) && (
                   <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
                 )}
-                {availableChartTypes.length > 1 && (
+                {chartSelection.availableChartTypes.length > 1 && (
                   <CardAction>
                     <ToggleGroup
                       type="single"
                       value={selectedChartType}
                       onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
                       size="sm">
-                      {availableChartTypes.map((chartType) => (
+                      {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
                         <ToggleGroupItem key={chartType} value={chartType}>
                           {getChartIcon(chartType)}
                         </ToggleGroupItem>
@@ -378,7 +328,7 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
               </CardContent>
               {selectedChartType === "meanBar" && (
                 <CardFooter className="flex justify-between items-center border-t">
-                  {datasetId && onSplitVariableChangeAction && (
+                  {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
                     <SplitVariableSelector
                       datasetId={datasetId}
                       selectedSplitVariable={selectedSplitVariable || null}
@@ -445,14 +395,14 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
               {getSplitVariableDescription(variable, stats) && (
                 <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
               )}
-              {availableChartTypes.length > 1 && (
+              {chartSelection.availableChartTypes.length > 1 && (
                 <CardAction>
                   <ToggleGroup
                     type="single"
                     value={selectedChartType}
                     onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
                     size="sm">
-                    {availableChartTypes.map((chartType) => (
+                    {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
                       <ToggleGroupItem key={chartType} value={chartType}>
                         {getChartIcon(chartType)}
                       </ToggleGroupItem>
@@ -463,7 +413,7 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
             </CardHeader>
             <CardContent>{renderChart()}</CardContent>
             <CardFooter className="flex justify-between items-center border-t">
-              {datasetId && onSplitVariableChangeAction && (
+              {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
                 <SplitVariableSelector
                   datasetId={datasetId}
                   selectedSplitVariable={selectedSplitVariable || null}
