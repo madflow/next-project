@@ -162,6 +162,7 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
         variableName={variable.name}
         variableLabel={variable.label ?? undefined}
         reason={chartSelection.unsupportedReason}
+        data-testid="unsupported-chart-placeholder"
         {...props}
       />
     );
@@ -309,9 +310,10 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                       type="single"
                       value={selectedChartType}
                       onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-                      size="sm">
+                      size="sm"
+                      data-testid="chart-type-selector">
                       {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
-                        <ToggleGroupItem key={chartType} value={chartType}>
+                        <ToggleGroupItem key={chartType} value={chartType} data-testid={`chart-type-${chartType}`}>
                           {getChartIcon(chartType)}
                         </ToggleGroupItem>
                       ))}
@@ -319,13 +321,13 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                   </CardAction>
                 )}
               </CardHeader>
-              <CardContent>
-                {selectedChartType === "metrics" ? (
-                  <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
-                ) : (
-                  <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
-                )}
-              </CardContent>
+               <CardContent data-testid={`chart-content-${selectedChartType}`}>
+                 {selectedChartType === "metrics" ? (
+                   <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
+                 ) : (
+                   <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
+                 )}
+               </CardContent>
               {selectedChartType === "meanBar" && (
                 <CardFooter className="flex justify-between items-center border-t">
                   {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
@@ -395,23 +397,24 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
               {getSplitVariableDescription(variable, stats) && (
                 <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
               )}
-              {chartSelection.availableChartTypes.length > 1 && (
-                <CardAction>
-                  <ToggleGroup
-                    type="single"
-                    value={selectedChartType}
-                    onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-                    size="sm">
-                    {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
-                      <ToggleGroupItem key={chartType} value={chartType}>
-                        {getChartIcon(chartType)}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                </CardAction>
-              )}
+               {chartSelection.availableChartTypes.length > 1 && (
+                 <CardAction>
+                   <ToggleGroup
+                     type="single"
+                     value={selectedChartType}
+                     onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
+                     size="sm"
+                     data-testid="chart-type-selector">
+                     {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
+                       <ToggleGroupItem key={chartType} value={chartType} data-testid={`chart-type-${chartType}`}>
+                         {getChartIcon(chartType)}
+                       </ToggleGroupItem>
+                     ))}
+                   </ToggleGroup>
+                 </CardAction>
+               )}
             </CardHeader>
-            <CardContent>{renderChart()}</CardContent>
+             <CardContent data-testid={`chart-content-${selectedChartType}`}>{renderChart()}</CardContent>
             <CardFooter className="flex justify-between items-center border-t">
               {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
                 <SplitVariableSelector
