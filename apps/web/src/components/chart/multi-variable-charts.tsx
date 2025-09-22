@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { DatasetVariable } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
@@ -22,6 +22,19 @@ export function MultiVariableCharts({
   onStatsRequestAction 
 }: MultiVariableChartsProps) {
   const [splitVariables, setSplitVariables] = useState<Record<string, string | null>>({});
+  const prevVariableIdsRef = useRef<string>('');
+
+  // Clear split variables when switching to different variables to prevent stale selections
+  useEffect(() => {
+    const currentVariableIds = variables.map(v => v.id).sort().join(',');
+    
+    // Only reset if we're switching to different variables
+    if (prevVariableIdsRef.current !== '' && prevVariableIdsRef.current !== currentVariableIds) {
+      setSplitVariables({});
+    }
+    
+    prevVariableIdsRef.current = currentVariableIds;
+  }, [variables]);
 
   if (variables.length === 0) {
     return <div className="text-muted-foreground">{"No variables selected"}</div>;
