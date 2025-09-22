@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -109,7 +109,15 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
                   dataKey={`segment${index}`}
                   stackId="categories"
                   fill={`var(--color-segment${index})`}
-                />
+                >
+                  <LabelList 
+                    dataKey={`segment${index}`} 
+                    position="center" 
+                    fontSize={10} 
+                    fill="white" 
+                    formatter={(value: number) => value > 5 ? `${Math.round(value * 100) / 100}%` : ''}
+                  />
+                </Bar>
               ))}
             <ChartLegend
               content={<ChartLegendContent />}
@@ -178,7 +186,15 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               dataKey={`segment${index}`}
               stackId="categories"
               fill={`var(--color-segment${index})`}
-            />
+            >
+              <LabelList 
+                dataKey={`segment${index}`} 
+                position="center" 
+                fontSize={10} 
+                fill="white" 
+                formatter={(value: number) => value > 5 ? `${Math.round(value * 100) / 100}%` : ''}
+              />
+            </Bar>
           ))}
           <ChartLegend
             content={<ChartLegendContent />}

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis, LabelList, Cell } from "recharts";
 import {
   Card,
   CardAction,
@@ -185,7 +185,14 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                 fontSize={10}
                 tickFormatter={(value) => `${value}%`}
               />
-              <Bar dataKey="percentage" fill="var(--color-percentage)" />
+              <Bar dataKey="percentage" fill="var(--color-percentage)">
+                <LabelList 
+                  dataKey="percentage" 
+                  position="top" 
+                  fontSize={10} 
+                  formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                />
+              </Bar>
             </BarChart>
           </ChartContainer>
         );
@@ -219,7 +226,14 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                 fontSize={10}
                 width={200}
               />
-              <Bar dataKey="percentage" fill="var(--color-percentage)" />
+              <Bar dataKey="percentage" fill="var(--color-percentage)">
+                <LabelList 
+                  dataKey="percentage" 
+                  position="right" 
+                  fontSize={10} 
+                  formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                />
+              </Bar>
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             </BarChart>
           </ChartContainer>
@@ -245,7 +259,24 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
           <ChartContainer config={pieChartConfig} ref={ref} data-export-filename={variable.name}>
             <PieChart>
               <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
-              <Pie data={pieData} dataKey="percentage" nameKey="label" startAngle={90} endAngle={-270} />
+              <Pie 
+                data={pieData} 
+                dataKey="percentage" 
+                nameKey="label" 
+                startAngle={90} 
+                endAngle={-270}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+                <LabelList 
+                  dataKey="percentage" 
+                  position="inside" 
+                  fontSize={10} 
+                  fill="white" 
+                  formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                />
+              </Pie>
               <ChartLegend
                 fontSize={10}
                 content={<ChartLegendContent nameKey="label" />}
