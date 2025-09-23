@@ -751,3 +751,372 @@ def test_decimal_places_with_split_variable(stats_service):
                 if "." in percentage_str:
                     decimal_places_count = len(percentage_str.split(".")[-1])
                     assert decimal_places_count <= 1
+
+
+# Test cases for missing ranges functionality
+def test_missing_ranges_single_range(stats_service):
+    """Test that values within a single missing range are treated as missing."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    })
+    
+    # Define range [2.0, 4.0] as missing
+    missing_ranges = {
+        "score": [{"lo": 2.0, "hi": 4.0}]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=missing_ranges,
+        include=["count", "mean", "min", "max", "frequencies"]
+    )
+    
+    # Only values 1.0, 5.0, 6.0 should remain (values 2.0, 3.0, 4.0 should be missing)
+    assert result["count"] == 3
+    assert result["mean"] == pytest.approx(4.0)  # (1 + 5 + 6) / 3
+    assert result["min"] == 1.0
+    assert result["max"] == 6.0
+    
+    # Check frequency table
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "5.0", "6.0"}
+    assert "2.0" not in frequency_values
+    assert "3.0" not in frequency_values
+    assert "4.0" not in frequency_values
+
+
+def test_missing_ranges_multiple_ranges(stats_service):
+    """Test that values within multiple missing ranges are treated as missing."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+    })
+    
+    # Define ranges [2.0, 3.0] and [7.0, 9.0] as missing
+    missing_ranges = {
+        "score": [
+            {"lo": 2.0, "hi": 3.0},
+            {"lo": 7.0, "hi": 9.0}
+        ]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=missing_ranges,
+        include=["count", "mean", "frequencies"]
+    )
+    
+    # Only values 1.0, 4.0, 5.0, 6.0, 10.0 should remain
+    assert result["count"] == 5
+    assert result["mean"] == pytest.approx(5.2)  # (1 + 4 + 5 + 6 + 10) / 5
+    
+    # Check frequency table
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    expected_values = {"1.0", "4.0", "5.0", "6.0", "10.0"}
+    assert frequency_values == expected_values
+
+
+def test_missing_ranges_inclusive_boundaries(stats_service):
+    """Test that missing ranges are inclusive of boundary values."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0]
+    })
+    
+    # Define range [2.0, 4.0] as missing (should include 2.0 and 4.0)
+    missing_ranges = {
+        "score": [{"lo": 2.0, "hi": 4.0}]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=missing_ranges,
+        include=["count", "frequencies"]
+    )
+    
+    # Only values 1.0 and 5.0 should remain
+    assert result["count"] == 2
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "5.0"}
+    assert "2.0" not in frequency_values  # Boundary value should be missing
+    assert "4.0" not in frequency_values  # Boundary value should be missing
+
+
+def test_missing_ranges_with_missing_values(stats_service):
+    """Test that missing ranges work together with traditional missing values."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0, -999.0, -998.0]
+    })
+    
+    # Define range [2.0, 3.0] as missing AND specific values as missing
+    missing_ranges = {
+        "score": [{"lo": 2.0, "hi": 3.0}]
+    }
+    missing_values = [-999, -998]
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_values=missing_values,
+        missing_ranges=missing_ranges,
+        include=["count", "mean", "frequencies"]
+    )
+    
+    # Only values 1.0, 4.0, 5.0 should remain
+    assert result["count"] == 3
+    assert result["mean"] == pytest.approx(3.33, abs=0.01)  # (1 + 4 + 5) / 3
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "4.0", "5.0"}
+
+
+def test_missing_ranges_different_variable(stats_service):
+    """Test that missing ranges only apply to the specified variable."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0],
+        "other": [1.0, 2.0, 3.0, 4.0, 5.0]
+    })
+    
+    # Define range [2.0, 4.0] as missing for "other" variable (not "score")
+    missing_ranges = {
+        "other": [{"lo": 2.0, "hi": 4.0}]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",  # Analyzing "score", not "other"
+        missing_ranges=missing_ranges,
+        include=["count", "frequencies"]
+    )
+    
+    # All values should remain since missing range is for different variable
+    assert result["count"] == 5
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "2.0", "3.0", "4.0", "5.0"}
+
+
+def test_missing_ranges_none(stats_service):
+    """Test that None missing_ranges parameter doesn't affect processing."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0]
+    })
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=None,
+        include=["count", "frequencies"]
+    )
+    
+    # All values should remain
+    assert result["count"] == 5
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "2.0", "3.0", "4.0", "5.0"}
+
+
+def test_missing_ranges_empty_dict(stats_service):
+    """Test that empty missing_ranges dictionary doesn't affect processing."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0]
+    })
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges={},
+        include=["count", "frequencies"]
+    )
+    
+    # All values should remain
+    assert result["count"] == 5
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "2.0", "3.0", "4.0", "5.0"}
+
+
+def test_missing_ranges_invalid_range_structure(stats_service):
+    """Test that invalid range structures are gracefully ignored."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0]
+    })
+    
+    # Define invalid range structures
+    missing_ranges = {
+        "score": [
+            {"lo": 2.0, "hi": 3.0},  # Valid range
+            {"invalid": "structure"},  # Invalid range - missing lo/hi
+            {"lo": 4.0},  # Invalid range - missing hi
+            {"hi": 5.0}  # Invalid range - missing lo
+        ]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=missing_ranges,
+        include=["count", "frequencies"]
+    )
+    
+    # Only the valid range [2.0, 3.0] should be applied
+    assert result["count"] == 3  # Values 1.0, 4.0, 5.0 remain
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "4.0", "5.0"}
+
+
+def test_missing_ranges_with_split_variable(stats_service):
+    """Test that missing ranges work correctly with split variables."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "group": ["A", "A", "A", "B", "B", "B"]
+    })
+    
+    # Define range [2.0, 3.0] as missing
+    missing_ranges = {
+        "score": [{"lo": 2.0, "hi": 3.0}]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        split_variable="group",
+        missing_ranges=missing_ranges,
+        include=["count", "mean"]
+    )
+    
+    categories = result["categories"]
+    
+    # Group A should have only value 1.0 (values 2.0, 3.0 are missing)
+    assert categories["A"]["count"] == 1
+    assert categories["A"]["mean"] == pytest.approx(1.0)
+    
+    # Group B should have values 4.0, 5.0, 6.0
+    assert categories["B"]["count"] == 3
+    assert categories["B"]["mean"] == pytest.approx(5.0)  # (4 + 5 + 6) / 3
+
+
+def test_missing_ranges_overlapping_ranges(stats_service):
+    """Test behavior with overlapping missing ranges."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    })
+    
+    # Define overlapping ranges [2.0, 4.0] and [3.0, 5.0]
+    missing_ranges = {
+        "score": [
+            {"lo": 2.0, "hi": 4.0},
+            {"lo": 3.0, "hi": 5.0}
+        ]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=missing_ranges,
+        include=["count", "frequencies"]
+    )
+    
+    # Values 2.0, 3.0, 4.0, 5.0 should be missing, leaving 1.0, 6.0
+    assert result["count"] == 2
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.0", "6.0"}
+
+
+def test_missing_ranges_floating_point_precision(stats_service):
+    """Test missing ranges with floating point precision considerations."""
+    df = pd.DataFrame({
+        "score": [1.1, 1.15, 1.2, 1.25, 1.3]
+    })
+    
+    # Define range [1.15, 1.25] as missing
+    missing_ranges = {
+        "score": [{"lo": 1.15, "hi": 1.25}]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=missing_ranges,
+        include=["count", "frequencies"]
+    )
+    
+    # Values 1.15, 1.2, 1.25 should be missing, leaving 1.1, 1.3
+    assert result["count"] == 2
+    
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    assert frequency_values == {"1.1", "1.3"}
+
+
+def test_missing_ranges_all_values_missing(stats_service):
+    """Test behavior when missing ranges cover all values."""
+    df = pd.DataFrame({
+        "score": [1.0, 2.0, 3.0, 4.0, 5.0]
+    })
+    
+    # Define range that covers all values
+    missing_ranges = {
+        "score": [{"lo": 0.0, "hi": 10.0}]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "score",
+        missing_ranges=missing_ranges,
+        include=["count", "mean", "frequencies"]
+    )
+    
+    # All values should be missing
+    assert result["count"] == 0
+    assert result["mean"] is None
+    assert result["frequency_table"] == []
+
+
+def test_missing_ranges_with_value_labels(stats_service):
+    """Test missing ranges interaction with value labels."""
+    df = pd.DataFrame({
+        "rating": [1.0, 2.0, 3.0, 4.0, 5.0]
+    })
+    
+    value_labels = {
+        "1.0": "Very Bad",
+        "2.0": "Bad",
+        "3.0": "Neutral",
+        "4.0": "Good",
+        "5.0": "Very Good"
+    }
+    
+    # Define range [2.0, 3.0] as missing
+    missing_ranges = {
+        "rating": [{"lo": 2.0, "hi": 3.0}]
+    }
+    
+    result = stats_service.describe_var(
+        df,
+        "rating",
+        missing_ranges=missing_ranges,
+        value_labels=value_labels,
+        include=["frequencies"]
+    )
+    
+    # Values 2.0 and 3.0 should be missing, but their labels should still appear with 0 counts
+    frequency_values = {item["value"] for item in result["frequency_table"]}
+    
+    # All labeled values should appear in frequency table
+    assert "1.0" in frequency_values
+    assert "2.0" in frequency_values  # Missing but has label
+    assert "3.0" in frequency_values  # Missing but has label
+    assert "4.0" in frequency_values
+    assert "5.0" in frequency_values
+    
+    # Check counts
+    freq_dict = {item["value"]: item for item in result["frequency_table"]}
+    assert freq_dict["1.0"]["counts"] == 1
+    assert freq_dict["2.0"]["counts"] == 0  # Missing due to range
+    assert freq_dict["3.0"]["counts"] == 0  # Missing due to range
+    assert freq_dict["4.0"]["counts"] == 1
+    assert freq_dict["5.0"]["counts"] == 1

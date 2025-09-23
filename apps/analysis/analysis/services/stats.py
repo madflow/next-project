@@ -16,6 +16,7 @@ class StatisticsService:
         variable_name: str,
         include: list[str] | None = None,
         missing_values: list[str | int | float] | None = None,
+        missing_ranges: dict[str, list[dict[str, float]]] | None = None,
         value_labels: dict[str, str] | None = None,
         split_variable: str | None = None,
         split_variable_value_labels: dict[str, str] | None = None,
@@ -37,6 +38,10 @@ class StatisticsService:
                      based on the data type.
             missing_values: A list of values to replace with NaN for the main
                            variable.
+            missing_ranges: A dictionary mapping field names to lists of range
+                           objects. Each range object has 'lo' and 'hi' keys
+                           defining a numeric range where values within the range
+                           (inclusive) should be treated as missing.
             value_labels: A dictionary mapping values to labels. All keys from
                          this dict (except those in missing_values) will be
                          included in the frequency table, even if they have 0
@@ -59,11 +64,14 @@ class StatisticsService:
         if variable_name not in data.columns:
             raise ValueError(f"Variable '{variable_name}' not found in the DataFrame.")
 
+        # Check if variable is numeric before applying missing values/ranges
+        original_is_numeric = pd.api.types.is_numeric_dtype(data[variable_name])
+
         if split_variable is not None:
             if split_variable not in data.columns:
                 raise ValueError(f"Split variable '{split_variable}' not found in the DataFrame.")
             return self._describe_var_with_split(
-                data, variable_name, split_variable, include, missing_values, value_labels, split_variable_value_labels, split_variable_missing_values, decimal_places,
+                data, variable_name, split_variable, include, missing_values, missing_ranges, value_labels, split_variable_value_labels, split_variable_missing_values, decimal_places,
             )
 
         if missing_values is not None:
@@ -72,7 +80,11 @@ class StatisticsService:
             )
             data = data.replace(numeric_missing_values, pd.NA)
 
-        return self._calculate_single_var_stats(data, variable_name, include, missing_values, value_labels, decimal_places)
+        # Apply missing ranges to mark values within ranges as missing
+        if missing_ranges is not None:
+            data = self._apply_missing_ranges(data, variable_name, missing_ranges)
+
+        return self._calculate_single_var_stats(data, variable_name, include, missing_values, value_labels, decimal_places, original_is_numeric)
 
     def _convert_to_numeric_missing_values(self, missing_values: list) -> list:
         """
@@ -124,6 +136,42 @@ class StatisticsService:
 
         return converted_values
 
+    def _apply_missing_ranges(self, data: pd.DataFrame, variable_name: str, missing_ranges: dict[str, list[dict[str, float]]] | None) -> pd.DataFrame:
+        """
+        Apply missing ranges to mark values within specified ranges as missing (pd.NA).
+
+        Args:
+            data: The input DataFrame to modify
+            variable_name: The name of the variable to apply missing ranges to
+            missing_ranges: Dictionary mapping field names to lists of range objects
+                           with 'lo' and 'hi' keys defining inclusive ranges
+
+        Returns:
+            Modified DataFrame with values in specified ranges replaced with pd.NA
+        """
+        if missing_ranges is None or variable_name not in missing_ranges:
+            return data
+
+        # Make a copy to avoid modifying the original data
+        data = data.copy()
+        variable = data[variable_name]
+
+        # Apply each range for this variable
+        for range_obj in missing_ranges[variable_name]:
+            if not isinstance(range_obj, dict) or 'lo' not in range_obj or 'hi' not in range_obj:
+                continue
+            
+            lo = range_obj['lo']
+            hi = range_obj['hi']
+            
+            # Create mask for values within the range (inclusive)
+            mask = (variable >= lo) & (variable <= hi)
+            
+            # Replace values within range with pd.NA
+            data.loc[mask, variable_name] = pd.NA
+
+        return data
+
     def _describe_var_with_split(
         self,
         data: pd.DataFrame,
@@ -131,6 +179,7 @@ class StatisticsService:
         split_variable: str,
         include: list[str] | None = None,
         missing_values: list[str | int | float] | None = None,
+        missing_ranges: dict[str, list[dict[str, float]]] | None = None,
         value_labels: dict[str, str] | None = None,
         split_variable_value_labels: dict[str, str] | None = None,
         split_variable_missing_values: list[str | int | float] | None = None,
@@ -146,6 +195,10 @@ class StatisticsService:
             split_variable: The name of the variable to split by.
             include: Statistics to calculate.
             missing_values: Values to treat as missing for the main variable.
+            missing_ranges: A dictionary mapping field names to lists of range
+                           objects. Each range object has 'lo' and 'hi' keys
+                           defining a numeric range where values within the range
+                           (inclusive) should be treated as missing.
             value_labels: Value labels for the main variable.
             split_variable_value_labels: Value labels for the split variable.
             split_variable_missing_values: Values to treat as missing for the
@@ -155,9 +208,16 @@ class StatisticsService:
             Dictionary with split variable categories as keys, each containing
             statistics for the main variable.
         """
+        # Check if main variable is numeric before applying missing values/ranges
+        original_is_numeric = pd.api.types.is_numeric_dtype(data[variable_name])
+        
         if missing_values is not None:
             numeric_missing_values = self._convert_to_numeric_missing_values(missing_values)
             data = data.replace(numeric_missing_values, pd.NA)
+
+        # Apply missing ranges to mark values within ranges as missing
+        if missing_ranges is not None:
+            data = self._apply_missing_ranges(data, variable_name, missing_ranges)
 
         # Filter out missing values for the split variable
         if split_variable_missing_values is not None:
@@ -190,7 +250,7 @@ class StatisticsService:
             mask = data[split_variable] == category
             category_data = data.loc[mask].copy()
             category_stats = self._calculate_single_var_stats(
-                category_data, variable_name, include, missing_values, value_labels, decimal_places,
+                category_data, variable_name, include, missing_values, value_labels, decimal_places, original_is_numeric,
             )
 
             # Convert category to string for JSON serialization
@@ -206,14 +266,19 @@ class StatisticsService:
         missing_values: list[str | int | float] | None = None,
         value_labels: dict[str, str] | None = None,
         decimal_places: int | None = 2,
+        original_is_numeric: bool | None = None,
     ) -> dict:
         """Calculate statistics for a single variable."""
         variable = data[variable_name]
         stats = {}
 
+        # Determine if variable is numeric - use original_is_numeric if provided
+        # (to handle cases where dtype changed due to missing values)
+        is_numeric = original_is_numeric if original_is_numeric is not None else pd.api.types.is_numeric_dtype(variable)
+
         # Set default includes if none are provided
         if include is None:
-            if pd.api.types.is_numeric_dtype(variable):
+            if is_numeric:
                 include = [
                     "count",
                     "frequencies",
@@ -236,7 +301,7 @@ class StatisticsService:
             stats["mode"] = variable.mode().tolist()
 
         # --- Numeric-only Statistics ---
-        if pd.api.types.is_numeric_dtype(variable):
+        if is_numeric:
             if "mean" in include:
                 mean_val = variable.mean()
                 if mean_val is not None and str(mean_val) != "nan":
