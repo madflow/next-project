@@ -1,0 +1,1 @@
+ALTER TABLE "dataset_variables" ADD COLUMN "missing_ranges" jsonb;

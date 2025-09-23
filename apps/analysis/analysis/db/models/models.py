@@ -69,6 +69,7 @@ class DatasetVariable(Base):
     variable_labels = Column("variable_labels", JSONB)
     value_labels = Column("value_labels", JSONB)
     missing_values = Column("missing_values", JSONB)
+    missing_ranges = Column("missing_ranges", JSONB)
     dataset_id = Column(
         UUID(as_uuid=True),
         ForeignKey("datasets.id", ondelete="CASCADE"),

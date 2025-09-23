@@ -312,43 +312,7 @@ async function createDatasetVariableSets(datasetId: string) {
   console.log("Variable sets creation completed");
 }
 
-// Function to update missing values for dataset variables
-async function updateMissingValues(datasetId: string) {
-  console.log(`Updating missing values for dataset: ${datasetId}`);
 
-  // Get all variables for this dataset
-  const variables = await adminClient.select().from(datasetVariable).where(eq(datasetVariable.datasetId, datasetId));
-
-  console.log(`Found ${variables.length} variables to process`);
-
-  // Define common missing value labels that indicate missing data
-  const missingValueLabels = ["KA", "WN", "NZ", "NAP", "NA", "VERWEIGERT"];
-
-  for (const variable of variables) {
-    const missingValues: string[] = [];
-
-    if (variable.valueLabels && typeof variable.valueLabels === "object") {
-      // Check each value-label pair
-      for (const [value, label] of Object.entries(variable.valueLabels)) {
-        if (typeof label === "string" && missingValueLabels.includes(label)) {
-          missingValues.push(value);
-        }
-      }
-    }
-
-    // Update the variable if we found missing values
-    if (missingValues.length > 0) {
-      await adminClient
-        .update(datasetVariable)
-        .set({ missingValues: missingValues })
-        .where(eq(datasetVariable.id, variable.id));
-
-      console.log(`Updated missing values for ${variable.name}: [${missingValues.join(", ")}]`);
-    }
-  }
-
-  console.log("Missing values update completed");
-}
 
 // Truncate tables in the correct order to respect foreign key constraints
 console.log("Truncating tables...");
@@ -562,9 +526,6 @@ try {
 
   // Create variable sets for the SPSS Beispielumfrage dataset
   await createDatasetVariableSets(DATASET_TEST_2_UID);
-
-  // Update missing values for the SPSS Beispielumfrage dataset
-  await updateMissingValues(DATASET_TEST_2_UID);
 
   await adminPool.end();
 

@@ -146,6 +146,9 @@ export async function createDataset({
         default: columnLabel,
       };
 
+      // Extract missing ranges for this variable from metadata
+      const variableMissingRanges = metadata.missing_ranges[columnName] ?? null;
+
       const insertVariable = insertDatasetVariableSchema.parse({
         name: columnName,
         label: columnLabel,
@@ -155,6 +158,7 @@ export async function createDataset({
         valueLabels: columnValueLabels,
         datasetId: datasetId,
         missingValues: missingValues ?? null,
+        missingRanges: variableMissingRanges,
       } as CreateDatasetVariableData);
 
       insertValues.push(insertVariable);

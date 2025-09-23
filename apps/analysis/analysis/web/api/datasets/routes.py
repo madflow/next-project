@@ -263,6 +263,7 @@ async def get_dataset_stats(
                     df,
                     var_request.variable,
                     missing_values=dataset_variable.missing_values,  # type: ignore
+                    missing_ranges=dataset_variable.missing_ranges,  # type: ignore
                     value_labels=dataset_variable.value_labels,  # type: ignore
                     split_variable=split_var,
                     split_variable_value_labels=split_variable_value_labels,
