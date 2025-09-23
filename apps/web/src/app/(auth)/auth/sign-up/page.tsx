@@ -11,8 +11,8 @@ export default function Page() {
     return notFound();
   }
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center" data-testid="auth.sign-up.page">
-      <div className="w-md">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4" data-testid="auth.sign-up.page">
+      <div className="w-full max-w-md">
         <SignUpForm />
       </div>
     </main>
