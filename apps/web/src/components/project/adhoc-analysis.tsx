@@ -57,6 +57,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         // Individual split variable requests will be handled by MultiVariableCharts
         const request: StatsRequest = {
           variables: variables.map(v => ({ variable: v.name })),
+          decimal_places: 2,
         };
 
         mutate(request, {
@@ -84,6 +85,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     if (currentSelection) {
       const request: StatsRequest = {
         variables: [{ variable: variableName, split_variable: splitVariable }],
+        decimal_places: 2,
       };
 
       mutate(request, {

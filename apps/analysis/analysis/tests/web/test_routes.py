@@ -145,3 +145,34 @@ def test_split_variable_precedence():
     var = request.variables[0]
     actual_split = var.split_variable or request.split_variable
     assert actual_split == "global_split"
+
+
+def test_stats_request_model_with_decimal_places():
+    """Test that the StatsRequest model accepts decimal_places parameter."""
+    from analysis.web.api.datasets.routes import StatsRequest, StatsVariable
+    
+    # Test with decimal_places
+    request = StatsRequest(
+        variables=[
+            StatsVariable(variable="test_var")
+        ],
+        decimal_places=2
+    )
+    assert request.decimal_places == 2
+    
+    # Test without decimal_places (should be 2 by default)
+    request = StatsRequest(
+        variables=[
+            StatsVariable(variable="test_var")
+        ]
+    )
+    assert request.decimal_places == 2
+    
+    # Test with zero decimal places
+    request = StatsRequest(
+        variables=[
+            StatsVariable(variable="test_var")
+        ],
+        decimal_places=0
+    )
+    assert request.decimal_places == 0

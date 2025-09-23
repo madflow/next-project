@@ -29,6 +29,8 @@ class StatsRequest(BaseModel):
     variables: List[StatsVariable]
     # Keep global split_variable for backward compatibility
     split_variable: Optional[str] = None
+    # Number of decimal places for numeric statistics (mean, std, percentages, etc.)
+    decimal_places: Optional[int] = 2
 
 
 async def _get_dataset_by_id(db: AsyncSession, dataset_id: str) -> Optional[Dataset]:
@@ -265,6 +267,7 @@ async def get_dataset_stats(
                     split_variable=split_var,
                     split_variable_value_labels=split_variable_value_labels,
                     split_variable_missing_values=split_variable_missing_values,
+                    decimal_places=stats_request.decimal_places,
                 )
                 results.append({"variable": var_request.variable, "stats": stats})
             except ValueError as e:
