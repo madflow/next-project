@@ -1,3 +1,9 @@
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "250m"
+    max-file: "3"
+
 services:
 
   caddy:
@@ -13,6 +19,7 @@ services:
     environment:
       - SITE_ADDRESS=${SITE_ADDRESS}
       - BASIC_AUTH=${BASIC_AUTH}
+    logging: *default-logging
 
   app:
     image: ghcr.io/madflow/next-project-app:main
@@ -43,6 +50,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    logging: *default-logging
 
   analysis:
     image: ghcr.io/madflow/next-project-analysis:main
@@ -67,6 +75,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    logging: *default-logging
 
   migrations:
     image: ghcr.io/madflow/next-project-db:main
@@ -76,6 +85,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    logging: *default-logging
 
   cli:
     image: ghcr.io/madflow/next-project-cli:main
@@ -84,6 +94,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    logging: *default-logging
 
   # https://hub.docker.com/_/postgres/
   postgres:
@@ -102,6 +113,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
+    logging: *default-logging
 
   #https://mailpit.axllent.org/docs/install/docker/
   smtp:
@@ -112,12 +124,14 @@ services:
       MP_MAX_MESSAGES: 5000
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    logging: *default-logging
 
   watchtower:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 300 --cleanup
+    logging: *default-logging
 
 volumes:
   pg-data:
