@@ -121,9 +121,8 @@ test.describe("API Frequency Analysis Endpoint", () => {
           const actualItem = actualFreqMap.get(i + indexOffset);
           
           if (actualItem) {
-            // Allow small differences due to rounding (within 0.3%)
             expect(actualItem.counts).toBe(expectedItem.frequency);
-            expect(Math.abs(actualItem.percentages - expectedItem.percent)).toBeLessThan(0.3);
+            expect(actualItem.percentages).toBe(expectedItem.percent);
             matchedCategories++;
           } else if (expectedItem.frequency > 10) {
             // Only fail if we're missing a significant category (> 10 occurrences)
@@ -178,7 +177,7 @@ test.describe("API Frequency Analysis Endpoint", () => {
           
           if (actualItem) {
             expect(actualItem.counts).toBe(expectedItem.frequency);
-            expect(Math.abs(actualItem.percentages - expectedItem.percent)).toBeLessThan(0.3);
+            expect(actualItem.percentages).toBe(expectedItem.percent);
             matchedCategories++;
           } else if (expectedItem.frequency > 10) {
             throw new Error(`Missing significant category with ${expectedItem.frequency} occurrences`);
@@ -231,8 +230,8 @@ test.describe("API Frequency Analysis Endpoint", () => {
       expect(result).toHaveLength(2);
       
       // Find the valid and invalid variable results
-      const validResult = result.find((v: any) => v.variable === "wrkstat");
-      const invalidResult = result.find((v: any) => v.variable === "nonexistent_var");
+      const validResult = result.find((v: VariableFrequencies) => v.variable === "wrkstat");
+      const invalidResult = result.find((v: VariableFrequencies) => v.variable === "nonexistent_var");
       
       expect(validResult).toBeDefined();
       expect(validResult.stats.frequency_table).toBeDefined();
