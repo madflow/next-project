@@ -29,18 +29,18 @@ numeric_test_data = [
         ],
         {
             "count": 7,
-            "mean": 2.857142857142857,
-            "std": 1.2149858938925602,
+            "mean": 2.86,
+            "std": 1.21,
             "min": 1.0,
             "max": 4.0,
             "median": 3.0,
             "range": 3.0,
             "mode": [4],
             "frequency_table": [
-                {"value": "4.0", "counts": 3, "percentages": 42.857142857142854},
-                {"value": "2.0", "counts": 2, "percentages": 28.57142857142857},
-                {"value": "1.0", "counts": 1, "percentages": 14.285714285714285},
-                {"value": "3.0", "counts": 1, "percentages": 14.285714285714285},
+                {"value": "4.0", "counts": 3, "percentages": 42.86},
+                {"value": "2.0", "counts": 2, "percentages": 28.57},
+                {"value": "1.0", "counts": 1, "percentages": 14.29},
+                {"value": "3.0", "counts": 1, "percentages": 14.29},
             ],
         },
     ),
@@ -49,7 +49,7 @@ numeric_test_data = [
         pd.Series([1.5, 2.5, 2.5, 3.5]),
         "float_var",
         ["mean", "std"],
-        {"mean": 2.5, "std": 0.816496580927726},
+        {"mean": 2.5, "std": 0.82},
     ),
     # Case with negative numbers
     (
@@ -111,8 +111,8 @@ categorical_test_data = [
             "mode": ["apple"],
             "frequency_table": [
                 {"value": "apple", "counts": 3, "percentages": 50.0},
-                {"value": "banana", "counts": 2, "percentages": 33.33333333333333},
-                {"value": "orange", "counts": 1, "percentages": 16.666666666666664},
+                {"value": "banana", "counts": 2, "percentages": 33.33},
+                {"value": "orange", "counts": 1, "percentages": 16.67},
             ],
         },
     ),
@@ -183,7 +183,7 @@ edge_case_data = [
         pd.Series([1, 2, None, 4]),
         "some_nan_var",
         ["count", "mean", "min", "max"],
-        {"count": 3, "mean": 2.3333333333333335, "min": 1.0, "max": 4.0},
+        {"count": 3, "mean": 2.33, "min": 1.0, "max": 4.0},
     ),
     # Empty series
     (
@@ -667,3 +667,87 @@ def test_describe_var_with_split_variable_main_var_missing_values(stats_service)
     # Check if mean is calculated - it should be for multiple values
     if "mean" in categories["B"]:
         assert categories["B"]["mean"] == pytest.approx(35.0)  # (30 + 40) / 2
+
+
+def test_decimal_places_rounding(stats_service):
+    """Test that decimal_places parameter properly rounds numeric statistics."""
+    # Create test data with values that will produce many decimal places
+    df = pd.DataFrame({
+        "test_var": [1, 2, 2, 3, 4, 4, 4]  # Mean: 2.857..., Std: 1.214...
+    })
+    
+    # Test with default decimal_places (should return 2 decimal places)
+    stats_default = stats_service.describe_var(df, "test_var")
+    assert "mean" in stats_default
+    assert "std" in stats_default
+    assert "frequency_table" in stats_default
+    
+    # Check that default values have 2 decimal places
+    assert stats_default["mean"] == pytest.approx(2.86, abs=0.001)
+    assert stats_default["std"] == pytest.approx(1.21, abs=0.001)
+    
+    # Test with decimal_places=None (should return full precision)
+    stats_full_precision = stats_service.describe_var(df, "test_var", decimal_places=None)
+    assert len(str(stats_full_precision["mean"]).split(".")[-1]) > 2
+    assert len(str(stats_full_precision["std"]).split(".")[-1]) > 2
+    
+    # Test with decimal_places=2 (explicitly set)
+    stats_rounded = stats_service.describe_var(df, "test_var", decimal_places=2)
+    
+    # Check rounded mean and std (actual values: mean=2.857..., std=1.214...)
+    assert stats_rounded["mean"] == pytest.approx(2.86, abs=0.001)
+    assert stats_rounded["std"] == pytest.approx(1.21, abs=0.001)
+    
+    # Check that frequency table percentages are rounded
+    freq_table = stats_rounded["frequency_table"]
+    for item in freq_table:
+        percentage_str = str(item["percentages"])
+        if "." in percentage_str:
+            decimal_places_count = len(percentage_str.split(".")[-1])
+            assert decimal_places_count <= 2, f"Percentage {item['percentages']} has more than 2 decimal places"
+    
+    # Test with decimal_places=0 (integers)
+    stats_integer = stats_service.describe_var(df, "test_var", decimal_places=0)
+    assert stats_integer["mean"] == 3.0  # 2.857... rounded to 3
+    assert stats_integer["std"] == 1.0   # 1.214... rounded to 1
+    
+    # Test that counts remain integers (not affected by rounding)
+    assert isinstance(stats_rounded["count"], int)
+    for item in stats_rounded["frequency_table"]:
+        assert isinstance(item["counts"], int)
+
+
+def test_decimal_places_with_split_variable(stats_service):
+    """Test decimal_places works correctly with split variables."""
+    df = pd.DataFrame({
+        "values": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        "groups": ["A", "A", "A", "B", "B", "B"]
+    })
+    
+    # Test with decimal_places=1
+    stats = stats_service.describe_var(
+        df, 
+        "values", 
+        split_variable="groups", 
+        decimal_places=1
+    )
+    
+    assert "categories" in stats
+    categories = stats["categories"]
+    
+    # Check that both categories have rounded statistics
+    for category in ["A", "B"]:
+        assert category in categories
+        if "mean" in categories[category]:
+            mean_str = str(categories[category]["mean"])
+            if "." in mean_str:
+                decimal_places_count = len(mean_str.split(".")[-1])
+                assert decimal_places_count <= 1
+        
+        # Check frequency table percentages in each category
+        if "frequency_table" in categories[category]:
+            for item in categories[category]["frequency_table"]:
+                percentage_str = str(item["percentages"])
+                if "." in percentage_str:
+                    decimal_places_count = len(percentage_str.split(".")[-1])
+                    assert decimal_places_count <= 1

@@ -10,6 +10,8 @@ export const StatsRequestSchema = z.object({
   variables: z.array(StatsVariableSchema),
   // Keep global split_variable for backward compatibility
   split_variable: z.string().optional(),
+  // Number of decimal places for numeric statistics (mean, std, percentages, etc.)
+  decimal_places: z.number().optional(),
 });
 
 // Schema for the response
