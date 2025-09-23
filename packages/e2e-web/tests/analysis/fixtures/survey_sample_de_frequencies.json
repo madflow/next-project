@@ -1,0 +1,1233 @@
+{
+    "wrkstat": [
+        {
+            "category": "Vollzeit berufstätig",
+            "frequency": 1568,
+            "percent": 55.367,
+            "valid_percent": 55.367,
+            "cumulative_percent": 55.367
+        },
+        {
+            "category": "Teilzeit berufstätig",
+            "frequency": 304,
+            "percent": 10.734,
+            "valid_percent": 10.734,
+            "cumulative_percent": 66.102
+        },
+        {
+            "category": "Zeitweilig nicht berufstätig",
+            "frequency": 46,
+            "percent": 1.624,
+            "valid_percent": 1.624,
+            "cumulative_percent": 67.726
+        },
+        {
+            "category": "Arbeitslos, entlassen",
+            "frequency": 58,
+            "percent": 2.048,
+            "valid_percent": 2.048,
+            "cumulative_percent": 69.774
+        },
+        {
+            "category": "Im Ruhestand",
+            "frequency": 394,
+            "percent": 13.912,
+            "valid_percent": 13.912,
+            "cumulative_percent": 83.686
+        },
+        {
+            "category": "Schule",
+            "frequency": 79,
+            "percent": 2.79,
+            "valid_percent": 2.79,
+            "cumulative_percent": 86.476
+        },
+        {
+            "category": "Haushalt",
+            "frequency": 328,
+            "percent": 11.582,
+            "valid_percent": 11.582,
+            "cumulative_percent": 98.058
+        },
+        {
+            "category": "Sonstiges",
+            "frequency": 54,
+            "percent": 1.907,
+            "valid_percent": 1.907,
+            "cumulative_percent": 99.965
+        },
+        {
+            "category": "KA",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "marital": [
+        {
+            "category": "Verheiratet",
+            "frequency": 1346,
+            "percent": 47.528,
+            "valid_percent": 47.528,
+            "cumulative_percent": 47.528
+        },
+        {
+            "category": "Verwitwet",
+            "frequency": 283,
+            "percent": 9.993,
+            "valid_percent": 9.993,
+            "cumulative_percent": 57.521
+        },
+        {
+            "category": "Geschieden",
+            "frequency": 446,
+            "percent": 15.749,
+            "valid_percent": 15.749,
+            "cumulative_percent": 73.27
+        },
+        {
+            "category": "Getrennt",
+            "frequency": 93,
+            "percent": 3.284,
+            "valid_percent": 3.284,
+            "cumulative_percent": 76.554
+        },
+        {
+            "category": "Nie verheiratet",
+            "frequency": 663,
+            "percent": 23.411,
+            "valid_percent": 23.411,
+            "cumulative_percent": 99.965
+        },
+        {
+            "category": "KA",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "degree": [
+        {
+            "category": "Niedriger als High School",
+            "frequency": 430,
+            "percent": 15.184,
+            "valid_percent": 15.184,
+            "cumulative_percent": 15.184
+        },
+        {
+            "category": "High School",
+            "frequency": 1500,
+            "percent": 52.966,
+            "valid_percent": 52.966,
+            "cumulative_percent": 68.15
+        },
+        {
+            "category": "Junior College",
+            "frequency": 209,
+            "percent": 7.38,
+            "valid_percent": 7.38,
+            "cumulative_percent": 75.53
+        },
+        {
+            "category": "Bachelor",
+            "frequency": 478,
+            "percent": 16.879,
+            "valid_percent": 16.879,
+            "cumulative_percent": 92.408
+        },
+        {
+            "category": "Universitätsabschluss",
+            "frequency": 205,
+            "percent": 7.239,
+            "valid_percent": 7.239,
+            "cumulative_percent": 99.647
+        },
+        {
+            "category": "KA",
+            "frequency": 10,
+            "percent": 0.353,
+            "valid_percent": 0.353,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "sex": [
+        {
+            "category": "Männlich",
+            "frequency": 1232,
+            "percent": 43.503,
+            "valid_percent": 43.503,
+            "cumulative_percent": 43.503
+        },
+        {
+            "category": "Weiblich",
+            "frequency": 1600,
+            "percent": 56.497,
+            "valid_percent": 56.497,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "race": [
+        {
+            "category": "Weiß",
+            "frequency": 2241,
+            "percent": 79.131,
+            "valid_percent": 79.131,
+            "cumulative_percent": 79.131
+        },
+        {
+            "category": "Schwarz",
+            "frequency": 400,
+            "percent": 14.124,
+            "valid_percent": 14.124,
+            "cumulative_percent": 93.256
+        },
+        {
+            "category": "Andere",
+            "frequency": 191,
+            "percent": 6.744,
+            "valid_percent": 6.744,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "born": [
+        {
+            "category": "Ja",
+            "frequency": 2577,
+            "percent": 90.996,
+            "valid_percent": 90.996,
+            "cumulative_percent": 90.996
+        },
+        {
+            "category": "Nein",
+            "frequency": 242,
+            "percent": 8.545,
+            "valid_percent": 8.545,
+            "cumulative_percent": 99.541
+        },
+        {
+            "category": "WN",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 99.576
+        },
+        {
+            "category": "KA",
+            "frequency": 12,
+            "percent": 0.424,
+            "valid_percent": 0.424,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "parborn": [
+        {
+            "category": "Beide in USA",
+            "frequency": 2323,
+            "percent": 82.027,
+            "valid_percent": 82.027,
+            "cumulative_percent": 82.027
+        },
+        {
+            "category": "Nur die Mutter",
+            "frequency": 86,
+            "percent": 3.037,
+            "valid_percent": 3.037,
+            "cumulative_percent": 85.064
+        },
+        {
+            "category": "Nur der Vater",
+            "frequency": 47,
+            "percent": 1.66,
+            "valid_percent": 1.66,
+            "cumulative_percent": 86.723
+        },
+        {
+            "category": "Mutter ja; Vater WN",
+            "frequency": 11,
+            "percent": 0.388,
+            "valid_percent": 0.388,
+            "cumulative_percent": 87.112
+        },
+        {
+            "category": "Mutter nein; Vater WN",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 87.147
+        },
+        {
+            "category": "Vater ja; Mutter WN",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 87.182
+        },
+        {
+            "category": "Vater nein; Mutter WN",
+            "frequency": 3,
+            "percent": 0.106,
+            "valid_percent": 0.106,
+            "cumulative_percent": 87.288
+        },
+        {
+            "category": "WN bei beiden",
+            "frequency": 2,
+            "percent": 0.071,
+            "valid_percent": 0.071,
+            "cumulative_percent": 87.359
+        },
+        {
+            "category": "Keiner in USA",
+            "frequency": 338,
+            "percent": 11.935,
+            "valid_percent": 11.935,
+            "cumulative_percent": 99.294
+        },
+        {
+            "category": "KA",
+            "frequency": 20,
+            "percent": 0.706,
+            "valid_percent": 0.706,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "polviews": [
+        {
+            "category": "Extrem liberal",
+            "frequency": 64,
+            "percent": 2.26,
+            "valid_percent": 2.26,
+            "cumulative_percent": 2.26
+        },
+        {
+            "category": "Liberal",
+            "frequency": 357,
+            "percent": 12.606,
+            "valid_percent": 12.606,
+            "cumulative_percent": 14.866
+        },
+        {
+            "category": "Etwas liberal",
+            "frequency": 351,
+            "percent": 12.394,
+            "valid_percent": 12.394,
+            "cumulative_percent": 27.26
+        },
+        {
+            "category": "Gemäßigt",
+            "frequency": 986,
+            "percent": 34.816,
+            "valid_percent": 34.816,
+            "cumulative_percent": 62.076
+        },
+        {
+            "category": "Etwas konservativ",
+            "frequency": 432,
+            "percent": 15.254,
+            "valid_percent": 15.254,
+            "cumulative_percent": 77.331
+        },
+        {
+            "category": "Konservativ",
+            "frequency": 415,
+            "percent": 14.654,
+            "valid_percent": 14.654,
+            "cumulative_percent": 91.984
+        },
+        {
+            "category": "Extrem konservativ",
+            "frequency": 86,
+            "percent": 3.037,
+            "valid_percent": 3.037,
+            "cumulative_percent": 95.021
+        },
+        {
+            "category": "WN",
+            "frequency": 133,
+            "percent": 4.696,
+            "valid_percent": 4.696,
+            "cumulative_percent": 99.718
+        },
+        {
+            "category": "KA",
+            "frequency": 8,
+            "percent": 0.282,
+            "valid_percent": 0.282,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "cappun": [
+        {
+            "category": "Dafür",
+            "frequency": 1906,
+            "percent": 67.302,
+            "valid_percent": 67.302,
+            "cumulative_percent": 67.302
+        },
+        {
+            "category": "Dagegen",
+            "frequency": 693,
+            "percent": 24.47,
+            "valid_percent": 24.47,
+            "cumulative_percent": 91.773
+        },
+        {
+            "category": "WN",
+            "frequency": 220,
+            "percent": 7.768,
+            "valid_percent": 7.768,
+            "cumulative_percent": 99.541
+        },
+        {
+            "category": "KA",
+            "frequency": 13,
+            "percent": 0.459,
+            "valid_percent": 0.459,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "postlife": [
+        {
+            "category": "NZ",
+            "frequency": 463,
+            "percent": 16.349,
+            "valid_percent": 16.349,
+            "cumulative_percent": 16.349
+        },
+        {
+            "category": "Ja",
+            "frequency": 1687,
+            "percent": 59.569,
+            "valid_percent": 59.569,
+            "cumulative_percent": 75.918
+        },
+        {
+            "category": "Nein",
+            "frequency": 379,
+            "percent": 13.383,
+            "valid_percent": 13.383,
+            "cumulative_percent": 89.301
+        },
+        {
+            "category": "WN",
+            "frequency": 281,
+            "percent": 9.922,
+            "valid_percent": 9.922,
+            "cumulative_percent": 99.223
+        },
+        {
+            "category": "KA",
+            "frequency": 22,
+            "percent": 0.777,
+            "valid_percent": 0.777,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "happy": [
+        {
+            "category": "Sehr zufrieden",
+            "frequency": 891,
+            "percent": 31.462,
+            "valid_percent": 31.462,
+            "cumulative_percent": 31.462
+        },
+        {
+            "category": "Ziemlich zufrieden",
+            "frequency": 1575,
+            "percent": 55.614,
+            "valid_percent": 55.614,
+            "cumulative_percent": 87.076
+        },
+        {
+            "category": "Nicht sehr zufrieden",
+            "frequency": 340,
+            "percent": 12.006,
+            "valid_percent": 12.006,
+            "cumulative_percent": 99.082
+        },
+        {
+            "category": "KA",
+            "frequency": 2,
+            "percent": 0.071,
+            "valid_percent": 0.071,
+            "cumulative_percent": 99.153
+        },
+        {
+            "category": "NA",
+            "frequency": 24,
+            "percent": 0.847,
+            "valid_percent": 0.847,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "hapmar": [
+        {
+            "category": "NZ",
+            "frequency": 1486,
+            "percent": 52.472,
+            "valid_percent": 52.472,
+            "cumulative_percent": 52.472
+        },
+        {
+            "category": "Sehr zufrieden",
+            "frequency": 855,
+            "percent": 30.191,
+            "valid_percent": 30.191,
+            "cumulative_percent": 82.662
+        },
+        {
+            "category": "Ziemlich zufrieden",
+            "frequency": 445,
+            "percent": 15.713,
+            "valid_percent": 15.713,
+            "cumulative_percent": 98.376
+        },
+        {
+            "category": "Nicht sehr zufrieden",
+            "frequency": 37,
+            "percent": 1.306,
+            "valid_percent": 1.306,
+            "cumulative_percent": 99.682
+        },
+        {
+            "category": "KA",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 99.718
+        },
+        {
+            "category": "NA",
+            "frequency": 8,
+            "percent": 0.282,
+            "valid_percent": 0.282,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "owngun": [
+        {
+            "category": "NAP",
+            "frequency": 950,
+            "percent": 33.545,
+            "valid_percent": 33.545,
+            "cumulative_percent": 33.545
+        },
+        {
+            "category": "Ja",
+            "frequency": 654,
+            "percent": 23.093,
+            "valid_percent": 23.093,
+            "cumulative_percent": 56.638
+        },
+        {
+            "category": "Nein",
+            "frequency": 1215,
+            "percent": 42.903,
+            "valid_percent": 42.903,
+            "cumulative_percent": 99.541
+        },
+        {
+            "category": "Verweigert",
+            "frequency": 6,
+            "percent": 0.212,
+            "valid_percent": 0.212,
+            "cumulative_percent": 99.753
+        },
+        {
+            "category": "KA",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 99.788
+        },
+        {
+            "category": "NA",
+            "frequency": 6,
+            "percent": 0.212,
+            "valid_percent": 0.212,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "news": [
+        {
+            "category": "NZ",
+            "frequency": 961,
+            "percent": 33.934,
+            "valid_percent": 33.934,
+            "cumulative_percent": 33.934
+        },
+        {
+            "category": "Jeden Tag",
+            "frequency": 805,
+            "percent": 28.425,
+            "valid_percent": 28.425,
+            "cumulative_percent": 62.359
+        },
+        {
+            "category": "Mehrmals pro Woche",
+            "frequency": 420,
+            "percent": 14.831,
+            "valid_percent": 14.831,
+            "cumulative_percent": 77.189
+        },
+        {
+            "category": "Einmal pro Woche",
+            "frequency": 294,
+            "percent": 10.381,
+            "valid_percent": 10.381,
+            "cumulative_percent": 87.571
+        },
+        {
+            "category": "Seltener als einmal pro Woche",
+            "frequency": 202,
+            "percent": 7.133,
+            "valid_percent": 7.133,
+            "cumulative_percent": 94.703
+        },
+        {
+            "category": "Nie",
+            "frequency": 149,
+            "percent": 5.261,
+            "valid_percent": 5.261,
+            "cumulative_percent": 99.965
+        },
+        {
+            "category": "KA",
+            "frequency": 1,
+            "percent": 0.035,
+            "valid_percent": 0.035,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "howpaid": [
+        {
+            "category": "NZ",
+            "frequency": 1455,
+            "percent": 51.377,
+            "valid_percent": 51.377,
+            "cumulative_percent": 51.377
+        },
+        {
+            "category": "Stundenlohn",
+            "frequency": 650,
+            "percent": 22.952,
+            "valid_percent": 22.952,
+            "cumulative_percent": 74.329
+        },
+        {
+            "category": "Tageslohn",
+            "frequency": 17,
+            "percent": 0.6,
+            "valid_percent": 0.6,
+            "cumulative_percent": 74.929
+        },
+        {
+            "category": "Wochenlohn",
+            "frequency": 124,
+            "percent": 4.379,
+            "valid_percent": 4.379,
+            "cumulative_percent": 79.308
+        },
+        {
+            "category": "Monatslohn",
+            "frequency": 149,
+            "percent": 5.261,
+            "valid_percent": 5.261,
+            "cumulative_percent": 84.569
+        },
+        {
+            "category": "Jahreslohn",
+            "frequency": 225,
+            "percent": 7.945,
+            "valid_percent": 7.945,
+            "cumulative_percent": 92.514
+        },
+        {
+            "category": "Andere Art der Bezahlung",
+            "frequency": 182,
+            "percent": 6.427,
+            "valid_percent": 6.427,
+            "cumulative_percent": 98.941
+        },
+        {
+            "category": "KA",
+            "frequency": 30,
+            "percent": 1.059,
+            "valid_percent": 1.059,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "confinan": [
+        {
+            "category": "NZ",
+            "frequency": 921,
+            "percent": 32.521,
+            "valid_percent": 32.521,
+            "cumulative_percent": 32.521
+        },
+        {
+            "category": "Sehr viel",
+            "frequency": 490,
+            "percent": 17.302,
+            "valid_percent": 17.302,
+            "cumulative_percent": 49.823
+        },
+        {
+            "category": "Nur einiges",
+            "frequency": 1068,
+            "percent": 37.712,
+            "valid_percent": 37.712,
+            "cumulative_percent": 87.535
+        },
+        {
+            "category": "Kaum welches",
+            "frequency": 306,
+            "percent": 10.805,
+            "valid_percent": 10.805,
+            "cumulative_percent": 98.34
+        },
+        {
+            "category": "WN",
+            "frequency": 43,
+            "percent": 1.518,
+            "valid_percent": 1.518,
+            "cumulative_percent": 99.859
+        },
+        {
+            "category": "KA",
+            "frequency": 4,
+            "percent": 0.141,
+            "valid_percent": 0.141,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "conbus": [
+        {
+            "category": "NZ",
+            "frequency": 921,
+            "percent": 32.521,
+            "valid_percent": 32.521,
+            "cumulative_percent": 32.521
+        },
+        {
+            "category": "Sehr viel",
+            "frequency": 500,
+            "percent": 17.655,
+            "valid_percent": 17.655,
+            "cumulative_percent": 50.177
+        },
+        {
+            "category": "Nur einiges",
+            "frequency": 1078,
+            "percent": 38.065,
+            "valid_percent": 38.065,
+            "cumulative_percent": 88.242
+        },
+        {
+            "category": "Kaum welches",
+            "frequency": 243,
+            "percent": 8.581,
+            "valid_percent": 8.581,
+            "cumulative_percent": 96.822
+        },
+        {
+            "category": "WN",
+            "frequency": 87,
+            "percent": 3.072,
+            "valid_percent": 3.072,
+            "cumulative_percent": 99.894
+        },
+        {
+            "category": "KA",
+            "frequency": 3,
+            "percent": 0.106,
+            "valid_percent": 0.106,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "coneduc": [
+        {
+            "category": "NZ",
+            "frequency": 921,
+            "percent": 32.521,
+            "valid_percent": 32.521,
+            "cumulative_percent": 32.521
+        },
+        {
+            "category": "Sehr viel",
+            "frequency": 511,
+            "percent": 18.044,
+            "valid_percent": 18.044,
+            "cumulative_percent": 50.565
+        },
+        {
+            "category": "Nur einiges",
+            "frequency": 1055,
+            "percent": 37.253,
+            "valid_percent": 37.253,
+            "cumulative_percent": 87.818
+        },
+        {
+            "category": "Kaum welches",
+            "frequency": 315,
+            "percent": 11.123,
+            "valid_percent": 11.123,
+            "cumulative_percent": 98.941
+        },
+        {
+            "category": "WN",
+            "frequency": 23,
+            "percent": 0.812,
+            "valid_percent": 0.812,
+            "cumulative_percent": 99.753
+        },
+        {
+            "category": "KA",
+            "frequency": 7,
+            "percent": 0.247,
+            "valid_percent": 0.247,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "conpress": [
+        {
+            "category": "NZ",
+            "frequency": 921,
+            "percent": 32.521,
+            "valid_percent": 32.521,
+            "cumulative_percent": 32.521
+        },
+        {
+            "category": "Sehr viel",
+            "frequency": 176,
+            "percent": 6.215,
+            "valid_percent": 6.215,
+            "cumulative_percent": 38.736
+        },
+        {
+            "category": "Nur einiges",
+            "frequency": 878,
+            "percent": 31.003,
+            "valid_percent": 31.003,
+            "cumulative_percent": 69.739
+        },
+        {
+            "category": "Kaum welches",
+            "frequency": 808,
+            "percent": 28.531,
+            "valid_percent": 28.531,
+            "cumulative_percent": 98.27
+        },
+        {
+            "category": "WN",
+            "frequency": 46,
+            "percent": 1.624,
+            "valid_percent": 1.624,
+            "cumulative_percent": 99.894
+        },
+        {
+            "category": "KA",
+            "frequency": 3,
+            "percent": 0.106,
+            "valid_percent": 0.106,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "conmedic": [
+        {
+            "category": "NZ",
+            "frequency": 921,
+            "percent": 32.521,
+            "valid_percent": 32.521,
+            "cumulative_percent": 32.521
+        },
+        {
+            "category": "Sehr viel",
+            "frequency": 844,
+            "percent": 29.802,
+            "valid_percent": 29.802,
+            "cumulative_percent": 62.323
+        },
+        {
+            "category": "Nur einiges",
+            "frequency": 864,
+            "percent": 30.508,
+            "valid_percent": 30.508,
+            "cumulative_percent": 92.832
+        },
+        {
+            "category": "Kaum welches",
+            "frequency": 167,
+            "percent": 5.897,
+            "valid_percent": 5.897,
+            "cumulative_percent": 98.729
+        },
+        {
+            "category": "WN",
+            "frequency": 30,
+            "percent": 1.059,
+            "valid_percent": 1.059,
+            "cumulative_percent": 99.788
+        },
+        {
+            "category": "KA",
+            "frequency": 6,
+            "percent": 0.212,
+            "valid_percent": 0.212,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "contv": [
+        {
+            "category": "NZ",
+            "frequency": 921,
+            "percent": 32.521,
+            "valid_percent": 32.521,
+            "cumulative_percent": 32.521
+        },
+        {
+            "category": "Sehr viel",
+            "frequency": 196,
+            "percent": 6.921,
+            "valid_percent": 6.921,
+            "cumulative_percent": 39.442
+        },
+        {
+            "category": "Nur einiges",
+            "frequency": 936,
+            "percent": 33.051,
+            "valid_percent": 33.051,
+            "cumulative_percent": 72.493
+        },
+        {
+            "category": "Kaum welches",
+            "frequency": 744,
+            "percent": 26.271,
+            "valid_percent": 26.271,
+            "cumulative_percent": 98.764
+        },
+        {
+            "category": "WN",
+            "frequency": 31,
+            "percent": 1.095,
+            "valid_percent": 1.095,
+            "cumulative_percent": 99.859
+        },
+        {
+            "category": "KA",
+            "frequency": 4,
+            "percent": 0.141,
+            "valid_percent": 0.141,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "agecat": [
+        {
+            "category": "Unter 25",
+            "frequency": 242,
+            "percent": 8.545,
+            "valid_percent": 8.557,
+            "cumulative_percent": 8.557
+        },
+        {
+            "category": "25 bis 34",
+            "frequency": 627,
+            "percent": 22.14,
+            "valid_percent": 22.171,
+            "cumulative_percent": 30.728
+        },
+        {
+            "category": "35 bis 44",
+            "frequency": 679,
+            "percent": 23.976,
+            "valid_percent": 24.01,
+            "cumulative_percent": 54.738
+        },
+        {
+            "category": "45 bis 54",
+            "frequency": 481,
+            "percent": 16.984,
+            "valid_percent": 17.008,
+            "cumulative_percent": 71.747
+        },
+        {
+            "category": "55 bis 64",
+            "frequency": 320,
+            "percent": 11.299,
+            "valid_percent": 11.315,
+            "cumulative_percent": 83.062
+        },
+        {
+            "category": "65 oder älter",
+            "frequency": 479,
+            "percent": 16.914,
+            "valid_percent": 16.938,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "childcat": [
+        {
+            "category": "Keine",
+            "frequency": 802,
+            "percent": 28.319,
+            "valid_percent": 28.319,
+            "cumulative_percent": 28.319
+        },
+        {
+            "category": "1-2",
+            "frequency": 1217,
+            "percent": 42.973,
+            "valid_percent": 42.973,
+            "cumulative_percent": 71.292
+        },
+        {
+            "category": "3-4",
+            "frequency": 620,
+            "percent": 21.893,
+            "valid_percent": 21.893,
+            "cumulative_percent": 93.185
+        },
+        {
+            "category": "5 oder mehr",
+            "frequency": 186,
+            "percent": 6.568,
+            "valid_percent": 6.568,
+            "cumulative_percent": 99.753
+        },
+        {
+            "category": "KA",
+            "frequency": 7,
+            "percent": 0.247,
+            "valid_percent": 0.247,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "news1": [
+        {
+            "category": "Nein",
+            "frequency": 2027,
+            "percent": 71.575,
+            "valid_percent": 71.575,
+            "cumulative_percent": 71.575
+        },
+        {
+            "category": "Ja",
+            "frequency": 805,
+            "percent": 28.425,
+            "valid_percent": 28.425,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "news2": [
+        {
+            "category": "Nein",
+            "frequency": 2538,
+            "percent": 89.619,
+            "valid_percent": 89.619,
+            "cumulative_percent": 89.619
+        },
+        {
+            "category": "Ja",
+            "frequency": 294,
+            "percent": 10.381,
+            "valid_percent": 10.381,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "news3": [
+        {
+            "category": "Nein",
+            "frequency": 1755,
+            "percent": 61.97,
+            "valid_percent": 61.97,
+            "cumulative_percent": 61.97
+        },
+        {
+            "category": "Ja",
+            "frequency": 1077,
+            "percent": 38.03,
+            "valid_percent": 38.03,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "news4": [
+        {
+            "category": "Nein",
+            "frequency": 2281,
+            "percent": 80.544,
+            "valid_percent": 80.544,
+            "cumulative_percent": 80.544
+        },
+        {
+            "category": "Ja",
+            "frequency": 551,
+            "percent": 19.456,
+            "valid_percent": 19.456,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "news5": [
+        {
+            "category": "Nein",
+            "frequency": 1965,
+            "percent": 69.386,
+            "valid_percent": 69.386,
+            "cumulative_percent": 69.386
+        },
+        {
+            "category": "Ja",
+            "frequency": 867,
+            "percent": 30.614,
+            "valid_percent": 30.614,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "car1": [
+        {
+            "category": "Amerikanisch",
+            "frequency": 1229,
+            "percent": 43.397,
+            "valid_percent": 43.397,
+            "cumulative_percent": 43.397
+        },
+        {
+            "category": "Japanisch",
+            "frequency": 627,
+            "percent": 22.14,
+            "valid_percent": 22.14,
+            "cumulative_percent": 65.537
+        },
+        {
+            "category": "Koreanisch",
+            "frequency": 318,
+            "percent": 11.229,
+            "valid_percent": 11.229,
+            "cumulative_percent": 76.766
+        },
+        {
+            "category": "Deutsch",
+            "frequency": 339,
+            "percent": 11.97,
+            "valid_percent": 11.97,
+            "cumulative_percent": 88.736
+        },
+        {
+            "category": "Schwedisch",
+            "frequency": 165,
+            "percent": 5.826,
+            "valid_percent": 5.826,
+            "cumulative_percent": 94.562
+        },
+        {
+            "category": "Anderer",
+            "frequency": 154,
+            "percent": 5.438,
+            "valid_percent": 5.438,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "car2": [
+        {
+            "category": "Amerikanisch",
+            "frequency": 967,
+            "percent": 34.145,
+            "valid_percent": 34.145,
+            "cumulative_percent": 34.145
+        },
+        {
+            "category": "Japanisch",
+            "frequency": 556,
+            "percent": 19.633,
+            "valid_percent": 19.633,
+            "cumulative_percent": 53.778
+        },
+        {
+            "category": "Koreanisch",
+            "frequency": 234,
+            "percent": 8.263,
+            "valid_percent": 8.263,
+            "cumulative_percent": 62.041
+        },
+        {
+            "category": "Deutsch",
+            "frequency": 256,
+            "percent": 9.04,
+            "valid_percent": 9.04,
+            "cumulative_percent": 71.081
+        },
+        {
+            "category": "Schwedisch",
+            "frequency": 126,
+            "percent": 4.449,
+            "valid_percent": 4.449,
+            "cumulative_percent": 75.53
+        },
+        {
+            "category": "Anderer",
+            "frequency": 127,
+            "percent": 4.484,
+            "valid_percent": 4.484,
+            "cumulative_percent": 80.014
+        },
+        {
+            "category": "Keiner",
+            "frequency": 566,
+            "percent": 19.986,
+            "valid_percent": 19.986,
+            "cumulative_percent": 100.0
+        }
+    ],
+    "car3": [
+        {
+            "category": "Amerikanisch",
+            "frequency": 601,
+            "percent": 21.222,
+            "valid_percent": 21.222,
+            "cumulative_percent": 21.222
+        },
+        {
+            "category": "Japanisch",
+            "frequency": 534,
+            "percent": 18.856,
+            "valid_percent": 18.856,
+            "cumulative_percent": 40.078
+        },
+        {
+            "category": "Koreanisch",
+            "frequency": 208,
+            "percent": 7.345,
+            "valid_percent": 7.345,
+            "cumulative_percent": 47.422
+        },
+        {
+            "category": "Deutsch",
+            "frequency": 159,
+            "percent": 5.614,
+            "valid_percent": 5.614,
+            "cumulative_percent": 53.037
+        },
+        {
+            "category": "Schwedisch",
+            "frequency": 92,
+            "percent": 3.249,
+            "valid_percent": 3.249,
+            "cumulative_percent": 56.285
+        },
+        {
+            "category": "Anderer",
+            "frequency": 78,
+            "percent": 2.754,
+            "valid_percent": 2.754,
+            "cumulative_percent": 59.04
+        },
+        {
+            "category": "Keiner",
+            "frequency": 1160,
+            "percent": 40.96,
+            "valid_percent": 40.96,
+            "cumulative_percent": 100.0
+        }
+    ]
+}
