@@ -19,6 +19,10 @@ const formSchema = z.object({
   id: z.uuid(),
   label: z.string().nullable(),
   missingValues: z.array(z.string()).nullable(),
+  missingRanges: z
+    .record(z.string(), z.array(z.object({ lo: z.number(), hi: z.number() })))
+    .nullable()
+    .optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -37,7 +41,10 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     defaultValues: {
       id: datasetVariable.id,
       label: datasetVariable.label,
-      missingValues: (datasetVariable.missingValues as string[]) ?? null,
+      missingValues: Array.isArray(datasetVariable.missingValues) 
+        ? datasetVariable.missingValues as string[]
+        : null,
+      missingRanges: datasetVariable.missingRanges ?? null,
     },
   });
 
@@ -103,6 +110,31 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                   <FormLabel>{t("editVariable.form.missingValues.label")}</FormLabel>
                   <FormControl>
                     <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="missingRanges"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{"Missing Ranges"}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={'JSON format: {"fieldName": [{"lo": 1, "hi": 5}]}'}
+                      value={field.value ? JSON.stringify(field.value, null, 2) : ""}
+                      onChange={(e) => {
+                        try {
+                          const parsed = e.target.value ? JSON.parse(e.target.value) : null;
+                          field.onChange(parsed);
+                        } catch {
+                          // Invalid JSON, keep the field value as is for now
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
