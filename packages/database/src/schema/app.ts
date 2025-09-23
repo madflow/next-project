@@ -92,6 +92,14 @@ export type DatasetVariableLabels = z.infer<typeof datasetVariableLabelsSchema>;
 
 export type DatasetVariableType = "float" | "double" | "int8" | "int16" | "int32" | "string" | "unknown";
 export type DatasetVariableMeasure = "nominal" | "ordinal" | "scale" | "unknown";
+export type MissingRange = {
+  lo: number;
+  hi: number;
+};
+
+export type MissingRanges = {
+  [fieldName: string]: MissingRange[];
+};
 
 export const typeEnum = pgEnum("dataset_variable_type", [
   "float",
@@ -115,7 +123,8 @@ export const datasetVariable = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     variableLabels: jsonb("variable_labels"),
     valueLabels: jsonb("value_labels"),
-    missingValues: jsonb("missing_values"),
+    missingValues: jsonb("missing_values").$type<Record<string, unknown>>(),
+    missingRanges: jsonb("missing_ranges").$type<MissingRanges>(),
     datasetId: uuid("dataset_id")
       .notNull()
       .references(() => dataset.id, { onDelete: "cascade" }),
