@@ -10,9 +10,13 @@ help:
 dev:
 	pnpm run dev
 
-## Build all apps
+## Build all apps and packages
 build:
 	pnpm run build
+
+## Build only database
+build-database:
+	pnpm --filter ./packages/database run build
 
 ## Start all apps in production mode
 start:

@@ -18,7 +18,11 @@ import { DatasetVariable, updateDatasetVariableSchema } from "@/types/dataset-va
 const formSchema = z.object({
   id: z.uuid(),
   label: z.string().nullable(),
-  missingValues: z.array(z.string()).nullable(),
+  missingValues: z.array(z.string()).nullable().optional(),
+  missingRanges: z
+    .record(z.string(), z.array(z.object({ lo: z.number(), hi: z.number() })))
+    .nullable()
+    .optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -37,7 +41,8 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     defaultValues: {
       id: datasetVariable.id,
       label: datasetVariable.label,
-      missingValues: (datasetVariable.missingValues as string[]) ?? null,
+      missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
+      missingRanges: datasetVariable.missingRanges ?? null,
     },
   });
 
