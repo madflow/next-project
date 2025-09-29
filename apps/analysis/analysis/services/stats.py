@@ -1,3 +1,5 @@
+from typing import Dict, List, Optional
+
 import pandas as pd
 
 
@@ -16,10 +18,12 @@ class StatisticsService:
         variable_name: str,
         include: list[str] | None = None,
         missing_values: list[str | int | float] | None = None,
+        missing_ranges: Optional[List[Dict[str, float]]] = None,
         value_labels: dict[str, str] | None = None,
         split_variable: str | None = None,
         split_variable_value_labels: dict[str, str] | None = None,
         split_variable_missing_values: list[str | int | float] | None = None,
+        split_variable_missing_ranges: Optional[List[Dict[str, float]]] = None,
         decimal_places: int | None = 2,
     ) -> dict:
         """
@@ -37,6 +41,8 @@ class StatisticsService:
                      based on the data type.
             missing_values: A list of values to replace with NaN for the main
                            variable.
+            missing_ranges: A dictionary specifying ranges of values to treat
+                            as missing for the main variable.
             value_labels: A dictionary mapping values to labels. All keys from
                          this dict (except those in missing_values) will be
                          included in the frequency table, even if they have 0
@@ -46,6 +52,8 @@ class StatisticsService:
                            category of the split variable.
             split_variable_value_labels: Value labels for the split variable.
             split_variable_missing_values: A list of values to treat as missing
+                                          for the split variable.
+            split_variable_missing_ranges: Ranges of values to treat as missing
                                           for the split variable.
             decimal_places: Number of decimal places to round numeric statistics
                            to (mean, std, percentages, etc.). If None, no
@@ -61,9 +69,19 @@ class StatisticsService:
 
         if split_variable is not None:
             if split_variable not in data.columns:
-                raise ValueError(f"Split variable '{split_variable}' not found in the DataFrame.")
+                raise ValueError(
+                    f"Split variable '{split_variable}' not found in the DataFrame.",
+                )
             return self._describe_var_with_split(
-                data, variable_name, split_variable, include, missing_values, value_labels, split_variable_value_labels, split_variable_missing_values, decimal_places,
+                data,
+                variable_name,
+                split_variable,
+                include,
+                missing_values,
+                value_labels,
+                split_variable_value_labels,
+                split_variable_missing_values,
+                decimal_places,
             )
 
         if missing_values is not None:
@@ -72,7 +90,63 @@ class StatisticsService:
             )
             data = data.replace(numeric_missing_values, pd.NA)
 
-        return self._calculate_single_var_stats(data, variable_name, include, missing_values, value_labels, decimal_places)
+        # Apply missing ranges to mark values within ranges as missing
+        if missing_ranges is not None:
+            data = self._apply_missing_ranges(data, variable_name, missing_ranges)
+
+        return self._calculate_single_var_stats(
+            data,
+            variable_name,
+            include,
+            missing_values,
+            value_labels,
+            decimal_places,
+        )
+
+    def _apply_missing_ranges(
+        self,
+        data: pd.DataFrame,
+        variable_name: str,
+        missing_ranges: Optional[Dict[str, List[Dict[str, float]]]] = None,
+    ) -> pd.DataFrame:
+        """
+        Apply missing ranges to mark values within specified ranges as missing (pd.NA).
+
+        Args:
+            data: The input DataFrame to modify
+            variable_name: The name of the variable to apply missing ranges to
+            missing_ranges: Dictionary mapping field names to lists of range objects
+                           with 'lo' and 'hi' keys defining inclusive ranges
+
+        Returns:
+            Modified DataFrame with values in specified ranges replaced with pd.NA
+        """
+        if missing_ranges is None or variable_name not in missing_ranges:
+            return data
+
+        # Make a copy to avoid modifying the original data
+        data = data.copy()
+        variable = data[variable_name]
+
+        # Apply each range for this variable
+        for range_obj in missing_ranges[variable_name]:
+            if (
+                not isinstance(range_obj, dict)
+                or "lo" not in range_obj
+                or "hi" not in range_obj
+            ):
+                continue
+
+            lo = range_obj["lo"]
+            hi = range_obj["hi"]
+
+            # Create mask for values within the range (inclusive)
+            mask = (variable >= lo) & (variable <= hi)
+
+            # Replace values within range with pd.NA
+            data.loc[mask, variable_name] = pd.NA
+
+        return data
 
     def _convert_to_numeric_missing_values(self, missing_values: list) -> list:
         """
@@ -131,9 +205,11 @@ class StatisticsService:
         split_variable: str,
         include: list[str] | None = None,
         missing_values: list[str | int | float] | None = None,
+        missing_ranges: Optional[List[Dict[str, float]]] = None,
         value_labels: dict[str, str] | None = None,
         split_variable_value_labels: dict[str, str] | None = None,
         split_variable_missing_values: list[str | int | float] | None = None,
+        split_variable_missing_ranges: Optional[List[Dict[str, float]]] = None,
         decimal_places: int | None = 2,
     ) -> dict:
         """
@@ -156,12 +232,16 @@ class StatisticsService:
             statistics for the main variable.
         """
         if missing_values is not None:
-            numeric_missing_values = self._convert_to_numeric_missing_values(missing_values)
+            numeric_missing_values = self._convert_to_numeric_missing_values(
+                missing_values,
+            )
             data = data.replace(numeric_missing_values, pd.NA)
 
         # Filter out missing values for the split variable
         if split_variable_missing_values is not None:
-            split_numeric_missing_values = self._convert_to_numeric_missing_values(split_variable_missing_values)
+            split_numeric_missing_values = self._convert_to_numeric_missing_values(
+                split_variable_missing_values,
+            )
             # Create mask for split variable missing values
             split_missing_mask = data[split_variable].isin(split_numeric_missing_values)
             # Keep only rows where split variable is not missing
@@ -169,12 +249,13 @@ class StatisticsService:
 
         # Get unique categories from split variable (excluding NA and missing values)
         split_categories = data[split_variable].dropna().unique()
+
         # Sort categories in ascending order
         def sort_key(item) -> tuple[int, float | str]:
             try:
                 return (0, float(item))  # Numeric values get priority
             except (ValueError, TypeError):
-                return (1, str(item))   # String values come after numbers
+                return (1, str(item))  # String values come after numbers
 
         split_categories = sorted(split_categories, key=sort_key)
 
@@ -190,7 +271,13 @@ class StatisticsService:
             mask = data[split_variable] == category
             category_data = data.loc[mask].copy()
             category_stats = self._calculate_single_var_stats(
-                category_data, variable_name, include, missing_values, value_labels, decimal_places,
+                category_data,
+                variable_name,
+                include,
+                missing_values,
+                missing_ranges,
+                value_labels,
+                decimal_places,
             )
 
             # Convert category to string for JSON serialization
@@ -198,12 +285,14 @@ class StatisticsService:
             result["categories"][category_key] = category_stats
 
         return result
+
     def _calculate_single_var_stats(
         self,
         data: pd.DataFrame,
         variable_name: str,
         include: list[str] | None = None,
         missing_values: list[str | int | float] | None = None,
+        missing_ranges: Optional[List[Dict[str, float]]] = None,
         value_labels: dict[str, str] | None = None,
         decimal_places: int | None = 2,
     ) -> dict:
@@ -240,7 +329,10 @@ class StatisticsService:
             if "mean" in include:
                 mean_val = variable.mean()
                 if mean_val is not None and str(mean_val) != "nan":
-                    stats["mean"] = self._round_if_needed(float(mean_val), decimal_places)
+                    stats["mean"] = self._round_if_needed(
+                        float(mean_val),
+                        decimal_places,
+                    )
                 else:
                     stats["mean"] = None
             if "std" in include:
@@ -265,7 +357,10 @@ class StatisticsService:
                 if variable.count() > 0:
                     median_val = variable.median()
                     if median_val is not None and str(median_val) != "nan":
-                        stats["median"] = self._round_if_needed(float(median_val), decimal_places)
+                        stats["median"] = self._round_if_needed(
+                            float(median_val),
+                            decimal_places,
+                        )
                     else:
                         stats["median"] = None
                 else:
@@ -273,9 +368,16 @@ class StatisticsService:
             if "range" in include:
                 min_val = variable.min()
                 max_val = variable.max()
-                if (min_val is not None and str(min_val) != "nan" and
-                    max_val is not None and str(max_val) != "nan"):
-                    stats["range"] = self._round_if_needed(float(max_val - min_val), decimal_places)
+                if (
+                    min_val is not None
+                    and str(min_val) != "nan"
+                    and max_val is not None
+                    and str(max_val) != "nan"
+                ):
+                    stats["range"] = self._round_if_needed(
+                        float(max_val - min_val),
+                        decimal_places,
+                    )
                 else:
                     stats["range"] = None
 
@@ -297,7 +399,9 @@ class StatisticsService:
                 missing_set = set()
                 if missing_values is not None:
                     # Convert missing values to their various string representations for comparison
-                    numeric_missing_values = self._convert_to_numeric_missing_values(missing_values)
+                    numeric_missing_values = self._convert_to_numeric_missing_values(
+                        missing_values,
+                    )
                     for mv in numeric_missing_values:
                         # Add both integer and float string representations
                         missing_set.add(str(mv))
@@ -326,7 +430,10 @@ class StatisticsService:
 
                     value_to_data[value_str] = {
                         "counts": int(row["counts"]),
-                        "percentages": self._round_if_needed(float(row["percentages"]), decimal_places),
+                        "percentages": self._round_if_needed(
+                            float(row["percentages"]),
+                            decimal_places,
+                        ),
                     }
 
                 # Then, add all valid label keys with 0 counts if they don't exist
@@ -339,11 +446,13 @@ class StatisticsService:
 
                 # Convert to frequency records
                 for value_str, data in value_to_data.items():
-                    frequency_records.append({
-                        "value": value_str,
-                        "counts": data["counts"],
-                        "percentages": data["percentages"],
-                    })
+                    frequency_records.append(
+                        {
+                            "value": value_str,
+                            "counts": data["counts"],
+                            "percentages": data["percentages"],
+                        },
+                    )
             else:
                 # Original behavior when no value_labels are provided
                 for _, row in frequency_table_df.iterrows():
@@ -358,7 +467,10 @@ class StatisticsService:
                         {
                             "value": value,
                             "counts": int(row["counts"]),
-                            "percentages": self._round_if_needed(float(row["percentages"]), decimal_places),
+                            "percentages": self._round_if_needed(
+                                float(row["percentages"]),
+                                decimal_places,
+                            ),
                         },
                     )
 
@@ -367,7 +479,7 @@ class StatisticsService:
                 try:
                     return (0, float(item["value"]))  # Numeric values get priority
                 except (ValueError, TypeError):
-                    return (1, str(item["value"]))   # String values come after numbers
+                    return (1, str(item["value"]))  # String values come after numbers
 
             frequency_records.sort(key=sort_key)
             stats["frequency_table"] = frequency_records

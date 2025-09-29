@@ -16,7 +16,9 @@ class Organization(Base):
     slug = Column(Text, nullable=False, unique=True)
     logo = Column(Text)
     created_at = Column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
     )
     org_metadata = Column("metadata", JSONB, nullable=True)
 
@@ -36,13 +38,19 @@ class Dataset(Base):
     file_hash = Column(Text, nullable=False)
     s3_key = Column(Text, nullable=False)
     uploaded_at = Column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
     )
     organization_id = Column(
-        UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("organizations.id"),
+        nullable=False,
     )
     created_at = Column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
     )
     updated_at = Column(DateTime(timezone=True))
 
@@ -51,7 +59,9 @@ class Dataset(Base):
 
     # Relationship to dataset variables
     variables = relationship(
-        "DatasetVariable", back_populates="dataset", cascade="all, delete-orphan"
+        "DatasetVariable",
+        back_populates="dataset",
+        cascade="all, delete-orphan",
     )
 
 
@@ -64,11 +74,14 @@ class DatasetVariable(Base):
     type = Column(Text, nullable=False)
     measure = Column(Text, nullable=False)
     created_at = Column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
     )
     variable_labels = Column("variable_labels", JSONB)
     value_labels = Column("value_labels", JSONB)
     missing_values = Column("missing_values", JSONB)
+    missing_ranges = Column("missing_ranges", JSONB)
     dataset_id = Column(
         UUID(as_uuid=True),
         ForeignKey("datasets.id", ondelete="CASCADE"),
