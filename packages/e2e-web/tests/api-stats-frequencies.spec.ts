@@ -24,9 +24,18 @@ test.describe("API Stats Endpoint with Frequencies", () => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-    const variables = Object.keys(surveyFrequencies); // Get all variable names from fixture
+    const variables = Object.keys(surveyFrequencies);
     const statsResponse = await fetchApiVariableStats(variables, 1, page);
-    console.log("Frequencies fixture:", JSON.stringify(surveyFrequencies, null, 2));
-    console.log("Stats Response:", JSON.stringify(statsResponse, null, 2));
+
+    expect(Array.isArray(statsResponse)).toBe(true);
+    expect(statsResponse.length).toBe(variables.length);
+
+    for (const variable of variables) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const apiResult = statsResponse.find((item: any) => item.variable === variable);
+      expect(apiResult).toBeDefined();
+      expect(apiResult.stats).toBeDefined();
+      expect(apiResult.stats.frequency_table).toBeDefined();
+    }
   });
 });
