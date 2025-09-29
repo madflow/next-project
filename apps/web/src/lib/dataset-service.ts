@@ -3,17 +3,15 @@ import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariableData,
   DatasetVariableValueLabel,
+  MissingRanges,
   dataset,
   datasetVariable,
   insertDatasetVariableSchema,
 } from "@repo/database/schema";
-import {
-  ServerActionException,
-  ServerActionValidationException,
-} from "@/lib/exception";
+import { env } from "@/env";
+import { ServerActionException, ServerActionValidationException } from "@/lib/exception";
 import { putDataset } from "@/lib/storage";
 import { datasetReadResponseSchema } from "@/types/dataset";
-import { env } from "@/env";
 
 const ALLOWED_FILE_TYPES = [
   "application/x-spss-sav", // .sav
@@ -104,10 +102,7 @@ export async function createDataset({
       ...(id && { id }), // Include predefined ID if provided
     };
 
-    const result = await db
-      .insert(dataset)
-      .values(datasetValues)
-      .returning({ id: dataset.id });
+    const result = await db.insert(dataset).values(datasetValues).returning({ id: dataset.id });
 
     if (!result[0]?.id) {
       throw new ServerActionException("Failed to save file metadata to database");
@@ -124,7 +119,6 @@ export async function createDataset({
     const metadataResult = await fileMetadataResp.json();
     const datasetReadResponse = datasetReadResponseSchema.safeParse(metadataResult);
     if (!datasetReadResponse.success) {
-      console.error(datasetReadResponse.error);
       throw new ServerActionException("Failed to fetch file metadata from analysis service");
     }
 
@@ -146,6 +140,8 @@ export async function createDataset({
         default: columnLabel,
       };
 
+      const missingRanges = metadata.missing_ranges[columnName] ?? null;
+
       const insertVariable = insertDatasetVariableSchema.parse({
         name: columnName,
         label: columnLabel,
@@ -155,6 +151,7 @@ export async function createDataset({
         valueLabels: columnValueLabels,
         datasetId: datasetId,
         missingValues: missingValues ?? null,
+        missingRanges,
       } as CreateDatasetVariableData);
 
       insertValues.push(insertVariable);
@@ -184,3 +181,4 @@ export async function createDataset({
     };
   }
 }
+
