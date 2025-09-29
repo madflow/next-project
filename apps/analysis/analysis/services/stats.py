@@ -78,9 +78,11 @@ class StatisticsService:
                 split_variable,
                 include,
                 missing_values,
+                missing_ranges,
                 value_labels,
                 split_variable_value_labels,
                 split_variable_missing_values,
+                split_variable_missing_ranges,
                 decimal_places,
             )
 
@@ -99,6 +101,7 @@ class StatisticsService:
             variable_name,
             include,
             missing_values,
+            missing_ranges,
             value_labels,
             decimal_places,
         )
@@ -107,7 +110,7 @@ class StatisticsService:
         self,
         data: pd.DataFrame,
         variable_name: str,
-        missing_ranges: Optional[Dict[str, List[Dict[str, float]]]] = None,
+        missing_ranges: Optional[List[Dict[str, float]]] = None,
     ) -> pd.DataFrame:
         """
         Apply missing ranges to mark values within specified ranges as missing (pd.NA).
@@ -115,13 +118,12 @@ class StatisticsService:
         Args:
             data: The input DataFrame to modify
             variable_name: The name of the variable to apply missing ranges to
-            missing_ranges: Dictionary mapping field names to lists of range objects
-                           with 'lo' and 'hi' keys defining inclusive ranges
+            missing_ranges: List of range objects with 'lo' and 'hi' keys defining inclusive ranges
 
         Returns:
             Modified DataFrame with values in specified ranges replaced with pd.NA
         """
-        if missing_ranges is None or variable_name not in missing_ranges:
+        if missing_ranges is None:
             return data
 
         # Make a copy to avoid modifying the original data
@@ -129,7 +131,7 @@ class StatisticsService:
         variable = data[variable_name]
 
         # Apply each range for this variable
-        for range_obj in missing_ranges[variable_name]:
+        for range_obj in missing_ranges:
             if (
                 not isinstance(range_obj, dict)
                 or "lo" not in range_obj
@@ -198,6 +200,48 @@ class StatisticsService:
 
         return converted_values
 
+    def _get_missing_ranges_values(self, missing_ranges: Optional[List[Dict[str, float]]]) -> set:
+        """
+        Get all values that fall within the missing ranges.
+        
+        Args:
+            missing_ranges: List of range objects with 'lo' and 'hi' keys
+            
+        Returns:
+            Set of values (as strings) that fall within the missing ranges
+        """
+        missing_set = set()
+        if missing_ranges is None:
+            return missing_set
+            
+        for range_obj in missing_ranges:
+            if (
+                not isinstance(range_obj, dict)
+                or "lo" not in range_obj
+                or "hi" not in range_obj
+            ):
+                continue
+                
+            lo = range_obj["lo"]
+            hi = range_obj["hi"]
+            
+            # For each value in the range (assuming integer ranges like 97-97, 98-98, 99-99)
+            # Generate all possible values in the range
+            if isinstance(lo, (int, float)) and isinstance(hi, (int, float)):
+                # For ranges like 97-97, 98-98, this will add just that single value
+                # For ranges like 97-99, this will add 97, 98, 99
+                current = lo
+                while current <= hi:
+                    # Add different string representations
+                    missing_set.add(str(current))
+                    missing_set.add(str(float(current)))
+                    if isinstance(current, int) or current.is_integer():
+                        missing_set.add(f"{int(current)}.0")
+                        missing_set.add(str(int(current)))
+                    current += 1
+                    
+        return missing_set
+
     def _describe_var_with_split(
         self,
         data: pd.DataFrame,
@@ -237,6 +281,10 @@ class StatisticsService:
             )
             data = data.replace(numeric_missing_values, pd.NA)
 
+        # Apply missing ranges to main variable
+        if missing_ranges is not None:
+            data = self._apply_missing_ranges(data, variable_name, missing_ranges)
+
         # Filter out missing values for the split variable
         if split_variable_missing_values is not None:
             split_numeric_missing_values = self._convert_to_numeric_missing_values(
@@ -246,6 +294,10 @@ class StatisticsService:
             split_missing_mask = data[split_variable].isin(split_numeric_missing_values)
             # Keep only rows where split variable is not missing
             data = data.loc[~split_missing_mask].copy()
+
+        # Apply missing ranges to split variable
+        if split_variable_missing_ranges is not None:
+            data = self._apply_missing_ranges(data, split_variable, split_variable_missing_ranges)
 
         # Get unique categories from split variable (excluding NA and missing values)
         split_categories = data[split_variable].dropna().unique()
@@ -411,7 +463,12 @@ class StatisticsService:
                         elif isinstance(mv, float) and mv.is_integer():
                             missing_set.add(str(int(mv)))
 
-                # Create a set of all valid label keys (excluding missing values)
+                # Add missing ranges values to the missing set
+                if missing_ranges is not None:
+                    missing_ranges_set = self._get_missing_ranges_values(missing_ranges)
+                    missing_set.update(missing_ranges_set)
+
+                # Create a set of all valid label keys (excluding missing values and ranges)
                 valid_label_keys = set()
                 for key in value_labels.keys():
                     if key not in missing_set:

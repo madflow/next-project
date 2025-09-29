@@ -3,7 +3,6 @@ import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariableData,
   DatasetVariableValueLabel,
-  MissingRanges,
   dataset,
   datasetVariable,
   insertDatasetVariableSchema,
@@ -181,4 +180,3 @@ export async function createDataset({
     };
   }
 }
-
