@@ -315,7 +315,7 @@
     ]
   },
   "degree": {
-    "count": 2392,
+    "count": 2822,
     "frequency_table": [
       {
         "counts": 1500,
@@ -765,7 +765,7 @@
     ]
   },
   "eth3": {
-    "count": 444,
+    "count": 445,
     "frequency_table": [
       {
         "counts": 6,
@@ -1155,7 +1155,7 @@
     ]
   },
   "hapmar": {
-    "count": 1300,
+    "count": 1337,
     "frequency_table": [
       {
         "counts": 855,
@@ -1170,7 +1170,7 @@
     ]
   },
   "happy": {
-    "count": 2466,
+    "count": 2806,
     "frequency_table": [
       {
         "counts": 891,
@@ -1185,7 +1185,7 @@
     ]
   },
   "howpaid": {
-    "count": 1165,
+    "count": 1347,
     "frequency_table": [
       {
         "counts": 650,
@@ -1310,7 +1310,7 @@
     ]
   },
   "news": {
-    "count": 1668,
+    "count": 1870,
     "frequency_table": [
       {
         "counts": 805,
@@ -1425,7 +1425,7 @@
     ]
   },
   "parborn": {
-    "count": 2808,
+    "count": 2812,
     "frequency_table": [
       {
         "counts": 2323,
@@ -1620,7 +1620,7 @@
     ]
   },
   "wrkstat": {
-    "count": 2785,
+    "count": 2831,
     "frequency_table": [
       {
         "counts": 1568,
@@ -1660,4 +1660,3 @@
     ]
   }
 }
-
