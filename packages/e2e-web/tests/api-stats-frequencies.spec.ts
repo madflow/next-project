@@ -36,6 +36,10 @@ test.describe("API Stats Endpoint with Frequencies", () => {
       expect(apiResult).toBeDefined();
       expect(apiResult.stats).toBeDefined();
       expect(apiResult.stats.frequency_table).toBeDefined();
+
+      // Compare the actual values from API with fixture data
+      const fixtureData = surveyFrequencies[variable as keyof typeof surveyFrequencies];
+      expect(apiResult.stats.count, `Count mismatch for variable: ${variable}`).toBe(fixtureData.count);
     }
   });
 });
