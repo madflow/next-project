@@ -1,5 +1,5 @@
 import tempfile
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, ClassVar, Dict, List, Optional, Tuple
 
 import pandas as pd
 import pyreadstat
@@ -21,11 +21,15 @@ router = APIRouter(tags=["datasets"])
 
 
 class StatsVariable(BaseModel):
+    """A variable for which statistics are to be calculated."""
+
     variable: str
     split_variable: Optional[str] = None
 
 
 class StatsRequest(BaseModel):
+    """Request model for dataset statistics."""
+
     variables: List[StatsVariable]
     # Keep global split_variable for backward compatibility
     split_variable: Optional[str] = None
@@ -34,9 +38,7 @@ class StatsRequest(BaseModel):
 
 
 async def _get_dataset_by_id(db: AsyncSession, dataset_id: str) -> Optional[Dataset]:
-    """
-    Fetches a dataset from the database by its ID.
-    """
+    """Fetches a dataset from the database by its ID."""
     try:
         result = await db.execute(select(Dataset).filter(Dataset.id == dataset_id))
         return result.scalar_one_or_none()
@@ -46,14 +48,16 @@ async def _get_dataset_by_id(db: AsyncSession, dataset_id: str) -> Optional[Data
 
 
 async def _get_dataset_variable_by_name(
-    db: AsyncSession, dataset_id: str, variable_name: str
+    db: AsyncSession,
+    dataset_id: str,
+    variable_name: str,
 ) -> Optional[DatasetVariable]:
     try:
         result = await db.execute(
             select(DatasetVariable).filter(
                 DatasetVariable.dataset_id == dataset_id,
                 DatasetVariable.name == variable_name,
-            )
+            ),
         )
         return result.scalar_one_or_none()
     except ValueError:
@@ -67,9 +71,7 @@ async def get_dataset(
     db: AsyncSession = Depends(get_db_session),
     api_key: str = Security(get_api_key),
 ) -> DatasetResponse:
-    """
-    Retrieves a dataset by its ID.
-    """
+    """Retrieves a dataset by its ID."""
     dataset = await _get_dataset_by_id(db, dataset_id)
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
@@ -78,6 +80,8 @@ async def get_dataset(
 
 
 class MetadataResponse(BaseModel):
+    """Response model for dataset metadata."""
+
     status: str
     message: str
     dataset_id: str
@@ -85,7 +89,7 @@ class MetadataResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = {}
 
     class Config:
-        json_encoders = {
+        json_encoders: ClassVar[Dict[str, Any]] = {
             # Handle numpy types that might be in the metadata
             "int64": int,
             "float64": float,
@@ -108,12 +112,16 @@ def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         try:
             # Download file from S3 to a temporary file
             s3_client.download_file(
-                Bucket=settings.s3_bucket_name, Key=s3_key, Filename=temp_file.name
+                Bucket=settings.s3_bucket_name,
+                Key=s3_key,
+                Filename=temp_file.name,
             )
 
             # Read the SAV file
             df, meta = pyreadstat.read_sav(
-                temp_file.name, metadataonly=True, user_missing=True
+                temp_file.name,
+                metadataonly=True,
+                user_missing=True,
             )
 
             # Convert to dict for JSON serialization
@@ -132,21 +140,21 @@ def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Error reading SAV file: {str(e)}",
-            )
+                detail=f"Error reading SAV file: {e!s}",
+            ) from e
 
 
 def _read_dataframe_from_s3(s3_key: str) -> pd.DataFrame:
-    """
-    Read SAV file from S3 and return a pandas DataFrame.
-    """
+    """Read SAV file from S3 and return a pandas DataFrame."""
     s3_client = S3Client.get_client()
 
     with tempfile.NamedTemporaryFile(suffix=".sav") as temp_file:
         try:
             # Download file from S3 to a temporary file
             s3_client.download_file(
-                Bucket=settings.s3_bucket_name, Key=s3_key, Filename=temp_file.name
+                Bucket=settings.s3_bucket_name,
+                Key=s3_key,
+                Filename=temp_file.name,
             )
 
             # Read the SAV file
@@ -158,8 +166,8 @@ def _read_dataframe_from_s3(s3_key: str) -> pd.DataFrame:
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Error reading SAV file: {str(e)}",
-            )
+                detail=f"Error reading SAV file: {e!s}",
+            ) from e
 
 
 @router.get("/datasets/{dataset_id}/metadata", response_model=MetadataResponse)
@@ -200,8 +208,8 @@ async def get_dataset_metadata(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error importing dataset: {str(e)}",
-        )
+            detail=f"Error importing dataset: {e!s}",
+        ) from e
 
 
 @router.post("/datasets/{dataset_id}/stats")
@@ -211,9 +219,7 @@ async def get_dataset_stats(
     db: AsyncSession = Depends(get_db_session),
     api_key: str = Security(get_api_key),
 ) -> List[Dict[str, Any]]:
-    """
-    Calculate statistics for a list of variables in a dataset.
-    """
+    """Calculate statistics for a list of variables in a dataset."""
     dataset = await _get_dataset_by_id(db, dataset_id)
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
@@ -228,45 +234,55 @@ async def get_dataset_stats(
         df = _read_dataframe_from_s3(str(dataset.s3_key))
         stats_service = StatisticsService()
         results = []
-        
+
         for var_request in stats_request.variables:
             try:
                 dataset_variable = await _get_dataset_variable_by_name(
-                    db, dataset_id, var_request.variable
+                    db,
+                    dataset_id,
+                    var_request.variable,
                 )
                 if not dataset_variable:
                     raise ValueError(f"Variable {var_request.variable} not found")
-                
+
                 # Use per-variable split_variable if provided, otherwise fall back to global
                 split_var = var_request.split_variable or stats_request.split_variable
-                
+
                 # Get split variable value labels if split variable is provided
                 split_variable_value_labels: dict[str, str] | None = None
                 split_variable_missing_values: list[str | int | float] | None = None
+                split_variable_missing_ranges: Optional[List[Dict[str, float]]] = None
                 if split_var:
                     split_variable_obj = await _get_dataset_variable_by_name(
-                        db, dataset_id, split_var
+                        db,
+                        dataset_id,
+                        split_var,
                     )
                     if not split_variable_obj:
                         raise ValueError(f"Split variable {split_var} not found")
                     # Cast JSONB to dict
                     value_labels_raw = split_variable_obj.value_labels
                     if isinstance(value_labels_raw, dict):
-                        split_variable_value_labels = {str(k): str(v) for k, v in value_labels_raw.items()}
+                        split_variable_value_labels = {
+                            str(k): str(v) for k, v in value_labels_raw.items()
+                        }
                     else:
                         split_variable_value_labels = None
-                    
+
                     # Get missing values for split variable
                     split_variable_missing_values = split_variable_obj.missing_values  # type: ignore
-                
+                    split_variable_missing_ranges = split_variable_obj.missing_ranges  # type: ignore
+
                 stats = stats_service.describe_var(
                     df,
                     var_request.variable,
                     missing_values=dataset_variable.missing_values,  # type: ignore
+                    missing_ranges=dataset_variable.missing_ranges,  # type: ignore
                     value_labels=dataset_variable.value_labels,  # type: ignore
                     split_variable=split_var,
                     split_variable_value_labels=split_variable_value_labels,
                     split_variable_missing_values=split_variable_missing_values,
+                    split_variable_missing_ranges=split_variable_missing_ranges,
                     decimal_places=stats_request.decimal_places,
                 )
                 results.append({"variable": var_request.variable, "stats": stats})
@@ -280,5 +296,5 @@ async def get_dataset_stats(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error processing dataset statistics: {str(e)}",
-        )
+            detail=f"Error processing dataset statistics: {e!s}",
+        ) from e

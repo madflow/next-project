@@ -42,7 +42,6 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
       id: datasetVariable.id,
       label: datasetVariable.label,
       missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
-      missingRanges: datasetVariable.missingRanges ?? null,
     },
   });
 
@@ -113,7 +112,6 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                 </FormItem>
               )}
             />
-
             <FormItem>
               <FormLabel>{t("editVariable.form.type.label")}</FormLabel>
               <Input value={datasetVariable.type} disabled />
@@ -130,10 +128,11 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
               type="button"
               variant="outline"
               onClick={() => router.push(`/admin/datasets/${datasetVariable.datasetId}/editor`)}
+              className="cursor-pointer"
               disabled={isLoading}>
               {t("common.cancel")}
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="cursor-pointer">
               {isLoading ? t("common.saving") : t("common.saveChanges")}
             </Button>
           </div>

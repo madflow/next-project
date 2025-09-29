@@ -38,13 +38,13 @@ class Settings(BaseSettings):
     # Current environment
     environment: str = "dev"
 
-    log_level: LogLevel = LogLevel.INFO
+    log_level: LogLevel = LogLevel.DEBUG
     # Variables for the database
     db_host: str = "localhost"
     db_port: int = 5432
     db_user: str = "analysis"
-    db_pass: str = "analysis"
-    db_base: str = "admin"
+    db_pass: str = ""
+    db_base: str = ""
     db_echo: bool = False
 
     @property
