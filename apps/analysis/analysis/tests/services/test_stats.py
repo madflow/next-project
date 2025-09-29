@@ -751,3 +751,231 @@ def test_decimal_places_with_split_variable(stats_service):
                 if "." in percentage_str:
                     decimal_places_count = len(percentage_str.split(".")[-1])
                     assert decimal_places_count <= 1
+
+
+def test_missing_ranges_basic(stats_service):
+    """Test that missing ranges are applied correctly to exclude values from statistics."""
+    df = pd.DataFrame({
+        "test_var": [1, 2, 3, 97, 98, 99, 100]
+    })
+    
+    missing_ranges = [
+        {"lo": 97, "hi": 99}  # Should exclude 97, 98, 99
+    ]
+    
+    stats = stats_service.describe_var(df, "test_var", missing_ranges=missing_ranges)
+    
+    # Should only count non-missing values: 1, 2, 3, 100
+    assert stats["count"] == 4
+    assert stats["min"] == 1.0
+    assert stats["max"] == 100.0
+    assert stats["mean"] == 26.5  # (1+2+3+100)/4
+
+
+def test_missing_ranges_frequency_table(stats_service):
+    """Test that missing ranges are excluded from frequency tables."""
+    df = pd.DataFrame({
+        "test_var": [1, 2, 97, 98, 99, 100]
+    })
+    
+    missing_ranges = [
+        {"lo": 97, "hi": 97},
+        {"lo": 98, "hi": 98}, 
+        {"lo": 99, "hi": 99}
+    ]
+    
+    stats = stats_service.describe_var(df, "test_var", missing_ranges=missing_ranges)
+    
+    # Check frequency table doesn't include 97, 98, 99
+    freq_table = stats["frequency_table"]
+    values_in_freq = [item["value"] for item in freq_table]
+    
+    assert "97.0" not in values_in_freq
+    assert "98.0" not in values_in_freq
+    assert "99.0" not in values_in_freq
+    assert "1.0" in values_in_freq
+    assert "2.0" in values_in_freq
+    assert "100.0" in values_in_freq
+
+
+def test_missing_ranges_with_value_labels(stats_service):
+    """Test that missing ranges work correctly with value labels."""
+    df = pd.DataFrame({
+        "test_var": [1, 2, 97, 98, 99, 100]
+    })
+    
+    value_labels = {
+        "1": "One",
+        "2": "Two", 
+        "97": "Don't know",
+        "98": "Refused",
+        "99": "Not applicable",
+        "100": "One hundred"
+    }
+    
+    missing_ranges = [
+        {"lo": 97, "hi": 99}
+    ]
+    
+    stats = stats_service.describe_var(
+        df, 
+        "test_var", 
+        missing_ranges=missing_ranges,
+        value_labels=value_labels
+    )
+    
+    # Check frequency table excludes missing range values even when they have labels
+    freq_table = stats["frequency_table"]
+    values_in_freq = [item["value"] for item in freq_table]
+    
+    assert "97" not in values_in_freq
+    assert "98" not in values_in_freq
+    assert "99" not in values_in_freq
+    assert "1" in values_in_freq
+    assert "2" in values_in_freq
+    assert "100" in values_in_freq
+
+
+def test_missing_ranges_with_split_variable(stats_service):
+    """Test that missing ranges work with split variables."""
+    df = pd.DataFrame({
+        "main_var": [1, 2, 97, 98, 1, 2, 99],
+        "split_var": ["A", "A", "A", "B", "B", "B", "B"]
+    })
+    
+    missing_ranges = [
+        {"lo": 97, "hi": 99}
+    ]
+    
+    stats = stats_service.describe_var(
+        df, 
+        "main_var", 
+        missing_ranges=missing_ranges,
+        split_variable="split_var"
+    )
+    
+    # Check that missing range values are excluded from each split category
+    categories = stats["categories"]
+    
+    # Category A should only have values 1, 2 (97 excluded)
+    freq_table_a = categories["A"]["frequency_table"]
+    values_a = [item["value"] for item in freq_table_a]
+    assert "97.0" not in values_a
+    assert "1.0" in values_a
+    assert "2.0" in values_a
+    
+    # Category B should only have values 1, 2 (98, 99 excluded)
+    freq_table_b = categories["B"]["frequency_table"] 
+    values_b = [item["value"] for item in freq_table_b]
+    assert "98.0" not in values_b
+    assert "99.0" not in values_b
+    assert "1.0" in values_b
+    assert "2.0" in values_b
+
+
+def test_split_variable_missing_ranges(stats_service):
+    """Test that missing ranges work for split variables themselves."""
+    df = pd.DataFrame({
+        "main_var": [1, 2, 3, 4, 5, 6],
+        "split_var": [1, 2, 97, 98, 99, 3]  # 97, 98, 99 should be excluded from split
+    })
+    
+    split_variable_missing_ranges = [
+        {"lo": 97, "hi": 99}
+    ]
+    
+    stats = stats_service.describe_var(
+        df, 
+        "main_var", 
+        split_variable="split_var",
+        split_variable_missing_ranges=split_variable_missing_ranges
+    )
+    
+    # Should only have categories 1, 2, 3 (97, 98, 99 excluded)
+    categories = stats["categories"]
+    assert "1.0" in categories  # Values are converted to float strings
+    assert "2.0" in categories 
+    assert "3.0" in categories
+    assert "97.0" not in categories
+    assert "98.0" not in categories
+    assert "99.0" not in categories
+
+
+def test_missing_ranges_combined_with_missing_values(stats_service):
+    """Test that missing ranges work together with missing values."""
+    df = pd.DataFrame({
+        "test_var": [1, 2, 96, 97, 98, 99, 100]
+    })
+    
+    missing_values = [96]  # Explicit missing value
+    missing_ranges = [
+        {"lo": 97, "hi": 99}  # Range of missing values
+    ]
+    
+    stats = stats_service.describe_var(
+        df, 
+        "test_var", 
+        missing_values=missing_values,
+        missing_ranges=missing_ranges
+    )
+    
+    # Should only count: 1, 2, 100 (96, 97, 98, 99 excluded)
+    assert stats["count"] == 3
+    
+    # Check frequency table
+    freq_table = stats["frequency_table"]
+    values_in_freq = [item["value"] for item in freq_table]
+    
+    assert "96.0" not in values_in_freq  # excluded by missing_values
+    assert "97.0" not in values_in_freq  # excluded by missing_ranges
+    assert "98.0" not in values_in_freq  # excluded by missing_ranges
+    assert "99.0" not in values_in_freq  # excluded by missing_ranges
+    assert "1.0" in values_in_freq
+    assert "2.0" in values_in_freq
+    assert "100.0" in values_in_freq
+
+
+def test_get_missing_ranges_values_helper(stats_service):
+    """Test the helper method that converts missing ranges to excluded values."""
+    missing_ranges = [
+        {"lo": 97, "hi": 97},
+        {"lo": 98, "hi": 98},
+        {"lo": 99, "hi": 99}
+    ]
+    
+    excluded_values = stats_service._get_missing_ranges_values(missing_ranges)
+    
+    # Should include various string representations of 97, 98, 99
+    assert "97" in excluded_values
+    assert "97.0" in excluded_values
+    assert "98" in excluded_values
+    assert "98.0" in excluded_values
+    assert "99" in excluded_values
+    assert "99.0" in excluded_values
+
+
+def test_missing_ranges_empty_or_none(stats_service):
+    """Test that empty or None missing ranges don't affect results."""
+    df = pd.DataFrame({
+        "test_var": [1, 2, 97, 98, 99]
+    })
+    
+    # Test with None
+    stats_none = stats_service.describe_var(df, "test_var", missing_ranges=None)
+    
+    # Test with empty list
+    stats_empty = stats_service.describe_var(df, "test_var", missing_ranges=[])
+    
+    # Both should include all values
+    assert stats_none["count"] == 5
+    assert stats_empty["count"] == 5
+    
+    freq_none = [item["value"] for item in stats_none["frequency_table"]]
+    freq_empty = [item["value"] for item in stats_empty["frequency_table"]]
+    
+    assert "97.0" in freq_none
+    assert "98.0" in freq_none
+    assert "99.0" in freq_none
+    assert "97.0" in freq_empty
+    assert "98.0" in freq_empty
+    assert "99.0" in freq_empty
