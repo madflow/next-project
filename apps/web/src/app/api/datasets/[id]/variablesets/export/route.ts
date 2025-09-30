@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { assertAccess, find } from "@/dal/dataset";
 import { exportVariableSets } from "@/dal/dataset-variableset-export";
 import { raiseExceptionResponse } from "@/lib/exception";
+import { assertUserIsAdmin } from "@/lib/dal";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
   }
 
   try {
+    // Ensure only admin users can export variable sets
+    await assertUserIsAdmin();
     await assertAccess(id);
     const dataset = await find(id);
 
