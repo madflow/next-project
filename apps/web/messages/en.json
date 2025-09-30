@@ -399,6 +399,37 @@
       "moveSet": "Move Set",
       "rootLevel": "Root Level",
       "variableCount": "{count, plural, =0 {no variables} =1 {1 variable} other {# variables}}"
+    },
+    "exportImport": {
+      "export": "Export",
+      "exporting": "Exporting...",
+      "import": "Import",
+      "importDialog": {
+        "title": "Import Variable Sets",
+        "description": "Import variable sets from a JSON file. You can choose how to handle conflicts with existing variable sets.",
+        "selectFile": "Select File",
+        "conflictResolution": "Conflict Resolution",
+        "conflictOptions": {
+          "skip": "Skip existing sets",
+          "overwrite": "Overwrite existing sets", 
+          "rename": "Rename imported sets"
+        },
+        "cancel": "Cancel",
+        "importing": "Processing import...",
+        "importCompleted": "Import completed successfully",
+        "importFailed": "Import failed",
+        "summary": {
+          "totalSets": "Total Sets:",
+          "created": "Created:",
+          "updated": "Updated:",
+          "skipped": "Skipped:", 
+          "failed": "Failed:"
+        },
+        "warnings": "Warnings:",
+        "errors": "Errors:",
+        "importAnother": "Import Another",
+        "close": "Close"
+      }
     }
   },
   "adminSidebar": {
