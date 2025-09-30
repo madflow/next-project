@@ -1,4 +1,4 @@
-.PHONY: help dev build start lint migrate check-types format docker-up docker-down docker-ps docker-logs init shell psql
+.PHONY: help dev build start lint migrate check-types format docker-up docker-down docker-ps docker-logs init shell psql dump-in dump-out prod-dump-in prod-dump-out
 
 ## Show this help message
 help:
@@ -65,6 +65,46 @@ shell:
 ## Run psql inside the postgres container
 psql:
 	docker-compose exec postgres psql -U postgres postgres
+
+## Export database dump to file. Usage: make dump-out FILE=backup.sql
+dump-out:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Error: FILE parameter is required. Usage: make dump-out FILE=backup.sql"; \
+		exit 1; \
+	fi
+	docker-compose exec -T postgres pg_dump -U postgres -d postgres > $(FILE)
+
+## Import database dump from file. Usage: make dump-in FILE=backup.sql
+dump-in:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Error: FILE parameter is required. Usage: make dump-in FILE=backup.sql"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(FILE)" ]; then \
+		echo "Error: File $(FILE) does not exist"; \
+		exit 1; \
+	fi
+	docker-compose exec -T postgres psql -U postgres -d postgres < $(FILE)
+
+## Export database dump to file (production). Usage: make prod-dump-out FILE=backup.sql
+prod-dump-out:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Error: FILE parameter is required. Usage: make prod-dump-out FILE=backup.sql"; \
+		exit 1; \
+	fi
+	docker-compose -f docker-compose.prod.yml exec -T postgres pg_dump -U $${POSTGRES_USER} -d $${POSTGRES_DB} > $(FILE)
+
+## Import database dump from file (production). Usage: make prod-dump-in FILE=backup.sql
+prod-dump-in:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Error: FILE parameter is required. Usage: make prod-dump-in FILE=backup.sql"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(FILE)" ]; then \
+		echo "Error: File $(FILE) does not exist"; \
+		exit 1; \
+	fi
+	docker-compose -f docker-compose.prod.yml exec -T postgres psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} < $(FILE)
 
 ## Seed 
 seed:
