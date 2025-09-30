@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariable } from "@/types/dataset-variable";
 
@@ -92,7 +91,8 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
   };
 
   return (
-    <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-3">
+    <div className="w-3/4">
+      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
       {/* Available Variables */}
       <Card className="rounded-md shadow-xs lg:col-span-1">
         <CardHeader className="pb-3">
@@ -107,7 +107,6 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
             />
           </div>
         </CardHeader>
-        <Separator />
         <CardContent className="p-0">
           <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.available.section">
             {isLoadingAvailable ? (
@@ -150,7 +149,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
       </Card>
 
       {/* Assigned Split Variables */}
-      <Card className="rounded-md shadow-xs lg:col-span-2">
+      <Card className="rounded-md shadow-xs lg:col-span-1">
         <CardHeader className="pb-3">
           <CardTitle>{t("assignment.assigned")}</CardTitle>
           <div className="relative">
@@ -163,7 +162,6 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
             />
           </div>
         </CardHeader>
-        <Separator />
         <CardContent className="p-0">
           <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.assigned.section">
             {isLoadingAssigned ? (
@@ -204,6 +202,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
           </ScrollArea>
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 }
