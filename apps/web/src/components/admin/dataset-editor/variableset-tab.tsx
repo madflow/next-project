@@ -10,6 +10,7 @@ import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-va
 import { VariableAssignment } from "../dataset-variableset/variable-assignment";
 import { VariablesetForm } from "../dataset-variableset/variableset-form";
 import { VariablesetTree } from "../dataset-variableset/variableset-tree";
+import { ExportImportActions } from "../dataset-variableset/export-import-actions";
 
 interface VariablesetTabProps {
   datasetId: string;
@@ -84,9 +85,12 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
             <CardTitle>{t("editTitle")}</CardTitle>
             <CardDescription>{t("editDescription")}</CardDescription>
             <CardAction>
-              <Button onClick={handleCreateSet} data-testid="admin.dataset.variableset.create" className="cursor-pointer">
-                {t("createSet")}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button onClick={handleCreateSet} data-testid="admin.dataset.variableset.create" className="cursor-pointer">
+                  {t("createSet")}
+                </Button>
+                <ExportImportActions datasetId={datasetId} onImportSuccess={handleRefresh} />
+              </div>
             </CardAction>
           </CardHeader>
           <CardContent className="p-4">

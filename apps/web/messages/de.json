@@ -399,6 +399,37 @@
       "moveSet": "Set verschieben",
       "rootLevel": "Hauptebene",
       "variableCount": "{count, plural, =0 {keine Variablen} =1 {1 Variable} other {# Variablen}}"
+    },
+    "exportImport": {
+      "export": "Exportieren",
+      "exporting": "Wird exportiert...",
+      "import": "Importieren",
+      "importDialog": {
+        "title": "Variablen-Sets importieren",
+        "description": "Importieren Sie Variablen-Sets aus einer JSON-Datei. Sie können wählen, wie Konflikte mit bestehenden Variablen-Sets behandelt werden sollen.",
+        "selectFile": "Datei auswählen",
+        "conflictResolution": "Konfliktlösung",
+        "conflictOptions": {
+          "skip": "Bestehende Sets überspringen",
+          "overwrite": "Bestehende Sets überschreiben",
+          "rename": "Importierte Sets umbenennen"
+        },
+        "cancel": "Abbrechen",
+        "importing": "Import wird verarbeitet...",
+        "importCompleted": "Import erfolgreich abgeschlossen",
+        "importFailed": "Import fehlgeschlagen",
+        "summary": {
+          "totalSets": "Sets insgesamt:",
+          "created": "Erstellt:",
+          "updated": "Aktualisiert:",
+          "skipped": "Übersprungen:",
+          "failed": "Fehlgeschlagen:"
+        },
+        "warnings": "Warnungen:",
+        "errors": "Fehler:",
+        "importAnother": "Weitere importieren",
+        "close": "Schließen"
+      }
     }
   },
   "adminSidebar": {
