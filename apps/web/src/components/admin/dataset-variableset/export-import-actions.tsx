@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Upload, CheckCircle, XCircle } from "lucide-react";
+import { Download, Upload, CheckCircle, XCircle, EllipsisVertical } from "lucide-react";
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,13 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -136,25 +141,38 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
   };
 
   return (
-    <div className="flex gap-2">
-      <Button
-        onClick={handleExport}
-        disabled={isExporting}
-        variant="outline"
-        size="sm"
-        className="flex items-center gap-2"
-      >
-        <Download className="h-4 w-4" />
-        {isExporting ? t("exporting") : t("export")}
-      </Button>
-
-      <Dialog open={importOpen} onOpenChange={handleImportDialogClose}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+          >
+            <EllipsisVertical className="h-4 w-4" />
+            <span className="sr-only">{"Open menu"}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onClick={handleExport}
+            disabled={isExporting}
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            {isExporting ? t("exporting") : t("export")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setImportOpen(true)}
+            className="flex items-center gap-2"
+          >
             <Upload className="h-4 w-4" />
             {t("import")}
-          </Button>
-        </DialogTrigger>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={importOpen} onOpenChange={handleImportDialogClose}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{t("importDialog.title")}</DialogTitle>
@@ -288,6 +306,6 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
