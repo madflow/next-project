@@ -7,144 +7,144 @@ env:
   NEXT_PUBLIC_SITE_NAME: app
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 jobs:
   build-run-test:
     services:
-          mailpit:
-            image: axllent/mailpit
-            ports:
-              - 1025:1025
-              - 8025:8025
-          postgres:
-            image: postgres:17-alpine
-            env:
-              POSTGRES_DB: postgres
-              POSTGRES_USER: postgres
-              POSTGRES_PASSWORD: postgres
-            ports:
-              - 5432:5432
-            options: >-
-              --health-cmd="pg_isready -U postgres"
-              --health-interval=10s
-              --health-timeout=5s
-              --health-retries=5
+      mailpit:
+        image: axllent/mailpit
+        ports:
+          - 1025:1025
+          - 8025:8025
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
-    
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 10.17.1
-    
-    - name: Cache pnpm modules
-      uses: actions/cache@v4
-      with:
-        path: ~/.pnpm-store
-        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-
-    
-    - name: Cache build artifacts
-      uses: actions/cache@v4
-      with:
-        path: |
-          .next/cache
-          apps/web/.next/cache
-        key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-        restore-keys: |
-          ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
-          ${{ runner.os }}-nextjs-
-    
-    - name: Cache Playwright browsers
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-playwright-
-    
-    - name: Cache Python dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cache/pip
-          apps/analysis/.venv
-        key: ${{ runner.os }}-python-${{ hashFiles('apps/analysis/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-python-
-    
-    - uses: actions/setup-node@v5
-      with:
-        node-version: lts/*
-        cache: 'pnpm'
-    - name: Start S3 service
-      run: |
-        docker compose -f docker-compose.actions.yml up -d
-        sleep 5
-        docker compose -f docker-compose.actions.yml logs
-    - name: Wait for S3 service to be ready
-      run: |
-        echo "Waiting for S3 service..."
-        timeout 10 bash -c 'until http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:7070) && [ "$http_code" -ge 200 ] && [ "$http_code" -lt 500 ]; do sleep 2; done'
-        echo "S3 service is ready!"
-    - name: Configure AWS CLI for local S3
-      run: |
-        pip install awscli
-        aws configure set aws_access_key_id s3
-        aws configure set aws_secret_access_key s3
-        aws configure set default.region us-east-1
-    
-    - name: Create app bucket
-      run: |
-        export AWS_ENDPOINT_URL=http://localhost:7070
-        aws s3 mb s3://app --endpoint-url $AWS_ENDPOINT_URL
-        echo "Bucket 'app' created successfully"
-    - name: Copy .env.dist
-      run: cp ./apps/web/.env.dist ./apps/web/.env && cp ./packages/database/.env.dist ./packages/database/.env && cp ./apps/analysis/.env.dist ./apps/analysis/.env
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-    - name: Install Python deps 
-      run: | 
+      - uses: actions/checkout@v5
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+            apps/web/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-nextjs-
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            apps/analysis/.venv
+          key: ${{ runner.os }}-python-${{ hashFiles('apps/analysis/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+          cache: "pnpm"
+      - name: Start S3 service
+        run: |
+          docker compose -f docker-compose.actions.yml up -d
+          sleep 5
+          docker compose -f docker-compose.actions.yml logs
+      - name: Wait for S3 service to be ready
+        run: |
+          echo "Waiting for S3 service..."
+          timeout 10 bash -c 'until http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:7070) && [ "$http_code" -ge 200 ] && [ "$http_code" -lt 500 ]; do sleep 2; done'
+          echo "S3 service is ready!"
+      - name: Configure AWS CLI for local S3
+        run: |
+          pip install awscli
+          aws configure set aws_access_key_id s3
+          aws configure set aws_secret_access_key s3
+          aws configure set default.region us-east-1
+
+      - name: Create app bucket
+        run: |
+          export AWS_ENDPOINT_URL=http://localhost:7070
+          aws s3 mb s3://app --endpoint-url $AWS_ENDPOINT_URL
+          echo "Bucket 'app' created successfully"
+      - name: Copy .env.dist
+        run: cp ./apps/web/.env.dist ./apps/web/.env && cp ./packages/database/.env.dist ./packages/database/.env && cp ./apps/analysis/.env.dist ./apps/analysis/.env
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Python deps
+        run: |
           curl -sSL https://install.python-poetry.org | python3 -
           cd apps/analysis 
           python3 -m venv .venv
           source .venv/bin/activate
           poetry install
-      shell: bash
-    - name: Install e2e dependencies
-      run: pnpm run e2e:deps
-    - name: Build
-      run: pnpm run build
-    - name: Migrate 
-      run: pnpm run db:migrate
-    - name: Run App
-      run: |
-        pnpm run start | tee app.log 2>&1 &
-        sleep 10  # Optional: gives some buffer for the app to start
-        for attempt in {1..10}; do
-          if [ $(curl -o /dev/null -s -w "%{http_code}" http://localhost:3000/api/health) -eq 200 ]; then
-            echo "Application is ready."
-            break
-          fi
-          if [ $attempt -eq 10 ]; then
-            echo "Application failed to start in time."
-            exit 1
-          fi
-          echo "Still waiting for the application to be ready..."
-          sleep 10
-        done
-    - name: Seed 
-      run: pnpm run seed
-    - name: Run Playwright tests
-      run:  pnpm run e2e
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-test-results
-        path: ./packages/e2e-web/test-results
-        retention-days: 30
+        shell: bash
+      - name: Install e2e dependencies
+        run: pnpm run e2e:deps
+      - name: Build
+        run: pnpm run build
+      - name: Migrate
+        run: pnpm run db:migrate
+      - name: Run App
+        run: |
+          pnpm run start | tee app.log 2>&1 &
+          sleep 10  # Optional: gives some buffer for the app to start
+          for attempt in {1..10}; do
+            if [ $(curl -o /dev/null -s -w "%{http_code}" http://localhost:3000/api/health) -eq 200 ]; then
+              echo "Application is ready."
+              break
+            fi
+            if [ $attempt -eq 10 ]; then
+              echo "Application failed to start in time."
+              exit 1
+            fi
+            echo "Still waiting for the application to be ready..."
+            sleep 10
+          done
+      - name: Seed
+        run: pnpm run seed
+      - name: Run Playwright tests
+        run: pnpm run e2e
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-test-results
+          path: ./packages/e2e-web/test-results
+          retention-days: 30

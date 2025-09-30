@@ -21,7 +21,9 @@ import { organization } from "./auth.js";
 export const project = pgTable(
   "projects",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     name: text("name").notNull(),
     slug: text("slug").unique().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
@@ -46,7 +48,9 @@ export type Project = z.infer<typeof selectProjectSchema>;
 export type UpdateProjectData = z.infer<typeof updateProjectSchema>;
 
 export const dataset = pgTable("datasets", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuidv7()`),
   name: text("name").notNull(),
   description: text("description"),
   filename: text("filename").notNull(), // Original filename
@@ -115,7 +119,9 @@ export const measureEnum = pgEnum("dataset_variable_measure", ["nominal", "ordin
 export const datasetVariable = pgTable(
   "dataset_variables",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     name: varchar("name", { length: 64 }).notNull(),
     label: text("label"),
     type: typeEnum().notNull(),
@@ -145,7 +151,9 @@ export type UpdateDatasetVariableData = z.infer<typeof updateDatasetVariableSche
 export const datasetProject = pgTable(
   "dataset_projects",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     projectId: uuid("project_id")
       .notNull()
       .references(() => project.id, { onDelete: "cascade" }),
@@ -167,7 +175,9 @@ export type UpdateDatasetProjectData = z.infer<typeof updateDatasetProjectSchema
 export const datasetVariableset = pgTable(
   "dataset_variablesets",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     name: text("name").notNull(),
     description: text("description"),
     parentId: uuid("parent_id").references((): AnyPgColumn => datasetVariableset.id, {
@@ -198,7 +208,9 @@ export type UpdateDatasetVariablesetData = z.infer<typeof updateDatasetVariables
 export const datasetVariablesetItem = pgTable(
   "dataset_variableset_items",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     variablesetId: uuid("variableset_id")
       .notNull()
       .references(() => datasetVariableset.id, { onDelete: "cascade" }),
@@ -223,7 +235,9 @@ export type DatasetVariablesetItem = z.infer<typeof selectDatasetVariablesetItem
 export const datasetSplitVariable = pgTable(
   "dataset_splitvariables",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     datasetId: uuid("dataset_id")
       .notNull()
       .references(() => dataset.id, { onDelete: "cascade" }),

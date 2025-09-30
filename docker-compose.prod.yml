@@ -98,7 +98,7 @@ services:
   # https://hub.docker.com/_/postgres/
   postgres:
     restart: unless-stopped
-    image: "postgres:17-alpine"
+    image: "postgres:18-alpine"
     command: "postgres -c log_statement=all"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
