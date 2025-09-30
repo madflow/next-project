@@ -851,7 +851,64 @@
     "title": "{name} members"
   },
   "pageLanding": {
-    "title": "Global landing page"
+    "title": "Dashboard",
+    "welcome": "Welcome to your workspace",
+    "contextSelection": {
+      "title": "Current Context",
+      "selectOrganization": "Select Organization",
+      "selectProject": "Select Project",
+      "noOrganization": "No organization selected",
+      "noProject": "No project selected"
+    },
+    "shortcuts": {
+      "title": "Quick Actions",
+      "createProject": "Create New Project",
+      "createProjectDescription": "Start a new project in your organization",
+      "adminPanel": "Admin Panel",
+      "adminPanelDescription": "Manage users, projects, and settings",
+      "uploadDataset": "Upload Dataset",
+      "uploadDatasetDescription": "Add data files to your projects",
+      "viewProjects": "View All Projects",
+      "viewProjectsDescription": "Browse and manage your projects"
+    },
+    "capabilities": {
+      "title": "What You Can Do",
+      "dataAnalysis": {
+        "title": "Data Analysis",
+        "description": "Upload datasets and perform statistical analysis with powerful visualization tools"
+      },
+      "projectManagement": {
+        "title": "Project Management",
+        "description": "Organize your work into projects and collaborate with your team"
+      },
+      "teamCollaboration": {
+        "title": "Team Collaboration",
+        "description": "Invite members to your organization and work together on projects"
+      },
+      "visualization": {
+        "title": "Data Visualization",
+        "description": "Create interactive charts and export results in various formats"
+      }
+    },
+    "gettingStarted": {
+      "title": "Getting Started",
+      "noProjects": {
+        "title": "Create Your First Project",
+        "description": "Projects help you organize your data analysis work. Start by creating your first project.",
+        "action": "Create Project"
+      },
+      "noMembers": {
+        "title": "Invite Team Members",
+        "description": "Collaborate with your team by inviting members to your organization.",
+        "action": "Invite Members"
+      }
+    },
+    "overview": {
+      "title": "Overview",
+      "projectsCount": "{count, plural, =0 {No projects} =1 {1 project} other {# projects}}",
+      "membersCount": "{count, plural, =0 {No members} =1 {1 member} other {# members}}",
+      "datasetsCount": "{count, plural, =0 {No datasets} =1 {1 dataset} other {# datasets}}"
+    }
   },
   "pageProjectAdhoc": {
     "title": "Ad Hoc Analysis"

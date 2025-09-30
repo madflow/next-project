@@ -851,7 +851,64 @@
     "title": "Mitglieder von {name}"
   },
   "pageLanding": {
-    "title": "Globale Startseite"
+    "title": "Dashboard",
+    "welcome": "Willkommen in Ihrem Arbeitsbereich",
+    "contextSelection": {
+      "title": "Aktueller Kontext",
+      "selectOrganization": "Organisation auswählen",
+      "selectProject": "Projekt auswählen",
+      "noOrganization": "Keine Organisation ausgewählt",
+      "noProject": "Kein Projekt ausgewählt"
+    },
+    "shortcuts": {
+      "title": "Schnellzugriff",
+      "createProject": "Neues Projekt erstellen",
+      "createProjectDescription": "Ein neues Projekt in Ihrer Organisation starten",
+      "adminPanel": "Admin-Panel",
+      "adminPanelDescription": "Benutzer, Projekte und Einstellungen verwalten",
+      "uploadDataset": "Datensatz hochladen",
+      "uploadDatasetDescription": "Datendateien zu Ihren Projekten hinzufügen",
+      "viewProjects": "Alle Projekte anzeigen",
+      "viewProjectsDescription": "Ihre Projekte durchsuchen und verwalten"
+    },
+    "capabilities": {
+      "title": "Was Sie tun können",
+      "dataAnalysis": {
+        "title": "Datenanalyse",
+        "description": "Laden Sie Datensätze hoch und führen Sie statistische Analysen mit leistungsstarken Visualisierungstools durch"
+      },
+      "projectManagement": {
+        "title": "Projektmanagement",
+        "description": "Organisieren Sie Ihre Arbeit in Projekten und arbeiten Sie mit Ihrem Team zusammen"
+      },
+      "teamCollaboration": {
+        "title": "Teamzusammenarbeit",
+        "description": "Laden Sie Mitglieder in Ihre Organisation ein und arbeiten Sie gemeinsam an Projekten"
+      },
+      "visualization": {
+        "title": "Datenvisualisierung",
+        "description": "Erstellen Sie interaktive Diagramme und exportieren Sie Ergebnisse in verschiedenen Formaten"
+      }
+    },
+    "gettingStarted": {
+      "title": "Erste Schritte",
+      "noProjects": {
+        "title": "Ihr erstes Projekt erstellen",
+        "description": "Projekte helfen Ihnen dabei, Ihre Datenanalysearbeit zu organisieren. Beginnen Sie mit der Erstellung Ihres ersten Projekts.",
+        "action": "Projekt erstellen"
+      },
+      "noMembers": {
+        "title": "Teammitglieder einladen",
+        "description": "Arbeiten Sie mit Ihrem Team zusammen, indem Sie Mitglieder in Ihre Organisation einladen.",
+        "action": "Mitglieder einladen"
+      }
+    },
+    "overview": {
+      "title": "Übersicht",
+      "projectsCount": "{count, plural, =0 {Keine Projekte} =1 {1 Projekt} other {# Projekte}}",
+      "membersCount": "{count, plural, =0 {Keine Mitglieder} =1 {1 Mitglied} other {# Mitglieder}}",
+      "datasetsCount": "{count, plural, =0 {Keine Datensätze} =1 {1 Datensatz} other {# Datensätze}}"
+    }
   },
   "pageProjectAdhoc": {
     "title": "Ad Hoc Analyse"
