@@ -28,7 +28,9 @@ export type OrganizationSettings = {
 export const user = pgTable(
   "users",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").notNull(),
@@ -45,7 +47,9 @@ export const user = pgTable(
 );
 
 export const session = pgTable("sessions", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuidv7()`),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
@@ -60,7 +64,9 @@ export const session = pgTable("sessions", {
 });
 
 export const account = pgTable("accounts", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuidv7()`),
   accountId: uuid("account_id").notNull(),
   providerId: text("provider_id").notNull(),
   userId: uuid("user_id")
@@ -80,7 +86,9 @@ export const account = pgTable("accounts", {
 export const organization = pgTable(
   "organizations",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     name: text("name").notNull(),
     slug: text("slug").unique().notNull(),
     logo: text("logo"),
@@ -100,7 +108,9 @@ export const organization = pgTable(
 export const member = pgTable(
   "members",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
     organizationId: uuid("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -114,7 +124,9 @@ export const member = pgTable(
 );
 
 export const invitation = pgTable("invitations", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuidv7()`),
   organizationId: uuid("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -128,7 +140,9 @@ export const invitation = pgTable("invitations", {
 });
 
 export const verification = pgTable("verifications", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuidv7()`),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
@@ -137,7 +151,9 @@ export const verification = pgTable("verifications", {
 });
 
 export const rateLimit = pgTable("rate_limits", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuidv7()`),
   key: text("key"),
   count: integer("count"),
   lastRequest: bigint("last_request", { mode: "number" }),

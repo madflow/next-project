@@ -1,4 +1,4 @@
-.PHONY: help dev build start lint migrate check-types format docker-up docker-down docker-ps docker-logs shell psql
+.PHONY: help dev build start lint migrate check-types format docker-up docker-down docker-ps docker-logs init shell psql
 
 ## Show this help message
 help:
@@ -80,4 +80,12 @@ check:
 	pnpm run check-translations
 	pnpm run check-types
 	pnpm run lint
+
+## Init 
+dev-init:
+				s3cmd --no-check-certificate -c .config/s3cfg.local mb s3://app
+				make migrate
+				make seed
+
+
 

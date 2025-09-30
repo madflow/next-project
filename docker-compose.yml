@@ -1,5 +1,4 @@
 services:
-
   app:
     build:
       context: .
@@ -16,7 +15,7 @@ services:
       - NEXT_PUBLIC_BASE_URL=http://localhost:3001
       - NEXT_PUBLIC_SITE_NAME='App'
       - NODE_ENV=production
-      - S3_ACCESS_KEY_ID=s3 
+      - S3_ACCESS_KEY_ID=s3
       - S3_BUCKET_NAME=app
       - S3_ENDPOINT=http://s3:7070
       - S3_REGION=us-east-1
@@ -57,26 +56,26 @@ services:
     build:
       context: ./apps/analysis
     environment:
-      -  ANALYSIS_DB_HOST=postgres
-      -  ANALYSIS_DB_PORT=5432
-      -  ANALYSIS_DB_USER=postgres
-      -  ANALYSIS_DB_PASS=postgres
-      -  ANALYSIS_DB_BASE=postgres
-      -  ANALYSIS_DB_ECHO=false
-      -  ANALYSIS_S3_REGION=us-east-1
-      -  ANALYSIS_S3_BUCKET_NAME=app
-      -  ANALYSIS_S3_ACCESS_KEY_ID=s3
-      -  ANALYSIS_S3_SECRET_ACCESS_KEY=s3
-      -  ANALYSIS_S3_ENDPOINT=http://s3:7070
-      -  ANALYSIS_API_KEY=secret
-      -  ANALYSIS_RELOAD=true
-      -  ANALYSIS_LOG_LEVEL=DEBUG
-      -  ANALYSIS_HOST=0.0.0.0
-      -  ANALYSIS_PORT=3003
+      - ANALYSIS_DB_HOST=postgres
+      - ANALYSIS_DB_PORT=5432
+      - ANALYSIS_DB_USER=postgres
+      - ANALYSIS_DB_PASS=postgres
+      - ANALYSIS_DB_BASE=postgres
+      - ANALYSIS_DB_ECHO=false
+      - ANALYSIS_S3_REGION=us-east-1
+      - ANALYSIS_S3_BUCKET_NAME=app
+      - ANALYSIS_S3_ACCESS_KEY_ID=s3
+      - ANALYSIS_S3_SECRET_ACCESS_KEY=s3
+      - ANALYSIS_S3_ENDPOINT=http://s3:7070
+      - ANALYSIS_API_KEY=secret
+      - ANALYSIS_RELOAD=true
+      - ANALYSIS_LOG_LEVEL=DEBUG
+      - ANALYSIS_HOST=0.0.0.0
+      - ANALYSIS_PORT=3003
 
   # https://hub.docker.com/_/postgres/
   postgres:
-    image: "postgres:17-alpine"
+    image: "postgres:18-alpine"
     platform: linux/arm64
     command: "postgres -c log_statement=all"
     healthcheck:
@@ -139,7 +138,7 @@ services:
     command: >
       posix /data
     volumes:
-     - s3-data:/data
+      - s3-data:/data
 
 volumes:
   pg-data:
