@@ -11,7 +11,7 @@ import {
   SheetIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis, LabelList, Cell } from "recharts";
 import {
   Card,
@@ -117,36 +117,27 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
     return chartSelection.defaultChartType;
   });
 
-  const prevVariableIdRef = useRef(variable.id);
-  const prevHasSplitVariableRef = useRef<boolean>(false);
+  const [prevState, setPrevState] = useState({ variableId: variable.id, hasSplitVariable: false });
 
-  useEffect(() => {
-    // Check if this variable has split variable stats
-    const targetVariable = stats.find((item) => item.variable === variable.name);
-    const hasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
+  // Check if this variable has split variable stats
+  const targetVariable = stats.find((item) => item.variable === variable.name);
+  const hasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
 
-    // Reset chart type when:
-    // 1. Variable changes, OR
-    // 2. Split variable status changes (from split to non-split or vice versa)
-    const variableChanged = prevVariableIdRef.current !== variable.id;
-    const splitVariableStatusChanged = prevHasSplitVariableRef.current !== hasSplitVariable;
+  // Adjust state during render when variable or split status changes
+  if (prevState.variableId !== variable.id || prevState.hasSplitVariable !== hasSplitVariable) {
+    const newChartSelection = determineChartSelection({
+      variable,
+      stats,
+      hasSplitVariable
+    });
 
-    if (variableChanged || splitVariableStatusChanged) {
-      const newChartSelection = determineChartSelection({
-        variable,
-        stats,
-        hasSplitVariable
-      });
-
-      // Always reset to default when split variable status changes or current selection not available
-      if (splitVariableStatusChanged || !newChartSelection.availableChartTypes.includes(selectedChartType)) {
-        setSelectedChartType(newChartSelection.defaultChartType);
-      }
-
-      prevVariableIdRef.current = variable.id;
-      prevHasSplitVariableRef.current = hasSplitVariable;
+    // Reset to default when split variable status changes or current selection not available
+    if (prevState.hasSplitVariable !== hasSplitVariable || !newChartSelection.availableChartTypes.includes(selectedChartType)) {
+      setSelectedChartType(newChartSelection.defaultChartType);
     }
-  }, [variable.id, variable, stats, selectedChartType]);
+
+    setPrevState({ variableId: variable.id, hasSplitVariable });
+  }
 
   const chartConfig = {
     percentage: {

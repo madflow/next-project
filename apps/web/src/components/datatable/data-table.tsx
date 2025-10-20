@@ -60,6 +60,7 @@ export function DataTable<TData>({
 
   const showSearch = typeof searchValue === "string" && typeof onSearchChange === "function";
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table has known incompatibility with React Compiler
   const table = useReactTable({
     data,
     columns,

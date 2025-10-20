@@ -18,27 +18,26 @@ type AdHocAnalysisProps = {
 };
 
 export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
-  const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
+  const { restoreState, saveDataset, saveCurrentSelection } = useAdhocPersistence(project.id);
+  
+  const [selectedDataset, setSelectedDataset] = useState<string | null>(() => {
+    const restoredState = restoreState();
+    return restoredState?.selectedDataset || null;
+  });
+  
   const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
   const [statsData, setStatsData] = useState<Record<string, StatsResponse>>({});
 
   const t = useTranslations("projectAdhocAnalysis");
   const { setActiveTheme } = useThemeConfig();
-  const { restoreState, saveDataset, saveCurrentSelection } = useAdhocPersistence(project.id);
 
-  // Restore state from localStorage on mount
   useEffect(() => {
     const restoredState = restoreState();
-    if (restoredState) {
-      if (restoredState.selectedDataset) {
-        setSelectedDataset(restoredState.selectedDataset);
-      }
-      if (restoredState.selectedTheme && restoredState.selectedTheme !== "default") {
-        setActiveTheme(restoredState.selectedTheme);
-      }
-      // Note: currentSelection will be restored when dataset is set and variableset selector is rendered
+    if (restoredState?.selectedTheme && restoredState.selectedTheme !== "default") {
+      setActiveTheme(restoredState.selectedTheme);
     }
-  }, [restoreState, setActiveTheme]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run on mount
+  }, []);
 
   const { mutate } = useDatasetStats(selectedDataset || "", {
     onError: (error) => {
