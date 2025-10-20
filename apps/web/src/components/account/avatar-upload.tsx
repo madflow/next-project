@@ -2,7 +2,7 @@
 
 import { Loader2, Trash2, Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, useEffect, useRef, useState, useTransition } from "react";
+import { ChangeEvent, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deleteAvatar, uploadAvatar } from "@/actions/avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,20 +15,13 @@ export function AvatarUpload() {
   const { data: session } = useSession();
   const user = session?.user;
   const [isPending, startTransition] = useTransition();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Update preview URL when user or image changes
-  useEffect(() => {
-    if (user?.image) {
-      // Construct the URL to our API endpoint which will handle the redirect
-      const url = `/api/users/${user.id}/avatars/${encodeURIComponent(user.image)}`;
-      setPreviewUrl(url);
-    } else {
-      setPreviewUrl(null);
-    }
-  }, [user?.id, user?.image]);
+  const previewUrl = localPreviewUrl || (user?.image 
+    ? `/api/users/${user.id}/avatars/${encodeURIComponent(user.image)}` 
+    : null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -48,7 +41,7 @@ export function AvatarUpload() {
 
     // Create a preview URL for the selected image
     const imageUrl = URL.createObjectURL(file);
-    setPreviewUrl(imageUrl);
+    setLocalPreviewUrl(imageUrl);
     setSelectedFile(file);
   };
 
@@ -76,7 +69,7 @@ export function AvatarUpload() {
             },
             onSuccess: () => {
               toast.success(t("successDelete"));
-              setPreviewUrl(null);
+              setLocalPreviewUrl(null);
               setSelectedFile(null);
               if (fileInputRef.current) {
                 fileInputRef.current.value = "";
@@ -117,13 +110,9 @@ export function AvatarUpload() {
               },
               onSuccess: () => {
                 toast.success(t("success"));
-                // Clear the selected file after successful update
+                // Clear the selected file and local preview after successful update
                 setSelectedFile(null);
-                // Update the preview URL to use the new API route
-                if (user?.id && result.url) {
-                  const newPreviewUrl = `/api/users/${user.id}/avatars/${encodeURIComponent(result.url)}`;
-                  setPreviewUrl(newPreviewUrl);
-                }
+                setLocalPreviewUrl(null);
               },
             },
           });

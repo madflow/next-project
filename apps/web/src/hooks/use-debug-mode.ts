@@ -1,23 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 const DEBUG_MODE_STORAGE_KEY = "adhoc-debug-mode";
 
 export function useDebugMode() {
-  const [debugMode, setDebugModeState] = useState<boolean>(false);
-
-  // Load debug mode from localStorage on mount
-  useEffect(() => {
+  const [debugMode, setDebugModeState] = useState<boolean>(() => {
     try {
       const stored = localStorage.getItem(DEBUG_MODE_STORAGE_KEY);
-      if (stored !== null) {
-        setDebugModeState(stored === "true");
-      }
+      return stored === "true";
     } catch (error) {
       console.warn("Failed to load debug mode from localStorage:", error);
+      return false;
     }
-  }, []);
+  });
 
   // Set debug mode and persist to localStorage
   const setDebugMode = useCallback((enabled: boolean) => {
