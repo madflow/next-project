@@ -12,7 +12,7 @@
 - **Language:** Python 3.9+
 - **Framework:** FastAPI
 - **Server:** Uvicorn (dev), Gunicorn (prod)
-- **Database:** PostgreSQL 17
+- **Database:** PostgreSQL 18
 - **ORM:** SQLAlchemy 2.0 with asyncio
 - **Data Processing:** Pandas, PyReadstat
 - **Dependency Management:** Poetry

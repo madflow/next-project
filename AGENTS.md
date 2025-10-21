@@ -17,7 +17,7 @@ This project uses the following technologies:
 - **Package Manager:** pnpm
 - **Runtime:** Node.js 22
 - **Monorepo Tool:** Turborepo
-- **Database:** PostgreSQL 17
+- **Database:** PostgreSQL 18
 - **ORM:** Drizzle ORM
 - **Containerization:** Docker, Docker Compose
 - **Styling:** Tailwindcss 4.1
