@@ -10,7 +10,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Locale } from "@/i18n/config";
 import { resetPassword } from "@/lib/auth-client";
@@ -76,48 +76,38 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentPropsW
           <CardDescription>{t("resetPassword.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form data-testid="auth.reset-password.form" onSubmit={form.handleSubmit(handleSubmit)}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="newPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("resetPassword.form.newPassword")}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            autoComplete="new-password"
-                            {...field}
-                            data-testid="auth.reset-password.form.password"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full cursor-pointer"
-                  disabled={form.formState.isSubmitting}
-                  data-testid="auth.reset-password.form.submit">
-                  {form.formState.isSubmitting ? t("resetPassword.form.submitting") : t("resetPassword.form.submit")}
-                </Button>
-                {error && <div className="mt-2 text-sm text-red-500">{error}</div>}
-                <div className="mt-4 text-center text-sm">
-                  <Link
-                    href="/auth/login"
-                    className="underline underline-offset-4"
-                    data-testid="auth.reset-password.form.login">
-                    {t("resetPassword.links.login")}
-                  </Link>
-                </div>
-              </div>
-            </form>
-          </Form>
+          <form data-testid="auth.reset-password.form" onSubmit={form.handleSubmit(handleSubmit)}>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="reset-password-new-password">{t("resetPassword.form.newPassword")}</FieldLabel>
+                <Input
+                  id="reset-password-new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  {...form.register("newPassword")}
+                  data-testid="auth.reset-password.form.password"
+                />
+                <FieldError errors={[form.formState.errors.newPassword]} />
+              </Field>
+
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={form.formState.isSubmitting}
+                data-testid="auth.reset-password.form.submit">
+                {form.formState.isSubmitting ? t("resetPassword.form.submitting") : t("resetPassword.form.submit")}
+              </Button>
+              {error && <div className="text-sm text-red-500">{error}</div>}
+            </FieldGroup>
+            <div className="mt-4 text-center text-sm">
+              <Link
+                href="/auth/login"
+                className="underline underline-offset-4"
+                data-testid="auth.reset-password.form.login">
+                {t("resetPassword.links.login")}
+              </Link>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>
