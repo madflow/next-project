@@ -10,7 +10,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Locale } from "@/i18n/config";
 import { forgetPassword } from "@/lib/auth-client";
@@ -61,48 +61,38 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
           <CardDescription>{t("forgotPassword.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form data-testid="auth.forgot-password.form" onSubmit={form.handleSubmit(handleSubmit)}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("forgotPassword.form.email")}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            autoComplete="email"
-                            {...field}
-                            data-testid="auth.forgot-password.form.email"
-                            placeholder="name@example.com"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full cursor-pointer"
-                  disabled={form.formState.isSubmitting}
-                  data-testid="auth.forgot-password.form.submit">
-                  {form.formState.isSubmitting ? t("forgotPassword.form.submitting") : t("forgotPassword.form.submit")}
-                </Button>
-                <div className="mt-4 text-center text-sm">
-                  <Link
-                    href="/auth/login"
-                    className="underline underline-offset-4"
-                    data-testid="auth.forgot-password.form.login">
-                    {t("forgotPassword.links.login")}
-                  </Link>
-                </div>
-              </div>
-            </form>
-          </Form>
+          <form data-testid="auth.forgot-password.form" onSubmit={form.handleSubmit(handleSubmit)}>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="forgot-password-email">{t("forgotPassword.form.email")}</FieldLabel>
+                <Input
+                  id="forgot-password-email"
+                  type="email"
+                  autoComplete="email"
+                  {...form.register("email")}
+                  data-testid="auth.forgot-password.form.email"
+                  placeholder="name@example.com"
+                />
+                <FieldError errors={[form.formState.errors.email]} />
+              </Field>
+
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={form.formState.isSubmitting}
+                data-testid="auth.forgot-password.form.submit">
+                {form.formState.isSubmitting ? t("forgotPassword.form.submitting") : t("forgotPassword.form.submit")}
+              </Button>
+            </FieldGroup>
+            <div className="mt-4 text-center text-sm">
+              <Link
+                href="/auth/login"
+                className="underline underline-offset-4"
+                data-testid="auth.forgot-password.form.login">
+                {t("forgotPassword.links.login")}
+              </Link>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>
