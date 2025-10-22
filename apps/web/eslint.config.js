@@ -4,6 +4,11 @@ import { nextJsConfig } from "@repo/eslint-config/next-js";
 const localConfig = [
   ...nextJsConfig,
   {
+    rules: {
+      "react/prop-types": "off",
+    },
+  },
+  {
     files: ["!src/components/ui/**/*"],
     rules: {
       // Avoid hardcoded labels
