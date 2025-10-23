@@ -82,13 +82,13 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentPropsW
                 name="newPassword"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="reset-password-new-password">{t("resetPassword.form.newPassword")}</FieldLabel>
                     <Input
                       id="reset-password-new-password"
                       type="password"
                       autoComplete="new-password"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.reset-password.form.password"
                     />
