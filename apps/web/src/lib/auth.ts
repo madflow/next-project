@@ -100,7 +100,7 @@ export const auth = betterAuth({
             action,
             newEmail,
             baseUrl: env.BASE_URL,
-            siteName: "Your App",
+            siteName: env.SITE_NAME,
           }),
         });
       },
@@ -135,7 +135,7 @@ export const auth = betterAuth({
           content,
           action,
           baseUrl: env.BASE_URL,
-          siteName: "Your App",
+          siteName: env.SITE_NAME,
         }),
       });
     },
@@ -159,7 +159,7 @@ export const auth = betterAuth({
           content,
           action,
           baseUrl: env.BASE_URL,
-          siteName: "Your App",
+          siteName: env.SITE_NAME,
         }),
       });
     },
@@ -196,7 +196,7 @@ export const auth = betterAuth({
             action,
             organizationName: data.organization.name,
             baseUrl: env.BASE_URL,
-            siteName: "Your App",
+            siteName: env.SITE_NAME,
           }),
         });
       },
