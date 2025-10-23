@@ -66,12 +66,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 name="email"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="sign-up-email">{t("signUp.form.email")}</FieldLabel>
                     <Input
                       id="sign-up-email"
                       type="email"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.sign-up.form.email"
                     />
@@ -84,12 +84,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 name="name"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="sign-up-name">{t("signUp.form.name")}</FieldLabel>
                     <Input
                       id="sign-up-name"
                       type="text"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.sign-up.form.name"
                     />
@@ -102,12 +102,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 name="password"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="sign-up-password">{t("signUp.form.password")}</FieldLabel>
                     <Input
                       id="sign-up-password"
                       type="password"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.sign-up.form.password"
                     />
@@ -120,12 +120,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 name="confirmPassword"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="sign-up-confirm-password">{t("signUp.form.confirmPassword")}</FieldLabel>
                     <Input
                       id="sign-up-confirm-password"
                       type="password"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.sign-up.form.confirm-password"
                     />

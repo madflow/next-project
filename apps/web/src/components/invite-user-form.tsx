@@ -92,7 +92,7 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
           name="email"
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field>
+            <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="email">{t("formLabels.email")}</FieldLabel>
               <FieldGroup>
                 <Input
@@ -100,7 +100,7 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
                   disabled={!!user}
                   type="email"
                   placeholder={t("formPlaceholders.email")}
-                  data-invalid={fieldState.invalid}
+                  aria-invalid={fieldState.invalid}
                   {...field}
                   data-testid="admin.users.invite.form.email"
                 />
@@ -114,7 +114,7 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
           name="role"
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field>
+            <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="role">{t("formLabels.role")}</FieldLabel>
               <FieldGroup>
                 <Select value={field.value} onValueChange={field.onChange}>

@@ -67,13 +67,13 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
                 name="email"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="forgot-password-email">{t("forgotPassword.form.email")}</FieldLabel>
                     <Input
                       id="forgot-password-email"
                       type="email"
                       autoComplete="email"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.forgot-password.form.email"
                       placeholder="name@example.com"

@@ -83,13 +83,13 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
             name="label"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field>
+              <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="label">{t("editVariable.form.label.label")}</FieldLabel>
                 <FieldGroup>
                   <Input
                     id="label"
                     placeholder={t("editVariable.form.label.placeholder")}
-                    data-invalid={fieldState.invalid}
+                    aria-invalid={fieldState.invalid}
                     {...field}
                     value={field.value ?? ""}
                   />
@@ -103,7 +103,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
             name="missingValues"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field>
+              <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>{t("editVariable.form.missingValues.label")}</FieldLabel>
                 <FieldGroup>
                   <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />

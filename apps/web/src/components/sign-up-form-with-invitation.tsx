@@ -74,14 +74,14 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
                   name="email"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field>
+                    <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="email">{t("signUp.form.email")}</FieldLabel>
                       <FieldGroup>
                         <Input
                           id="email"
                           disabled
                           type="email"
-                          data-invalid={fieldState.invalid}
+                          aria-invalid={fieldState.invalid}
                           {...field}
                           data-testid="auth.sign-up.form.email"
                           readOnly
@@ -97,13 +97,13 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
                   name="name"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field>
+                    <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="name">{t("signUp.form.name")}</FieldLabel>
                       <FieldGroup>
                         <Input
                           id="name"
                           type="text"
-                          data-invalid={fieldState.invalid}
+                          aria-invalid={fieldState.invalid}
                           {...field}
                           data-testid="auth.sign-up.form.name"
                         />
@@ -118,13 +118,13 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
                   name="password"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field>
+                    <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="password">{t("signUp.form.password")}</FieldLabel>
                       <FieldGroup>
                         <Input
                           id="password"
                           type="password"
-                          data-invalid={fieldState.invalid}
+                          aria-invalid={fieldState.invalid}
                           {...field}
                           data-testid="auth.sign-up.form.password"
                         />
@@ -139,13 +139,13 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
                   name="confirmPassword"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field>
+                    <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="confirmPassword">{t("signUp.form.confirmPassword")}</FieldLabel>
                       <FieldGroup>
                         <Input
                           id="confirmPassword"
                           type="password"
-                          data-invalid={fieldState.invalid}
+                          aria-invalid={fieldState.invalid}
                           {...field}
                           data-testid="auth.sign-up.form.confirm-password"
                         />

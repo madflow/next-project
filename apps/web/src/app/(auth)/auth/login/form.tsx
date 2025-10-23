@@ -63,12 +63,12 @@ export function LoginForm(props: LoginFormProps) {
                 name="email"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="login-email">{t("login.form.email")}</FieldLabel>
                     <Input
                       id="login-email"
                       type="email"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.login.form.email"
                     />
@@ -81,12 +81,12 @@ export function LoginForm(props: LoginFormProps) {
                 name="password"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field>
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="login-password">{t("login.form.password")}</FieldLabel>
                     <Input
                       id="login-password"
                       type="password"
-                      data-invalid={fieldState.invalid}
+                      aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.login.form.password"
                     />
