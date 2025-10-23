@@ -5,9 +5,8 @@ import { admin as adminPlugin, organization as organizationPlugin } from "better
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
-import { sendMail } from "@/email/mailer";
+import { sendEmail, EmailVerification, PasswordReset, EmailChange, OrganizationInvite } from "@repo/email";
 import { getEmailMessage } from "@/email/messages";
-import { renderDefaultTemplateWithProps } from "@/email/renderer";
 import { env } from "@/env";
 
 export const USER_ADMIN_ROLE = "admin";
@@ -86,21 +85,23 @@ export const auth = betterAuth({
         url: string;
       }) => {
         const { user, newEmail, url } = data;
-        const { heading, content, action } = getEmailMessage("emailChange", user.locale, { newEmail });
+        const { subject, heading, content, action } = getEmailMessage("emailChange", user.locale, { newEmail });
 
-        const html = await renderDefaultTemplateWithProps({
-          heading,
-          content,
-          action,
-          url,
-        });
-
-        await sendMail({
+        await sendEmail({
           to: user.email,
           from: env.MAIL_DEFAULT_SENDER,
-          subject: heading,
+          subject,
           text: `${content}\n\n${action}: ${url}`,
-          html,
+          react: EmailChange({
+            email: user.email,
+            url,
+            heading,
+            content,
+            action,
+            newEmail,
+            baseUrl: env.BASE_URL,
+            siteName: env.SITE_NAME,
+          }),
         });
       },
     },
@@ -121,19 +122,21 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendVerificationEmail: async (data: { user: { email: string; locale?: string }; url: string }) => {
       const { user, url } = data;
-      const { heading, content, action } = getEmailMessage("emailVerification", user.locale);
-      const html = await renderDefaultTemplateWithProps({
-        heading,
-        content,
-        action,
-        url,
-      });
-      await sendMail({
+      const { subject, heading, content, action } = getEmailMessage("emailVerification", user.locale);
+      await sendEmail({
         to: user.email,
         from: env.MAIL_DEFAULT_SENDER,
-        subject: heading,
+        subject,
         text: `${content}\n\n${action}: ${url}`,
-        html,
+        react: EmailVerification({
+          email: user.email,
+          url,
+          heading,
+          content,
+          action,
+          baseUrl: env.BASE_URL,
+          siteName: env.SITE_NAME,
+        }),
       });
     },
   },
@@ -143,19 +146,21 @@ export const auth = betterAuth({
     disableSignUp: false, // this needs to stay false, when private signup via invitation should work
     sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }) => {
       const { user, url } = data;
-      const { heading, content, action } = getEmailMessage("passwordReset", user.locale);
-      const html = await renderDefaultTemplateWithProps({
-        heading,
-        content,
-        action,
-        url,
-      });
-      await sendMail({
+      const { subject, heading, content, action } = getEmailMessage("passwordReset", user.locale);
+      await sendEmail({
         to: user.email,
         from: env.MAIL_DEFAULT_SENDER,
-        subject: heading,
+        subject,
         text: `${content}\n\n${action}: ${url}`,
-        html,
+        react: PasswordReset({
+          email: user.email,
+          url,
+          heading,
+          content,
+          action,
+          baseUrl: env.BASE_URL,
+          siteName: env.SITE_NAME,
+        }),
       });
     },
   },
@@ -175,21 +180,24 @@ export const auth = betterAuth({
       },
       async sendInvitationEmail(data) {
         const inviteLink = `${env.BASE_URL}/auth/accept-invitation/${data.invitation.id}`;
-        const { heading, content, action } = getEmailMessage("emailInvitation", "en", {
+        const { subject, heading, content, action } = getEmailMessage("emailInvitation", "en", {
           inviteLink,
         });
-        const html = await renderDefaultTemplateWithProps({
-          heading,
-          content,
-          action,
-          url: inviteLink,
-        });
-        await sendMail({
+        await sendEmail({
           to: data.invitation.email,
           from: env.MAIL_DEFAULT_SENDER,
-          subject: heading,
+          subject,
           text: `${content}\n\n${action}: ${inviteLink}`,
-          html,
+          react: OrganizationInvite({
+            email: data.invitation.email,
+            url: inviteLink,
+            heading,
+            content,
+            action,
+            organizationName: data.organization.name,
+            baseUrl: env.BASE_URL,
+            siteName: env.SITE_NAME,
+          }),
         });
       },
       allowUserToCreateOrganization: async () => {
