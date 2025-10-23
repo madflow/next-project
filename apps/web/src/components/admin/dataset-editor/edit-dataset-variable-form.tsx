@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { update } from "@/actions/dataset-variable";
@@ -79,29 +79,39 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
             </FieldGroup>
           </Field>
 
-          <Field>
-            <FieldLabel htmlFor="label">{t("editVariable.form.label.label")}</FieldLabel>
-            <FieldGroup>
-              <Input
-                id="label"
-                placeholder={t("editVariable.form.label.placeholder")}
-                aria-invalid={!!form.formState.errors.label}
-                {...form.register("label")}
-              />
-            </FieldGroup>
-            <FieldError errors={[form.formState.errors.label]} />
-          </Field>
+          <Controller
+            name="label"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel htmlFor="label">{t("editVariable.form.label.label")}</FieldLabel>
+                <FieldGroup>
+                  <Input
+                    id="label"
+                    placeholder={t("editVariable.form.label.placeholder")}
+                    data-invalid={fieldState.invalid}
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <Field>
-            <FieldLabel>{t("editVariable.form.missingValues.label")}</FieldLabel>
-            <FieldGroup>
-              <TextArrayEditor
-                value={form.watch("missingValues") ?? []}
-                onChange={(value) => form.setValue("missingValues", value)}
-              />
-            </FieldGroup>
-            <FieldError errors={[form.formState.errors.missingValues]} />
-          </Field>
+          <Controller
+            name="missingValues"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel>{t("editVariable.form.missingValues.label")}</FieldLabel>
+                <FieldGroup>
+                  <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
           <Field>
             <FieldLabel>{t("editVariable.form.type.label")}</FieldLabel>

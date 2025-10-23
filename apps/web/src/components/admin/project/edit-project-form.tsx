@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { update } from "@/actions/project";
@@ -104,62 +104,80 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Field>
-        <FieldLabel htmlFor="name">{t("form.name.label")}</FieldLabel>
-        <FieldGroup>
-          <Input
-            id="name"
-            placeholder={t("form.name.placeholder")}
-            data-testid="admin.projects.edit.form.name"
-            aria-invalid={!!form.formState.errors.name}
-            {...form.register("name")}
-          />
-        </FieldGroup>
-        <FieldError errors={[form.formState.errors.name]} />
-      </Field>
+      <Controller
+        name="name"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("form.name.label")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                {...field}
+                id={field.name}
+                placeholder={t("form.name.placeholder")}
+                data-testid="admin.projects.edit.form.name"
+                aria-invalid={fieldState.invalid}
+              />
+            </FieldGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="slug">{t("form.slug.label")}</FieldLabel>
-        <FieldGroup>
-          <Input
-            id="slug"
-            placeholder={t("form.slug.placeholder")}
-            data-testid="admin.projects.edit.form.slug"
-            aria-invalid={!!form.formState.errors.slug}
-            {...form.register("slug")}
-          />
-        </FieldGroup>
-        <FieldDescription>{t("form.slug.description")}</FieldDescription>
-        <FieldError errors={[form.formState.errors.slug]} />
-      </Field>
+      <Controller
+        name="slug"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("form.slug.label")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                {...field}
+                id={field.name}
+                placeholder={t("form.slug.placeholder")}
+                data-testid="admin.projects.edit.form.slug"
+                aria-invalid={fieldState.invalid}
+              />
+            </FieldGroup>
+            <FieldDescription>{t("form.slug.description")}</FieldDescription>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="organizationId">{t("form.organization.label")}</FieldLabel>
-        <FieldGroup>
-          <Select
-            onValueChange={(value) => form.setValue("organizationId", value)}
-            defaultValue={form.watch("organizationId")}
-            data-testid="organization-select">
-            <SelectTrigger id="organizationId" className="w-full sm:max-w-[50%]">
-              <SelectValue placeholder={t("form.organization.placeholder")} />
-            </SelectTrigger>
-            <SelectContent>
-              {isLoading ? (
-                <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.loading")}</div>
-              ) : organizations.length === 0 ? (
-                <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.notFound")}</div>
-              ) : (
-                organizations.map((org) => (
-                  <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
-                    {org.name}
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-        </FieldGroup>
-        <FieldError errors={[form.formState.errors.organizationId]} />
-      </Field>
+      <Controller
+        name="organizationId"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("form.organization.label")}</FieldLabel>
+            <FieldGroup>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                data-testid="organization-select">
+                <SelectTrigger id={field.name} className="w-full sm:max-w-[50%]">
+                  <SelectValue placeholder={t("form.organization.placeholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {isLoading ? (
+                    <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.loading")}</div>
+                  ) : organizations.length === 0 ? (
+                    <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.notFound")}</div>
+                  ) : (
+                    organizations.map((org) => (
+                      <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
+                        {org.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </FieldGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
       <div className="pt-2">
         <Button

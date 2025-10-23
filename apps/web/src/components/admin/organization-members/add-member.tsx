@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { addMember } from "@/actions/member";
@@ -85,41 +85,53 @@ export function AddMemberForm({ organizationId }: AddMemberFormProps) {
   return (
     <div className="max-w-2xl space-y-6">
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Field className="flex flex-col">
-          <FieldLabel>{t("user.label")}</FieldLabel>
-          <FieldGroup>
-            <SelectAsync<User, { rows: User[] }>
-              fetcher={searchUsers}
-              onValueChange={(value) => form.setValue("userId", value || "")}
-              value={form.watch("userId")}
-              placeholder={t("user.placeholder")}
-              itemToValue={(user) => user.id}
-              itemToLabel={(user) => user.name || user.email || ""}
-              responseToItems={(data) => data.rows}
-            />
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.userId]} />
-        </Field>
+        <Controller
+          name="userId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field className="flex flex-col" data-invalid={fieldState.invalid}>
+              <FieldLabel>{t("user.label")}</FieldLabel>
+              <FieldGroup>
+                <SelectAsync<User, { rows: User[] }>
+                  fetcher={searchUsers}
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  placeholder={t("user.placeholder")}
+                  itemToValue={(user) => user.id}
+                  itemToLabel={(user) => user.name || user.email || ""}
+                  responseToItems={(data) => data.rows}
+                />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="role">{t("role.label")}</FieldLabel>
-          <FieldGroup>
-            <Select
-              onValueChange={(value) => form.setValue("role", value as "admin" | "owner" | "member")}
-              defaultValue={form.watch("role")}
-              disabled={!form.watch("userId")}>
-              <SelectTrigger id="role">
-                <SelectValue placeholder={t("role.placeholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">{t("role.options.admin")}</SelectItem>
-                <SelectItem value="owner">{t("role.options.owner")}</SelectItem>
-                <SelectItem value="member">{t("role.options.member")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.role]} />
-        </Field>
+        <Controller
+          name="role"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("role.label")}</FieldLabel>
+              <FieldGroup>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={!form.watch("userId")}>
+                  <SelectTrigger id={field.name}>
+                    <SelectValue placeholder={t("role.placeholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">{t("role.options.admin")}</SelectItem>
+                    <SelectItem value="owner">{t("role.options.owner")}</SelectItem>
+                    <SelectItem value="member">{t("role.options.member")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
         <div className="flex justify-start gap-4">
           <Button

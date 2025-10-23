@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -61,50 +61,68 @@ export function UpdatePasswordForm() {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-4">
-        <Field>
-          <FieldLabel htmlFor="currentPassword">{t("account.password.fields.currentPassword")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="currentPassword"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={!!form.formState.errors.currentPassword}
-              {...form.register("currentPassword")}
-              data-testid="app.user.account.password.current"
-            />
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.currentPassword]} />
-        </Field>
+        <Controller
+          name="currentPassword"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("account.password.fields.currentPassword")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="password"
+                  autoComplete="current-password"
+                  aria-invalid={fieldState.invalid}
+                  data-testid="app.user.account.password.current"
+                />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="newPassword">{t("account.password.fields.newPassword")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="newPassword"
-              type="password"
-              autoComplete="new-password"
-              aria-invalid={!!form.formState.errors.newPassword}
-              {...form.register("newPassword")}
-              data-testid="app.user.account.password.new"
-            />
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.newPassword]} />
-        </Field>
+        <Controller
+          name="newPassword"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("account.password.fields.newPassword")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="password"
+                  autoComplete="new-password"
+                  aria-invalid={fieldState.invalid}
+                  data-testid="app.user.account.password.new"
+                />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="confirmPassword">{t("account.password.fields.confirmPassword")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              aria-invalid={!!form.formState.errors.confirmPassword}
-              {...form.register("confirmPassword")}
-              data-testid="app.user.account.password.confirm"
-            />
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.confirmPassword]} />
-        </Field>
+        <Controller
+          name="confirmPassword"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("account.password.fields.confirmPassword")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="password"
+                  autoComplete="new-password"
+                  aria-invalid={fieldState.invalid}
+                  data-testid="app.user.account.password.confirm"
+                />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
       </div>
 
       <Button type="submit" className="cursor-pointer" data-testid="app.user.account.password.update">

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { update } from "@/actions/dataset";
@@ -67,33 +67,45 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Field>
-        <FieldLabel htmlFor="name">{t("form.name.label")}</FieldLabel>
-        <FieldGroup>
-          <Input
-            id="name"
-            placeholder={t("form.name.placeholder")}
-            data-testid="admin.datasets.edit.form.name"
-            aria-invalid={!!form.formState.errors.name}
-            {...form.register("name")}
-          />
-        </FieldGroup>
-        <FieldError errors={[form.formState.errors.name]} />
-      </Field>
+      <Controller
+        name="name"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("form.name.label")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                {...field}
+                id={field.name}
+                placeholder={t("form.name.placeholder")}
+                data-testid="admin.datasets.edit.form.name"
+                aria-invalid={fieldState.invalid}
+              />
+            </FieldGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
-      <Field>
-        <FieldLabel htmlFor="description">{t("form.description.label")}</FieldLabel>
-        <FieldGroup>
-          <Input
-            id="description"
-            placeholder={t("form.description.placeholder")}
-            data-testid="admin.datasets.edit.form.description"
-            aria-invalid={!!form.formState.errors.description}
-            {...form.register("description")}
-          />
-        </FieldGroup>
-        <FieldError errors={[form.formState.errors.description]} />
-      </Field>
+      <Controller
+        name="description"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("form.description.label")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                {...field}
+                id={field.name}
+                placeholder={t("form.description.placeholder")}
+                data-testid="admin.datasets.edit.form.description"
+                aria-invalid={fieldState.invalid}
+              />
+            </FieldGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
       <div className="pt-2">
         <Button

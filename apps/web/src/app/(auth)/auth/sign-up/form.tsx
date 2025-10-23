@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Button } from "@/components/ui/button";
@@ -62,49 +62,77 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         <CardContent>
           <form data-testid="auth.sign-up.form" onSubmit={form.handleSubmit(handleSubmit)}>
             <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="sign-up-email">{t("signUp.form.email")}</FieldLabel>
-                <Input
-                  id="sign-up-email"
-                  type="email"
-                  {...form.register("email")}
-                  data-testid="auth.sign-up.form.email"
-                />
-                <FieldError errors={[form.formState.errors.email]} />
-              </Field>
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="sign-up-email">{t("signUp.form.email")}</FieldLabel>
+                    <Input
+                      id="sign-up-email"
+                      type="email"
+                      data-invalid={fieldState.invalid}
+                      {...field}
+                      data-testid="auth.sign-up.form.email"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
 
-              <Field>
-                <FieldLabel htmlFor="sign-up-name">{t("signUp.form.name")}</FieldLabel>
-                <Input
-                  id="sign-up-name"
-                  type="text"
-                  {...form.register("name")}
-                  data-testid="auth.sign-up.form.name"
-                />
-                <FieldError errors={[form.formState.errors.name]} />
-              </Field>
+              <Controller
+                name="name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="sign-up-name">{t("signUp.form.name")}</FieldLabel>
+                    <Input
+                      id="sign-up-name"
+                      type="text"
+                      data-invalid={fieldState.invalid}
+                      {...field}
+                      data-testid="auth.sign-up.form.name"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
 
-              <Field>
-                <FieldLabel htmlFor="sign-up-password">{t("signUp.form.password")}</FieldLabel>
-                <Input
-                  id="sign-up-password"
-                  type="password"
-                  {...form.register("password")}
-                  data-testid="auth.sign-up.form.password"
-                />
-                <FieldError errors={[form.formState.errors.password]} />
-              </Field>
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="sign-up-password">{t("signUp.form.password")}</FieldLabel>
+                    <Input
+                      id="sign-up-password"
+                      type="password"
+                      data-invalid={fieldState.invalid}
+                      {...field}
+                      data-testid="auth.sign-up.form.password"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
 
-              <Field>
-                <FieldLabel htmlFor="sign-up-confirm-password">{t("signUp.form.confirmPassword")}</FieldLabel>
-                <Input
-                  id="sign-up-confirm-password"
-                  type="password"
-                  {...form.register("confirmPassword")}
-                  data-testid="auth.sign-up.form.confirm-password"
-                />
-                <FieldError errors={[form.formState.errors.confirmPassword]} />
-              </Field>
+              <Controller
+                name="confirmPassword"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="sign-up-confirm-password">{t("signUp.form.confirmPassword")}</FieldLabel>
+                    <Input
+                      id="sign-up-confirm-password"
+                      type="password"
+                      data-invalid={fieldState.invalid}
+                      {...field}
+                      data-testid="auth.sign-up.form.confirm-password"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
 
               <Button type="submit" className="w-full cursor-pointer" data-testid="auth.sign-up.form.submit">
                 {t("signUp.form.submit")}

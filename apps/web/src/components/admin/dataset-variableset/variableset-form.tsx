@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { createVariableset, updateVariableset } from "@/actions/dataset-variableset";
@@ -142,55 +142,73 @@ export function VariablesetForm({
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <Field>
-            <FieldLabel htmlFor="name">{t("form.name")}</FieldLabel>
-            <FieldGroup>
-              <Input
-                id="name"
-                placeholder={t("form.namePlaceholder")}
-                aria-invalid={!!form.formState.errors.name}
-                {...form.register("name")}
-              />
-            </FieldGroup>
-            <FieldError errors={[form.formState.errors.name]} />
-          </Field>
+          <Controller
+            name="name"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>{t("form.name")}</FieldLabel>
+                <FieldGroup>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    placeholder={t("form.namePlaceholder")}
+                    aria-invalid={fieldState.invalid}
+                  />
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <Field>
-            <FieldLabel htmlFor="description">{t("form.description")}</FieldLabel>
-            <FieldGroup>
-              <Textarea
-                id="description"
-                placeholder={t("form.descriptionPlaceholder")}
-                rows={3}
-                aria-invalid={!!form.formState.errors.description}
-                {...form.register("description")}
-              />
-            </FieldGroup>
-            <FieldError errors={[form.formState.errors.description]} />
-          </Field>
+          <Controller
+            name="description"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>{t("form.description")}</FieldLabel>
+                <FieldGroup>
+                  <Textarea
+                    {...field}
+                    id={field.name}
+                    placeholder={t("form.descriptionPlaceholder")}
+                    rows={3}
+                    aria-invalid={fieldState.invalid}
+                  />
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-          <Field>
-            <FieldLabel htmlFor="parentId">{t("form.parent")}</FieldLabel>
-            <FieldGroup>
-              <Select
-                value={form.watch("parentId")}
-                onValueChange={(value) => form.setValue("parentId", value)}>
-                <SelectTrigger id="parentId">
-                  <SelectValue placeholder={t("form.selectParent")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_PARENT_VALUE}>{t("form.noParent")}</SelectItem>
-                  {filteredParents.map((parent) => (
-                    <SelectItem key={parent.id} value={parent.id}>
-                      {"  ".repeat(parent.level)}
-                      {parent.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FieldGroup>
-            <FieldError errors={[form.formState.errors.parentId]} />
-          </Field>
+          <Controller
+            name="parentId"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>{t("form.parent")}</FieldLabel>
+                <FieldGroup>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}>
+                    <SelectTrigger id={field.name}>
+                      <SelectValue placeholder={t("form.selectParent")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_PARENT_VALUE}>{t("form.noParent")}</SelectItem>
+                      {filteredParents.map((parent) => (
+                        <SelectItem key={parent.id} value={parent.id}>
+                          {"  ".repeat(parent.level)}
+                          {parent.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
           <DialogFooter className="gap-2 sm:gap-0">
             <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { createWithInvitation } from "@/actions/user";
 import { type SignUpSchema, signUpSchema } from "@/app/(auth)/auth/sign-up/schema";
@@ -70,66 +70,90 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
           <form data-testid="auth.sign-up-with-invitation.form" onSubmit={form.handleSubmit(handleSubmit)}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Field>
-                  <FieldLabel htmlFor="email">{t("signUp.form.email")}</FieldLabel>
-                  <FieldGroup>
-                    <Input
-                      id="email"
-                      disabled
-                      type="email"
-                      aria-invalid={!!form.formState.errors.email}
-                      {...form.register("email")}
-                      data-testid="auth.sign-up.form.email"
-                      readOnly
-                    />
-                  </FieldGroup>
-                  <FieldError errors={[form.formState.errors.email]} />
-                </Field>
+                <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="email">{t("signUp.form.email")}</FieldLabel>
+                      <FieldGroup>
+                        <Input
+                          id="email"
+                          disabled
+                          type="email"
+                          data-invalid={fieldState.invalid}
+                          {...field}
+                          data-testid="auth.sign-up.form.email"
+                          readOnly
+                        />
+                      </FieldGroup>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
               </div>
               <div className="grid gap-2">
-                <Field>
-                  <FieldLabel htmlFor="name">{t("signUp.form.name")}</FieldLabel>
-                  <FieldGroup>
-                    <Input
-                      id="name"
-                      type="text"
-                      aria-invalid={!!form.formState.errors.name}
-                      {...form.register("name")}
-                      data-testid="auth.sign-up.form.name"
-                    />
-                  </FieldGroup>
-                  <FieldError errors={[form.formState.errors.name]} />
-                </Field>
+                <Controller
+                  name="name"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="name">{t("signUp.form.name")}</FieldLabel>
+                      <FieldGroup>
+                        <Input
+                          id="name"
+                          type="text"
+                          data-invalid={fieldState.invalid}
+                          {...field}
+                          data-testid="auth.sign-up.form.name"
+                        />
+                      </FieldGroup>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
               </div>
               <div className="grid gap-2">
-                <Field>
-                  <FieldLabel htmlFor="password">{t("signUp.form.password")}</FieldLabel>
-                  <FieldGroup>
-                    <Input
-                      id="password"
-                      type="password"
-                      aria-invalid={!!form.formState.errors.password}
-                      {...form.register("password")}
-                      data-testid="auth.sign-up.form.password"
-                    />
-                  </FieldGroup>
-                  <FieldError errors={[form.formState.errors.password]} />
-                </Field>
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="password">{t("signUp.form.password")}</FieldLabel>
+                      <FieldGroup>
+                        <Input
+                          id="password"
+                          type="password"
+                          data-invalid={fieldState.invalid}
+                          {...field}
+                          data-testid="auth.sign-up.form.password"
+                        />
+                      </FieldGroup>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
               </div>
               <div className="grid gap-2">
-                <Field>
-                  <FieldLabel htmlFor="confirmPassword">{t("signUp.form.confirmPassword")}</FieldLabel>
-                  <FieldGroup>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      aria-invalid={!!form.formState.errors.confirmPassword}
-                      {...form.register("confirmPassword")}
-                      data-testid="auth.sign-up.form.confirm-password"
-                    />
-                  </FieldGroup>
-                  <FieldError errors={[form.formState.errors.confirmPassword]} />
-                </Field>
+                <Controller
+                  name="confirmPassword"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="confirmPassword">{t("signUp.form.confirmPassword")}</FieldLabel>
+                      <FieldGroup>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          data-invalid={fieldState.invalid}
+                          {...field}
+                          data-testid="auth.sign-up.form.confirm-password"
+                        />
+                      </FieldGroup>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
               </div>
               <Button type="submit" className="w-full cursor-pointer" data-testid="auth.sign-up.form.submit">
                 {t("signUp.form.submit")}
