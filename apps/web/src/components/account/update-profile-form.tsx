@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -70,43 +70,52 @@ export function UpdateProfileForm() {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-4">
-        <Field>
-          <FieldLabel htmlFor="name">{t("account.profile.fields.name")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="name"
-              aria-invalid={!!form.formState.errors.name}
-              {...form.register("name")}
-              data-testid="app.user.account.profile.name"
-            />
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.name]} />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="locale">{t("account.profile.fields.locale")}</FieldLabel>
-          <FieldGroup>
-            <Select
-              value={form.watch("locale")}
-              onValueChange={(value) => form.setValue("locale", value as Locale)}
-            >
-              <SelectTrigger
-                id="locale"
-                aria-invalid={!!form.formState.errors.locale}
-                data-testid="app.user.account.profile.locale"
-              >
-                <SelectValue placeholder={t("localeSwitcher.selectLanguage")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>{t("localeSwitcher.locale")}</SelectLabel>
-                  <SelectItem value="en">{t("localeSwitcher.languages.en")}</SelectItem>
-                  <SelectItem value="de">{t("localeSwitcher.languages.de")}</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.locale]} />
-        </Field>
+        <Controller
+          name="name"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("account.profile.fields.name")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  data-testid="app.user.account.profile.name"
+                />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="locale"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("account.profile.fields.locale")}</FieldLabel>
+              <FieldGroup>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    data-testid="app.user.account.profile.locale"
+                  >
+                    <SelectValue placeholder={t("localeSwitcher.selectLanguage")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>{t("localeSwitcher.locale")}</SelectLabel>
+                      <SelectItem value="en">{t("localeSwitcher.languages.en")}</SelectItem>
+                      <SelectItem value="de">{t("localeSwitcher.languages.de")}</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
       </div>
       <Button type="submit" className="cursor-pointer" data-testid="app.user.account.profile.update">
         {t("account.profile.fields.updateProfile")}

@@ -5,7 +5,7 @@ import { Terminal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -63,18 +63,25 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         <CardContent>
           <form data-testid="auth.forgot-password.form" onSubmit={form.handleSubmit(handleSubmit)}>
             <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="forgot-password-email">{t("forgotPassword.form.email")}</FieldLabel>
-                <Input
-                  id="forgot-password-email"
-                  type="email"
-                  autoComplete="email"
-                  {...form.register("email")}
-                  data-testid="auth.forgot-password.form.email"
-                  placeholder="name@example.com"
-                />
-                <FieldError errors={[form.formState.errors.email]} />
-              </Field>
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="forgot-password-email">{t("forgotPassword.form.email")}</FieldLabel>
+                    <Input
+                      id="forgot-password-email"
+                      type="email"
+                      autoComplete="email"
+                      data-invalid={fieldState.invalid}
+                      {...field}
+                      data-testid="auth.forgot-password.form.email"
+                      placeholder="name@example.com"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
 
               <Button
                 type="submit"

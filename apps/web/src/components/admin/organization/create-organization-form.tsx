@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { create } from "@/actions/organization";
@@ -52,34 +52,46 @@ export function CreateOrganizationForm() {
   return (
     <div className="space-y-8">
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <Field>
-          <FieldLabel htmlFor="name">{t("organization.form.name.label")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="name"
-              placeholder={t("organization.form.name.placeholder")}
-              data-testid="admin.organizations.new.form.name"
-              aria-invalid={!!form.formState.errors.name}
-              {...form.register("name")}
-            />
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.name]} />
-        </Field>
+        <Controller
+          name="name"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("organization.form.name.label")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder={t("organization.form.name.placeholder")}
+                  data-testid="admin.organizations.new.form.name"
+                  aria-invalid={fieldState.invalid}
+                />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="slug">{t("organization.form.slug.label")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="slug"
-              placeholder={t("organization.form.slug.placeholder")}
-              data-testid="admin.organizations.new.form.slug"
-              aria-invalid={!!form.formState.errors.slug}
-              {...form.register("slug")}
-            />
-          </FieldGroup>
-          <FieldDescription>{t("organization.form.slug.description")}</FieldDescription>
-          <FieldError errors={[form.formState.errors.slug]} />
-        </Field>
+        <Controller
+          name="slug"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("organization.form.slug.label")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder={t("organization.form.slug.placeholder")}
+                  data-testid="admin.organizations.new.form.slug"
+                  aria-invalid={fieldState.invalid}
+                />
+              </FieldGroup>
+              <FieldDescription>{t("organization.form.slug.description")}</FieldDescription>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
       </form>
 
       <div className="border-t pt-8">

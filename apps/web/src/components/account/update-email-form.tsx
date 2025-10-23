@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -54,21 +54,27 @@ export function UpdateEmailForm() {
           <p className="text-sm font-medium">{t("account.profile.fields.currentEmail")}</p>
           <p className="text-muted-foreground text-sm">{session?.user?.email}</p>
         </div>
-        <Field>
-          <FieldLabel htmlFor="email">{t("account.profile.fields.newEmail")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t("account.profile.fields.newEmailPlaceholder")}
-              aria-invalid={!!form.formState.errors.email}
-              {...form.register("email")}
-              data-testid="app.user.account.email"
-            />
-          </FieldGroup>
-          <FieldDescription>{t("account.profile.emailChangeNotice")}</FieldDescription>
-          <FieldError errors={[form.formState.errors.email]} />
-        </Field>
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{t("account.profile.fields.newEmail")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="email"
+                  placeholder={t("account.profile.fields.newEmailPlaceholder")}
+                  aria-invalid={fieldState.invalid}
+                  data-testid="app.user.account.email"
+                />
+              </FieldGroup>
+              <FieldDescription>{t("account.profile.emailChangeNotice")}</FieldDescription>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
       </div>
       <Button type="submit" className="cursor-pointer" data-testid="app.user.account.email.update">
         {t("account.profile.fields.updateEmail")}

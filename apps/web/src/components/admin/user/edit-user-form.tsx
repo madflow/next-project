@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { update } from "@/actions/user";
@@ -50,8 +50,7 @@ export function EditUserForm({ user }: FormEditProps) {
   const t = useTranslations("adminUserEditForm");
 
   const form = useForm<FormValues>({
-    // @ts-expect-error - The types are correct but there's a mismatch between the expected types
-    resolver: zodResolver(createFormSchema(t as unknown as EditUserTranslations)) as unknown as Resolver<FormValues>,
+    resolver: zodResolver(createFormSchema(t as unknown as EditUserTranslations)),
     defaultValues: {
       name: user.name,
       email: user.email,
@@ -73,57 +72,71 @@ export function EditUserForm({ user }: FormEditProps) {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <Field>
-        <FieldLabel htmlFor="name">{t("formLabels.name")}</FieldLabel>
-        <FieldGroup>
-          <Input
-            id="name"
-            aria-invalid={!!form.formState.errors.name}
-            {...form.register("name")}
-            data-testid="admin.users.edit.form.name"
-          />
-        </FieldGroup>
-        <FieldError errors={[form.formState.errors.name]} />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="email">{t("formLabels.email")}</FieldLabel>
-        <FieldGroup>
-          <Input
-            id="email"
-            aria-invalid={!!form.formState.errors.email}
-            {...form.register("email")}
-            data-testid="admin.users.edit.form.email"
-          />
-        </FieldGroup>
-        <FieldError errors={[form.formState.errors.email]} />
-      </Field>
-      <Field>
-        <FieldLabel htmlFor="role">{t("formLabels.role")}</FieldLabel>
-        <FieldGroup>
-          <Select
-            value={form.watch("role")}
-            onValueChange={(value) => form.setValue("role", value)}
-            defaultValue={form.getValues("role")}
-          >
-            <SelectTrigger
-              id="role"
-              className="w-full sm:w-1/2 lg:w-1/3"
-              aria-invalid={!!form.formState.errors.role}
-              data-testid="admin.users.edit.form.role"
-            >
-              <SelectValue placeholder={t("formPlaceholders.selectRole")} />
-            </SelectTrigger>
-            <SelectContent>
-              {getRoles(t as unknown as EditUserTranslations).map((role) => (
-                <SelectItem key={role.value} value={role.value}>
-                  {role.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FieldGroup>
-        <FieldError errors={[form.formState.errors.role]} />
-      </Field>
+      <Controller
+        name="name"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("formLabels.name")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                {...field}
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                data-testid="admin.users.edit.form.name"
+              />
+            </FieldGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <Controller
+        name="email"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("formLabels.email")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                {...field}
+                id={field.name}
+                aria-invalid={fieldState.invalid}
+                data-testid="admin.users.edit.form.email"
+              />
+            </FieldGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <Controller
+        name="role"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{t("formLabels.role")}</FieldLabel>
+            <FieldGroup>
+              <Select value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger
+                  id={field.name}
+                  className="w-full sm:w-1/2 lg:w-1/3"
+                  aria-invalid={fieldState.invalid}
+                  data-testid="admin.users.edit.form.role"
+                >
+                  <SelectValue placeholder={t("formPlaceholders.selectRole")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {getRoles(t as unknown as EditUserTranslations).map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FieldGroup>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
       <Button
         type="submit"
         className="cursor-pointer"

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { type Resolver, useForm } from "react-hook-form";
+import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { OrganizationSelect } from "@/components/form/organization-select";
@@ -88,42 +88,52 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-4">
-        <Field>
-          <FieldLabel htmlFor="email">{t("formLabels.email")}</FieldLabel>
-          <FieldGroup>
-            <Input
-              id="email"
-              disabled={!!user}
-              type="email"
-              placeholder={t("formPlaceholders.email")}
-              aria-invalid={!!form.formState.errors.email}
-              {...form.register("email")}
-              data-testid="admin.users.invite.form.email"
-            />
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.email]} />
-        </Field>
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel htmlFor="email">{t("formLabels.email")}</FieldLabel>
+              <FieldGroup>
+                <Input
+                  id="email"
+                  disabled={!!user}
+                  type="email"
+                  placeholder={t("formPlaceholders.email")}
+                  data-invalid={fieldState.invalid}
+                  {...field}
+                  data-testid="admin.users.invite.form.email"
+                />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Field>
-          <FieldLabel htmlFor="role">{t("formLabels.role")}</FieldLabel>
-          <FieldGroup>
-            <Select
-              value={form.watch("role")}
-              onValueChange={(value) => form.setValue("role", value as "member" | "admin" | "owner")}>
-              <SelectTrigger id="role" className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.invite.form.role">
-                <SelectValue placeholder={t("formPlaceholders.selectRole")} />
-              </SelectTrigger>
-              <SelectContent>
-                {roles.map((role) => (
-                  <SelectItem key={role.value} value={role.value}>
-                    {role.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FieldGroup>
-          <FieldError errors={[form.formState.errors.role]} />
-        </Field>
+        <Controller
+          name="role"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel htmlFor="role">{t("formLabels.role")}</FieldLabel>
+              <FieldGroup>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="role" className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.invite.form.role">
+                    <SelectValue placeholder={t("formPlaceholders.selectRole")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
         {!organizationId && (
           <Field>

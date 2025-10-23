@@ -5,7 +5,7 @@ import { Terminal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -78,17 +78,24 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentPropsW
         <CardContent>
           <form data-testid="auth.reset-password.form" onSubmit={form.handleSubmit(handleSubmit)}>
             <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="reset-password-new-password">{t("resetPassword.form.newPassword")}</FieldLabel>
-                <Input
-                  id="reset-password-new-password"
-                  type="password"
-                  autoComplete="new-password"
-                  {...form.register("newPassword")}
-                  data-testid="auth.reset-password.form.password"
-                />
-                <FieldError errors={[form.formState.errors.newPassword]} />
-              </Field>
+              <Controller
+                name="newPassword"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel htmlFor="reset-password-new-password">{t("resetPassword.form.newPassword")}</FieldLabel>
+                    <Input
+                      id="reset-password-new-password"
+                      type="password"
+                      autoComplete="new-password"
+                      data-invalid={fieldState.invalid}
+                      {...field}
+                      data-testid="auth.reset-password.form.password"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
 
               <Button
                 type="submit"
