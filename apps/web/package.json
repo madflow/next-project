@@ -39,6 +39,7 @@
     "@react-email/components": "^0.5.0",
     "@repo/cli": "workspace:*",
     "@repo/database": "workspace:*",
+    "@repo/email": "workspace:*",
     "@sentry/nextjs": "^10.0.0",
     "@t3-oss/env-nextjs": "^0.13.8",
     "@tailwindcss/postcss": "^4.1.10",
