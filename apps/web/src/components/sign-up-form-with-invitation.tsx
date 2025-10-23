@@ -11,7 +11,7 @@ import { type SignUpSchema, signUpSchema } from "@/app/(auth)/auth/sign-up/schem
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
@@ -67,81 +67,81 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
           <CardDescription>{t("authAcceptInvitation.needToSignUp")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form data-testid="auth.sign-up-with-invitation.form" onSubmit={form.handleSubmit(handleSubmit)}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("signUp.form.email")}</FormLabel>
-                        <FormControl>
-                          <Input disabled type="email" {...field} data-testid="auth.sign-up.form.email" readOnly />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("signUp.form.name")}</FormLabel>
-                        <FormControl>
-                          <Input type="text" {...field} data-testid="auth.sign-up.form.name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("signUp.form.password")}</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} data-testid="auth.sign-up.form.password" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("signUp.form.confirmPassword")}</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} data-testid="auth.sign-up.form.confirm-password" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <Button type="submit" className="w-full cursor-pointer" data-testid="auth.sign-up.form.submit">
-                  {t("signUp.form.submit")}
-                </Button>
+          <form data-testid="auth.sign-up-with-invitation.form" onSubmit={form.handleSubmit(handleSubmit)}>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Field>
+                  <FieldLabel htmlFor="email">{t("signUp.form.email")}</FieldLabel>
+                  <FieldGroup>
+                    <Input
+                      id="email"
+                      disabled
+                      type="email"
+                      aria-invalid={!!form.formState.errors.email}
+                      {...form.register("email")}
+                      data-testid="auth.sign-up.form.email"
+                      readOnly
+                    />
+                  </FieldGroup>
+                  <FieldError errors={[form.formState.errors.email]} />
+                </Field>
               </div>
-              <div className="mt-4 text-center text-sm">
-                {t("signUp.links.login.question")}{" "}
-                <Link href="/auth/login" className="underline underline-offset-4" data-testid="auth.sign-up.form.login">
-                  {t("signUp.links.login.text")}
-                </Link>
+              <div className="grid gap-2">
+                <Field>
+                  <FieldLabel htmlFor="name">{t("signUp.form.name")}</FieldLabel>
+                  <FieldGroup>
+                    <Input
+                      id="name"
+                      type="text"
+                      aria-invalid={!!form.formState.errors.name}
+                      {...form.register("name")}
+                      data-testid="auth.sign-up.form.name"
+                    />
+                  </FieldGroup>
+                  <FieldError errors={[form.formState.errors.name]} />
+                </Field>
               </div>
-            </form>
-          </Form>
+              <div className="grid gap-2">
+                <Field>
+                  <FieldLabel htmlFor="password">{t("signUp.form.password")}</FieldLabel>
+                  <FieldGroup>
+                    <Input
+                      id="password"
+                      type="password"
+                      aria-invalid={!!form.formState.errors.password}
+                      {...form.register("password")}
+                      data-testid="auth.sign-up.form.password"
+                    />
+                  </FieldGroup>
+                  <FieldError errors={[form.formState.errors.password]} />
+                </Field>
+              </div>
+              <div className="grid gap-2">
+                <Field>
+                  <FieldLabel htmlFor="confirmPassword">{t("signUp.form.confirmPassword")}</FieldLabel>
+                  <FieldGroup>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      aria-invalid={!!form.formState.errors.confirmPassword}
+                      {...form.register("confirmPassword")}
+                      data-testid="auth.sign-up.form.confirm-password"
+                    />
+                  </FieldGroup>
+                  <FieldError errors={[form.formState.errors.confirmPassword]} />
+                </Field>
+              </div>
+              <Button type="submit" className="w-full cursor-pointer" data-testid="auth.sign-up.form.submit">
+                {t("signUp.form.submit")}
+              </Button>
+            </div>
+            <div className="mt-4 text-center text-sm">
+              {t("signUp.links.login.question")}{" "}
+              <Link href="/auth/login" className="underline underline-offset-4" data-testid="auth.sign-up.form.login">
+                {t("signUp.links.login.text")}
+              </Link>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -141,81 +141,74 @@ export function VariablesetForm({
           <DialogDescription>{isEditing ? t("form.editDescription") : t("form.createDescription")}</DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("form.name")}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t("form.namePlaceholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Field>
+            <FieldLabel htmlFor="name">{t("form.name")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                id="name"
+                placeholder={t("form.namePlaceholder")}
+                aria-invalid={!!form.formState.errors.name}
+                {...form.register("name")}
+              />
+            </FieldGroup>
+            <FieldError errors={[form.formState.errors.name]} />
+          </Field>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("form.description")}</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder={t("form.descriptionPlaceholder")} rows={3} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Field>
+            <FieldLabel htmlFor="description">{t("form.description")}</FieldLabel>
+            <FieldGroup>
+              <Textarea
+                id="description"
+                placeholder={t("form.descriptionPlaceholder")}
+                rows={3}
+                aria-invalid={!!form.formState.errors.description}
+                {...form.register("description")}
+              />
+            </FieldGroup>
+            <FieldError errors={[form.formState.errors.description]} />
+          </Field>
 
-            <FormField
-              control={form.control}
-              name="parentId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("form.parent")}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("form.selectParent")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={NO_PARENT_VALUE}>{t("form.noParent")}</SelectItem>
-                      {filteredParents.map((parent) => (
-                        <SelectItem key={parent.id} value={parent.id}>
-                          {"  ".repeat(parent.level)}
-                          {parent.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Field>
+            <FieldLabel htmlFor="parentId">{t("form.parent")}</FieldLabel>
+            <FieldGroup>
+              <Select
+                value={form.watch("parentId")}
+                onValueChange={(value) => form.setValue("parentId", value)}>
+                <SelectTrigger id="parentId">
+                  <SelectValue placeholder={t("form.selectParent")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_PARENT_VALUE}>{t("form.noParent")}</SelectItem>
+                  {filteredParents.map((parent) => (
+                    <SelectItem key={parent.id} value={parent.id}>
+                      {"  ".repeat(parent.level)}
+                      {parent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FieldGroup>
+            <FieldError errors={[form.formState.errors.parentId]} />
+          </Field>
 
-            <DialogFooter className="gap-2 sm:gap-0">
-              <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleOpenChange(false)}
-                  disabled={form.formState.isSubmitting}
-                  className="w-full sm:w-auto"
-                  data-testid="admin.dataset.variableset.form.cancel">
-                  {t("form.cancel")}
-                </Button>
-                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto" data-testid="admin.dataset.variableset.form.submit">
-                  {form.formState.isSubmitting ? t("form.saving") : isEditing ? t("form.update") : t("form.create")}
-                </Button>
-              </div>
-            </DialogFooter>
-          </form>
-        </Form>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleOpenChange(false)}
+                disabled={form.formState.isSubmitting}
+                className="w-full sm:w-auto"
+                data-testid="admin.dataset.variableset.form.cancel">
+                {t("form.cancel")}
+              </Button>
+              <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto" data-testid="admin.dataset.variableset.form.submit">
+                {form.formState.isSubmitting ? t("form.saving") : isEditing ? t("form.update") : t("form.create")}
+              </Button>
+            </div>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

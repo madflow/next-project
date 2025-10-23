@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { update } from "@/actions/dataset";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { type Dataset, updateDatasetSchema } from "@/types/dataset";
 
@@ -66,52 +66,44 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.name.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder={t("form.name.placeholder")}
-                  data-testid="admin.datasets.edit.form.name"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.description.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder={t("form.description.placeholder")}
-                  data-testid="admin.datasets.edit.form.description"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="pt-2">
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="cursor-pointer"
-            data-testid="admin.datasets.edit.form.submit">
-            {form.formState.isSubmitting ? t("form.submit.updating") : t("form.submit.update")}
-          </Button>
-        </div>
-      </form>
-    </Form>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <Field>
+        <FieldLabel htmlFor="name">{t("form.name.label")}</FieldLabel>
+        <FieldGroup>
+          <Input
+            id="name"
+            placeholder={t("form.name.placeholder")}
+            data-testid="admin.datasets.edit.form.name"
+            aria-invalid={!!form.formState.errors.name}
+            {...form.register("name")}
+          />
+        </FieldGroup>
+        <FieldError errors={[form.formState.errors.name]} />
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="description">{t("form.description.label")}</FieldLabel>
+        <FieldGroup>
+          <Input
+            id="description"
+            placeholder={t("form.description.placeholder")}
+            data-testid="admin.datasets.edit.form.description"
+            aria-invalid={!!form.formState.errors.description}
+            {...form.register("description")}
+          />
+        </FieldGroup>
+        <FieldError errors={[form.formState.errors.description]} />
+      </Field>
+
+      <div className="pt-2">
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          className="cursor-pointer"
+          data-testid="admin.datasets.edit.form.submit">
+          {form.formState.isSubmitting ? t("form.submit.updating") : t("form.submit.update")}
+        </Button>
+      </div>
+    </form>
   );
 }

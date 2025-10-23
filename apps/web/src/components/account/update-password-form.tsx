@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { changePassword } from "@/lib/auth-client";
 
@@ -59,71 +59,57 @@ export function UpdatePasswordForm() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="currentPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("account.password.fields.currentPassword")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    autoComplete="current-password"
-                    {...field}
-                    data-testid="app.user.account.password.current"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-4">
+        <Field>
+          <FieldLabel htmlFor="currentPassword">{t("account.password.fields.currentPassword")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="currentPassword"
+              type="password"
+              autoComplete="current-password"
+              aria-invalid={!!form.formState.errors.currentPassword}
+              {...form.register("currentPassword")}
+              data-testid="app.user.account.password.current"
+            />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.currentPassword]} />
+        </Field>
 
-          <FormField
-            control={form.control}
-            name="newPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("account.password.fields.newPassword")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    autoComplete="new-password"
-                    {...field}
-                    data-testid="app.user.account.password.new"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Field>
+          <FieldLabel htmlFor="newPassword">{t("account.password.fields.newPassword")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="newPassword"
+              type="password"
+              autoComplete="new-password"
+              aria-invalid={!!form.formState.errors.newPassword}
+              {...form.register("newPassword")}
+              data-testid="app.user.account.password.new"
+            />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.newPassword]} />
+        </Field>
 
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("account.password.fields.confirmPassword")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    autoComplete="new-password"
-                    {...field}
-                    data-testid="app.user.account.password.confirm"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <Field>
+          <FieldLabel htmlFor="confirmPassword">{t("account.password.fields.confirmPassword")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              aria-invalid={!!form.formState.errors.confirmPassword}
+              {...form.register("confirmPassword")}
+              data-testid="app.user.account.password.confirm"
+            />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.confirmPassword]} />
+        </Field>
+      </div>
 
-        <Button type="submit" className="cursor-pointer" data-testid="app.user.account.password.update">
-          {t("account.password.fields.update")}
-        </Button>
-      </form>
-    </Form>
+      <Button type="submit" className="cursor-pointer" data-testid="app.user.account.password.update">
+        {t("account.password.fields.update")}
+      </Button>
+    </form>
   );
 }

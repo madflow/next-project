@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { changeEmail, useSession } from "@/lib/auth-client";
 
@@ -48,37 +48,31 @@ export function UpdateEmailForm() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium">{t("account.profile.fields.currentEmail")}</p>
-            <p className="text-muted-foreground text-sm">{session?.user?.email}</p>
-          </div>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("account.profile.fields.newEmail")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder={t("account.profile.fields.newEmailPlaceholder")}
-                    {...field}
-                    data-testid="app.user.account.email"
-                  />
-                </FormControl>
-                <p className="text-muted-foreground text-xs">{t("account.profile.emailChangeNotice")}</p>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <p className="text-sm font-medium">{t("account.profile.fields.currentEmail")}</p>
+          <p className="text-muted-foreground text-sm">{session?.user?.email}</p>
         </div>
-        <Button type="submit" className="cursor-pointer" data-testid="app.user.account.email.update">
-          {t("account.profile.fields.updateEmail")}
-        </Button>
-      </form>
-    </Form>
+        <Field>
+          <FieldLabel htmlFor="email">{t("account.profile.fields.newEmail")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="email"
+              type="email"
+              placeholder={t("account.profile.fields.newEmailPlaceholder")}
+              aria-invalid={!!form.formState.errors.email}
+              {...form.register("email")}
+              data-testid="app.user.account.email"
+            />
+          </FieldGroup>
+          <FieldDescription>{t("account.profile.emailChangeNotice")}</FieldDescription>
+          <FieldError errors={[form.formState.errors.email]} />
+        </Field>
+      </div>
+      <Button type="submit" className="cursor-pointer" data-testid="app.user.account.email.update">
+        {t("account.profile.fields.updateEmail")}
+      </Button>
+    </form>
   );
 }

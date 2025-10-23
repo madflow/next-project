@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { create } from "@/actions/organization";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { type OrganizationSettings, insertOrganizationSchema } from "@/types/organization";
 import { createFormSchema } from "./defaults";
@@ -51,45 +51,36 @@ export function CreateOrganizationForm() {
 
   return (
     <div className="space-y-8">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("organization.form.name.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder={t("organization.form.name.placeholder")}
-                    data-testid="admin.organizations.new.form.name"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="slug"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("organization.form.slug.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder={t("organization.form.slug.placeholder")}
-                    data-testid="admin.organizations.new.form.slug"
-                  />
-                </FormControl>
-                <FormDescription>{t("organization.form.slug.description")}</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </form>
-      </Form>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <Field>
+          <FieldLabel htmlFor="name">{t("organization.form.name.label")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="name"
+              placeholder={t("organization.form.name.placeholder")}
+              data-testid="admin.organizations.new.form.name"
+              aria-invalid={!!form.formState.errors.name}
+              {...form.register("name")}
+            />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.name]} />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="slug">{t("organization.form.slug.label")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="slug"
+              placeholder={t("organization.form.slug.placeholder")}
+              data-testid="admin.organizations.new.form.slug"
+              aria-invalid={!!form.formState.errors.slug}
+              {...form.register("slug")}
+            />
+          </FieldGroup>
+          <FieldDescription>{t("organization.form.slug.description")}</FieldDescription>
+          <FieldError errors={[form.formState.errors.slug]} />
+        </Field>
+      </form>
 
       <div className="border-t pt-8">
         <OrganizationSettingsEditor initialSettings={form.getValues("settings")} onChangeAction={updateSettings} />
