@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { OrganizationSelect } from "@/components/form/organization-select";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { organization } from "@/lib/auth-client";
@@ -86,79 +86,70 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("formLabels.email")}</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={!!user}
-                    type="email"
-                    {...field}
-                    placeholder={t("formPlaceholders.email")}
-                    data-testid="admin.users.invite.form.email"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("formLabels.role")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.invite.form.role">
-                      <SelectValue placeholder={t("formPlaceholders.selectRole")} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
-                        {role.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {!organizationId && (
-            <FormField
-              control={form.control}
-              name="organizationId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("formLabels.organization")}</FormLabel>
-                  <OrganizationSelect onValueChangeAction={field.onChange} defaultValue={field.value} />
-                  <FormMessage />
-                </FormItem>
-              )}
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-4">
+        <Field>
+          <FieldLabel htmlFor="email">{t("formLabels.email")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="email"
+              disabled={!!user}
+              type="email"
+              placeholder={t("formPlaceholders.email")}
+              aria-invalid={!!form.formState.errors.email}
+              {...form.register("email")}
+              data-testid="admin.users.invite.form.email"
             />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.email]} />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="role">{t("formLabels.role")}</FieldLabel>
+          <FieldGroup>
+            <Select
+              value={form.watch("role")}
+              onValueChange={(value) => form.setValue("role", value as "member" | "admin" | "owner")}>
+              <SelectTrigger id="role" className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.invite.form.role">
+                <SelectValue placeholder={t("formPlaceholders.selectRole")} />
+              </SelectTrigger>
+              <SelectContent>
+                {roles.map((role) => (
+                  <SelectItem key={role.value} value={role.value}>
+                    {role.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.role]} />
+        </Field>
+
+        {!organizationId && (
+          <Field>
+            <FieldLabel>{t("formLabels.organization")}</FieldLabel>
+            <FieldGroup>
+              <OrganizationSelect
+                onValueChangeAction={(value) => form.setValue("organizationId", value)}
+                defaultValue={form.watch("organizationId")}
+              />
+            </FieldGroup>
+            <FieldError errors={[form.formState.errors.organizationId]} />
+          </Field>
+        )}
+      </div>
+      <div className="flex justify-start gap-4">
+        <Button type="submit" disabled={form.formState.isSubmitting} data-testid="admin.users.invite.form.submit">
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t("buttons.sending")}
+            </>
+          ) : (
+            t("buttons.sendInvitation")
           )}
-        </div>
-        <div className="flex justify-start gap-4">
-          <Button type="submit" disabled={form.formState.isSubmitting} data-testid="admin.users.invite.form.submit">
-            {form.formState.isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("buttons.sending")}
-              </>
-            ) : (
-              t("buttons.sendInvitation")
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
+        </Button>
+      </div>
+    </form>
   );
 }

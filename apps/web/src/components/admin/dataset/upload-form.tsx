@@ -20,7 +20,7 @@ import {
   FileUploadItemPreview,
   FileUploadList,
 } from "@/components/ui/file-upload";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -148,166 +148,142 @@ export function DatasetUploadForm() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit, onErrors)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="files"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("formLabels.name")}</FormLabel>
-                <FormControl>
-                  <FileUpload
-                    maxFiles={1}
-                    maxSize={100 * 1024 * 1024}
-                    accept=".sav"
-                    className="w-full"
-                    value={field.value}
-                    onValueChange={(value) => {
-                      const nameState = form.getFieldState("name");
-                      if (!nameState.isTouched) {
-                        const fileValue = value[0] ?? null;
-                        if (fileValue) {
-                          form.setValue("name", generateDatasetName(fileValue.name));
-                        }
-                      }
-                      field.onChange(value);
-                    }}
-                    onFileReject={(_, message) => {
-                      form.setError("files", {
-                        message,
-                      });
-                    }}
-                    multiple={false}>
-                    <FileUploadDropzone>
-                      <div className="flex flex-col items-center gap-1 text-center">
-                        <div className="flex items-center justify-center rounded-full border p-2.5">
-                          <Upload className="text-muted-foreground size-6" />
-                        </div>
-                        <p className="text-muted-foreground mb-2 text-sm">
-                          <span className="font-semibold">{t("upload.clickToUpload")}</span> {t("upload.orDragAndDrop")}
-                        </p>
-                        <p className="text-muted-foreground text-xs">{t("upload.supportedFormats")}</p>
-                      </div>
-                    </FileUploadDropzone>
-                    <FileUploadList>
-                      {field.value.map((file, index) => (
-                        <FileUploadItem key={index} value={file} data-testid="app.admin.dataset.selected-file">
-                          <FileUploadItemPreview />
-                          <FileUploadItemMetadata />
-                          <FileUploadItemDelete asChild>
-                            <Button variant="ghost" size="icon" className="size-7">
-                              <X />
-                            </Button>
-                          </FileUploadItemDelete>
-                        </FileUploadItem>
-                      ))}
-                    </FileUploadList>
-                  </FileUpload>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <form onSubmit={form.handleSubmit(onSubmit, onErrors)} className="space-y-6">
+        <Field>
+          <FieldLabel>{t("formLabels.name")}</FieldLabel>
+          <FieldGroup>
+            <FileUpload
+              maxFiles={1}
+              maxSize={100 * 1024 * 1024}
+              accept=".sav"
+              className="w-full"
+              value={form.watch("files")}
+              onValueChange={(value) => {
+                const nameState = form.getFieldState("name");
+                if (!nameState.isTouched) {
+                  const fileValue = value[0] ?? null;
+                  if (fileValue) {
+                    form.setValue("name", generateDatasetName(fileValue.name));
+                  }
+                }
+                form.setValue("files", value);
+              }}
+              onFileReject={(_, message) => {
+                form.setError("files", {
+                  message,
+                });
+              }}
+              multiple={false}>
+              <FileUploadDropzone>
+                <div className="flex flex-col items-center gap-1 text-center">
+                  <div className="flex items-center justify-center rounded-full border p-2.5">
+                    <Upload className="text-muted-foreground size-6" />
+                  </div>
+                  <p className="text-muted-foreground mb-2 text-sm">
+                    <span className="font-semibold">{t("upload.clickToUpload")}</span> {t("upload.orDragAndDrop")}
+                  </p>
+                  <p className="text-muted-foreground text-xs">{t("upload.supportedFormats")}</p>
+                </div>
+              </FileUploadDropzone>
+              <FileUploadList>
+                {form.watch("files").map((file, index) => (
+                  <FileUploadItem key={index} value={file} data-testid="app.admin.dataset.selected-file">
+                    <FileUploadItemPreview />
+                    <FileUploadItemMetadata />
+                    <FileUploadItemDelete asChild>
+                      <Button variant="ghost" size="icon" className="size-7">
+                        <X />
+                      </Button>
+                    </FileUploadItemDelete>
+                  </FileUploadItem>
+                ))}
+              </FileUploadList>
+            </FileUpload>
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.files]} />
+        </Field>
 
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("formLabels.name")}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("formLabels.name")} {...field} data-testid="app.admin.dataset.name-input" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Field>
+          <FieldLabel htmlFor="name">{t("formLabels.name")}</FieldLabel>
+          <FieldGroup>
+            <Input
+              id="name"
+              placeholder={t("formLabels.name")}
+              aria-invalid={!!form.formState.errors.name}
+              {...form.register("name")}
+              data-testid="app.admin.dataset.name-input"
+            />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.name]} />
+        </Field>
 
-          <FormField
-            control={form.control}
-            name="organizationId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("formLabels.organization")}</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  data-testid="app.admin.dataset.organization-select">
-                  <FormControl>
-                    <SelectTrigger className="w-full" data-testid="app.admin.dataset.organization-trigger">
-                      <SelectValue placeholder={t("formLabels.organization")} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {isLoading ? (
-                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("buttons.uploading")}</div>
-                    ) : organizations.length === 0 ? (
-                      <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("messages.noOrganizations")}</div>
-                    ) : (
-                      organizations.map((org) => (
-                        <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
-                          {org.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Field>
+          <FieldLabel htmlFor="organizationId">{t("formLabels.organization")}</FieldLabel>
+          <FieldGroup>
+            <Select
+              value={form.watch("organizationId")}
+              onValueChange={(value) => form.setValue("organizationId", value)}
+              data-testid="app.admin.dataset.organization-select">
+              <SelectTrigger id="organizationId" className="w-full" data-testid="app.admin.dataset.organization-trigger">
+                <SelectValue placeholder={t("formLabels.organization")} />
+              </SelectTrigger>
+              <SelectContent>
+                {isLoading ? (
+                  <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("buttons.uploading")}</div>
+                ) : organizations.length === 0 ? (
+                  <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("messages.noOrganizations")}</div>
+                ) : (
+                  organizations.map((org) => (
+                    <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
+                      {org.name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.organizationId]} />
+        </Field>
 
-          <FormField
-            control={form.control}
-            name="missingValues"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("formLabels.defaultMissingValues")}</FormLabel>
-                <FormControl>
-                  <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Field>
+          <FieldLabel>{t("formLabels.defaultMissingValues")}</FieldLabel>
+          <FieldGroup>
+            <TextArrayEditor value={form.watch("missingValues") ?? []} onChange={(value) => form.setValue("missingValues", value)} />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.missingValues]} />
+        </Field>
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("formLabels.description")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("formLabels.description")}
-                    disabled={isPending || isUploading}
-                    rows={3}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Field>
+          <FieldLabel htmlFor="description">{t("formLabels.description")}</FieldLabel>
+          <FieldGroup>
+            <Textarea
+              id="description"
+              placeholder={t("formLabels.description")}
+              disabled={isPending || isUploading}
+              rows={3}
+              aria-invalid={!!form.formState.errors.description}
+              {...form.register("description")}
+            />
+          </FieldGroup>
+          <FieldError errors={[form.formState.errors.description]} />
+        </Field>
 
-          <div className="flex justify-start space-x-4 pt-4">
-            <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
-              {t("buttons.cancel")}
-            </Button>
-            <Button type="submit" data-testid="app.admin.dataset.upload-button" disabled={isPending || isUploading}>
-              {isUploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("buttons.uploading")}
-                </>
-              ) : (
-                t("buttons.upload")
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
+        <div className="flex justify-start space-x-4 pt-4">
+          <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
+            {t("buttons.cancel")}
+          </Button>
+          <Button type="submit" data-testid="app.admin.dataset.upload-button" disabled={isPending || isUploading}>
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t("buttons.uploading")}
+              </>
+            ) : (
+              t("buttons.upload")
+            )}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

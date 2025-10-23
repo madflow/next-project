@@ -10,7 +10,7 @@ import { z } from "zod";
 import { update } from "@/actions/dataset-variable";
 import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { DatasetVariable, updateDatasetVariableSchema } from "@/types/dataset-variable";
 
@@ -70,74 +70,68 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
 
   return (
     <div className="space-y-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid gap-4">
-            <FormItem>
-              <FormLabel>{t("editVariable.form.name.label")}</FormLabel>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid gap-4">
+          <Field>
+            <FieldLabel>{t("editVariable.form.name.label")}</FieldLabel>
+            <FieldGroup>
               <Input value={getFieldValue(datasetVariable.name)} disabled />
-            </FormItem>
+            </FieldGroup>
+          </Field>
 
-            <FormField
-              control={form.control}
-              name="label"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("editVariable.form.label.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("editVariable.form.label.placeholder")}
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      name={field.name}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Field>
+            <FieldLabel htmlFor="label">{t("editVariable.form.label.label")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                id="label"
+                placeholder={t("editVariable.form.label.placeholder")}
+                aria-invalid={!!form.formState.errors.label}
+                {...form.register("label")}
+              />
+            </FieldGroup>
+            <FieldError errors={[form.formState.errors.label]} />
+          </Field>
 
-            <FormField
-              control={form.control}
-              name="missingValues"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("editVariable.form.missingValues.label")}</FormLabel>
-                  <FormControl>
-                    <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormItem>
-              <FormLabel>{t("editVariable.form.type.label")}</FormLabel>
+          <Field>
+            <FieldLabel>{t("editVariable.form.missingValues.label")}</FieldLabel>
+            <FieldGroup>
+              <TextArrayEditor
+                value={form.watch("missingValues") ?? []}
+                onChange={(value) => form.setValue("missingValues", value)}
+              />
+            </FieldGroup>
+            <FieldError errors={[form.formState.errors.missingValues]} />
+          </Field>
+
+          <Field>
+            <FieldLabel>{t("editVariable.form.type.label")}</FieldLabel>
+            <FieldGroup>
               <Input value={datasetVariable.type} disabled />
-            </FormItem>
+            </FieldGroup>
+          </Field>
 
-            <FormItem>
-              <FormLabel>{t("editVariable.form.measure.label")}</FormLabel>
+          <Field>
+            <FieldLabel>{t("editVariable.form.measure.label")}</FieldLabel>
+            <FieldGroup>
               <Input value={datasetVariable.measure} disabled />
-            </FormItem>
-          </div>
+            </FieldGroup>
+          </Field>
+        </div>
 
-          <div className="flex justify-start gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push(`/admin/datasets/${datasetVariable.datasetId}/editor`)}
-              className="cursor-pointer"
-              disabled={isLoading}>
-              {t("common.cancel")}
-            </Button>
-            <Button type="submit" disabled={isLoading} className="cursor-pointer">
-              {isLoading ? t("common.saving") : t("common.saveChanges")}
-            </Button>
-          </div>
-        </form>
-      </Form>
+        <div className="flex justify-start gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push(`/admin/datasets/${datasetVariable.datasetId}/editor`)}
+            className="cursor-pointer"
+            disabled={isLoading}>
+            {t("common.cancel")}
+          </Button>
+          <Button type="submit" disabled={isLoading} className="cursor-pointer">
+            {isLoading ? t("common.saving") : t("common.saveChanges")}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { create } from "@/actions/project";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Organization } from "@/types/organization";
@@ -88,84 +88,82 @@ export function CreateProjectForm() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.name.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder={t("form.name.placeholder")} data-testid="admin.projects.new.form.name" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="slug"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.slug.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder={t("form.slug.placeholder")} data-testid="admin.projects.new.form.slug" />
-              </FormControl>
-              <FormDescription>{t("form.slug.description")}</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="organizationId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.organization.label")}</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} data-testid="organization-select">
-                <FormControl>
-                  <SelectTrigger className="w-full sm:max-w-[50%]">
-                    <SelectValue placeholder={t("form.organization.placeholder")} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {isLoading ? (
-                    <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.loading")}</div>
-                  ) : organizations.length === 0 ? (
-                    <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.notFound")}</div>
-                  ) : (
-                    organizations.map((org) => (
-                      <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
-                        {org.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex justify-start gap-4 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-            disabled={form.formState.isSubmitting || isLoading}
-            className="cursor-pointer">
-            {t("form.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting || isLoading || organizations.length === 0}
-            className="cursor-pointer"
-            data-testid="admin.projects.new.form.submit">
-            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {form.formState.isSubmitting ? t("form.submit.creating") : t("form.submit.create")}
-          </Button>
-        </div>
-      </form>
-    </Form>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <Field>
+        <FieldLabel htmlFor="name">{t("form.name.label")}</FieldLabel>
+        <FieldGroup>
+          <Input
+            id="name"
+            placeholder={t("form.name.placeholder")}
+            data-testid="admin.projects.new.form.name"
+            aria-invalid={!!form.formState.errors.name}
+            {...form.register("name")}
+          />
+        </FieldGroup>
+        <FieldError errors={[form.formState.errors.name]} />
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="slug">{t("form.slug.label")}</FieldLabel>
+        <FieldGroup>
+          <Input
+            id="slug"
+            placeholder={t("form.slug.placeholder")}
+            data-testid="admin.projects.new.form.slug"
+            aria-invalid={!!form.formState.errors.slug}
+            {...form.register("slug")}
+          />
+        </FieldGroup>
+        <FieldDescription>{t("form.slug.description")}</FieldDescription>
+        <FieldError errors={[form.formState.errors.slug]} />
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="organizationId">{t("form.organization.label")}</FieldLabel>
+        <FieldGroup>
+          <Select
+            onValueChange={(value) => form.setValue("organizationId", value)}
+            defaultValue={form.watch("organizationId")}
+            data-testid="organization-select">
+            <SelectTrigger id="organizationId" className="w-full sm:max-w-[50%]">
+              <SelectValue placeholder={t("form.organization.placeholder")} />
+            </SelectTrigger>
+            <SelectContent>
+              {isLoading ? (
+                <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.loading")}</div>
+              ) : organizations.length === 0 ? (
+                <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.notFound")}</div>
+              ) : (
+                organizations.map((org) => (
+                  <SelectItem key={org.id} value={org.id} data-testid={`org-option-${org.slug}`}>
+                    {org.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </FieldGroup>
+        <FieldError errors={[form.formState.errors.organizationId]} />
+      </Field>
+
+      <div className="flex justify-start gap-4 pt-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={form.formState.isSubmitting || isLoading}
+          className="cursor-pointer">
+          {t("form.cancel")}
+        </Button>
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting || isLoading || organizations.length === 0}
+          className="cursor-pointer"
+          data-testid="admin.projects.new.form.submit">
+          {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {form.formState.isSubmitting ? t("form.submit.creating") : t("form.submit.create")}
+        </Button>
+      </div>
+    </form>
   );
 }
