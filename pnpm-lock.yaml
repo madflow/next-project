@@ -318,8 +318,8 @@ importers:
         specifier: ^0.0.22
         version: 0.0.22(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nodemailer:
-        specifier: ^6.9.3
-        version: 6.10.1
+        specifier: ^7.0.0
+        version: 7.0.9
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -5727,10 +5727,6 @@ packages:
 
   node-releases@2.0.25:
     resolution: {integrity: sha512-4auku8B/vw5psvTiiN9j1dAOsXvMoGqJuKJcR+dTdqiXEK20mMTk1UEo3HS16LeGQsVG6+qKTPM9u/qQ2LqATA==}
-
-  nodemailer@6.10.1:
-    resolution: {integrity: sha512-Z+iLaBGVaSjbIzQ4pX6XV41HrooLsQ10ZWPUehGmuantvzWoDVBnmsdUcOIDM1t+yPor5pDhVlDESgOMEGxhHA==}
-    engines: {node: '>=6.0.0'}
 
   nodemailer@7.0.9:
     resolution: {integrity: sha512-9/Qm0qXIByEP8lEV2qOqcAW7bRpL8CR9jcTwk3NBnHJNmP9fIJ86g2fgmIXqHY+nj55ZEMwWqYAT2QTDpRUYiQ==}
@@ -13223,8 +13219,6 @@ snapshots:
       whatwg-url: 5.0.0
 
   node-releases@2.0.25: {}
-
-  nodemailer@6.10.1: {}
 
   nodemailer@7.0.9: {}
 
