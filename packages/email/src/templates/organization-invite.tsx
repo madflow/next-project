@@ -14,16 +14,16 @@ import { Footer } from "../components/footer";
 import type { OrganizationInviteProps } from "../types";
 
 export default function OrganizationInvite({
-  email = "user@example.com",
-  url = "http://localhost:3000/auth/accept-invitation/inv_12345",
-  organizationName = "Acme Corporation",
-  inviterName = "John Doe",
-  inviterEmail = "john@example.com",
-  heading = "You Have Been Invited",
-  content = "You have been invited to join an organization.",
-  action = "Accept Invitation",
-  baseUrl = "http://localhost:3000",
-  siteName = "Next.js App",
+  email,
+  url,
+  organizationName,
+  inviterName,
+  inviterEmail,
+  heading,
+  content,
+  action,
+  baseUrl,
+  siteName,
 }: OrganizationInviteProps) {
   return (
     <Html>
@@ -72,3 +72,16 @@ export default function OrganizationInvite({
     </Html>
   );
 }
+
+OrganizationInvite.PreviewProps = {
+  email: "user@example.com",
+  url: "http://localhost:3000/auth/accept-invitation/inv_12345",
+  organizationName: "Acme Corporation",
+  inviterName: "John Doe",
+  inviterEmail: "john@example.com",
+  heading: "You Have Been Invited",
+  content: "You have been invited to join an organization.",
+  action: "Accept Invitation",
+  baseUrl: "http://localhost:3000",
+  siteName: "Next.js App",
+} as OrganizationInviteProps;

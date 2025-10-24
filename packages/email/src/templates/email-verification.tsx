@@ -14,13 +14,13 @@ import { Footer } from "../components/footer";
 import type { EmailTemplateProps } from "../types";
 
 export default function EmailVerification({
-  email = "user@example.com",
-  url = "http://localhost:3000/auth/verify?token=abc123xyz",
-  heading = "Email Verification",
-  content = "In order to be able to log in, you need to verify your email address.",
-  action = "Verify Email",
-  baseUrl = "http://localhost:3000",
-  siteName = "Next.js App",
+  email,
+  url,
+  heading,
+  content,
+  action,
+  baseUrl,
+  siteName,
 }: EmailTemplateProps) {
   return (
     <Html>
@@ -54,3 +54,13 @@ export default function EmailVerification({
     </Html>
   );
 }
+
+EmailVerification.PreviewProps = {
+  email: "user@example.com",
+  url: "http://localhost:3000/auth/verify?token=abc123xyz",
+  heading: "Email Verification",
+  content: "In order to be able to log in, you need to verify your email address.",
+  action: "Verify Email",
+  baseUrl: "http://localhost:3000",
+  siteName: "Next.js App",
+} as EmailTemplateProps;
