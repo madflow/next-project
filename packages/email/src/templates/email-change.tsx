@@ -14,14 +14,14 @@ import { Footer } from "../components/footer";
 import type { EmailChangeProps } from "../types";
 
 export default function EmailChange({
-  email = "user@example.com",
-  newEmail = "newemail@example.com",
-  url = "http://localhost:3000/auth/verify-email-change?token=change123",
-  heading = "Confirm Your New Email Address",
-  content = "You have requested to change your email address.",
-  action = "Verify Email Change",
-  baseUrl = "http://localhost:3000",
-  siteName = "Next.js App",
+  email,
+  newEmail,
+  url,
+  heading,
+  content,
+  action,
+  baseUrl,
+  siteName,
 }: EmailChangeProps) {
   return (
     <Html>
@@ -63,3 +63,14 @@ export default function EmailChange({
     </Html>
   );
 }
+
+EmailChange.PreviewProps = {
+  email: "user@example.com",
+  newEmail: "newemail@example.com",
+  url: "http://localhost:3000/auth/verify-email-change?token=change123",
+  heading: "Confirm Your New Email Address",
+  content: "You have requested to change your email address.",
+  action: "Verify Email Change",
+  baseUrl: "http://localhost:3000",
+  siteName: "Next.js App",
+} as EmailChangeProps;

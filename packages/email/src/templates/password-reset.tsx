@@ -14,13 +14,13 @@ import { Footer } from "../components/footer";
 import type { EmailTemplateProps } from "../types";
 
 export default function PasswordReset({
-  email = "user@example.com",
-  url = "http://localhost:3000/auth/reset-password?token=xyz789abc",
-  heading = "Reset Your Password",
-  content = "You are receiving this email because we received a password reset request for your account.",
-  action = "Reset Password",
-  baseUrl = "http://localhost:3000",
-  siteName = "Next.js App",
+  email,
+  url,
+  heading,
+  content,
+  action,
+  baseUrl,
+  siteName,
 }: EmailTemplateProps) {
   return (
     <Html>
@@ -57,3 +57,13 @@ export default function PasswordReset({
     </Html>
   );
 }
+
+PasswordReset.PreviewProps = {
+  email: "user@example.com",
+  url: "http://localhost:3000/auth/reset-password?token=xyz789abc",
+  heading: "Reset Your Password",
+  content: "You are receiving this email because we received a password reset request for your account.",
+  action: "Reset Password",
+  baseUrl: "http://localhost:3000",
+  siteName: "Next.js App",
+} as EmailTemplateProps;
