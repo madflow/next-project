@@ -13,7 +13,7 @@ import {
 import { Footer } from "../components/footer";
 import type { OrganizationInviteProps } from "../types";
 
-export function OrganizationInvite({
+export default function OrganizationInvite({
   email = "user@example.com",
   url = "http://localhost:3000/auth/accept-invitation/inv_12345",
   organizationName = "Acme Corporation",

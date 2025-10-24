@@ -13,7 +13,7 @@ import {
 import { Footer } from "../components/footer";
 import type { EmailChangeProps } from "../types";
 
-export function EmailChange({
+export default function EmailChange({
   email = "user@example.com",
   newEmail = "newemail@example.com",
   url = "http://localhost:3000/auth/verify-email-change?token=change123",
