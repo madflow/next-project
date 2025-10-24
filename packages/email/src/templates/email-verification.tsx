@@ -13,7 +13,7 @@ import {
 import { Footer } from "../components/footer";
 import type { EmailTemplateProps } from "../types";
 
-export function EmailVerification({
+export default function EmailVerification({
   email = "user@example.com",
   url = "http://localhost:3000/auth/verify?token=abc123xyz",
   heading = "Email Verification",

@@ -13,7 +13,7 @@ import {
 import { Footer } from "../components/footer";
 import type { EmailTemplateProps } from "../types";
 
-export function PasswordReset({
+export default function PasswordReset({
   email = "user@example.com",
   url = "http://localhost:3000/auth/reset-password?token=xyz789abc",
   heading = "Reset Your Password",
