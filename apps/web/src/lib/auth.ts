@@ -7,7 +7,7 @@ import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
 import { sendEmail, EmailVerification, PasswordReset, EmailChange, OrganizationInvite, getEmailTranslations } from "@repo/email";
 import { env } from "@/env";
-import { extractAppLocale } from "@/i18n/config";
+import { defaultLocale, extractAppLocale } from "@/i18n/config";
 
 export const USER_ADMIN_ROLE = "admin";
 export const USER_ROLE = "user";
@@ -88,7 +88,7 @@ export const auth = betterAuth({
 
         const cookieHeader = request?.headers.get("cookie");
         const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
-        const locale = requestedLocale ?? user.locale;
+        const locale =user.locale || requestedLocale || defaultLocale;
         const { subject, heading, content, action } = getEmailTranslations("emailChange", locale, { newEmail });
 
         await sendEmail({
@@ -129,7 +129,8 @@ export const auth = betterAuth({
       const { user, url } = data;
       const cookieHeader = request?.headers.get("cookie");
       const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
-      const locale = requestedLocale ?? user.locale;
+
+      const locale =user.locale || requestedLocale || defaultLocale;
       const { subject, heading, content, action } = getEmailTranslations("emailVerification", locale);
       await sendEmail({
         to: user.email,
@@ -157,7 +158,7 @@ export const auth = betterAuth({
       const { user, url } = data;
       const cookieHeader = request?.headers.get("cookie");
       const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
-      const locale = requestedLocale ?? user.locale;
+      const locale =user.locale || requestedLocale || defaultLocale;
       const { subject, heading, content, action } = getEmailTranslations("passwordReset", locale);
       await sendEmail({
         to: user.email,
@@ -201,7 +202,7 @@ export const auth = betterAuth({
         const inviterLocale = inviter[0]?.locale ?? undefined;
         const cookieHeader = request?.headers.get("cookie");
         const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
-        const locale = requestedLocale ?? inviterLocale;
+        const locale = inviterLocale || requestedLocale || defaultLocale;
 
         const inviteLink = `${env.BASE_URL}/auth/accept-invitation/${data.invitation.id}`;
         const { subject, heading, content, action } = getEmailTranslations("organizationInvite", locale, {
