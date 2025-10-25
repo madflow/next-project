@@ -7,6 +7,7 @@ import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
 import { sendEmail, EmailVerification, PasswordReset, EmailChange, OrganizationInvite, getEmailTranslations } from "@repo/email";
 import { env } from "@/env";
+import { extractAppLocale } from "@/i18n/config";
 
 export const USER_ADMIN_ROLE = "admin";
 export const USER_ROLE = "user";
@@ -82,9 +83,13 @@ export const auth = betterAuth({
         user: { email: string; locale?: string };
         newEmail: string;
         url: string;
-      }) => {
+      }, request) => {
         const { user, newEmail, url } = data;
-        const { subject, heading, content, action } = getEmailTranslations("emailChange", user.locale, { newEmail });
+
+        const cookieHeader = request?.headers.get("cookie");
+        const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
+        const locale = requestedLocale ?? user.locale;
+        const { subject, heading, content, action } = getEmailTranslations("emailChange", locale, { newEmail });
 
         await sendEmail({
           to: user.email,
@@ -100,7 +105,7 @@ export const auth = betterAuth({
             newEmail,
             baseUrl: env.BASE_URL,
             siteName: env.SITE_NAME,
-            locale: user.locale,
+            locale,
           }),
         });
       },
@@ -120,9 +125,12 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
-    sendVerificationEmail: async (data: { user: { email: string; locale?: string }; url: string }) => {
+    sendVerificationEmail: async (data: { user: { email: string; locale?: string }; url: string }, request) => {
       const { user, url } = data;
-      const { subject, heading, content, action } = getEmailTranslations("emailVerification", user.locale);
+      const cookieHeader = request?.headers.get("cookie");
+      const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
+      const locale = requestedLocale ?? user.locale;
+      const { subject, heading, content, action } = getEmailTranslations("emailVerification", locale);
       await sendEmail({
         to: user.email,
         from: env.MAIL_DEFAULT_SENDER,
@@ -136,7 +144,7 @@ export const auth = betterAuth({
           action,
           baseUrl: env.BASE_URL,
           siteName: env.SITE_NAME,
-          locale: user.locale,
+          locale,
         }),
       });
     },
@@ -145,9 +153,12 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     disableSignUp: false, // this needs to stay false, when private signup via invitation should work
-    sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }) => {
+    sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }, request) => {
       const { user, url } = data;
-      const { subject, heading, content, action } = getEmailTranslations("passwordReset", user.locale);
+      const cookieHeader = request?.headers.get("cookie");
+      const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
+      const locale = requestedLocale ?? user.locale;
+      const { subject, heading, content, action } = getEmailTranslations("passwordReset", locale);
       await sendEmail({
         to: user.email,
         from: env.MAIL_DEFAULT_SENDER,
@@ -161,7 +172,7 @@ export const auth = betterAuth({
           action,
           baseUrl: env.BASE_URL,
           siteName: env.SITE_NAME,
-          locale: user.locale,
+          locale,
         }),
       });
     },
@@ -180,16 +191,20 @@ export const auth = betterAuth({
           },
         },
       },
-      async sendInvitationEmail(data) {
+      async sendInvitationEmail(data, request) {
         const inviter = await db
           .select()
           .from(authSchema.user)
           .where(eq(authSchema.user.id, data.invitation.inviterId))
           .limit(1);
+
         const inviterLocale = inviter[0]?.locale ?? undefined;
+        const cookieHeader = request?.headers.get("cookie");
+        const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
+        const locale = requestedLocale ?? inviterLocale;
 
         const inviteLink = `${env.BASE_URL}/auth/accept-invitation/${data.invitation.id}`;
-        const { subject, heading, content, action } = getEmailTranslations("organizationInvite", inviterLocale, {
+        const { subject, heading, content, action } = getEmailTranslations("organizationInvite", locale, {
           organizationName: data.organization.name,
         });
         await sendEmail({
@@ -206,7 +221,7 @@ export const auth = betterAuth({
             organizationName: data.organization.name,
             baseUrl: env.BASE_URL,
             siteName: env.SITE_NAME,
-            locale: inviterLocale,
+            locale,
           }),
         });
       },
