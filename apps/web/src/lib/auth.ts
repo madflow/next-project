@@ -5,8 +5,7 @@ import { admin as adminPlugin, organization as organizationPlugin } from "better
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
-import { sendEmail, EmailVerification, PasswordReset, EmailChange, OrganizationInvite } from "@repo/email";
-import { getEmailMessage } from "@/email/messages";
+import { sendEmail, EmailVerification, PasswordReset, EmailChange, OrganizationInvite, getEmailTranslations } from "@repo/email";
 import { env } from "@/env";
 
 export const USER_ADMIN_ROLE = "admin";
@@ -85,7 +84,7 @@ export const auth = betterAuth({
         url: string;
       }) => {
         const { user, newEmail, url } = data;
-        const { subject, heading, content, action } = getEmailMessage("emailChange", user.locale, { newEmail });
+        const { subject, heading, content, action } = getEmailTranslations("emailChange", user.locale, { newEmail });
 
         await sendEmail({
           to: user.email,
@@ -101,6 +100,7 @@ export const auth = betterAuth({
             newEmail,
             baseUrl: env.BASE_URL,
             siteName: env.SITE_NAME,
+            locale: user.locale,
           }),
         });
       },
@@ -122,7 +122,7 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendVerificationEmail: async (data: { user: { email: string; locale?: string }; url: string }) => {
       const { user, url } = data;
-      const { subject, heading, content, action } = getEmailMessage("emailVerification", user.locale);
+      const { subject, heading, content, action } = getEmailTranslations("emailVerification", user.locale);
       await sendEmail({
         to: user.email,
         from: env.MAIL_DEFAULT_SENDER,
@@ -136,6 +136,7 @@ export const auth = betterAuth({
           action,
           baseUrl: env.BASE_URL,
           siteName: env.SITE_NAME,
+          locale: user.locale,
         }),
       });
     },
@@ -146,7 +147,7 @@ export const auth = betterAuth({
     disableSignUp: false, // this needs to stay false, when private signup via invitation should work
     sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }) => {
       const { user, url } = data;
-      const { subject, heading, content, action } = getEmailMessage("passwordReset", user.locale);
+      const { subject, heading, content, action } = getEmailTranslations("passwordReset", user.locale);
       await sendEmail({
         to: user.email,
         from: env.MAIL_DEFAULT_SENDER,
@@ -160,6 +161,7 @@ export const auth = betterAuth({
           action,
           baseUrl: env.BASE_URL,
           siteName: env.SITE_NAME,
+          locale: user.locale,
         }),
       });
     },
@@ -179,9 +181,16 @@ export const auth = betterAuth({
         },
       },
       async sendInvitationEmail(data) {
+        const inviter = await db
+          .select()
+          .from(authSchema.user)
+          .where(eq(authSchema.user.id, data.invitation.inviterId))
+          .limit(1);
+        const inviterLocale = inviter[0]?.locale ?? undefined;
+
         const inviteLink = `${env.BASE_URL}/auth/accept-invitation/${data.invitation.id}`;
-        const { subject, heading, content, action } = getEmailMessage("emailInvitation", "en", {
-          inviteLink,
+        const { subject, heading, content, action } = getEmailTranslations("organizationInvite", inviterLocale, {
+          organizationName: data.organization.name,
         });
         await sendEmail({
           to: data.invitation.email,
@@ -197,6 +206,7 @@ export const auth = betterAuth({
             organizationName: data.organization.name,
             baseUrl: env.BASE_URL,
             siteName: env.SITE_NAME,
+            locale: inviterLocale,
           }),
         });
       },

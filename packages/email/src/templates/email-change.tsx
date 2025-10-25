@@ -12,6 +12,7 @@ import {
 } from "@react-email/components";
 import { Footer } from "../components/footer";
 import type { EmailChangeProps } from "../types";
+import { getEmailTranslations } from "../translations";
 
 export default function EmailChange({
   email,
@@ -22,7 +23,10 @@ export default function EmailChange({
   action,
   baseUrl,
   siteName,
+  locale = "en",
 }: EmailChangeProps) {
+  const t = getEmailTranslations("emailChange", locale, { newEmail });
+  
   return (
     <Html>
       <Head />
@@ -37,10 +41,10 @@ export default function EmailChange({
               {content}
             </Text>
             <Text className="text-sm leading-6 text-black">
-              Your new email address will be: <strong>{newEmail}</strong>
+              {t.newEmailLabel} <strong>{newEmail}</strong>
             </Text>
             <Text className="text-sm leading-6 text-black">
-              Please confirm this change by clicking the button below.
+              {t.confirmInstructions}
             </Text>
             <Section className="my-8">
               <Link
@@ -51,12 +55,12 @@ export default function EmailChange({
               </Link>
             </Section>
             <Text className="text-sm leading-6 text-black">
-              or copy and paste this URL into your browser:
+              {t.urlInstructions}
             </Text>
             <Text className="max-w-sm flex-wrap break-words font-medium text-purple-600 no-underline">
               {url.replace(/^https?:\/\//, "")}
             </Text>
-            <Footer email={email} baseUrl={baseUrl} siteName={siteName} />
+            <Footer email={email} baseUrl={baseUrl} siteName={siteName} locale={locale} />
           </Container>
         </Body>
       </Tailwind>
@@ -73,4 +77,5 @@ EmailChange.PreviewProps = {
   action: "Verify Email Change",
   baseUrl: "http://localhost:3000",
   siteName: "Next.js App",
+  locale: "en",
 } as EmailChangeProps;

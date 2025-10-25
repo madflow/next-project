@@ -1,3 +1,8 @@
+/**
+ * @deprecated This file is deprecated. Use getEmailTranslations from @repo/email instead.
+ * This file is kept for backwards compatibility but should not be used in new code.
+ */
+
 // Simple message templates for different languages
 const emailTemplates = {
   en: {
