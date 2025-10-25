@@ -16,3 +16,4 @@ export async function sendEmail(options: SendEmailOptions) {
 
 export * from "./templates";
 export * from "./types";
+export * from "./translations";

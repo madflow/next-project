@@ -12,6 +12,7 @@ import {
 } from "@react-email/components";
 import { Footer } from "../components/footer";
 import type { EmailTemplateProps } from "../types";
+import { getEmailTranslations } from "../translations";
 
 export default function PasswordReset({
   email,
@@ -21,7 +22,10 @@ export default function PasswordReset({
   action,
   baseUrl,
   siteName,
+  locale = "en",
 }: EmailTemplateProps) {
+  const t = getEmailTranslations("passwordReset", locale);
+  
   return (
     <Html>
       <Head />
@@ -34,7 +38,7 @@ export default function PasswordReset({
             </Heading>
             <Text className="text-sm leading-6 text-black">{content}</Text>
             <Text className="text-sm leading-6 text-black">
-              Please click the button below to reset your password.
+              {t.instructions}
             </Text>
             <Section className="my-8">
               <Link
@@ -45,12 +49,12 @@ export default function PasswordReset({
               </Link>
             </Section>
             <Text className="text-sm leading-6 text-black">
-              or copy and paste this URL into your browser:
+              {t.urlInstructions}
             </Text>
             <Text className="max-w-sm flex-wrap break-words font-medium text-purple-600 no-underline">
               {url.replace(/^https?:\/\//, "")}
             </Text>
-            <Footer email={email} baseUrl={baseUrl} siteName={siteName} />
+            <Footer email={email} baseUrl={baseUrl} siteName={siteName} locale={locale} />
           </Container>
         </Body>
       </Tailwind>
@@ -66,4 +70,5 @@ PasswordReset.PreviewProps = {
   action: "Reset Password",
   baseUrl: "http://localhost:3000",
   siteName: "Next.js App",
+  locale: "en",
 } as EmailTemplateProps;

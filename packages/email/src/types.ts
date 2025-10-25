@@ -16,6 +16,7 @@ export interface EmailTemplateProps {
   action: string;
   baseUrl?: string;
   siteName?: string;
+  locale?: string;
 }
 
 export interface EmailChangeProps extends EmailTemplateProps {

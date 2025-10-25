@@ -1,12 +1,11 @@
 "use server";
 
 import { cookies, headers } from "next/headers";
-import { Locale, defaultLocale } from "@/i18n/config";
+import { COOKIE_NAME, Locale, defaultLocale } from "@/i18n/config";
 import { auth } from "@/lib/auth";
 
 // In this example the locale is read from a cookie. You could alternatively
 // also read it from a database, backend service, or any other source.
-const COOKIE_NAME = "APP_LOCALE";
 
 export async function getUserLocale(): Promise<Locale> {
   const session = await auth.api.getSession({
@@ -21,3 +20,4 @@ export async function getUserLocale(): Promise<Locale> {
 export async function setUserLocale(locale: Locale) {
   (await cookies()).set(COOKIE_NAME, locale);
 }
+
