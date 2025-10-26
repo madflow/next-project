@@ -1,7 +1,7 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const cookies = getSessionCookie(request, {
     cookiePrefix: "auth",
   });
@@ -12,6 +12,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|auth|goodbye|_next/static|_next/image|favicon.ico).*)"],
-  runtime: "nodejs",
+  matcher: ["/((?!api|auth|goodbye|_next/static|_next/image|favicon.ico).*)"]
 };
