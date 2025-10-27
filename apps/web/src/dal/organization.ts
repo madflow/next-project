@@ -25,3 +25,28 @@ export async function hasAccess(organizationId: string) {
     .where(and(eq(member.organizationId, organizationId), eq(member.userId, user.id)));
   return rows.length === 1;
 }
+
+export const getUserOrganizations = async () => {
+  const user = await getSessionUser();
+  if (!user) {
+    return [];
+  }
+
+  const db = await getAuthenticatedClient();
+
+  const orgs = await db
+    .select({
+      id: entity.id,
+      name: entity.name,
+      slug: entity.slug,
+      logo: entity.logo,
+      createdAt: entity.createdAt,
+      metadata: entity.metadata,
+      settings: entity.settings,
+    })
+    .from(member)
+    .innerJoin(entity, eq(entity.id, member.organizationId))
+    .where(eq(member.userId, user.id));
+
+  return orgs;
+};
