@@ -85,9 +85,8 @@ function VariablesetNode({
         </Button>
 
         <button
-          className="flex-1 text-left text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer rounded px-1 py-0.5"
-          onClick={() => onSelectSet(node)}
-        >
+          className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm font-medium transition-colors"
+          onClick={() => onSelectSet(node)}>
           {node.name}
         </button>
 
@@ -106,9 +105,8 @@ function VariablesetNode({
               className="flex items-center py-1"
               style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
               <button
-                className="flex-1 text-left text-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer rounded px-1 py-0.5"
-                onClick={() => onSelectVariable(variable, node)}
-              >
+                className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
+                onClick={() => onSelectVariable(variable, node)}>
                 {variable.label} {"("}
                 {variable.name}
                 {")"}

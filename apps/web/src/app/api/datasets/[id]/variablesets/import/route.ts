@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { assertAccess } from "@/dal/dataset";
 import { importVariableSets } from "@/dal/dataset-variableset-export";
-import { raiseExceptionResponse } from "@/lib/exception";
 import { assertUserIsAdmin } from "@/lib/dal";
+import { raiseExceptionResponse } from "@/lib/exception";
 import { VariableSetExportFileSchema, VariableSetImportOptionsSchema } from "@/types/dataset-variableset-export";
 
 export const dynamic = "force-dynamic";
@@ -55,9 +55,12 @@ export async function POST(request: Request, { params }: RouteParams) {
       const parsedContent = JSON.parse(fileContent);
       importData = VariableSetExportFileSchema.parse(parsedContent);
     } catch {
-      return NextResponse.json({ 
-        error: "Invalid file format. Please upload a valid variable sets export file." 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Invalid file format. Please upload a valid variable sets export file.",
+        },
+        { status: 400 }
+      );
     }
 
     // Perform import

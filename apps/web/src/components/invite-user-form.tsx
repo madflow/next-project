@@ -118,7 +118,10 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
               <FieldLabel htmlFor="role">{t("formLabels.role")}</FieldLabel>
               <FieldGroup>
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="role" className="w-full sm:w-1/2 lg:w-1/3" data-testid="admin.users.invite.form.role">
+                  <SelectTrigger
+                    id="role"
+                    className="w-full sm:w-1/2 lg:w-1/3"
+                    data-testid="admin.users.invite.form.role">
                     <SelectValue placeholder={t("formPlaceholders.selectRole")} />
                   </SelectTrigger>
                   <SelectContent>

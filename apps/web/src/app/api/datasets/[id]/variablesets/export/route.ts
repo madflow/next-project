@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { assertAccess, find } from "@/dal/dataset";
 import { exportVariableSets } from "@/dal/dataset-variableset-export";
-import { raiseExceptionResponse } from "@/lib/exception";
 import { assertUserIsAdmin } from "@/lib/dal";
+import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
 
@@ -30,10 +30,10 @@ export async function GET(_request: Request, { params }: RouteParams) {
     }
 
     const exportData = await exportVariableSets(id);
-    
+
     // Generate filename with dataset name and current date
-    const date = new Date().toISOString().split('T')[0];
-    const filename = `dataset-${dataset.name.replace(/[^a-zA-Z0-9]/g, '_')}-variablesets-${date}.json`;
+    const date = new Date().toISOString().split("T")[0];
+    const filename = `dataset-${dataset.name.replace(/[^a-zA-Z0-9]/g, "_")}-variablesets-${date}.json`;
 
     // Return JSON file as download
     return new NextResponse(JSON.stringify(exportData, null, 2), {

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, isNull, sql, ilike, or } from "drizzle-orm";
+import { and, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariablesetData,
@@ -31,7 +31,6 @@ async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
 }
 
 async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]> {
-
   // Get all variablesets for the dataset with variable counts
   const variablesets = await db
     .select({
@@ -118,16 +117,13 @@ async function removeFn(id: string) {
 
 async function getVariablesInSetFn(variablesetId: string, options: ListOptions = {}) {
   const { search } = options;
-  
+
   // Build where conditions
   const whereConditions = [eq(datasetVariablesetItem.variablesetId, variablesetId)];
-  
+
   // Add search if provided
   if (search) {
-    const searchConditions = [
-      ilike(datasetVariable.name, `%${search}%`),
-      ilike(datasetVariable.label, `%${search}%`)
-    ];
+    const searchConditions = [ilike(datasetVariable.name, `%${search}%`), ilike(datasetVariable.label, `%${search}%`)];
     const searchOr = or(...searchConditions);
     if (searchOr) {
       whereConditions.push(searchOr);
@@ -166,19 +162,13 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
 
 async function getUnassignedVariablesFn(datasetId: string, options: ListOptions = {}) {
   const { search } = options;
-  
+
   // Build where conditions
-  const whereConditions = [
-    eq(datasetVariable.datasetId, datasetId), 
-    isNull(datasetVariablesetItem.variableId)
-  ];
-  
+  const whereConditions = [eq(datasetVariable.datasetId, datasetId), isNull(datasetVariablesetItem.variableId)];
+
   // Add search if provided
   if (search) {
-    const searchConditions = [
-      ilike(datasetVariable.name, `%${search}%`),
-      ilike(datasetVariable.label, `%${search}%`)
-    ];
+    const searchConditions = [ilike(datasetVariable.name, `%${search}%`), ilike(datasetVariable.label, `%${search}%`)];
     const searchOr = or(...searchConditions);
     if (searchOr) {
       whereConditions.push(searchOr);

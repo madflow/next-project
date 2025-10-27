@@ -2,7 +2,7 @@
 
 import { DownloadIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
@@ -47,7 +47,11 @@ export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
               tickFormatter={(value) => `${value}%`}
             />
             <Bar dataKey="percentage" fill="var(--color-percentage)">
-              <LabelList dataKey="percentage" position="top" formatter={(value: number) => `${Math.round(value * 100) / 100}%`} />
+              <LabelList
+                dataKey="percentage"
+                position="top"
+                formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+              />
             </Bar>
           </BarChart>
         </ChartContainer>

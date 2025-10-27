@@ -1,5 +1,6 @@
 "use client";
 
+import { CircleHelp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -7,7 +8,6 @@ import { useQueryApi } from "@/hooks/use-query-api";
 import { getVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
-import { CircleHelp } from "lucide-react";
 
 type BarAdhocProps = {
   variable: DatasetVariable;
@@ -21,9 +21,15 @@ function formatDecimal(value?: number) {
   return new Intl.NumberFormat("de-DE", { style: "decimal" }).format(value);
 }
 
-function MetricHelp({ metricKey, children }: { metricKey: "count" | "mean" | "median" | "stdev" | "min" | "max"; children: React.ReactNode }) {
+function MetricHelp({
+  metricKey,
+  children,
+}: {
+  metricKey: "count" | "mean" | "median" | "stdev" | "min" | "max";
+  children: React.ReactNode;
+}) {
   const tHelp = useTranslations("metricsHelp");
-  
+
   return (
     <div className="flex items-center gap-1">
       {children}
@@ -36,7 +42,7 @@ function MetricHelp({ metricKey, children }: { metricKey: "count" | "mean" | "me
         <PopoverContent className="w-80" align="start">
           <div className="space-y-2">
             <h4 className="font-medium">{tHelp(`${metricKey}.title`)}</h4>
-            <p className="text-sm text-muted-foreground">{tHelp(`${metricKey}.description`)}</p>
+            <p className="text-muted-foreground text-sm">{tHelp(`${metricKey}.description`)}</p>
           </div>
         </PopoverContent>
       </Popover>
@@ -49,7 +55,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
   const variableStats = getVariableStats(variable, stats);
 
   // Fetch split variables when datasetId is provided
-  const { data: splitVariablesResponse } = useQueryApi<{rows: DatasetVariable[]}>({
+  const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariable[] }>({
     endpoint: `/api/datasets/${datasetId}/splitvariables`,
     pagination: { pageIndex: 0, pageSize: 100 },
     sorting: [],
@@ -67,9 +73,9 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
     if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
       return null;
     }
-    
+
     const splitVariableName = targetVariable.stats.split_variable;
-    
+
     // Try to find the split variable in allVariables to get its label
     if (allVariables.length > 0) {
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
@@ -78,7 +84,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
         return `Split by ${splitVariableLabel}`;
       }
     }
-    
+
     // Fallback to variable name if no label found
     return `Split by ${splitVariableName}`;
   }

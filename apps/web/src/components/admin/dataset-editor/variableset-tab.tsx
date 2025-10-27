@@ -1,16 +1,15 @@
 "use client";
 
-
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
+import { ExportImportActions } from "../dataset-variableset/export-import-actions";
 import { VariableAssignment } from "../dataset-variableset/variable-assignment";
 import { VariablesetForm } from "../dataset-variableset/variableset-form";
 import { VariablesetTree } from "../dataset-variableset/variableset-tree";
-import { ExportImportActions } from "../dataset-variableset/export-import-actions";
 
 interface VariablesetTabProps {
   datasetId: string;
@@ -74,55 +73,58 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-base font-medium mt-6">{t("title")}</h2>
+        <h2 className="mt-6 text-base font-medium">{t("title")}</h2>
         <p className="text-muted-foreground text-sm">{t("description")}</p>
       </div>
 
       <div className="w-3/4">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Variable Sets Tree */}
-        <Card className="h-fit rounded-md shadow-xs lg:col-span-1">
-          <CardHeader>
-            <CardTitle>{t("editTitle")}</CardTitle>
-            <CardDescription>{t("editDescription")}</CardDescription>
-            <CardAction>
-              <div className="flex items-center gap-2">
-                <Button onClick={handleCreateSet} data-testid="admin.dataset.variableset.create" className="cursor-pointer">
-                  {t("createSet")}
-                </Button>
-                <ExportImportActions datasetId={datasetId} onImportSuccess={handleRefresh} />
-              </div>
-            </CardAction>
-          </CardHeader>
-          <CardContent className="p-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="text-muted-foreground text-sm">{"Loading..."}</div>
-              </div>
-            ) : (
-              <VariablesetTree
-                nodes={hierarchy}
-                datasetId={datasetId}
-                selectedSetId={selectedSetId}
-                onSelectSet={setSelectedSetId}
-                onEditSet={handleEditSet}
-                onRefresh={handleRefresh}
-              />
-            )}
-          </CardContent>
-        </Card>
+          {/* Variable Sets Tree */}
+          <Card className="h-fit rounded-md shadow-xs lg:col-span-1">
+            <CardHeader>
+              <CardTitle>{t("editTitle")}</CardTitle>
+              <CardDescription>{t("editDescription")}</CardDescription>
+              <CardAction>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleCreateSet}
+                    data-testid="admin.dataset.variableset.create"
+                    className="cursor-pointer">
+                    {t("createSet")}
+                  </Button>
+                  <ExportImportActions datasetId={datasetId} onImportSuccess={handleRefresh} />
+                </div>
+              </CardAction>
+            </CardHeader>
+            <CardContent className="p-4">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-muted-foreground text-sm">{"Loading..."}</div>
+                </div>
+              ) : (
+                <VariablesetTree
+                  nodes={hierarchy}
+                  datasetId={datasetId}
+                  selectedSetId={selectedSetId}
+                  onSelectSet={setSelectedSetId}
+                  onEditSet={handleEditSet}
+                  onRefresh={handleRefresh}
+                />
+              )}
+            </CardContent>
+          </Card>
 
-        {/* Variable Assignment */}
-        <Card className="h-fit rounded-md shadow-xs lg:col-span-1">
-          <CardHeader>
-            <CardTitle>{t("assignVariables")}</CardTitle>
-            <CardDescription>{t("assignment.description")}</CardDescription>
-          </CardHeader>
-          <CardContent className="p-4">
-            <VariableAssignment datasetId={datasetId} selectedSetId={selectedSetId} onRefresh={handleRefresh} />
-          </CardContent>
-        </Card>
-      </div>
+          {/* Variable Assignment */}
+          <Card className="h-fit rounded-md shadow-xs lg:col-span-1">
+            <CardHeader>
+              <CardTitle>{t("assignVariables")}</CardTitle>
+              <CardDescription>{t("assignment.description")}</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4">
+              <VariableAssignment datasetId={datasetId} selectedSetId={selectedSetId} onRefresh={handleRefresh} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       <VariablesetForm

@@ -16,9 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { signOut, useSession } from "@/lib/auth-client";
 import { useIsImpersonating } from "@/hooks/use-is-impersonating";
 import { useStopImpersonating } from "@/hooks/use-stop-impersonating";
+import { signOut, useSession } from "@/lib/auth-client";
 
 export function NavUser() {
   const isMobile = useSidebar();
@@ -110,8 +110,7 @@ export function NavUser() {
               <DropdownMenuItem
                 onClick={handleStopImpersonating}
                 disabled={isStoppingImpersonation}
-                className="cursor-pointer text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200"
-              >
+                className="cursor-pointer text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200">
                 <UserX className="mr-2 size-4" />
                 {isStoppingImpersonation ? tUser("button.stopping") : tUser("button.stopImpersonating")}
               </DropdownMenuItem>

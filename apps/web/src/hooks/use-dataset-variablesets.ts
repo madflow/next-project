@@ -6,7 +6,7 @@ export function useDatasetVariablesets(datasetId: string | null) {
     queryKey: ["dataset-variablesets", datasetId],
     queryFn: async (): Promise<VariablesetTreeNode[]> => {
       if (!datasetId) return [];
-      
+
       const response = await fetch(`/api/datasets/${datasetId}/variablesets?hierarchical=true`);
       if (!response.ok) {
         throw new Error("Failed to fetch variable sets");

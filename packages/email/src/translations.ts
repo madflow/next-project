@@ -29,8 +29,7 @@ const emailTranslations = {
       heading: "You have been invited",
       content: (organizationName: string) => `You have been invited to join an organization.`,
       action: "Accept invitation",
-      invitedBy: (inviterName: string, organizationName: string) =>
-        `has invited you to join ${organizationName}.`,
+      invitedBy: (inviterName: string, organizationName: string) => `has invited you to join ${organizationName}.`,
       joinPrompt: (organizationName: string) => `Join ${organizationName} to get started.`,
       urlInstructions: "or copy and paste this URL into your browser:",
     },
@@ -97,21 +96,24 @@ export function getEmailTranslations(type: EmailType, locale?: string, data?: Em
   const lang: Locale = locale === "de" ? "de" : "en";
   const template = emailTranslations[lang][type];
 
-  const content = typeof template.content === "function" 
-    ? template.content(data?.newEmail || data?.organizationName || "") 
-    : template.content;
+  const content =
+    typeof template.content === "function"
+      ? template.content(data?.newEmail || data?.organizationName || "")
+      : template.content;
 
   let invitedBy = "";
   let joinPrompt = "";
-  
+
   if (type === "organizationInvite" && "invitedBy" in template) {
-    invitedBy = typeof template.invitedBy === "function"
-      ? template.invitedBy(data?.inviterName || "", data?.organizationName || "")
-      : template.invitedBy;
-    
-    joinPrompt = typeof template.joinPrompt === "function"
-      ? template.joinPrompt(data?.organizationName || "")
-      : template.joinPrompt;
+    invitedBy =
+      typeof template.invitedBy === "function"
+        ? template.invitedBy(data?.inviterName || "", data?.organizationName || "")
+        : template.invitedBy;
+
+    joinPrompt =
+      typeof template.joinPrompt === "function"
+        ? template.joinPrompt(data?.organizationName || "")
+        : template.joinPrompt;
   }
 
   return {
@@ -120,14 +122,18 @@ export function getEmailTranslations(type: EmailType, locale?: string, data?: Em
     content,
     action: template.action,
     ...(type === "passwordReset" && "instructions" in template ? { instructions: template.instructions } : {}),
-    ...(type === "emailChange" && "newEmailLabel" in template ? { 
-      newEmailLabel: template.newEmailLabel,
-      confirmInstructions: template.confirmInstructions,
-    } : {}),
-    ...(type === "organizationInvite" ? { 
-      invitedBy,
-      joinPrompt,
-    } : {}),
+    ...(type === "emailChange" && "newEmailLabel" in template
+      ? {
+          newEmailLabel: template.newEmailLabel,
+          confirmInstructions: template.confirmInstructions,
+        }
+      : {}),
+    ...(type === "organizationInvite"
+      ? {
+          invitedBy,
+          joinPrompt,
+        }
+      : {}),
     urlInstructions: template.urlInstructions,
   };
 }

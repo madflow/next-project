@@ -40,9 +40,9 @@ export const StatsResponseItemSchema = z.object({
     z.object({
       split_variable: z.string(),
       categories: z.record(z.string(), VariableStatsSchema),
-      split_variable_labels: z.record(z.string(), z.string()).optional()
-    })
-  ])
+      split_variable_labels: z.record(z.string(), z.string()).optional(),
+    }),
+  ]),
 });
 
 export const StatsResponseSchema = z.array(StatsResponseItemSchema);

@@ -13,16 +13,16 @@ test.describe("API Dataset Variable Sets", () => {
     const page = await context.newPage();
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-    
+
     const response = await page.request.get("/api/datasets?limit=1");
     const data = await response.json();
-    
+
     if (data.rows && data.rows.length > 0) {
       testDatasetId = data.rows[0].id;
     } else {
       throw new Error("No datasets found in test environment");
     }
-    
+
     await context.close();
   });
 
@@ -51,7 +51,7 @@ test.describe("API Dataset Variable Sets", () => {
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
       const response = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
       expect(response.status()).toBe(200);
-      
+
       // Verify response headers for JSON export
       const contentType = response.headers()["content-type"];
       expect(contentType).toContain("application/json");
@@ -74,9 +74,9 @@ test.describe("API Dataset Variable Sets", () => {
           {
             name: "Test Set",
             description: "Test Description",
-            variables: ["var1", "var2"]
-          }
-        ]
+            variables: ["var1", "var2"],
+          },
+        ],
       });
 
       const formData = new FormData();
@@ -88,9 +88,9 @@ test.describe("API Dataset Variable Sets", () => {
           file: {
             name: "test-variablesets.json",
             mimeType: "application/json",
-            buffer: Buffer.from(importData)
-          }
-        }
+            buffer: Buffer.from(importData),
+          },
+        },
       });
       expect(response.status()).toBe(401);
     });
@@ -103,20 +103,20 @@ test.describe("API Dataset Variable Sets", () => {
         variableSets: [
           {
             name: "Test Set",
-            description: "Test Description", 
-            variables: ["var1", "var2"]
-          }
-        ]
+            description: "Test Description",
+            variables: ["var1", "var2"],
+          },
+        ],
       });
 
       const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
         multipart: {
           file: {
             name: "test-variablesets.json",
-            mimeType: "application/json", 
-            buffer: Buffer.from(importData)
-          }
-        }
+            mimeType: "application/json",
+            buffer: Buffer.from(importData),
+          },
+        },
       });
       expect(response.status()).toBe(401);
     });
@@ -130,9 +130,9 @@ test.describe("API Dataset Variable Sets", () => {
           {
             name: "Test Set",
             description: "Test Description",
-            variables: ["var1", "var2"]
-          }
-        ]
+            variables: ["var1", "var2"],
+          },
+        ],
       });
 
       const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
@@ -140,9 +140,9 @@ test.describe("API Dataset Variable Sets", () => {
           file: {
             name: "test-variablesets.json",
             mimeType: "application/json",
-            buffer: Buffer.from(importData)
-          }
-        }
+            buffer: Buffer.from(importData),
+          },
+        },
       });
       expect(response.status()).toBe(401);
     });
@@ -156,9 +156,9 @@ test.describe("API Dataset Variable Sets", () => {
           {
             name: "Test Import Set",
             description: "Test import description",
-            variables: ["age", "gender"] // Use variables that likely exist in demo.sav
-          }
-        ]
+            variables: ["age", "gender"], // Use variables that likely exist in demo.sav
+          },
+        ],
       });
 
       const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
@@ -166,11 +166,11 @@ test.describe("API Dataset Variable Sets", () => {
           file: {
             name: "test-variablesets.json",
             mimeType: "application/json",
-            buffer: Buffer.from(importData)
-          }
-        }
+            buffer: Buffer.from(importData),
+          },
+        },
       });
-      
+
       // Should return 200 for successful import or 400 for validation errors (which is still authenticated access)
       expect([200, 400].includes(response.status())).toBe(true);
     });
@@ -184,20 +184,23 @@ test.describe("API Dataset Variable Sets", () => {
           {
             name: "Test Set",
             description: "Test Description",
-            variables: ["var1", "var2"] 
-          }
-        ]
+            variables: ["var1", "var2"],
+          },
+        ],
       });
 
-      const response = await page.request.post("/api/datasets/00000000-0000-0000-0000-000000000000/variablesets/import", {
-        multipart: {
-          file: {
-            name: "test-variablesets.json",
-            mimeType: "application/json",
-            buffer: Buffer.from(importData)
-          }
+      const response = await page.request.post(
+        "/api/datasets/00000000-0000-0000-0000-000000000000/variablesets/import",
+        {
+          multipart: {
+            file: {
+              name: "test-variablesets.json",
+              mimeType: "application/json",
+              buffer: Buffer.from(importData),
+            },
+          },
         }
-      });
+      );
       // Import endpoint's assertAccess error gets converted differently due to form parsing
       expect(response.status()).toBe(400);
     });
@@ -213,9 +216,9 @@ test.describe("API Dataset Variable Sets", () => {
           file: {
             name: "invalid.txt",
             mimeType: "text/plain",
-            buffer: Buffer.from(invalidData)
-          }
-        }
+            buffer: Buffer.from(invalidData),
+          },
+        },
       });
       expect(response.status()).toBe(400);
     });

@@ -2,12 +2,12 @@ import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
 
 // Helper function to check if stats data is split variable format
-export function isSplitVariableStats(stats: unknown): stats is { 
-  split_variable: string; 
+export function isSplitVariableStats(stats: unknown): stats is {
+  split_variable: string;
   categories: Record<string, VariableStats>;
   split_variable_labels?: Record<string, string>;
 } {
-  return Boolean(stats && typeof stats === 'object' && 'split_variable' in stats && 'categories' in stats);
+  return Boolean(stats && typeof stats === "object" && "split_variable" in stats && "categories" in stats);
 }
 
 // Helper function to get stats for single variable (handles both normal and split variable formats)
@@ -114,7 +114,7 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
   const valueLabels = variableConfig.valueLabels ?? {};
   const splitStats = targetVariable.stats;
   const splitVariableLabels = splitStats.split_variable_labels || {};
-  
+
   // Get categories and sort them in ascending order
   const categories = Object.keys(splitStats.categories);
   const sortedCategories = categories.sort((a, b) => {
@@ -129,35 +129,37 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
     }
     return a.localeCompare(b); // String sort
   });
-  
+
   // Create a separate bar for each split category
-  const rechartsData = sortedCategories.map((category, categoryIndex) => {
-    const categoryStats = splitStats.categories[category];
-    if (!categoryStats?.frequency_table) return null;
+  const rechartsData = sortedCategories
+    .map((category, categoryIndex) => {
+      const categoryStats = splitStats.categories[category];
+      if (!categoryStats?.frequency_table) return null;
 
-    const categoryData = categoryStats.frequency_table.map((item, itemIndex) => {
-      const valueKey = item.value.toString() as keyof typeof valueLabels;
-      const label = valueLabels[valueKey] || item.value;
-      
+      const categoryData = categoryStats.frequency_table.map((item, itemIndex) => {
+        const valueKey = item.value.toString() as keyof typeof valueLabels;
+        const label = valueLabels[valueKey] || item.value;
+
+        return {
+          segment: `segment${itemIndex}`,
+          value: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
+          label: label,
+          count: item.counts,
+          color: `hsl(var(--chart-${(itemIndex % 6) + 1}))`,
+        };
+      });
+
+      // Use split variable label if available, otherwise use category key
+      const categoryLabel = splitVariableLabels[category] || category;
+
       return {
-        segment: `segment${itemIndex}`,
-        value: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
-        label: label,
-        count: item.counts,
-        color: `hsl(var(--chart-${(itemIndex % 6) + 1}))`,
+        category: categoryLabel,
+        categoryKey: category,
+        categoryIndex: categoryIndex,
+        segments: categoryData,
       };
-    });
-
-    // Use split variable label if available, otherwise use category key
-    const categoryLabel = splitVariableLabels[category] || category;
-
-    return {
-      category: categoryLabel,
-      categoryKey: category,
-      categoryIndex: categoryIndex,
-      segments: categoryData,
-    };
-  }).filter(Boolean);
+    })
+    .filter(Boolean);
 
   return rechartsData;
 }

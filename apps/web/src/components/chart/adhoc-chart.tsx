@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis, YAxis, LabelList, Cell } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardAction,
@@ -32,24 +32,20 @@ import {
 } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useAppContext } from "@/context/app-context";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
-import {
-  isSplitVariableStats,
-  transformToRechartsBarData,
-  transformToRechartsPieData,
-} from "@/lib/analysis-bridge";
+import { isSplitVariableStats, transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { determineChartSelection } from "@/lib/chart-selection";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
+import { SplitVariableSelector } from "../project/split-variable-selector";
 import { Button } from "../ui/button";
 import { Code } from "../ui/code";
 import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
 import { UnsupportedChartPlaceholder } from "./unsupported-chart-placeholder";
-import { useAppContext } from "@/context/app-context";
-import { SplitVariableSelector } from "../project/split-variable-selector";
 
 type AdhocChartProps = {
   variable: DatasetVariable;
@@ -59,7 +55,14 @@ type AdhocChartProps = {
   onSplitVariableChangeAction?: (splitVariable: string | null) => void;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, onSplitVariableChangeAction, ...props }: AdhocChartProps) {
+export function AdhocChart({
+  variable,
+  stats,
+  datasetId,
+  selectedSplitVariable,
+  onSplitVariableChangeAction,
+  ...props
+}: AdhocChartProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const tChart = useTranslations("chartMetricsCard");
   const { ref, exportPNG } = useChartExport();
@@ -105,11 +108,11 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
     // Check if split variable is present in the data
     const targetVariable = stats.find((item) => item.variable === variable.name);
     const hasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
-    
+
     return determineChartSelection({
       variable,
       stats,
-      hasSplitVariable
+      hasSplitVariable,
     });
   }, [variable, stats]);
 
@@ -135,7 +138,7 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
       const newChartSelection = determineChartSelection({
         variable,
         stats,
-        hasSplitVariable
+        hasSplitVariable,
       });
 
       // Always reset to default when split variable status changes or current selection not available
@@ -186,10 +189,10 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                 tickFormatter={(value) => `${value}%`}
               />
               <Bar dataKey="percentage" fill="var(--color-percentage)">
-                <LabelList 
-                  dataKey="percentage" 
-                  position="top" 
-                  fontSize={10} 
+                <LabelList
+                  dataKey="percentage"
+                  position="top"
+                  fontSize={10}
                   formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
                 />
               </Bar>
@@ -227,10 +230,10 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                 width={200}
               />
               <Bar dataKey="percentage" fill="var(--color-percentage)">
-                <LabelList 
-                  dataKey="percentage" 
-                  position="right" 
-                  fontSize={10} 
+                <LabelList
+                  dataKey="percentage"
+                  position="right"
+                  fontSize={10}
                   formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
                 />
               </Bar>
@@ -259,21 +262,15 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
           <ChartContainer config={pieChartConfig} ref={ref} data-export-filename={variable.name}>
             <PieChart>
               <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
-              <Pie 
-                data={pieData} 
-                dataKey="percentage" 
-                nameKey="label" 
-                startAngle={90} 
-                endAngle={-270}
-              >
+              <Pie data={pieData} dataKey="percentage" nameKey="label" startAngle={90} endAngle={-270}>
                 {pieData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
-                <LabelList 
-                  dataKey="percentage" 
-                  position="inside" 
-                  fontSize={10} 
-                  fill="white" 
+                <LabelList
+                  dataKey="percentage"
+                  position="inside"
+                  fontSize={10}
+                  fill="white"
                   formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
                 />
               </Pie>
@@ -352,28 +349,28 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
                   </CardAction>
                 )}
               </CardHeader>
-                <CardContent data-testid={`chart-content-${selectedChartType}`}>
-                  {selectedChartType === "metrics" ? (
-                    <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
-                  ) : (
-                    <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
+              <CardContent data-testid={`chart-content-${selectedChartType}`}>
+                {selectedChartType === "metrics" ? (
+                  <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
+                ) : (
+                  <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
+                )}
+              </CardContent>
+              <CardFooter className="flex items-center justify-between border-t">
+                <div>
+                  {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
+                    <SplitVariableSelector
+                      datasetId={datasetId}
+                      selectedSplitVariable={selectedSplitVariable || null}
+                      onSplitVariableChangeAction={onSplitVariableChangeAction}
+                      compact
+                    />
                   )}
-                </CardContent>
-                <CardFooter className="flex justify-between items-center border-t">
-                  <div>
-                    {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
-                      <SplitVariableSelector
-                        datasetId={datasetId}
-                        selectedSplitVariable={selectedSplitVariable || null}
-                        onSplitVariableChangeAction={onSplitVariableChangeAction}
-                        compact
-                      />
-                    )}
-                  </div>
-                  <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
-                    <DownloadIcon className="h-4 w-4" />
-                  </Button>
-                </CardFooter>
+                </div>
+                <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
+                  <DownloadIcon className="h-4 w-4" />
+                </Button>
+              </CardFooter>
             </Card>
           </TabsContent>
           {debugMode && (
@@ -428,25 +425,25 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
               {getSplitVariableDescription(variable, stats) && (
                 <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
               )}
-               {chartSelection.availableChartTypes.length > 1 && (
-                 <CardAction>
-                   <ToggleGroup
-                     type="single"
-                     value={selectedChartType}
-                     onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
-                     size="sm"
-                     data-testid="chart-type-selector">
-                     {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
-                       <ToggleGroupItem key={chartType} value={chartType} data-testid={`chart-type-${chartType}`}>
-                         {getChartIcon(chartType)}
-                       </ToggleGroupItem>
-                     ))}
-                   </ToggleGroup>
-                 </CardAction>
-               )}
+              {chartSelection.availableChartTypes.length > 1 && (
+                <CardAction>
+                  <ToggleGroup
+                    type="single"
+                    value={selectedChartType}
+                    onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
+                    size="sm"
+                    data-testid="chart-type-selector">
+                    {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
+                      <ToggleGroupItem key={chartType} value={chartType} data-testid={`chart-type-${chartType}`}>
+                        {getChartIcon(chartType)}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </CardAction>
+              )}
             </CardHeader>
-             <CardContent data-testid={`chart-content-${selectedChartType}`}>{renderChart()}</CardContent>
-            <CardFooter className="flex justify-between items-center border-t">
+            <CardContent data-testid={`chart-content-${selectedChartType}`}>{renderChart()}</CardContent>
+            <CardFooter className="flex items-center justify-between border-t">
               <div>
                 {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (
                   <SplitVariableSelector

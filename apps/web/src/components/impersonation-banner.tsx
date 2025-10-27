@@ -21,10 +21,10 @@ export function ImpersonationBanner() {
   };
 
   return (
-    <Alert className="rounded-none border-l-0 border-r-0 border-t-0 bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
+    <Alert className="rounded-none border-t-0 border-r-0 border-l-0 border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/20">
       <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
-      <AlertDescription className="flex items-center justify-between w-full">
-        <span className="text-yellow-800 dark:text-yellow-200 font-medium">
+      <AlertDescription className="flex w-full items-center justify-between">
+        <span className="font-medium text-yellow-800 dark:text-yellow-200">
           {t("banner.message", { userName: currentUser.name || currentUser.email })}
         </span>
         <Button
@@ -32,9 +32,8 @@ export function ImpersonationBanner() {
           size="sm"
           onClick={handleStopImpersonating}
           disabled={isLoading}
-          className="ml-4 cursor-pointer border-yellow-300 text-yellow-800 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-200 dark:hover:bg-yellow-900/50"
-        >
-          <X className="h-3 w-3 mr-1" />
+          className="ml-4 cursor-pointer border-yellow-300 text-yellow-800 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-200 dark:hover:bg-yellow-900/50">
+          <X className="mr-1 h-3 w-3" />
           {isLoading ? t("button.stopping") : t("banner.stopButton")}
         </Button>
       </AlertDescription>

@@ -30,10 +30,10 @@ test.describe("API Organizations", () => {
     test("returns default pagination (limit=10, offset=0)", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data).toHaveProperty("rows");
       expect(data).toHaveProperty("count");
@@ -45,10 +45,10 @@ test.describe("API Organizations", () => {
     test("respects custom pagination parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?limit=5&offset=0");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.limit).toBe(5);
       expect(data.offset).toBe(0);
@@ -58,10 +58,10 @@ test.describe("API Organizations", () => {
     test("handles large offset", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?limit=10&offset=1000");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.offset).toBe(1000);
       expect(Array.isArray(data.rows)).toBe(true);
@@ -72,10 +72,10 @@ test.describe("API Organizations", () => {
     test("searches by organization name", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?search=Test Organization");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].name).toContain("Test");
@@ -84,10 +84,10 @@ test.describe("API Organizations", () => {
     test("searches by organization slug", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?search=test-organization");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
     });
@@ -95,10 +95,10 @@ test.describe("API Organizations", () => {
     test("returns empty results for non-existent search", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?search=nonexistentorg123");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.rows.length).toBe(0);
       expect(data.count).toBe(0);
@@ -107,10 +107,10 @@ test.describe("API Organizations", () => {
     test("performs case-insensitive search", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?search=TEST");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 0) {
         expect(data.rows[0].name.toLowerCase()).toContain("test");
@@ -122,10 +122,10 @@ test.describe("API Organizations", () => {
     test("orders by organization name ascending", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?order=name.asc");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 1) {
         expect(data.rows[0].name <= data.rows[1].name).toBe(true);
@@ -135,10 +135,10 @@ test.describe("API Organizations", () => {
     test("orders by organization name descending", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?order=name.desc");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 1) {
         expect(data.rows[0].name >= data.rows[1].name).toBe(true);
@@ -148,10 +148,10 @@ test.describe("API Organizations", () => {
     test("orders by organization slug", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?order=slug.asc");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 1) {
         expect(data.rows[0].slug <= data.rows[1].slug).toBe(true);
@@ -161,10 +161,10 @@ test.describe("API Organizations", () => {
     test("orders by creation date", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?order=createdAt.desc");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 1) {
         const firstDate = new Date(data.rows[0].createdAt);
@@ -176,10 +176,10 @@ test.describe("API Organizations", () => {
     test("handles multiple order criteria", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?order=name.asc,slug.desc");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
     });
@@ -187,10 +187,10 @@ test.describe("API Organizations", () => {
     test("ignores invalid order parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?order=invalidcolumn.asc");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(Array.isArray(data.rows)).toBe(true);
     });
@@ -200,10 +200,10 @@ test.describe("API Organizations", () => {
     test("filters by organization name", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?name=Test Organization");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 0) {
         expect(data.rows[0].name).toBe("Test Organization");
@@ -213,10 +213,10 @@ test.describe("API Organizations", () => {
     test("filters by organization slug", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?slug=test-organization");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 0) {
         expect(data.rows[0].slug).toBe("test-organization");
@@ -226,10 +226,10 @@ test.describe("API Organizations", () => {
     test("applies multiple filters with AND logic", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?name=Test Organization&slug=test-organization");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 0) {
         expect(data.rows[0].name).toBe("Test Organization");
@@ -240,10 +240,10 @@ test.describe("API Organizations", () => {
     test("returns empty results for non-matching filters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?name=NonExistentOrganization");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.rows.length).toBe(0);
       expect(data.count).toBe(0);
@@ -252,10 +252,10 @@ test.describe("API Organizations", () => {
     test("ignores invalid filter parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?invalidcolumn=value");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(Array.isArray(data.rows)).toBe(true);
     });
@@ -265,10 +265,12 @@ test.describe("API Organizations", () => {
     test("combines search, filtering, and ordering", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
-      const response = await page.request.get("/api/organizations?search=Test&name=Test Organization&order=name.asc&limit=5");
+
+      const response = await page.request.get(
+        "/api/organizations?search=Test&name=Test Organization&order=name.asc&limit=5"
+      );
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.limit).toBe(5);
       expect(Array.isArray(data.rows)).toBe(true);
@@ -277,10 +279,10 @@ test.describe("API Organizations", () => {
     test("combines filtering with pagination", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations?slug=test-organization&limit=3&offset=0");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
@@ -294,10 +296,10 @@ test.describe("API Organizations", () => {
     test("returns correct response schema structure", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       expect(data).toHaveProperty("rows");
       expect(data).toHaveProperty("count");
@@ -312,10 +314,10 @@ test.describe("API Organizations", () => {
     test("includes expected organization data fields", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       const response = await page.request.get("/api/organizations");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 0) {
         const organization = data.rows[0];
@@ -329,15 +331,15 @@ test.describe("API Organizations", () => {
     test("count accuracy with filters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       // Get total count
       const allResponse = await page.request.get("/api/organizations");
       const allData = await allResponse.json();
-      
+
       // Get filtered count
       const filteredResponse = await page.request.get("/api/organizations?name=Test Organization");
       const filteredData = await filteredResponse.json();
-      
+
       expect(filteredData.count).toBeLessThanOrEqual(allData.count);
       expect(filteredData.rows.length).toBeLessThanOrEqual(filteredData.count);
     });
@@ -345,11 +347,11 @@ test.describe("API Organizations", () => {
     test("verifies test data exists", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      
+
       // Check if test organization exists
       const response = await page.request.get("/api/organizations?name=Test Organization");
       expect(response.status()).toBe(200);
-      
+
       const data = await response.json();
       if (data.rows.length > 0) {
         expect(data.rows[0].name).toBe("Test Organization");

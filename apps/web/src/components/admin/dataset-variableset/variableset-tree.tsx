@@ -82,13 +82,17 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
 
         <div className="flex h-4 w-4 items-center justify-center">
           {hasChildren && isExpanded ? (
-            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            <FolderOpen className="text-muted-foreground h-4 w-4" />
           ) : (
-            <Folder className="h-4 w-4 text-muted-foreground" />
+            <Folder className="text-muted-foreground h-4 w-4" />
           )}
         </div>
 
-        <span className="flex-1 truncate text-sm font-medium" data-testid={`admin.dataset.variableset.tree.name.${node.id}`}>{node.name}</span>
+        <span
+          className="flex-1 truncate text-sm font-medium"
+          data-testid={`admin.dataset.variableset.tree.name.${node.id}`}>
+          {node.name}
+        </span>
 
         <Badge variant="secondary" className="text-xs">
           {node.variableCount}
@@ -108,11 +112,7 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
             <span className="sr-only">{"Edit"}</span>
           </Button>
 
-          <DeleteVariablesetDialog
-            variablesetId={node.id}
-            variablesetName={node.name}
-            onSuccess={onRefresh}
-          />
+          <DeleteVariablesetDialog variablesetId={node.id} variablesetName={node.name} onSuccess={onRefresh} />
         </div>
       </div>
 

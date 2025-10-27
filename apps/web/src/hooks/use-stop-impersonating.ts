@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { toast } from "sonner";
 import { admin } from "@/lib/auth-client";
 
@@ -11,7 +11,7 @@ export function useStopImpersonating() {
     try {
       setIsLoading(true);
       await admin.stopImpersonating();
-      
+
       toast.success(t("stopSuccess"));
       // Force a real page reload to ensure all state is properly cleared
       window.location.href = "/";

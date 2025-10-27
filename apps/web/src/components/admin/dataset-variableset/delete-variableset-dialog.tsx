@@ -21,11 +21,7 @@ interface DeleteVariablesetDialogProps {
   onSuccess?: () => void;
 }
 
-export function DeleteVariablesetDialog({
-  variablesetId,
-  variablesetName,
-  onSuccess,
-}: DeleteVariablesetDialogProps) {
+export function DeleteVariablesetDialog({ variablesetId, variablesetName, onSuccess }: DeleteVariablesetDialogProps) {
   const t = useTranslations("adminDatasetVariableset");
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

@@ -134,8 +134,11 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
               <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noVariables")}</div>
             ) : (
               <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.available.variables.list">
-                 {unassignedResponse?.rows.map((variable) => (
-                   <div key={variable.id} className="hover:bg-muted flex items-start gap-2 rounded-md p-2" data-testid={`admin.dataset.variableset.available.variable.${variable.id}`}>
+                {unassignedResponse?.rows.map((variable) => (
+                  <div
+                    key={variable.id}
+                    className="hover:bg-muted flex items-start gap-2 rounded-md p-2"
+                    data-testid={`admin.dataset.variableset.available.variable.${variable.id}`}>
                     <Button
                       size="sm"
                       variant="outline"
@@ -188,10 +191,13 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
               <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
             ) : assignedResponse?.rows.length === 0 ? (
               <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAssigned")}</div>
-             ) : (
-               <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.assigned.variables.list">
-                  {assignedResponse?.rows.map((variable) => (
-                   <div key={variable.id} className="hover:bg-muted flex items-start gap-2 rounded-md p-2" data-testid={`admin.dataset.variableset.assigned.variable.${variable.id}`}>
+            ) : (
+              <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.assigned.variables.list">
+                {assignedResponse?.rows.map((variable) => (
+                  <div
+                    key={variable.id}
+                    className="hover:bg-muted flex items-start gap-2 rounded-md p-2"
+                    data-testid={`admin.dataset.variableset.assigned.variable.${variable.id}`}>
                     <Button
                       size="sm"
                       variant="outline"

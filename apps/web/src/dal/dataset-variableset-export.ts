@@ -1,13 +1,13 @@
 import "server-only";
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
-import {
-  dataset,
-  datasetVariable,
-  datasetVariableset,
-  datasetVariablesetItem,
-} from "@repo/database/schema";
-import type { VariableSetExport, VariableSetExportFile, VariableSetImportOptions, VariableSetImportResult } from "@/types/dataset-variableset-export";
+import { dataset, datasetVariable, datasetVariableset, datasetVariablesetItem } from "@repo/database/schema";
+import type {
+  VariableSetExport,
+  VariableSetExportFile,
+  VariableSetImportOptions,
+  VariableSetImportResult,
+} from "@/types/dataset-variableset-export";
 
 export async function exportVariableSets(datasetId: string): Promise<VariableSetExportFile> {
   // Get dataset info
@@ -18,7 +18,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
     })
     .from(dataset)
     .where(eq(dataset.id, datasetId))
-    .then(rows => rows[0]);
+    .then((rows) => rows[0]);
 
   if (!datasetInfo) {
     throw new Error("Dataset not found");
@@ -50,20 +50,23 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
     .from(datasetVariableset)
     .where(eq(datasetVariableset.datasetId, datasetId));
 
-  allSets.forEach(set => {
+  allSets.forEach((set) => {
     parentMap.set(set.id, set.name);
   });
 
   // Group variables by variable set
-  const variableSetMap = new Map<string, {
-    name: string;
-    description: string | null;
-    parentId: string | null;
-    orderIndex: number;
-    variables: string[];
-  }>();
+  const variableSetMap = new Map<
+    string,
+    {
+      name: string;
+      description: string | null;
+      parentId: string | null;
+      orderIndex: number;
+      variables: string[];
+    }
+  >();
 
-  variableSetsQuery.forEach(row => {
+  variableSetsQuery.forEach((row) => {
     if (!variableSetMap.has(row.setId)) {
       variableSetMap.set(row.setId, {
         name: row.setName,
@@ -80,7 +83,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
   });
 
   // Convert to export format
-  const variableSets: VariableSetExport[] = Array.from(variableSetMap.values()).map(set => ({
+  const variableSets: VariableSetExport[] = Array.from(variableSetMap.values()).map((set) => ({
     name: set.name,
     description: set.description,
     parentName: set.parentId ? parentMap.get(set.parentId) || null : null,
@@ -129,7 +132,7 @@ export async function importVariableSets(
       .where(eq(datasetVariable.datasetId, datasetId));
 
     const variableNameToIdMap = new Map<string, string>();
-    existingVariables.forEach(variable => {
+    existingVariables.forEach((variable) => {
       variableNameToIdMap.set(variable.name, variable.id);
     });
 
@@ -142,7 +145,7 @@ export async function importVariableSets(
       .from(datasetVariableset)
       .where(eq(datasetVariableset.datasetId, datasetId));
 
-    const existingSetNames = new Set(existingVariableSets.map(set => set.name));
+    const existingSetNames = new Set(existingVariableSets.map((set) => set.name));
 
     // Create a map to track created sets for parent relationships
     const createdSetsMap = new Map<string, string>(); // name -> id
@@ -217,15 +220,13 @@ export async function importVariableSets(
 
         // Create variable set items
         if (validVariableIds.length > 0) {
-          await db
-            .insert(datasetVariablesetItem)
-            .values(
-              validVariableIds.map((variableId, index) => ({
-                variablesetId: createdSetId,
-                variableId,
-                orderIndex: index,
-              }))
-            );
+          await db.insert(datasetVariablesetItem).values(
+            validVariableIds.map((variableId, index) => ({
+              variablesetId: createdSetId,
+              variableId,
+              orderIndex: index,
+            }))
+          );
         }
 
         if (nameExists && options.conflictResolution === "overwrite") {
@@ -233,7 +234,8 @@ export async function importVariableSets(
           result.details.push({
             setName: finalName,
             status: "updated",
-            message: unmatchedVariables.length > 0 ? `${unmatchedVariables.length} variables could not be matched` : undefined,
+            message:
+              unmatchedVariables.length > 0 ? `${unmatchedVariables.length} variables could not be matched` : undefined,
             unmatchedVariables: unmatchedVariables.length > 0 ? unmatchedVariables : undefined,
           });
         } else {
@@ -241,15 +243,17 @@ export async function importVariableSets(
           result.details.push({
             setName: finalName,
             status: "created",
-            message: unmatchedVariables.length > 0 ? `${unmatchedVariables.length} variables could not be matched` : undefined,
+            message:
+              unmatchedVariables.length > 0 ? `${unmatchedVariables.length} variables could not be matched` : undefined,
             unmatchedVariables: unmatchedVariables.length > 0 ? unmatchedVariables : undefined,
           });
         }
 
         if (unmatchedVariables.length > 0) {
-          result.warnings.push(`Variable set "${finalName}": ${unmatchedVariables.length} variables could not be matched`);
+          result.warnings.push(
+            `Variable set "${finalName}": ${unmatchedVariables.length} variables could not be matched`
+          );
         }
-
       } catch (error) {
         result.summary.failedSets++;
         result.details.push({
@@ -267,16 +271,12 @@ export async function importVariableSets(
         const parentId = createdSetsMap.get(importSet.parentName);
 
         if (parentId) {
-          await db
-            .update(datasetVariableset)
-            .set({ parentId })
-            .where(eq(datasetVariableset.id, setId));
+          await db.update(datasetVariableset).set({ parentId }).where(eq(datasetVariableset.id, setId));
         } else {
           result.warnings.push(`Parent "${importSet.parentName}" not found for variable set "${importSet.name}"`);
         }
       }
     }
-
   } catch (error) {
     result.success = false;
     result.errors.push(error instanceof Error ? error.message : "Unknown error occurred during import");

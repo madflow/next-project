@@ -33,8 +33,7 @@ export function ImpersonateUserButton({ userId, userRole }: ImpersonateUserButto
       disabled={isLoading}
       title={t("actions.impersonate")}
       className="cursor-pointer"
-      data-testid={`admin.users.list.impersonate-${userId}`}
-    >
+      data-testid={`admin.users.list.impersonate-${userId}`}>
       <UserCheck className="h-4 w-4" />
       <span className="sr-only">{t("actions.impersonate")}</span>
     </Button>
