@@ -149,8 +149,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             <EmptyMedia variant="icon">
               <FolderXIcon />
             </EmptyMedia>
-            <EmptyTitle>Keine Auswertungseinheiten ausgewählt</EmptyTitle>
-            <EmptyDescription>Bitte wählen Sie ...</EmptyDescription>
+            <EmptyTitle>{t("empty.title")}</EmptyTitle>
+            <EmptyDescription>{t("empty.description")}</EmptyDescription>
           </EmptyHeader>
           <EmptyContent></EmptyContent>
         </Empty>

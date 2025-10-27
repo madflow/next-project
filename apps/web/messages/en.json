@@ -103,13 +103,12 @@
     "title": "Delete Account"
   },
   "adminDashboard": {
-    "title": "Admin Dashboard",
-    "description": "Access administrative tools and manage system settings.",
     "datasets": {
       "description": "Manage datasets and their configurations.",
       "link": "View Datasets",
       "title": "Datasets"
     },
+    "description": "Access administrative tools and manage system settings.",
     "organizations": {
       "description": "Manage organizations and their settings.",
       "link": "View Organizations",
@@ -120,6 +119,7 @@
       "link": "View Projects",
       "title": "Projects"
     },
+    "title": "Admin Dashboard",
     "users": {
       "description": "Manage user accounts and roles.",
       "link": "View Users",
@@ -371,6 +371,37 @@
     "editDescription": "Create and edit variable sets to organize variables",
     "editSet": "Edit Set",
     "editTitle": "Edit Variable Sets",
+    "exportImport": {
+      "export": "Export",
+      "exporting": "Exporting...",
+      "import": "Import",
+      "importDialog": {
+        "cancel": "Cancel",
+        "close": "Close",
+        "conflictOptions": {
+          "overwrite": "Overwrite existing sets",
+          "rename": "Rename imported sets",
+          "skip": "Skip existing sets"
+        },
+        "conflictResolution": "Conflict Resolution",
+        "description": "Import variable sets from a JSON file. You can choose how to handle conflicts with existing variable sets.",
+        "errors": "Errors:",
+        "importAnother": "Import Another",
+        "importCompleted": "Import completed successfully",
+        "importFailed": "Import failed",
+        "importing": "Processing import...",
+        "selectFile": "Select File",
+        "summary": {
+          "created": "Created:",
+          "failed": "Failed:",
+          "skipped": "Skipped:",
+          "totalSets": "Total Sets:",
+          "updated": "Updated:"
+        },
+        "title": "Import Variable Sets",
+        "warnings": "Warnings:"
+      }
+    },
     "form": {
       "cancel": "Cancel",
       "create": "Create",
@@ -399,37 +430,6 @@
       "moveSet": "Move Set",
       "rootLevel": "Root Level",
       "variableCount": "{count, plural, =0 {no variables} =1 {1 variable} other {# variables}}"
-    },
-    "exportImport": {
-      "export": "Export",
-      "exporting": "Exporting...",
-      "import": "Import",
-      "importDialog": {
-        "title": "Import Variable Sets",
-        "description": "Import variable sets from a JSON file. You can choose how to handle conflicts with existing variable sets.",
-        "selectFile": "Select File",
-        "conflictResolution": "Conflict Resolution",
-        "conflictOptions": {
-          "skip": "Skip existing sets",
-          "overwrite": "Overwrite existing sets", 
-          "rename": "Rename imported sets"
-        },
-        "cancel": "Cancel",
-        "importing": "Processing import...",
-        "importCompleted": "Import completed successfully",
-        "importFailed": "Import failed",
-        "summary": {
-          "totalSets": "Total Sets:",
-          "created": "Created:",
-          "updated": "Updated:",
-          "skipped": "Skipped:", 
-          "failed": "Failed:"
-        },
-        "warnings": "Warnings:",
-        "errors": "Errors:",
-        "importAnother": "Import Another",
-        "close": "Close"
-      }
     }
   },
   "adminSidebar": {
@@ -624,6 +624,11 @@
       "view": "View"
     }
   },
+  "debugMode": {
+    "disabled": "OFF",
+    "enabled": "ON",
+    "label": "Debug Mode"
+  },
   "forgotPassword": {
     "description": "Enter your email address and we'll send you a link to reset your password.",
     "form": {
@@ -693,6 +698,32 @@
       }
     },
     "title": "Login"
+  },
+  "metricsHelp": {
+    "count": {
+      "description": "The total number of valid (non-missing) observations in the dataset.",
+      "title": "Count"
+    },
+    "max": {
+      "description": "The largest value in the dataset.",
+      "title": "Maximum"
+    },
+    "mean": {
+      "description": "The arithmetic mean (average) of all values. Calculated by summing all values and dividing by the count.",
+      "title": "Mean"
+    },
+    "median": {
+      "description": "The middle value when all observations are arranged in ascending order. For an even number of observations, it's the average of the two middle values.",
+      "title": "Median"
+    },
+    "min": {
+      "description": "The smallest value in the dataset.",
+      "title": "Minimum"
+    },
+    "stdev": {
+      "description": "A measure of how spread out the data points are from the mean. A higher standard deviation indicates more variability in the data.",
+      "title": "Standard Deviation"
+    }
   },
   "navUser": {
     "account": "Account",
@@ -943,6 +974,10 @@
     "title": "Projects"
   },
   "projectAdhocAnalysis": {
+    "empty": {
+      "description": "Please select a variable or variable set from the list to begin your analysis.",
+      "title": "No Selection Made"
+    },
     "errors": {
       "fetchStats": "Error loading dataset statistics"
     },
@@ -998,50 +1033,19 @@
     },
     "title": "Sign Up"
   },
-  "debugMode": {
-    "label": "Debug Mode",
-    "enabled": "ON",
-    "disabled": "OFF"
-  },
   "themeSelector": {
+    "changeTheme": "Change theme",
     "colorThemes": "Colors",
     "label": "Theme",
     "labelSelect": "Theme:",
     "organizationThemes": "Organization Themes",
-    "placeholder": "Select a theme",
-    "changeTheme": "Change theme"
+    "placeholder": "Select a theme"
   },
   "themeToggle": {
     "dark": "Dark",
     "light": "Light",
     "system": "System",
     "toggleTheme": "Toggle theme"
-  },
-  "metricsHelp": {
-    "count": {
-      "title": "Count",
-      "description": "The total number of valid (non-missing) observations in the dataset."
-    },
-    "mean": {
-      "title": "Mean",
-      "description": "The arithmetic mean (average) of all values. Calculated by summing all values and dividing by the count."
-    },
-    "median": {
-      "title": "Median",
-      "description": "The middle value when all observations are arranged in ascending order. For an even number of observations, it's the average of the two middle values."
-    },
-    "stdev": {
-      "title": "Standard Deviation",
-      "description": "A measure of how spread out the data points are from the mean. A higher standard deviation indicates more variability in the data."
-    },
-    "min": {
-      "title": "Minimum",
-      "description": "The smallest value in the dataset."
-    },
-    "max": {
-      "title": "Maximum",
-      "description": "The largest value in the dataset."
-    }
   },
   "user": {
     "actions": {

@@ -103,13 +103,12 @@
     "title": "Konto löschen"
   },
   "adminDashboard": {
-    "title": "Admin Dashboard",
-    "description": "Zugriff auf administrative Tools und Verwaltung der Anwendungseinstellungen.",
     "datasets": {
       "description": "Verwalten Sie Datensätze und deren Konfigurationen.",
       "link": "Datensätze anzeigen",
       "title": "Datensätze"
     },
+    "description": "Zugriff auf administrative Tools und Verwaltung der Anwendungseinstellungen.",
     "organizations": {
       "description": "Verwalten Sie Organisationen und deren Einstellungen.",
       "link": "Organisationen anzeigen",
@@ -120,6 +119,7 @@
       "link": "Projekte anzeigen",
       "title": "Projekte"
     },
+    "title": "Admin Dashboard",
     "users": {
       "description": "Verwalten Sie Benutzerkonten und Rollen.",
       "link": "Benutzer anzeigen",
@@ -371,6 +371,37 @@
     "editDescription": "Erstellen und bearbeiten Sie Variablen-Sets um Variablen zu organisieren",
     "editSet": "Set bearbeiten",
     "editTitle": "Variablen-Sets bearbeiten",
+    "exportImport": {
+      "export": "Exportieren",
+      "exporting": "Wird exportiert...",
+      "import": "Importieren",
+      "importDialog": {
+        "cancel": "Abbrechen",
+        "close": "Schließen",
+        "conflictOptions": {
+          "overwrite": "Bestehende Sets überschreiben",
+          "rename": "Importierte Sets umbenennen",
+          "skip": "Bestehende Sets überspringen"
+        },
+        "conflictResolution": "Konfliktlösung",
+        "description": "Importieren Sie Variablen-Sets aus einer JSON-Datei. Sie können wählen, wie Konflikte mit bestehenden Variablen-Sets behandelt werden sollen.",
+        "errors": "Fehler:",
+        "importAnother": "Weitere importieren",
+        "importCompleted": "Import erfolgreich abgeschlossen",
+        "importFailed": "Import fehlgeschlagen",
+        "importing": "Import wird verarbeitet...",
+        "selectFile": "Datei auswählen",
+        "summary": {
+          "created": "Erstellt:",
+          "failed": "Fehlgeschlagen:",
+          "skipped": "Übersprungen:",
+          "totalSets": "Sets insgesamt:",
+          "updated": "Aktualisiert:"
+        },
+        "title": "Variablen-Sets importieren",
+        "warnings": "Warnungen:"
+      }
+    },
     "form": {
       "cancel": "Abbrechen",
       "create": "Erstellen",
@@ -399,37 +430,6 @@
       "moveSet": "Set verschieben",
       "rootLevel": "Hauptebene",
       "variableCount": "{count, plural, =0 {keine Variablen} =1 {1 Variable} other {# Variablen}}"
-    },
-    "exportImport": {
-      "export": "Exportieren",
-      "exporting": "Wird exportiert...",
-      "import": "Importieren",
-      "importDialog": {
-        "title": "Variablen-Sets importieren",
-        "description": "Importieren Sie Variablen-Sets aus einer JSON-Datei. Sie können wählen, wie Konflikte mit bestehenden Variablen-Sets behandelt werden sollen.",
-        "selectFile": "Datei auswählen",
-        "conflictResolution": "Konfliktlösung",
-        "conflictOptions": {
-          "skip": "Bestehende Sets überspringen",
-          "overwrite": "Bestehende Sets überschreiben",
-          "rename": "Importierte Sets umbenennen"
-        },
-        "cancel": "Abbrechen",
-        "importing": "Import wird verarbeitet...",
-        "importCompleted": "Import erfolgreich abgeschlossen",
-        "importFailed": "Import fehlgeschlagen",
-        "summary": {
-          "totalSets": "Sets insgesamt:",
-          "created": "Erstellt:",
-          "updated": "Aktualisiert:",
-          "skipped": "Übersprungen:",
-          "failed": "Fehlgeschlagen:"
-        },
-        "warnings": "Warnungen:",
-        "errors": "Fehler:",
-        "importAnother": "Weitere importieren",
-        "close": "Schließen"
-      }
     }
   },
   "adminSidebar": {
@@ -624,6 +624,11 @@
       "view": "Ansicht"
     }
   },
+  "debugMode": {
+    "disabled": "AUS",
+    "enabled": "AN",
+    "label": "Debug-Modus"
+  },
   "forgotPassword": {
     "description": "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts zu.",
     "form": {
@@ -693,6 +698,32 @@
       }
     },
     "title": "Einloggen"
+  },
+  "metricsHelp": {
+    "count": {
+      "description": "Die Gesamtzahl der gültigen (nicht fehlenden) Beobachtungen im Datensatz.",
+      "title": "Anzahl"
+    },
+    "max": {
+      "description": "Der größte Wert im Datensatz.",
+      "title": "Maximum"
+    },
+    "mean": {
+      "description": "Das arithmetische Mittel (Durchschnitt) aller Werte. Wird berechnet, indem alle Werte addiert und durch die Anzahl geteilt werden.",
+      "title": "Arithmetisches Mittel"
+    },
+    "median": {
+      "description": "Der mittlere Wert, wenn alle Beobachtungen in aufsteigender Reihenfolge angeordnet sind. Bei einer geraden Anzahl von Beobachtungen ist es der Durchschnitt der beiden mittleren Werte.",
+      "title": "Median"
+    },
+    "min": {
+      "description": "Der kleinste Wert im Datensatz.",
+      "title": "Minimum"
+    },
+    "stdev": {
+      "description": "Ein Maß dafür, wie weit die Datenpunkte vom Mittelwert entfernt sind. Eine höhere Standardabweichung zeigt mehr Variabilität in den Daten an.",
+      "title": "Standardabweichung"
+    }
   },
   "navUser": {
     "account": "Konto",
@@ -943,6 +974,10 @@
     "title": "Projekte"
   },
   "projectAdhocAnalysis": {
+    "empty": {
+      "description": "Bitte wählen Sie eine Variable oder ein Variablen-Set aus der Liste aus, um mit der Analyse zu beginnen.",
+      "title": "Keine Auswahl getroffen"
+    },
     "errors": {
       "fetchStats": "Fehler beim Laden der Statistiken"
     },
@@ -998,50 +1033,19 @@
     },
     "title": "Registrieren"
   },
-  "debugMode": {
-    "label": "Debug-Modus",
-    "enabled": "AN",
-    "disabled": "AUS"
-  },
   "themeSelector": {
+    "changeTheme": "Design ändern",
     "colorThemes": "Farben",
     "label": "Design",
     "labelSelect": "Design:",
     "organizationThemes": "Organisationsthemes",
-    "placeholder": "Design auswählen",
-    "changeTheme": "Design ändern"
+    "placeholder": "Design auswählen"
   },
   "themeToggle": {
     "dark": "Dunkel",
     "light": "Hell",
     "system": "System",
     "toggleTheme": "Design umschalten"
-  },
-  "metricsHelp": {
-    "count": {
-      "title": "Anzahl",
-      "description": "Die Gesamtzahl der gültigen (nicht fehlenden) Beobachtungen im Datensatz."
-    },
-    "mean": {
-      "title": "Arithmetisches Mittel",
-      "description": "Das arithmetische Mittel (Durchschnitt) aller Werte. Wird berechnet, indem alle Werte addiert und durch die Anzahl geteilt werden."
-    },
-    "median": {
-      "title": "Median",
-      "description": "Der mittlere Wert, wenn alle Beobachtungen in aufsteigender Reihenfolge angeordnet sind. Bei einer geraden Anzahl von Beobachtungen ist es der Durchschnitt der beiden mittleren Werte."
-    },
-    "stdev": {
-      "title": "Standardabweichung",
-      "description": "Ein Maß dafür, wie weit die Datenpunkte vom Mittelwert entfernt sind. Eine höhere Standardabweichung zeigt mehr Variabilität in den Daten an."
-    },
-    "min": {
-      "title": "Minimum",
-      "description": "Der kleinste Wert im Datensatz."
-    },
-    "max": {
-      "title": "Maximum",
-      "description": "Der größte Wert im Datensatz."
-    }
   },
   "user": {
     "actions": {
