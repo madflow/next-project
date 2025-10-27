@@ -1,5 +1,6 @@
 "use client";
 
+import { FolderXIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Suspense, useEffect, useState } from "react";
 import { useThemeConfig } from "@/components/active-theme";
@@ -10,6 +11,7 @@ import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
 import BarSkeleton from "../chart/bar-skeleton";
 import { MultiVariableCharts } from "../chart/multi-variable-charts";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-selector";
 
 type AdHocAnalysisProps = {
@@ -128,7 +130,6 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           <AdHocVariablesetSelector datasetId={selectedDataset} onSelectionChangeAction={handleSelectionChange} />
         )}
       </div>
-
       {selectedDataset && currentSelection && selectedVariables.length > 0 && (
         <Suspense fallback={<BarSkeleton />}>
           <MultiVariableCharts
@@ -141,6 +142,18 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             onStatsRequestAction={handleStatsRequest}
           />
         </Suspense>
+      )}
+      {selectedDataset && !currentSelection && (
+        <Empty className="flex w-64 max-w-128 min-w-64 flex-col gap-4">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FolderXIcon />
+            </EmptyMedia>
+            <EmptyTitle>Keine Auswertungseinheiten ausgewählt</EmptyTitle>
+            <EmptyDescription>Bitte wählen Sie ...</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent></EmptyContent>
+        </Empty>
       )}
     </div>
   );
