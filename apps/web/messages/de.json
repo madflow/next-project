@@ -946,6 +946,7 @@
     "errors": {
       "fetchStats": "Fehler beim Laden der Statistiken"
     },
+    "splitBy": "aufgeteilt nach: {variable}",
     "splitVariable": {
       "label": "Teilungsvariable:",
       "none": "Keine",
