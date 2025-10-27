@@ -188,9 +188,7 @@ export function VariablesetForm({
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name}>{t("form.parent")}</FieldLabel>
                 <FieldGroup>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id={field.name}>
                       <SelectValue placeholder={t("form.selectParent")} />
                     </SelectTrigger>
@@ -221,7 +219,11 @@ export function VariablesetForm({
                 data-testid="admin.dataset.variableset.form.cancel">
                 {t("form.cancel")}
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto" data-testid="admin.dataset.variableset.form.submit">
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                className="w-full sm:w-auto"
+                data-testid="admin.dataset.variableset.form.submit">
                 {form.formState.isSubmitting ? t("form.saving") : isEditing ? t("form.update") : t("form.create")}
               </Button>
             </div>

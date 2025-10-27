@@ -2,16 +2,15 @@
 
 import { useTranslations } from "next-intl";
 import { Suspense, useEffect, useState } from "react";
+import { useThemeConfig } from "@/components/active-theme";
 import { DatasetSelect } from "@/components/form/dataset-select";
-import { useDatasetStats } from "@/hooks/use-dataset-stats";
 import { useAdhocPersistence } from "@/hooks/use-adhoc-persistence";
+import { useDatasetStats } from "@/hooks/use-dataset-stats";
 import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
-import { MultiVariableCharts } from "../chart/multi-variable-charts";
 import BarSkeleton from "../chart/bar-skeleton";
+import { MultiVariableCharts } from "../chart/multi-variable-charts";
 import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-selector";
-
-import { useThemeConfig } from "@/components/active-theme";
 
 type AdHocAnalysisProps = {
   project: Project;
@@ -36,7 +35,6 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       if (restoredState.selectedTheme && restoredState.selectedTheme !== "default") {
         setActiveTheme(restoredState.selectedTheme);
       }
-      // Note: currentSelection will be restored when dataset is set and variableset selector is rendered
     }
   }, [restoreState, setActiveTheme]);
 
@@ -48,15 +46,16 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
 
   useEffect(() => {
     if (currentSelection) {
-      const variables = currentSelection.type === "variable" && currentSelection.variable 
-        ? [currentSelection.variable]
-        : currentSelection.variables || [];
+      const variables =
+        currentSelection.type === "variable" && currentSelection.variable
+          ? [currentSelection.variable]
+          : currentSelection.variables || [];
 
       if (variables.length > 0) {
         // Initialize stats data for all variables without split variables
         // Individual split variable requests will be handled by MultiVariableCharts
         const request: StatsRequest = {
-          variables: variables.map(v => ({ variable: v.name })),
+          variables: variables.map((v) => ({ variable: v.name })),
           decimal_places: 2,
         };
 
@@ -92,9 +91,9 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         onSuccess: (data) => {
           const responseItem = data[0];
           if (responseItem) {
-            setStatsData(prev => ({
+            setStatsData((prev) => ({
               ...prev,
-              [variableName]: [responseItem]
+              [variableName]: [responseItem],
             }));
           }
         },
@@ -102,9 +101,10 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     }
   };
 
-  const selectedVariables = currentSelection?.type === "variable" && currentSelection.variable
-    ? [currentSelection.variable]
-    : currentSelection?.variables || [];
+  const selectedVariables =
+    currentSelection?.type === "variable" && currentSelection.variable
+      ? [currentSelection.variable]
+      : currentSelection?.variables || [];
 
   return (
     <div className="theme-container flex gap-4">
@@ -117,7 +117,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             setCurrentSelection(null);
             setStatsData({});
             saveDataset(value || null);
-            
+
             // If value is empty (dataset was deleted), also clear the stored selection
             if (!value) {
               saveCurrentSelection(null);
@@ -125,20 +125,18 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           }}
         />
         {selectedDataset && (
-          <AdHocVariablesetSelector 
-            datasetId={selectedDataset} 
-            onSelectionChangeAction={handleSelectionChange} 
-          />
+          <AdHocVariablesetSelector datasetId={selectedDataset} onSelectionChangeAction={handleSelectionChange} />
         )}
-
       </div>
-      
+
       {selectedDataset && currentSelection && selectedVariables.length > 0 && (
         <Suspense fallback={<BarSkeleton />}>
-          <MultiVariableCharts 
+          <MultiVariableCharts
             variables={selectedVariables}
             statsData={statsData}
-            variableset={currentSelection?.type === "set" ? currentSelection.variableset : currentSelection?.parentVariableset}
+            variableset={
+              currentSelection?.type === "set" ? currentSelection.variableset : currentSelection?.parentVariableset
+            }
             datasetId={selectedDataset}
             onStatsRequestAction={handleStatsRequest}
           />

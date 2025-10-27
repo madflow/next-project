@@ -252,4 +252,3 @@ export function getDefaultChartType(criteria: ChartSelectionCriteria): AnalysisC
   const result = determineChartSelection(criteria);
   return result.defaultChartType;
 }
-

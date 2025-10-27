@@ -71,7 +71,7 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         if (!column) {
           continue;
         }
-        
+
         if (filter.operator === "=" || filter.operator === "eq") {
           filterConditions.push(eq(column, filter.value));
         }
@@ -107,10 +107,10 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         searchConditions.push(searchCondition);
       }
     }
-    
+
     // Combine search and filter conditions
     const allConditions: SQL<unknown>[] = [];
-    
+
     // Add search conditions (OR logic for search)
     if (searchConditions.length > 0) {
       const searchCondition = or(...searchConditions);
@@ -118,12 +118,12 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         allConditions.push(searchCondition);
       }
     }
-    
+
     // Add filter conditions (AND logic for filters)
     if (filterConditions.length > 0) {
       allConditions.push(...filterConditions);
     }
-    
+
     // Apply all conditions
     if (allConditions.length > 0) {
       const finalCondition = allConditions.length === 1 ? allConditions[0] : and(...allConditions);

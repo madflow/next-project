@@ -152,10 +152,7 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor={field.name}>{t("form.organization.label")}</FieldLabel>
             <FieldGroup>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                data-testid="organization-select">
+              <Select onValueChange={field.onChange} value={field.value} data-testid="organization-select">
                 <SelectTrigger id={field.name} className="w-full sm:max-w-[50%]">
                   <SelectValue placeholder={t("form.organization.placeholder")} />
                 </SelectTrigger>

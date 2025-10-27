@@ -18,7 +18,6 @@ async function getLatestEmail(email: string) {
 
 test.describe.configure({ mode: "parallel" });
 test.describe("Email Translations", () => {
-
   test("email verification email should be sent in English when locale is English", async ({ page }) => {
     const userEmail = `e2e-email-verify-en-${Date.now()}@example.com`;
     const password = crypto.randomUUID();

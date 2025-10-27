@@ -11,6 +11,7 @@ import { z } from "zod";
 import { uploadDataset } from "@/actions/dataset";
 import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
   FileUpload,
   FileUploadDropzone,
@@ -20,7 +21,6 @@ import {
   FileUploadItemPreview,
   FileUploadList,
 } from "@/components/ui/file-upload";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -240,7 +240,10 @@ export function DatasetUploadForm() {
                   value={field.value}
                   onValueChange={field.onChange}
                   data-testid="app.admin.dataset.organization-select">
-                  <SelectTrigger id={field.name} className="w-full" data-testid="app.admin.dataset.organization-trigger">
+                  <SelectTrigger
+                    id={field.name}
+                    className="w-full"
+                    data-testid="app.admin.dataset.organization-trigger">
                     <SelectValue placeholder={t("formLabels.organization")} />
                   </SelectTrigger>
                   <SelectContent>

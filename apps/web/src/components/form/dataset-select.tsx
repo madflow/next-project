@@ -35,7 +35,7 @@ export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, tr
 
     // If data is loaded, check if the defaultValue exists in available datasets
     if (data?.rows) {
-      const datasetExists = data.rows.some(item => item.datasets.id === defaultValue);
+      const datasetExists = data.rows.some((item) => item.datasets.id === defaultValue);
       if (datasetExists) {
         setSelectedValue(defaultValue);
       } else {

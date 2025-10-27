@@ -2,7 +2,7 @@
 
 import { DownloadIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
@@ -115,7 +115,11 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
           width={200}
         />
         <Bar dataKey="value" fill="var(--color-value)">
-          <LabelList dataKey="value" position="right" formatter={(value: number) => `${Math.round(value * 100) / 100}`} />
+          <LabelList
+            dataKey="value"
+            position="right"
+            formatter={(value: number) => `${Math.round(value * 100) / 100}`}
+          />
         </Bar>
         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
       </BarChart>

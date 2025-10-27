@@ -56,7 +56,7 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
     return (
       <div className="space-y-4">
         <div>
-          <h2 className="text-base font-medium mt-6">{t("projects")}</h2>
+          <h2 className="mt-6 text-base font-medium">{t("projects")}</h2>
           <p className="text-muted-foreground text-sm">{t("datasetProjectsDescription")}</p>
         </div>
 
@@ -73,13 +73,13 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-base font-medium mt-6">{t("projects")}</h2>
+        <h2 className="mt-6 text-base font-medium">{t("projects")}</h2>
         <p className="text-muted-foreground text-sm">{t("datasetProjectsDescription")}</p>
       </div>
 
       <Card className="rounded-md shadow-xs">
         <CardContent>
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             <ProjectSelect onValueChange={setSelectedProject} organizationId={organizationId} />
             <Button onClick={handleAddToProject} disabled={!selectedProject || isAddingToProject}>
               {isAddingToProject ? t("adding") : t("addToProject")}

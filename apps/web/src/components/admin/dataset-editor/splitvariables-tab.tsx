@@ -13,8 +13,12 @@ export function SplitVariablesTab({ datasetId }: SplitVariablesTabProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-base font-medium mt-6" data-testid="admin.dataset.splitvariables.title">{t("title")}</h2>
-        <p className="text-muted-foreground text-sm" data-testid="admin.dataset.splitvariables.description">{t("description")}</p>
+        <h2 className="mt-6 text-base font-medium" data-testid="admin.dataset.splitvariables.title">
+          {t("title")}
+        </h2>
+        <p className="text-muted-foreground text-sm" data-testid="admin.dataset.splitvariables.description">
+          {t("description")}
+        </p>
       </div>
 
       {/* Split Variables Assignment */}

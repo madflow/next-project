@@ -54,7 +54,8 @@ netstat -an | grep :3000
 make dev
 ```
 
-**Important**: 
+**Important**:
+
 - Do not start multiple dev server instances on port 3000
 - Always check server status before attempting to start
 - The dev server must be running outside of Docker for tests to work properly
@@ -102,153 +103,161 @@ pnpm --filter e2e-web exec playwright show-report
 ### Navigation and Page Interaction
 
 **Basic Navigation:**
+
 ```javascript
 // Navigate to the web application
-playwright_browser_navigate("http://localhost:3000")
+playwright_browser_navigate("http://localhost:3000");
 
 // Take a snapshot to understand page structure
-playwright_browser_snapshot()
+playwright_browser_snapshot();
 
 // Navigate to specific admin page
-playwright_browser_navigate("http://localhost:3000/admin/users")
+playwright_browser_navigate("http://localhost:3000/admin/users");
 ```
 
 **Element Interaction:**
+
 ```javascript
 // Click on elements
 playwright_browser_click({
-  element: "Login button", 
-  ref: "button[type='submit']"
-})
+  element: "Login button",
+  ref: "button[type='submit']",
+});
 
 // Fill form fields
 playwright_browser_fill_form([
   {
-    name: "email", 
-    type: "textbox", 
-    ref: "input[name='email']", 
-    value: "admin@example.com"
+    name: "email",
+    type: "textbox",
+    ref: "input[name='email']",
+    value: "admin@example.com",
   },
   {
-    name: "password", 
-    type: "textbox", 
-    ref: "input[name='password']", 
-    value: "Tester12345"
-  }
-])
+    name: "password",
+    type: "textbox",
+    ref: "input[name='password']",
+    value: "Tester12345",
+  },
+]);
 
 // Type in specific elements
 playwright_browser_type({
   element: "Search input",
   ref: "input[placeholder='Search...']",
-  text: "test query"
-})
+  text: "test query",
+});
 ```
 
 ### Authentication Testing
 
 **Login Flow:**
+
 ```javascript
 // Navigate to login page
-playwright_browser_navigate("http://localhost:3000/auth/login")
+playwright_browser_navigate("http://localhost:3000/auth/login");
 
 // Fill login form
 playwright_browser_fill_form([
-  {name: "email", type: "textbox", ref: "input[name='email']", value: "admin@example.com"},
-  {name: "password", type: "textbox", ref: "input[name='password']", value: "Tester12345"}
-])
+  { name: "email", type: "textbox", ref: "input[name='email']", value: "admin@example.com" },
+  { name: "password", type: "textbox", ref: "input[name='password']", value: "Tester12345" },
+]);
 
 // Submit form
-playwright_browser_click({element: "Login button", ref: "button[type='submit']"})
+playwright_browser_click({ element: "Login button", ref: "button[type='submit']" });
 
 // Wait for redirect to dashboard
-playwright_browser_wait_for({text: "Dashboard"})
+playwright_browser_wait_for({ text: "Dashboard" });
 ```
 
 **Logout Flow:**
+
 ```javascript
 // Click user menu
-playwright_browser_click({element: "User menu", ref: "[data-testid='user-menu']"})
+playwright_browser_click({ element: "User menu", ref: "[data-testid='user-menu']" });
 
 // Click logout option
-playwright_browser_click({element: "Logout", ref: "text=Logout"})
+playwright_browser_click({ element: "Logout", ref: "text=Logout" });
 
 // Verify redirect to login
-playwright_browser_wait_for({text: "Sign in"})
+playwright_browser_wait_for({ text: "Sign in" });
 ```
 
 ### Data Verification and Testing
 
 **Form Submission Testing:**
+
 ```javascript
 // Navigate to form page
-playwright_browser_navigate("http://localhost:3000/admin/users/new")
+playwright_browser_navigate("http://localhost:3000/admin/users/new");
 
 // Fill user creation form
 playwright_browser_fill_form([
-  {name: "email", type: "textbox", ref: "input[name='email']", value: "newuser@example.com"},
-  {name: "firstName", type: "textbox", ref: "input[name='firstName']", value: "John"},
-  {name: "lastName", type: "textbox", ref: "input[name='lastName']", value: "Doe"},
-  {name: "role", type: "combobox", ref: "select[name='role']", value: "user"}
-])
+  { name: "email", type: "textbox", ref: "input[name='email']", value: "newuser@example.com" },
+  { name: "firstName", type: "textbox", ref: "input[name='firstName']", value: "John" },
+  { name: "lastName", type: "textbox", ref: "input[name='lastName']", value: "Doe" },
+  { name: "role", type: "combobox", ref: "select[name='role']", value: "user" },
+]);
 
 // Submit form
-playwright_browser_click({element: "Create user button", ref: "button[type='submit']"})
+playwright_browser_click({ element: "Create user button", ref: "button[type='submit']" });
 
 // Wait for success message
-playwright_browser_wait_for({text: "User created successfully"})
+playwright_browser_wait_for({ text: "User created successfully" });
 
 // Verify user appears in list
-playwright_browser_navigate("http://localhost:3000/admin/users")
-playwright_browser_wait_for({text: "newuser@example.com"})
+playwright_browser_navigate("http://localhost:3000/admin/users");
+playwright_browser_wait_for({ text: "newuser@example.com" });
 ```
 
 **File Upload Testing:**
+
 ```javascript
 // Navigate to upload page
-playwright_browser_navigate("http://localhost:3000/datasets/upload")
+playwright_browser_navigate("http://localhost:3000/datasets/upload");
 
 // Upload test file
 playwright_browser_file_upload({
-  paths: ["/absolute/path/to/testdata/spss/demo.sav"]
-})
+  paths: ["/absolute/path/to/testdata/spss/demo.sav"],
+});
 
 // Wait for upload completion
-playwright_browser_wait_for({text: "Upload completed"})
+playwright_browser_wait_for({ text: "Upload completed" });
 ```
 
 ### Debugging and Inspection
 
 **Page State Inspection:**
+
 ```javascript
 // Take screenshot for debugging
 playwright_browser_take_screenshot({
   filename: "debug-screenshot.png",
-  fullPage: true
-})
+  fullPage: true,
+});
 
 // Evaluate JavaScript on page
 playwright_browser_evaluate({
-  function: "() => { return document.title; }"
-})
+  function: "() => { return document.title; }",
+});
 
 // Get console messages
-playwright_browser_console_messages()
+playwright_browser_console_messages();
 
 // Get network requests
-playwright_browser_network_requests()
+playwright_browser_network_requests();
 ```
 
 **Waiting for Elements and Content:**
+
 ```javascript
 // Wait for specific text to appear
-playwright_browser_wait_for({text: "Loading complete"})
+playwright_browser_wait_for({ text: "Loading complete" });
 
 // Wait for text to disappear
-playwright_browser_wait_for({textGone: "Loading..."})
+playwright_browser_wait_for({ textGone: "Loading..." });
 
 // Wait for specific time
-playwright_browser_wait_for({time: 2})
+playwright_browser_wait_for({ time: 2 });
 ```
 
 ## Test Data Management
@@ -259,25 +268,27 @@ The tests use a separate test database configured in `config.ts`:
 
 ```typescript
 export const testConfig = {
-  baseURL: 'http://localhost:3000',
+  baseURL: "http://localhost:3000",
   testUser: {
-    email: 'admin@example.com',
-    password: 'Tester12345'
+    email: "admin@example.com",
+    password: "Tester12345",
   },
   database: {
     // Test database configuration
-  }
-}
+  },
+};
 ```
 
 ### Test Data Files
 
 **SPSS Test Files:**
+
 - Located in `testdata/spss/`
 - Various sample datasets for testing upload and analysis features
 - Use these files for consistent test data across test runs
 
 **Test Utilities:**
+
 - `utils.ts` contains helper functions for common test operations
 - Database seeding and cleanup utilities
 - User authentication helpers
@@ -292,20 +303,20 @@ Create reusable page objects for complex interactions:
 class AdminUsersPage {
   async navigateToUsersPage() {
     await playwright_browser_navigate("http://localhost:3000/admin/users");
-    await playwright_browser_wait_for({text: "Users"});
+    await playwright_browser_wait_for({ text: "Users" });
   }
 
   async createUser(userData) {
-    await playwright_browser_click({element: "Add user button", ref: "text=Add User"});
+    await playwright_browser_click({ element: "Add user button", ref: "text=Add User" });
     await playwright_browser_fill_form([
-      {name: "email", type: "textbox", ref: "input[name='email']", value: userData.email},
-      {name: "firstName", type: "textbox", ref: "input[name='firstName']", value: userData.firstName}
+      { name: "email", type: "textbox", ref: "input[name='email']", value: userData.email },
+      { name: "firstName", type: "textbox", ref: "input[name='firstName']", value: userData.firstName },
     ]);
-    await playwright_browser_click({element: "Submit", ref: "button[type='submit']"});
+    await playwright_browser_click({ element: "Submit", ref: "button[type='submit']" });
   }
 
   async verifyUserExists(email) {
-    await playwright_browser_wait_for({text: email});
+    await playwright_browser_wait_for({ text: email });
   }
 }
 ```
@@ -339,21 +350,25 @@ async function cleanupTestData() {
 ### Common Issues and Solutions
 
 **Element Not Found:**
+
 - Use `playwright_browser_snapshot()` to see current page state
 - Verify selectors are correct
 - Add proper waits for dynamic content
 
 **Timing Issues:**
+
 - Use `playwright_browser_wait_for()` instead of fixed delays
 - Wait for specific content rather than arbitrary timeouts
 - Consider network delays and loading states
 
 **Authentication Problems:**
+
 - Verify test user credentials in `config.ts`
 - Check if session persistence is working correctly
 - Ensure login flow is completing successfully
 
 **Database State Issues:**
+
 - Verify test data setup and cleanup
 - Check for data conflicts between tests
 - Ensure test database isolation
@@ -367,6 +382,7 @@ pnpm --filter e2e-web exec playwright test --debug tests/specific-test.spec.ts
 ```
 
 This allows you to:
+
 - Step through test execution
 - Inspect page state at each step
 - Modify selectors and actions interactively

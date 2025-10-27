@@ -130,8 +130,7 @@ export function CreateUserForm() {
                     id={field.name}
                     className="w-full sm:w-1/2 lg:w-1/3"
                     aria-invalid={fieldState.invalid}
-                    data-testid="admin.users.new.form.role"
-                  >
+                    data-testid="admin.users.new.form.role">
                     <SelectValue placeholder={t("formPlaceholders.selectRole")} />
                   </SelectTrigger>
                   <SelectContent>

@@ -41,7 +41,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   console.log("canDirectlyAccept", canDirectlyAccept);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4" data-testid="auth.accept-invitation.page">
+    <main
+      className="flex min-h-screen flex-col items-center justify-center px-4"
+      data-testid="auth.accept-invitation.page">
       <div className="w-full max-w-md">
         {canDirectlyAccept ? (
           <AuthAcceptInvitationCard invitationId={id} userId={existingUser?.id} />

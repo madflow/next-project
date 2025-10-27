@@ -3,8 +3,8 @@
 import { type Organization } from "better-auth/plugins";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useActiveProject } from "@/hooks/use-active-project";
-import { useActiveOrganization } from "@/lib/auth-client";
 import { useDebugMode } from "@/hooks/use-debug-mode";
+import { useActiveOrganization } from "@/lib/auth-client";
 
 export type Project = {
   id: string;

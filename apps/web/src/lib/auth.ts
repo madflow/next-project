@@ -5,7 +5,14 @@ import { admin as adminPlugin, organization as organizationPlugin } from "better
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
-import { sendEmail, EmailVerification, PasswordReset, EmailChange, OrganizationInvite, getEmailTranslations } from "@repo/email";
+import {
+  EmailChange,
+  EmailVerification,
+  OrganizationInvite,
+  PasswordReset,
+  getEmailTranslations,
+  sendEmail,
+} from "@repo/email";
 import { env } from "@/env";
 import { defaultLocale, extractAppLocale } from "@/i18n/config";
 
@@ -79,16 +86,19 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async (data: {
-        user: { email: string; locale?: string };
-        newEmail: string;
-        url: string;
-      }, request) => {
+      sendChangeEmailVerification: async (
+        data: {
+          user: { email: string; locale?: string };
+          newEmail: string;
+          url: string;
+        },
+        request
+      ) => {
         const { user, newEmail, url } = data;
 
         const cookieHeader = request?.headers.get("cookie");
         const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
-        const locale =user.locale || requestedLocale || defaultLocale;
+        const locale = user.locale || requestedLocale || defaultLocale;
         const { subject, heading, content, action } = getEmailTranslations("emailChange", locale, { newEmail });
 
         await sendEmail({
@@ -130,7 +140,7 @@ export const auth = betterAuth({
       const cookieHeader = request?.headers.get("cookie");
       const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
 
-      const locale =user.locale || requestedLocale || defaultLocale;
+      const locale = user.locale || requestedLocale || defaultLocale;
       const { subject, heading, content, action } = getEmailTranslations("emailVerification", locale);
       await sendEmail({
         to: user.email,
@@ -158,7 +168,7 @@ export const auth = betterAuth({
       const { user, url } = data;
       const cookieHeader = request?.headers.get("cookie");
       const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
-      const locale =user.locale || requestedLocale || defaultLocale;
+      const locale = user.locale || requestedLocale || defaultLocale;
       const { subject, heading, content, action } = getEmailTranslations("passwordReset", locale);
       await sendEmail({
         to: user.email,

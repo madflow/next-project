@@ -33,12 +33,14 @@ export const VariableSetImportResultSchema = z.object({
   }),
   errors: z.array(z.string()),
   warnings: z.array(z.string()),
-  details: z.array(z.object({
-    setName: z.string(),
-    status: z.enum(["created", "skipped", "updated", "failed"]),
-    message: z.string().optional(),
-    unmatchedVariables: z.array(z.string()).optional(),
-  })),
+  details: z.array(
+    z.object({
+      setName: z.string(),
+      status: z.enum(["created", "skipped", "updated", "failed"]),
+      message: z.string().optional(),
+      unmatchedVariables: z.array(z.string()).optional(),
+    })
+  ),
 });
 
 export type VariableSetExport = z.infer<typeof VariableSetExportSchema>;

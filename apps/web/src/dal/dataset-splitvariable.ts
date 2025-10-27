@@ -1,26 +1,19 @@
 import "server-only";
-import { and, eq, ilike, or, notInArray } from "drizzle-orm";
+import { and, eq, ilike, notInArray, or } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
-import {
-  CreateDatasetSplitVariableData,
-  datasetVariable,
-  datasetSplitVariable as entity,
-} from "@repo/database/schema";
+import { CreateDatasetSplitVariableData, datasetVariable, datasetSplitVariable as entity } from "@repo/database/schema";
 import { ListOptions, withAdminCheck, withSessionCheck } from "@/lib/dal";
 import { DalException } from "@/lib/exception";
 
 async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
   const { search } = options;
-  
+
   // Build where conditions
   const whereConditions = [eq(entity.datasetId, datasetId)];
-  
+
   // Add search if provided
   if (search) {
-    const searchConditions = [
-      ilike(datasetVariable.name, `%${search}%`),
-      ilike(datasetVariable.label, `%${search}%`)
-    ];
+    const searchConditions = [ilike(datasetVariable.name, `%${search}%`), ilike(datasetVariable.label, `%${search}%`)];
     const searchOr = or(...searchConditions);
     if (searchOr) {
       whereConditions.push(searchOr);
@@ -58,29 +51,26 @@ async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
 
 async function getAvailableVariablesFn(datasetId: string, options: ListOptions = {}) {
   const { search } = options;
-  
+
   // Get variables that are NOT already split variables
   const existingSplitVariables = await db
     .select({ variableId: entity.variableId })
     .from(entity)
     .where(eq(entity.datasetId, datasetId));
-  
+
   const existingVariableIds = existingSplitVariables.map((item: { variableId: string }) => item.variableId);
-  
+
   // Build where conditions
   const whereConditions = [eq(datasetVariable.datasetId, datasetId)];
-  
+
   // Exclude variables that are already split variables
   if (existingVariableIds.length > 0) {
     whereConditions.push(notInArray(datasetVariable.id, existingVariableIds));
   }
-  
+
   // Add search if provided
   if (search) {
-    const searchConditions = [
-      ilike(datasetVariable.name, `%${search}%`),
-      ilike(datasetVariable.label, `%${search}%`)
-    ];
+    const searchConditions = [ilike(datasetVariable.name, `%${search}%`), ilike(datasetVariable.label, `%${search}%`)];
     const searchOr = or(...searchConditions);
     if (searchOr) {
       whereConditions.push(searchOr);
@@ -121,9 +111,7 @@ async function addSplitVariableFn(datasetId: string, variableId: string) {
   const existing = await db
     .select()
     .from(entity)
-    .where(
-      and(eq(entity.datasetId, datasetId), eq(entity.variableId, variableId))
-    )
+    .where(and(eq(entity.datasetId, datasetId), eq(entity.variableId, variableId)))
     .limit(1);
 
   if (existing.length > 0) {
@@ -145,11 +133,7 @@ async function addSplitVariableFn(datasetId: string, variableId: string) {
 }
 
 async function removeSplitVariableFn(datasetId: string, variableId: string) {
-  await db
-    .delete(entity)
-    .where(
-      and(eq(entity.datasetId, datasetId), eq(entity.variableId, variableId))
-    );
+  await db.delete(entity).where(and(eq(entity.datasetId, datasetId), eq(entity.variableId, variableId)));
 }
 
 // Exported functions with appropriate auth checks

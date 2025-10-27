@@ -35,11 +35,7 @@ export async function deleteVariableset(id: string) {
   await remove(id);
 }
 
-export async function addVariableToVariableset(
-  variablesetId: string,
-  variableId: string,
-  orderIndex?: number
-) {
+export async function addVariableToVariableset(variablesetId: string, variableId: string, orderIndex?: number) {
   assertUserIsAdmin();
 
   await addVariableToSet(variablesetId, variableId, orderIndex);

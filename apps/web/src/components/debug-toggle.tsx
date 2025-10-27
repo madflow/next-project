@@ -24,16 +24,9 @@ export function DebugToggle({ className }: DebugToggleProps) {
       size="icon"
       onClick={() => setDebugMode(!debugMode)}
       className={cn("h-8 w-8", className)}
-      title={debugMode ? "Disable debug mode" : "Enable debug mode"}
-    >
-      {debugMode ? (
-        <BugOff className="h-4 w-4" />
-      ) : (
-        <Bug className="h-4 w-4" />
-      )}
-      <span className="sr-only">
-        {debugMode ? "Disable debug mode" : "Enable debug mode"}
-      </span>
+      title={debugMode ? "Disable debug mode" : "Enable debug mode"}>
+      {debugMode ? <BugOff className="h-4 w-4" /> : <Bug className="h-4 w-4" />}
+      <span className="sr-only">{debugMode ? "Disable debug mode" : "Enable debug mode"}</span>
     </Button>
   );
 }

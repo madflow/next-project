@@ -1,7 +1,7 @@
 "use client";
 
 import { DownloadIcon } from "lucide-react";
-import { Pie, PieChart, LabelList, Cell } from "recharts";
+import { Cell, LabelList, Pie, PieChart } from "recharts";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -49,18 +49,16 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
           <PieChart>
             <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
             <Pie data={rechartsData} dataKey="percentage" nameKey="label" startAngle={90} endAngle={-270}>
-              <LabelList 
-                dataKey="percentage" 
-                position="inside" 
-                fill="white" 
+              <LabelList
+                dataKey="percentage"
+                position="inside"
+                fill="white"
                 fontSize={12}
-                formatter={(value: number) => `${Math.round(value * 100) / 100}%`} 
+                formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
               />
               {rechartsData.map((entry, index) => {
                 const colorIndex = (index % 6) + 1;
-                return (
-                  <Cell key={`cell-${index}`} fill={`hsl(var(--chart-${colorIndex}))`} />
-                );
+                return <Cell key={`cell-${index}`} fill={`hsl(var(--chart-${colorIndex}))`} />;
               })}
             </Pie>
             <ChartLegend

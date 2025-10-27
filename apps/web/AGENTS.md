@@ -148,6 +148,7 @@ When debugging database issues:
 #### Running Playwright Tests
 
 **Basic Commands:**
+
 - **Run all tests**: `pnpm --filter e2e-web exec playwright test`
 - **Run tests in headed mode**: `pnpm --filter e2e-web exec playwright test --headed`
 - **Run specific test file**: `pnpm --filter e2e-web exec playwright test tests/admin-users.spec.ts`
@@ -155,6 +156,7 @@ When debugging database issues:
 - **Run tests in UI mode**: `pnpm --filter e2e-web exec playwright test --ui`
 
 **Debugging Options:**
+
 - **Step-by-step debugging**: Use `--debug` flag to pause execution and step through tests
 - **Visual debugging**: Use `--headed` to see browser actions in real-time
 - **Interactive mode**: Use `--ui` for Playwright's interactive test runner
@@ -165,57 +167,64 @@ When debugging database issues:
 When using Playwright MCP for automated testing and debugging:
 
 **Navigation and Setup:**
+
 - Use `playwright_browser_navigate` to navigate to `http://localhost:3000`
 - Use `playwright_browser_snapshot` to capture the current page state for analysis
 - Use `playwright_browser_take_screenshot` for visual verification
 
 **Form Interactions:**
+
 - Use `playwright_browser_fill_form` for multi-field form submissions
 - Use `playwright_browser_type` for single input fields
 - Use `playwright_browser_click` for button clicks and navigation
 
 **Authentication Testing:**
+
 - Navigate to login page: `/auth/login`
 - Fill credentials: `admin@example.com` / `Tester12345`
 - Verify successful login by checking for dashboard elements
 
 **Data Verification:**
+
 - Use `playwright_browser_evaluate` to run JavaScript and extract data
 - Use `playwright_browser_wait_for` to wait for specific content to appear
 - Check network requests with `playwright_browser_network_requests`
 
 **Common MCP Debugging Patterns:**
+
 ```javascript
 // Take a snapshot to understand page structure
-playwright_browser_snapshot()
+playwright_browser_snapshot();
 
 // Navigate to a specific page
-playwright_browser_navigate("http://localhost:3000/admin/users")
+playwright_browser_navigate("http://localhost:3000/admin/users");
 
 // Wait for page to load
-playwright_browser_wait_for({text: "Users"})
+playwright_browser_wait_for({ text: "Users" });
 
 // Fill a form
 playwright_browser_fill_form([
-  {name: "email", type: "textbox", ref: "input[name='email']", value: "test@example.com"},
-  {name: "password", type: "textbox", ref: "input[name='password']", value: "password123"}
-])
+  { name: "email", type: "textbox", ref: "input[name='email']", value: "test@example.com" },
+  { name: "password", type: "textbox", ref: "input[name='password']", value: "password123" },
+]);
 
 // Click submit button
-playwright_browser_click({element: "Submit button", ref: "button[type='submit']"})
+playwright_browser_click({ element: "Submit button", ref: "button[type='submit']" });
 
 // Verify result
-playwright_browser_wait_for({text: "User created successfully"})
+playwright_browser_wait_for({ text: "User created successfully" });
 ```
 
 #### Test Data Management
 
 **Test Database:**
+
 - Tests run against a separate test database
 - Use the seeding scripts in `packages/e2e-web/` for test data setup
 - Check `packages/e2e-web/config.ts` for test configuration
 
 **Data Isolation:**
+
 - Each test should clean up after itself
 - Use database transactions or cleanup hooks
 - Verify data state before and after tests
@@ -223,6 +232,7 @@ playwright_browser_wait_for({text: "User created successfully"})
 #### Debugging Test Failures
 
 **Investigation Steps:**
+
 1. **Check test output**: Look for specific error messages and stack traces
 2. **Review screenshots**: Check `test-results/` directory for failure screenshots
 3. **Inspect network logs**: Use `playwright_browser_network_requests` to see API calls
@@ -230,6 +240,7 @@ playwright_browser_wait_for({text: "User created successfully"})
 5. **Verify test data**: Ensure test database is in expected state
 
 **Common Issues:**
+
 - **Timing issues**: Use proper waits instead of fixed delays
 - **Element not found**: Verify selectors and wait for elements to be visible
 - **Authentication failures**: Ensure test user credentials are correct

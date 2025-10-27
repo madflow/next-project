@@ -114,10 +114,7 @@ export function AddMemberForm({ organizationId }: AddMemberFormProps) {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>{t("role.label")}</FieldLabel>
               <FieldGroup>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={!form.watch("userId")}>
+                <Select onValueChange={field.onChange} value={field.value} disabled={!form.watch("userId")}>
                   <SelectTrigger id={field.name}>
                     <SelectValue placeholder={t("role.placeholder")} />
                   </SelectTrigger>
