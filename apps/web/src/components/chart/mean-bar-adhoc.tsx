@@ -21,6 +21,7 @@ type MeanBarAdhocProps = {
 
 export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...props }: MeanBarAdhocProps) {
   const t = useTranslations("chartMetricsCard");
+  const tAdhoc = useTranslations("projectAdhocAnalysis");
   const { ref, exportPNG } = useChartExport();
 
   // Fetch split variables when datasetId is provided
@@ -50,12 +51,12 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
       if (splitVariable) {
         const splitVariableLabel = splitVariable.label ?? splitVariable.name;
-        return `Split by ${splitVariableLabel}`;
+        return tAdhoc("splitBy", { variable: splitVariableLabel });
       }
     }
 
     // Fallback to variable name if no label found
-    return `Split by ${splitVariableName}`;
+    return tAdhoc("splitBy", { variable: splitVariableName });
   }
 
   // Find the stats for this variable using the helper function

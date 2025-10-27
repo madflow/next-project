@@ -946,6 +946,7 @@
     "errors": {
       "fetchStats": "Error loading dataset statistics"
     },
+    "splitBy": "Split by {variable}",
     "splitVariable": {
       "label": "Split Variable:",
       "none": "None",

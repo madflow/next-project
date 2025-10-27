@@ -92,12 +92,12 @@ export function AdhocChart({ variable, stats, datasetId, selectedSplitVariable, 
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
       if (splitVariable) {
         const splitVariableLabel = splitVariable.label ?? splitVariable.name;
-        return `Split by ${splitVariableLabel}`;
+        return t("splitBy", { variable: splitVariableLabel });
       }
     }
 
     // Fallback to variable name if no label found
-    return `Split by ${splitVariableName}`;
+    return t("splitBy", { variable: splitVariableName });
   }
 
   // Use new chart selection logic

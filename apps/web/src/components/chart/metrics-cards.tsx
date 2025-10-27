@@ -46,6 +46,7 @@ function MetricHelp({ metricKey, children }: { metricKey: "count" | "mean" | "me
 
 export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...props }: BarAdhocProps) {
   const t = useTranslations("chartMetricsCard");
+  const tAdhoc = useTranslations("projectAdhocAnalysis");
   const variableStats = getVariableStats(variable, stats);
 
   // Fetch split variables when datasetId is provided
@@ -75,12 +76,12 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
       if (splitVariable) {
         const splitVariableLabel = splitVariable.label ?? splitVariable.name;
-        return `Split by ${splitVariableLabel}`;
+        return tAdhoc("splitBy", { variable: splitVariableLabel });
       }
     }
     
     // Fallback to variable name if no label found
-    return `Split by ${splitVariableName}`;
+    return tAdhoc("splitBy", { variable: splitVariableName });
   }
 
   const content = (
