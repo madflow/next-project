@@ -17,13 +17,13 @@ test("login", async ({ page }) => {
     await expect(page.getByTestId(testId)).toBeVisible();
   }
   await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
-  // expect to navigate to /dasboard
-  await expect(page).toHaveURL("/landing");
+  // regularUser has 1 org and 1 project, so should be auto-redirected to project page
+  await expect(page).toHaveURL("/project/test-project");
   await logoutUser(page);
 
   await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-  // expect to navigate to /dasboard
-  await expect(page).toHaveURL("/landing");
+  // admin has 1 org and 1 project (same as regularUser), so should be auto-redirected
+  await expect(page).toHaveURL("/project/test-project");
 
   await logoutUser(page);
 });

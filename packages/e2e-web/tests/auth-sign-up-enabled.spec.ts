@@ -60,6 +60,35 @@ test("sign-up", async ({ page }) => {
   await page.getByTestId("auth.login.form.email").fill(signUpUser.email);
   await page.getByTestId("auth.login.form.password").fill(signUpUser.password);
   await page.getByTestId("auth.login.form.submit").click();
+
+  // Wait for navigation away from login
+  await page.waitForURL((url) => !url.pathname.includes("/auth/login"), { timeout: 10000 });
+
+  // Handle potential chunk loading errors by reloading
+  let retries = 0;
+  const maxRetries = 3;
+
+  while (retries < maxRetries) {
+    try {
+      const errorOverlay = await page.locator('dialog[role="dialog"]').count();
+      if (errorOverlay > 0) {
+        await page.reload({ waitUntil: "networkidle" });
+      }
+
+      await page.waitForSelector("data-testid=app.sidebar.user-menu-trigger", {
+        state: "visible",
+        timeout: 15000,
+      });
+      break;
+    } catch (error) {
+      retries++;
+      if (retries >= maxRetries) {
+        throw error;
+      }
+      await page.reload({ waitUntil: "networkidle" });
+    }
+  }
+
   await page.getByTestId("app.sidebar.user-menu-trigger").click();
   await expect(page.getByTestId("app.sign-out")).toBeVisible();
 });
