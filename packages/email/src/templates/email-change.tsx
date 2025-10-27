@@ -58,7 +58,7 @@ export default function EmailChange({
               {t.urlInstructions}
             </Text>
             <Text className="max-w-sm flex-wrap break-words font-medium text-purple-600 no-underline">
-              {url.replace(/^https?:\/\//, "")}
+              {url}
             </Text>
             <Footer email={email} baseUrl={baseUrl} siteName={siteName} locale={locale} />
           </Container>
@@ -72,9 +72,9 @@ EmailChange.PreviewProps = {
   email: "user@example.com",
   newEmail: "newemail@example.com",
   url: "http://localhost:3000/auth/verify-email-change?token=change123",
-  heading: "Confirm Your New Email Address",
-  content: "You have requested to change your email address.",
-  action: "Verify Email Change",
+  heading: getEmailTranslations("emailChange", "en", { newEmail: "newemail@example.com" }).heading,
+  content: getEmailTranslations("emailChange", "en", { newEmail: "newemail@example.com" }).content,
+  action: getEmailTranslations("emailChange", "en", { newEmail: "newemail@example.com" }).action,
   baseUrl: "http://localhost:3000",
   siteName: "Next.js App",
   locale: "en",

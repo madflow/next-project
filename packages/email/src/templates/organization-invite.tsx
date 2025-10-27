@@ -48,7 +48,7 @@ export default function OrganizationInvite({
                 >
                   {inviterEmail}
                 </Link>
-                ) {t.invitedBy} <strong>{organizationName}</strong>!
+                ) {t.invitedBy}
               </Text>
             ) : (
               <Text className="text-sm leading-6 text-black">
@@ -67,7 +67,7 @@ export default function OrganizationInvite({
               {t.urlInstructions}
             </Text>
             <Text className="max-w-sm flex-wrap break-words font-medium text-purple-600 no-underline">
-              {url.replace(/^https?:\/\//, "")}
+              {url}
             </Text>
             <Footer email={email} baseUrl={baseUrl} siteName={siteName} locale={locale} />
           </Container>
@@ -83,9 +83,9 @@ OrganizationInvite.PreviewProps = {
   organizationName: "Acme Corporation",
   inviterName: "John Doe",
   inviterEmail: "john@example.com",
-  heading: "You Have Been Invited",
-  content: "You have been invited to join an organization.",
-  action: "Accept Invitation",
+  heading: getEmailTranslations("organizationInvite", "en", { organizationName: "Acme Corporation" }).heading,
+  content: getEmailTranslations("organizationInvite", "en", { organizationName: "Acme Corporation" }).content,
+  action: getEmailTranslations("organizationInvite", "en", { organizationName: "Acme Corporation" }).action,
   baseUrl: "http://localhost:3000",
   siteName: "Next.js App",
   locale: "en",

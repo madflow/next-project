@@ -49,7 +49,7 @@ export default function EmailVerification({
               {t.urlInstructions}
             </Text>
             <Text className="max-w-sm flex-wrap break-words font-medium text-purple-600 no-underline">
-              {url.replace(/^https?:\/\//, "")}
+              {url}
             </Text>
             <Footer email={email} baseUrl={baseUrl} siteName={siteName} locale={locale} />
           </Container>
@@ -62,9 +62,9 @@ export default function EmailVerification({
 EmailVerification.PreviewProps = {
   email: "user@example.com",
   url: "http://localhost:3000/auth/verify?token=abc123xyz",
-  heading: "Email Verification",
-  content: "In order to be able to log in, you need to verify your email address.",
-  action: "Verify Email",
+  heading: getEmailTranslations("emailVerification", "en").heading,
+  content: getEmailTranslations("emailVerification", "en").content,
+  action: getEmailTranslations("emailVerification", "en").action,
   baseUrl: "http://localhost:3000",
   siteName: "Next.js App",
   locale: "en",

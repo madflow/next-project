@@ -52,7 +52,7 @@ export default function PasswordReset({
               {t.urlInstructions}
             </Text>
             <Text className="max-w-sm flex-wrap break-words font-medium text-purple-600 no-underline">
-              {url.replace(/^https?:\/\//, "")}
+              {url}
             </Text>
             <Footer email={email} baseUrl={baseUrl} siteName={siteName} locale={locale} />
           </Container>
@@ -65,9 +65,9 @@ export default function PasswordReset({
 PasswordReset.PreviewProps = {
   email: "user@example.com",
   url: "http://localhost:3000/auth/reset-password?token=xyz789abc",
-  heading: "Reset Your Password",
-  content: "You are receiving this email because we received a password reset request for your account.",
-  action: "Reset Password",
+  heading: getEmailTranslations("passwordReset", "en").heading,
+  content: getEmailTranslations("passwordReset", "en").content,
+  action: getEmailTranslations("passwordReset", "en").action,
   baseUrl: "http://localhost:3000",
   siteName: "Next.js App",
   locale: "en",

@@ -18,8 +18,7 @@ const emailTranslations = {
     emailChange: {
       subject: "Confirm your new email address",
       heading: "Confirm your new email address",
-      content: (newEmail: string) =>
-        `You have requested to change your email to ${newEmail}. Please verify this change by clicking the link below.`,
+      content: "You have requested to change your email address.",
       action: "Verify Email Change",
       newEmailLabel: "Your new email address will be:",
       confirmInstructions: "Please confirm this change by clicking the button below.",
@@ -31,7 +30,7 @@ const emailTranslations = {
       content: (organizationName: string) => `You have been invited to join an organization.`,
       action: "Accept invitation",
       invitedBy: (inviterName: string, organizationName: string) =>
-        `has invited you to join`,
+        `has invited you to join ${organizationName}.`,
       joinPrompt: (organizationName: string) => `Join ${organizationName} to get started.`,
       urlInstructions: "or copy and paste this URL into your browser:",
     },
@@ -61,8 +60,7 @@ const emailTranslations = {
     emailChange: {
       subject: "Bestätigen Sie Ihre neue E-Mail-Adresse",
       heading: "Bestätigen Sie Ihre neue E-Mail-Adresse",
-      content: (newEmail: string) =>
-        `Sie haben beantragt, Ihre E-Mail-Adresse auf ${newEmail} zu ändern. Bitte bestätigen Sie diese Änderung, indem Sie auf den untenstehenden Link klicken.`,
+      content: "Sie haben beantragt, Ihre E-Mail-Adresse zu ändern.",
       action: "E-Mail-Änderung bestätigen",
       newEmailLabel: "Ihre neue E-Mail-Adresse wird sein:",
       confirmInstructions: "Bitte bestätigen Sie diese Änderung, indem Sie auf die Schaltfläche unten klicken.",
@@ -74,7 +72,7 @@ const emailTranslations = {
       content: (organizationName: string) => `Sie wurden eingeladen, einer Organisation beizutreten.`,
       action: "Einladung annehmen",
       invitedBy: (inviterName: string, organizationName: string) =>
-        `hat Sie eingeladen, beizutreten`,
+        `hat Sie eingeladen, der Organisation ${organizationName} beizutreten.`,
       joinPrompt: (organizationName: string) => `Treten Sie ${organizationName} bei, um loszulegen.`,
       urlInstructions: "oder kopieren Sie diese URL und fügen Sie sie in Ihren Browser ein:",
     },
