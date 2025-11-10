@@ -75,8 +75,7 @@ services:
 
   # https://hub.docker.com/_/postgres/
   postgres:
-    image: "postgres:18-alpine"
-    platform: linux/arm64
+    image: "postgres:18"
     command: "postgres -c log_statement=all"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
@@ -85,7 +84,7 @@ services:
       retries: 5
       timeout: 5s
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/18/docker
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
