@@ -290,7 +290,7 @@ export function AdhocChart({
         return <MetricsCards variable={variable} stats={stats} datasetId={datasetId} />;
 
       case "meanBar":
-        return <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} />;
+        return <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} ref={ref} />;
 
       default:
         return null;
@@ -355,7 +355,7 @@ export function AdhocChart({
                 {selectedChartType === "metrics" ? (
                   <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
                 ) : (
-                  <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
+                  <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent ref={ref} />
                 )}
               </CardContent>
               <CardFooter className="flex items-center justify-between border-t">
