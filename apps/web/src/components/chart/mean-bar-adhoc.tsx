@@ -77,6 +77,7 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
 
   // Use the max value from stats for the domain
   const maxValue = variableStats.max;
+  const minValue = variableStats.min;
 
   const chartConfig = {
     value: {
@@ -97,7 +98,7 @@ export function MeanBarAdhoc({ variable, stats, datasetId, renderAsContent, ...p
         data={chartData}>
         <CartesianGrid vertical={true} horizontal={false} />
         <XAxis
-          domain={[0, maxValue]}
+          domain={[minValue, maxValue]}
           dataKey="value"
           type="number"
           tickLine={false}
