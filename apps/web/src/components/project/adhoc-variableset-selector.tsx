@@ -107,9 +107,7 @@ function VariablesetNode({
               <button
                 className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
                 onClick={() => onSelectVariable(variable, node)}>
-                {variable.label} {"("}
-                {variable.name}
-                {")"}
+                {variable.label}
               </button>
             </div>
           ))}
