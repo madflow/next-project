@@ -242,7 +242,13 @@
           "placeholder": "Geben Sie ein beschreibendes Label ein"
         },
         "measure": {
-          "label": "Niveau"
+          "label": "Niveau",
+          "options": {
+            "nominal": "Nominal",
+            "ordinal": "Ordinal",
+            "scale": "Skala",
+            "unknown": "Unbekannt"
+          }
         },
         "missingValues": {
           "label": "Missing Values",
