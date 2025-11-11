@@ -186,6 +186,7 @@ export function AdhocChart({
                 tickMargin={10}
                 axisLine={false}
                 fontSize={10}
+                ticks={[0, 20, 40, 60, 80, 100]}
                 tickFormatter={(value) => `${value}%`}
               />
               <Bar dataKey="percentage" fill="var(--color-percentage)">
@@ -218,6 +219,7 @@ export function AdhocChart({
                 tickMargin={10}
                 axisLine={false}
                 fontSize={10}
+                ticks={[0, 20, 40, 60, 80, 100]}
                 tickFormatter={(value) => `${value}%`}
               />
               <YAxis
