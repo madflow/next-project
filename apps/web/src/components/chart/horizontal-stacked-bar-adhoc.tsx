@@ -88,7 +88,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               tickMargin={10}
               axisLine={false}
               fontSize={10}
-              ticks={[0, 25, 50, 75, 100]}
+              ticks={[0, 20, 40, 60, 80, 100]}
               tickFormatter={(value) => `${Math.round(value)}%`}
             />
             <YAxis
@@ -166,7 +166,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
             tickMargin={10}
             axisLine={false}
             fontSize={10}
-            ticks={[0, 25, 50, 75, 100]}
+            ticks={[0, 20, 40, 60, 80, 100]}
             tickFormatter={(value) => `${Math.round(value)}%`}
           />
           <YAxis
