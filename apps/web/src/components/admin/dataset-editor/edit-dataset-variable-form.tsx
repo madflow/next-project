@@ -12,12 +12,17 @@ import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatasetVariable, updateDatasetVariableSchema } from "@/types/dataset-variable";
+
+// Define the allowed measure values
+const MEASURE_OPTIONS = ["nominal", "ordinal", "scale", "unknown"] as const;
 
 // Define the form schema
 const formSchema = z.object({
   id: z.uuid(),
   label: z.string().nullable(),
+  measure: z.enum(MEASURE_OPTIONS),
   missingValues: z.array(z.string()).nullable().optional(),
   missingRanges: z
     .record(z.string(), z.array(z.object({ lo: z.number(), hi: z.number() })))
@@ -41,6 +46,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     defaultValues: {
       id: datasetVariable.id,
       label: datasetVariable.label,
+      measure: datasetVariable.measure,
       missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
     },
   });
@@ -120,12 +126,30 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
             </FieldGroup>
           </Field>
 
-          <Field>
-            <FieldLabel>{t("editVariable.form.measure.label")}</FieldLabel>
-            <FieldGroup>
-              <Input value={datasetVariable.measure} disabled />
-            </FieldGroup>
-          </Field>
+          <Controller
+            name="measure"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="measure">{t("editVariable.form.measure.label")}</FieldLabel>
+                <FieldGroup>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="measure" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MEASURE_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {t(`editVariable.form.measure.options.${option}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
         </div>
 
         <div className="flex justify-start gap-4">

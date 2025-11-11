@@ -242,7 +242,13 @@
           "placeholder": "Enter a descriptive label"
         },
         "measure": {
-          "label": "Measure"
+          "label": "Measure",
+          "options": {
+            "nominal": "Nominal",
+            "ordinal": "Ordinal",
+            "scale": "Scale",
+            "unknown": "Unknown"
+          }
         },
         "missingValues": {
           "label": "Missing Values",
