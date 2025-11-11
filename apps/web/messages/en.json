@@ -250,6 +250,16 @@
             "unknown": "Unknown"
           }
         },
+        "missingRanges": {
+          "label": "Missing Ranges",
+          "placeholder": {
+            "high": "Max value",
+            "low": "Min value"
+          },
+          "validation": {
+            "lowGreaterThanHigh": "Low value must be less than or equal to high value"
+          }
+        },
         "missingValues": {
           "label": "Missing Values",
           "placeholder": "Add a missing value"
