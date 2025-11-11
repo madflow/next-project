@@ -149,16 +149,14 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                       {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
                     </Button>
                     <div className="min-w-0 flex-1 overflow-hidden">
-                      <p className="mb-1 truncate text-sm font-medium">{variable.name}</p>
-                      {variable.label && (
-                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.label}</p>
-                      )}
+                      {variable.label && <p className="mb-1 text-sm font-medium break-words">{variable.label}</p>}
+                      <p className="text-muted-foreground mb-1 truncate text-xs">{variable.name}</p>
                       <div className="flex flex-wrap gap-1">
                         <Badge variant="outline" className="shrink-0 text-xs">
-                          {variable.type}
+                          {variable.measure}
                         </Badge>
                         <Badge variant="outline" className="shrink-0 text-xs">
-                          {variable.measure}
+                          {variable.type}
                         </Badge>
                       </div>
                     </div>
@@ -208,16 +206,14 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                       {isRemoving === variable.id ? "..." : <X className="h-3 w-3" />}
                     </Button>
                     <div className="min-w-0 flex-1 overflow-hidden">
-                      <p className="mb-1 truncate text-sm font-medium">{variable.name}</p>
-                      {variable.label && (
-                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.label}</p>
-                      )}
+                      {variable.label && <p className="mb-1 text-sm font-medium break-words">{variable.label}</p>}
+                      <p className="text-muted-foreground mb-1 truncate text-xs">{variable.name}</p>
                       <div className="flex flex-wrap gap-1">
                         <Badge variant="outline" className="shrink-0 text-xs">
-                          {variable.type}
+                          {variable.measure}
                         </Badge>
                         <Badge variant="outline" className="shrink-0 text-xs">
-                          {variable.measure}
+                          {variable.type}
                         </Badge>
                       </div>
                     </div>
