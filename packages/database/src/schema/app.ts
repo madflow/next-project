@@ -142,6 +142,22 @@ export const insertDatasetVariableSchema = createInsertSchema(datasetVariable);
 export const selectDatasetVariableSchema = createSelectSchema(datasetVariable);
 export const updateDatasetVariableSchema = createUpdateSchema(datasetVariable, {
   valueLabels: z.record(z.string(), z.record(z.string(), z.string())).optional(),
+  missingRanges: z
+    .record(
+      z.string(),
+      z.array(
+        z
+          .object({
+            lo: z.number(),
+            hi: z.number(),
+          })
+          .refine((range) => range.lo <= range.hi, {
+            message: "Low value must be less than or equal to high value",
+          })
+      )
+    )
+    .optional()
+    .nullable(),
 });
 
 export type CreateDatasetVariableData = z.infer<typeof insertDatasetVariableSchema>;

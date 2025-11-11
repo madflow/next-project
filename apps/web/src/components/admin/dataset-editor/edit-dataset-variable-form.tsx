@@ -8,6 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { update } from "@/actions/dataset-variable";
+import { MissingRangesEditor } from "@/components/form/missing-ranges-editor";
 import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -25,7 +26,7 @@ const formSchema = z.object({
   measure: z.enum(MEASURE_OPTIONS),
   missingValues: z.array(z.string()).nullable().optional(),
   missingRanges: z
-    .record(z.string(), z.array(z.object({ lo: z.number(), hi: z.number() })))
+    .array(z.object({ lo: z.number(), hi: z.number() }))
     .nullable()
     .optional(),
 });
@@ -48,6 +49,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
       label: datasetVariable.label,
       measure: datasetVariable.measure,
       missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
+      missingRanges: datasetVariable.missingRanges?.[datasetVariable.name] ?? null,
     },
   });
 
@@ -57,7 +59,11 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
   };
 
   const onSubmit = async (values: FormValues) => {
-    const updateData = updateDatasetVariableSchema.parse(values);
+    // Transform missingRanges from array to record keyed by variable name
+    const updateData = updateDatasetVariableSchema.parse({
+      ...values,
+      missingRanges: values.missingRanges ? { [datasetVariable.name]: values.missingRanges } : null,
+    });
     try {
       setIsLoading(true);
 
@@ -113,6 +119,20 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                 <FieldLabel>{t("editVariable.form.missingValues.label")}</FieldLabel>
                 <FieldGroup>
                   <TextArrayEditor value={field.value ?? []} onChange={field.onChange} />
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="missingRanges"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>{t("editVariable.form.missingRanges.label")}</FieldLabel>
+                <FieldGroup>
+                  <MissingRangesEditor value={field.value ?? []} onChange={field.onChange} />
                 </FieldGroup>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>

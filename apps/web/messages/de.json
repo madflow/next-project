@@ -134,7 +134,7 @@
     },
     "columns": {
       "actions": "Aktionen",
-      "filename": "Name",
+      "filename": "Dateiname",
       "hash": "Datei-Hash",
       "name": "Name",
       "organization": "Organisation",
@@ -250,9 +250,19 @@
             "unknown": "Unbekannt"
           }
         },
+        "missingRanges": {
+          "label": "Fehlende Bereiche",
+          "placeholder": {
+            "high": "Maximalwert",
+            "low": "Minimalwert"
+          },
+          "validation": {
+            "lowGreaterThanHigh": "Niedriger Wert muss kleiner oder gleich dem hohen Wert sein"
+          }
+        },
         "missingValues": {
-          "label": "Missing Values",
-          "placeholder": "Missing value hinzufügen"
+          "label": "Fehlende Werte",
+          "placeholder": "Fehlenden Wert hinzufügen"
         },
         "name": {
           "label": "Name"
