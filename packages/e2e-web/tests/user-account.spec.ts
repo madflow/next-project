@@ -2,6 +2,10 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { extractLinkFromMessage, loginUser, logoutUser, smtpServerApi } from "../utils";
 
+test.afterAll(async () => {
+  await smtpServerApi.deleteMessages();
+});
+
 test.describe("User Account", () => {
   test.describe.configure({ mode: "serial" });
   test("should log in and navigate to account settings", async ({ page }) => {
@@ -16,7 +20,7 @@ test.describe("User Account", () => {
     await userMenuTrigger.click();
 
     // Click on Account menu item
-    const accountLink = page.getByRole("menuitem", { name: "Account" });
+    const accountLink = page.getByTestId("app.nav-user.account");
     await accountLink.click();
 
     // Navigate to account page and verify container is visible
