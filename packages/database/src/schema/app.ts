@@ -221,6 +221,12 @@ export type CreateDatasetVariablesetData = z.infer<typeof insertDatasetVariables
 export type DatasetVariableset = z.infer<typeof selectDatasetVariablesetSchema>;
 export type UpdateDatasetVariablesetData = z.infer<typeof updateDatasetVariablesetSchema>;
 
+export const datasetVariablesetItemAttributes = z.object({
+  allowedStatistics: z.enum(["distribution", "mean"]),
+});
+
+export type DatasetVariablesetItemAttributes = z.infer<typeof datasetVariablesetItemAttributes>;
+
 export const datasetVariablesetItem = pgTable(
   "dataset_variableset_items",
   {
@@ -233,6 +239,7 @@ export const datasetVariablesetItem = pgTable(
     variableId: uuid("variable_id")
       .notNull()
       .references(() => datasetVariable.id, { onDelete: "cascade" }),
+    attributes: jsonb("attributes").$type<DatasetVariablesetItemAttributes>(),
     orderIndex: integer("order_index").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
