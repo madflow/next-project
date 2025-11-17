@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsBarData } from "@/lib/analysis-bridge";
+import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -68,7 +69,7 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
                 dataKey="percentage"
                 position="right"
                 fontSize={10}
-                formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
               />
             </Bar>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />

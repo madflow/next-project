@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { getVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
+import { METRICS_CARD_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 
@@ -18,7 +19,7 @@ type BarAdhocProps = {
 
 function formatDecimal(value?: number) {
   if (!value) return "";
-  return new Intl.NumberFormat("de-DE", { style: "decimal" }).format(value);
+  return formatChartValue(value, METRICS_CARD_DECIMALS);
 }
 
 function MetricHelp({

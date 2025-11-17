@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsPieData } from "@/lib/analysis-bridge";
+import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -54,7 +55,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
                 position="inside"
                 fill="white"
                 fontSize={12}
-                formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
               />
               {rechartsData.map((entry, index) => {
                 const colorIndex = (index % 6) + 1;
