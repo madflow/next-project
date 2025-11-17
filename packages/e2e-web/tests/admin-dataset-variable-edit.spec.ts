@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
-const DATASET_ID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
 const DATASET_NAME = "SPSS Beispielumfrage";
 
 test.describe("Admin Dataset Variable Edit", () => {
