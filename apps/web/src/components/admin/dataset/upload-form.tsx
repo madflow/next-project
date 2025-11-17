@@ -122,15 +122,32 @@ export function DatasetUploadForm() {
 
     setIsUploading(true);
 
+    const uploadDataSchema = z.object({
+      file: z.instanceof(File),
+      name: z.string().min(1),
+      organizationId: z.string().min(1),
+      description: z.string().optional(),
+      missingValues: z.array(z.string()).nullable(),
+      contentType: z.string().min(1),
+    });
+
+    const parseResult = uploadDataSchema.safeParse({
+      file: selectedFile,
+      name: data.name,
+      organizationId: data.organizationId,
+      description: data.description,
+      missingValues: data.missingValues,
+      contentType: "application/octet-stream",
+    });
+
+    if (!parseResult.success) {
+      toast.error(parseResult.error.message);
+      setIsUploading(false);
+      return;
+    }
+
     try {
-      const result = await uploadDataset({
-        file: selectedFile,
-        name: data.name,
-        organizationId: data.organizationId,
-        description: data.description || undefined,
-        missingValues: data.missingValues || null,
-        contentType: selectedFile.type,
-      });
+      const result = await uploadDataset(parseResult.data);
 
       if (result.success) {
         toast.success(t("messages.success"));
