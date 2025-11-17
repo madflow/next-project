@@ -750,7 +750,8 @@
       "srText": "Benutzermenü öffnen"
     },
     "signOut": "Abmelden",
-    "signingOut": "Melde ab..."
+    "signingOut": "Melde ab...",
+    "stopImpersonating": "Personifiziung beenden"
   },
   "organization": {
     "actions": {
@@ -1120,16 +1121,16 @@
         "stopButton": "Verkörperung beenden"
       },
       "button": {
-        "impersonate": "Verkörpern",
-        "impersonating": "Verkörpere...",
-        "stopImpersonating": "Verkörperung beenden",
+        "impersonate": "Personifizieren",
+        "impersonating": "Personifizier...",
+        "stopImpersonating": "Personifiziung beenden",
         "stopping": "Beende..."
       },
       "messages": {
-        "impersonateError": "Verkörperung fehlgeschlagen",
-        "impersonateSuccess": "Verkörperung erfolgreich gestartet",
-        "stopError": "Beenden der Verkörperung fehlgeschlagen",
-        "stopSuccess": "Verkörperung beendet"
+        "impersonateError": "Personifizieren fehlgeschlagen",
+        "impersonateSuccess": "Personifizieren erfolgreich gestartet",
+        "stopError": "Beenden der Personifizierung fehlgeschlagen",
+        "stopSuccess": "Personifizierung beendet"
       }
     },
     "newUser": {

@@ -26,10 +26,9 @@ export function NavUser() {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const t = useTranslations("navUser");
-  const tUser = useTranslations("user.impersonation");
   const user = session.data?.user;
   const { isImpersonating } = useIsImpersonating();
-  const { stopImpersonating, isLoading: isStoppingImpersonation } = useStopImpersonating();
+  const { stopImpersonating } = useStopImpersonating();
 
   const handleSignOut = async () => {
     try {
@@ -102,17 +101,14 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="mr-2 size-4" />
-              <SidebarMenuButton asChild>
-                <Link href="/user/account">{t("account")}</Link>
-              </SidebarMenuButton>
+              <Link href="/user/account">{t("account")}</Link>
             </DropdownMenuItem>
             {isImpersonating && (
               <DropdownMenuItem
                 onClick={handleStopImpersonating}
-                disabled={isStoppingImpersonation}
                 className="cursor-pointer text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200">
                 <UserX className="mr-2 size-4" />
-                {isStoppingImpersonation ? tUser("button.stopping") : tUser("button.stopImpersonating")}
+                {t("stopImpersonating")}
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />

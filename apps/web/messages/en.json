@@ -750,7 +750,8 @@
       "srText": "Open user menu"
     },
     "signOut": "Sign out",
-    "signingOut": "Signing out..."
+    "signingOut": "Signing out...",
+    "stopImpersonating": "Stop impersonating"
   },
   "organization": {
     "actions": {
