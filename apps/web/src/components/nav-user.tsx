@@ -101,7 +101,9 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="mr-2 size-4" />
-              <Link href="/user/account">{t("account")}</Link>
+              <Link data-testid="app.nav-user.account" href="/user/account">
+                {t("account")}
+              </Link>
             </DropdownMenuItem>
             {isImpersonating && (
               <DropdownMenuItem

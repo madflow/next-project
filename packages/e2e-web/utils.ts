@@ -17,6 +17,7 @@ export async function loginUser(page: Page, email: string, password: string) {
   await page.getByTestId("auth.login.form.email").fill(email);
   await page.getByTestId("auth.login.form.password").fill(password);
   await page.getByTestId("auth.login.form.submit").click();
+  await page.waitForLoadState("networkidle");
   await page.waitForSelector("data-testid=app.sidebar.user-menu-trigger");
 }
 
