@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { headers } from "next/headers";
 import { env } from "@/env";
 import { auth } from "@/lib/auth";
+import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { getS3Client } from "@/lib/storage";
 
 type UploadAvatarParams = {
@@ -30,7 +31,7 @@ export async function uploadAvatar({ file, userId, contentType }: UploadAvatarPa
     headers: await headers(),
   });
   if (session?.user?.id !== userId) {
-    throw new Error("Unauthorized");
+    throw new ServerActionNotAuthorizedException("Unauthorized");
   }
   const s3Client = getS3Client();
 

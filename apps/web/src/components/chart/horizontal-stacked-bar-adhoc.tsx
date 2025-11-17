@@ -15,6 +15,7 @@ import {
   transformToRechartsStackedBarData,
   transformToSplitVariableStackedBarData,
 } from "@/lib/analysis-bridge";
+import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 
@@ -114,7 +115,9 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
                     position="center"
                     fontSize={10}
                     fill="white"
-                    formatter={(value: number) => (value > 5 ? `${Math.round(value * 100) / 100}%` : "")}
+                    formatter={(value: number) =>
+                      value > 5 ? `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%` : ""
+                    }
                   />
                 </Bar>
               ))}
@@ -190,7 +193,9 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
                 position="center"
                 fontSize={10}
                 fill="white"
-                formatter={(value: number) => (value > 5 ? `${Math.round(value * 100) / 100}%` : "")}
+                formatter={(value: number) =>
+                  value > 5 ? `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%` : ""
+                }
               />
             </Bar>
           ))}

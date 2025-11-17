@@ -36,6 +36,7 @@ import { useAppContext } from "@/context/app-context";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { isSplitVariableStats, transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
+import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { determineChartSelection } from "@/lib/chart-selection";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
@@ -194,7 +195,7 @@ export function AdhocChart({
                   dataKey="percentage"
                   position="top"
                   fontSize={10}
-                  formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                  formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
                 />
               </Bar>
             </BarChart>
@@ -236,7 +237,7 @@ export function AdhocChart({
                   dataKey="percentage"
                   position="right"
                   fontSize={10}
-                  formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                  formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
                 />
               </Bar>
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
@@ -273,7 +274,7 @@ export function AdhocChart({
                   position="inside"
                   fontSize={10}
                   fill="white"
-                  formatter={(value: number) => `${Math.round(value * 100) / 100}%`}
+                  formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
                 />
               </Pie>
               <ChartLegend
