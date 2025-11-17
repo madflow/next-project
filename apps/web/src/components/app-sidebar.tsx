@@ -34,7 +34,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { activeOrganization, activeProject, setActiveProject } = useAppContext();
 
   function handleSelectProject(project: Project) {
-    router.push(`/project/${project.slug}`);
+    router.push(`/project/${project.slug}/adhoc`);
     setActiveProject(project);
   }
 
