@@ -4,6 +4,7 @@ import { Plus, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
+import type { DatasetVariablesetItemAttributes } from "@repo/database/schema";
 import { addVariableToVariableset, removeVariableFromVariableset } from "@/actions/dataset-variableset";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariable } from "@/types/dataset-variable";
+import { AllowedStatisticsSelector } from "./allowed-statistics-selector";
 
 interface VariableAssignmentProps {
   datasetId: string;
@@ -21,7 +23,7 @@ interface VariableAssignmentProps {
 }
 
 interface ApiResponse {
-  rows: DatasetVariable[];
+  rows: (DatasetVariable & { attributes?: DatasetVariablesetItemAttributes })[];
   count: number;
   limit: number;
   offset: number;
@@ -216,6 +218,16 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                           {variable.type}
                         </Badge>
                       </div>
+                      {variable.attributes && (
+                        <div className="mt-2">
+                          <AllowedStatisticsSelector
+                            variablesetId={selectedSetId}
+                            variableId={variable.id}
+                            currentAttributes={variable.attributes}
+                            onUpdate={refetchAssigned}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
