@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BanIcon,
   BarChart3Icon,
   ChartBarBigIcon,
   ChartBarDecreasingIcon,
@@ -38,18 +39,19 @@ import { useQueryApi } from "@/hooks/use-query-api";
 import { isSplitVariableStats, transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { determineChartSelection } from "@/lib/chart-selection";
-import { type DatasetVariable } from "@/types/dataset-variable";
+import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { SplitVariableSelector } from "../project/split-variable-selector";
 import { Button } from "../ui/button";
 import { Code } from "../ui/code";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
 import { UnsupportedChartPlaceholder } from "./unsupported-chart-placeholder";
 
 type AdhocChartProps = {
-  variable: DatasetVariable;
+  variable: DatasetVariableWithAttributes;
   stats: StatsResponse;
   datasetId?: string;
   selectedSplitVariable?: string | null;
@@ -70,7 +72,7 @@ export function AdhocChart({
   const { debugMode } = useAppContext();
 
   // Fetch split variables when datasetId is provided
-  const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariable[] }>({
+  const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariableWithAttributes[] }>({
     endpoint: `/api/datasets/${datasetId}/splitvariables`,
     pagination: { pageIndex: 0, pageSize: 100 },
     sorting: [],
@@ -82,7 +84,7 @@ export function AdhocChart({
   const allVariables = splitVariablesResponse?.rows || [];
 
   // Helper function to get split variable description
-  function getSplitVariableDescription(variable: DatasetVariable, stats: StatsResponse): string | null {
+  function getSplitVariableDescription(variable: DatasetVariableWithAttributes, stats: StatsResponse): string | null {
     // Find the stats for this variable
     const targetVariable = stats.find((item) => item.variable === variable.name);
     if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
@@ -93,7 +95,7 @@ export function AdhocChart({
 
     // Try to find the split variable in allVariables to get its label
     if (allVariables.length > 0) {
-      const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
+      const splitVariable = allVariables.find((v: DatasetVariableWithAttributes) => v.name === splitVariableName);
       if (splitVariable) {
         const splitVariableLabel = splitVariable.label ?? splitVariable.name;
         return t("splitBy", { variable: splitVariableLabel });
@@ -114,6 +116,7 @@ export function AdhocChart({
       variable,
       stats,
       hasSplitVariable,
+      attributes: variable.attributes,
     });
   }, [variable, stats]);
 
@@ -140,6 +143,7 @@ export function AdhocChart({
         variable,
         stats,
         hasSplitVariable,
+        attributes: variable.attributes,
       });
 
       // Always reset to default when split variable status changes or current selection not available
@@ -169,6 +173,34 @@ export function AdhocChart({
         data-testid="unsupported-chart-placeholder"
         {...props}
       />
+    );
+  }
+
+  // Show empty state when no charts are allowed
+  if (chartSelection.availableChartTypes.length === 0) {
+    return (
+      <div {...props}>
+        <Card className="shadow-xs">
+          <CardHeader>
+            <CardTitle>{variable.label ?? variable.name}</CardTitle>
+            {getSplitVariableDescription(variable, stats) && (
+              <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
+            )}
+          </CardHeader>
+          <CardContent>
+            <Empty className="border-none p-8">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <BanIcon />
+                </EmptyMedia>
+                <EmptyTitle>{t("noChartsAllowed.title")}</EmptyTitle>
+                <EmptyDescription>{t("noChartsAllowed.description")}</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent></EmptyContent>
+            </Empty>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 

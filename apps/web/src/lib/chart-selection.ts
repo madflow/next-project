@@ -1,3 +1,4 @@
+import { DatasetVariablesetItemAttributes } from "@repo/database/schema";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { extractVariableStats, isSplitVariableStats } from "./analysis-bridge";
@@ -19,6 +20,8 @@ export interface ChartSelectionCriteria {
   stats: StatsResponse;
   /** Whether a split variable is currently selected */
   hasSplitVariable?: boolean;
+  /** Variable attributes including allowed statistics configuration */
+  attributes?: DatasetVariablesetItemAttributes | null;
 }
 
 export interface ChartSelectionResult {
@@ -69,6 +72,46 @@ function isNumericVariableType(type: string): boolean {
 function getDistinctValueCount(variable: DatasetVariable, stats: StatsResponse): number {
   const variableStats = extractVariableStats(variable, stats);
   return variableStats?.frequency_table?.length || 0;
+}
+
+/**
+ * Distribution-related chart types (require allowedStatistics.distribution = true)
+ */
+const DISTRIBUTION_CHART_TYPES: AnalysisChartType[] = ["bar", "horizontalBar", "horizontalStackedBar", "pie"];
+
+/**
+ * Mean-related chart types (require allowedStatistics.mean = true)
+ */
+const MEAN_CHART_TYPES: AnalysisChartType[] = ["meanBar", "metrics"];
+
+/**
+ * Filters chart types based on allowed statistics configuration
+ */
+function filterChartsByAllowedStatistics(
+  chartTypes: AnalysisChartType[],
+  attributes?: DatasetVariablesetItemAttributes | null
+): AnalysisChartType[] {
+  // If no attributes or no allowedStatistics config, allow all charts
+  if (!attributes?.allowedStatistics) {
+    return chartTypes;
+  }
+
+  const { distribution, mean } = attributes.allowedStatistics;
+
+  return chartTypes.filter((chartType) => {
+    // Check if chart is distribution-related
+    if (DISTRIBUTION_CHART_TYPES.includes(chartType)) {
+      return distribution;
+    }
+
+    // Check if chart is mean-related
+    if (MEAN_CHART_TYPES.includes(chartType)) {
+      return mean;
+    }
+
+    // Allow other chart types by default
+    return true;
+  });
 }
 
 /**
@@ -161,7 +204,7 @@ function sortChartsByPriority(chartTypes: AnalysisChartType[]): AnalysisChartTyp
  * Main function to determine chart selection for a variable
  */
 export function determineChartSelection(criteria: ChartSelectionCriteria): ChartSelectionResult {
-  const { variable, stats, hasSplitVariable = false } = criteria;
+  const { variable, stats, hasSplitVariable = false, attributes } = criteria;
 
   // Check if variable type is supported (numeric types only)
   if (!isNumericVariableType(variable.type)) {
@@ -198,6 +241,9 @@ export function determineChartSelection(criteria: ChartSelectionCriteria): Chart
   } else {
     availableChartTypes = getValidChartsWithoutSplit(variable, distinctValues);
   }
+
+  // Filter charts based on allowed statistics configuration
+  availableChartTypes = filterChartsByAllowedStatistics(availableChartTypes, attributes);
 
   // Sort by priority
   availableChartTypes = sortChartsByPriority(availableChartTypes);

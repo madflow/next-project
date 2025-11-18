@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { DatasetVariable } from "@/types/dataset-variable";
+import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
 import { AdhocChart } from "./adhoc-chart";
 
 type MultiVariableChartsProps = {
-  variables: DatasetVariable[];
+  variables: DatasetVariableWithAttributes[];
   statsData: Record<string, StatsResponse>;
   variableset?: VariablesetTreeNode;
   datasetId: string;

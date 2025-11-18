@@ -8,7 +8,7 @@ import { useThemeConfig } from "@/components/active-theme";
 import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
 import { useVariablesetVariables } from "@/hooks/use-variableset-variables";
-import type { DatasetVariable } from "@/types/dataset-variable";
+import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
@@ -19,9 +19,9 @@ import { Spinner } from "../ui/spinner";
 
 export type SelectionItem = {
   type: "variable" | "set";
-  variable?: DatasetVariable;
+  variable?: DatasetVariableWithAttributes;
   variableset?: VariablesetTreeNode;
-  variables?: DatasetVariable[];
+  variables?: DatasetVariableWithAttributes[];
   parentVariableset?: VariablesetTreeNode; // Add this for individual variable selections from a variableset
 };
 
@@ -34,7 +34,7 @@ type VariablesetNodeProps = {
   node: VariablesetTreeNode;
   level: number;
   onSelectSet: (node: VariablesetTreeNode) => void;
-  onSelectVariable: (variable: DatasetVariable, parentVariableset?: VariablesetTreeNode) => void;
+  onSelectVariable: (variable: DatasetVariableWithAttributes, parentVariableset?: VariablesetTreeNode) => void;
   expandedNodes: Set<string>;
   onToggleExpand: (nodeId: string) => void;
   search: string;
@@ -194,7 +194,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
     }
   };
 
-  const handleSelectVariable = (variable: DatasetVariable, parentVariableset?: VariablesetTreeNode) => {
+  const handleSelectVariable = (variable: DatasetVariableWithAttributes, parentVariableset?: VariablesetTreeNode) => {
     onSelectionChangeAction({
       type: "variable",
       variable,
