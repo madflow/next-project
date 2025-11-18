@@ -1013,6 +1013,10 @@
     "errors": {
       "fetchStats": "Fehler beim Laden der Statistiken"
     },
+    "noChartsAllowed": {
+      "description": "Für diese Variable sind keine Diagrammtypen aktiviert. Bitte kontaktieren Sie einen Administrator, um die erlaubten Statistiken zu konfigurieren.",
+      "title": "Keine Diagramme verfügbar"
+    },
     "splitBy": "aufgeteilt nach: {variable}",
     "splitVariable": {
       "label": "Teilungsvariable:",

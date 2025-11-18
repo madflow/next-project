@@ -1013,6 +1013,10 @@
     "errors": {
       "fetchStats": "Error loading dataset statistics"
     },
+    "noChartsAllowed": {
+      "description": "No chart types are enabled for this variable. Please contact an administrator to configure allowed statistics.",
+      "title": "No Charts Available"
+    },
     "splitBy": "Split by {variable}",
     "splitVariable": {
       "label": "Split Variable:",
