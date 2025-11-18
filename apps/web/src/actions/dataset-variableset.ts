@@ -1,7 +1,18 @@
 "use server";
 
-import { CreateDatasetVariablesetData, UpdateDatasetVariablesetData } from "@repo/database/schema";
-import { addVariableToSet, create, remove, removeVariableFromSet, update } from "@/dal/dataset-variableset";
+import {
+  CreateDatasetVariablesetData,
+  CreateDatasetVariablesetItemData,
+  UpdateDatasetVariablesetData,
+} from "@repo/database/schema";
+import {
+  addVariableToSet,
+  create,
+  remove,
+  removeVariableFromSet,
+  update,
+  updateVariablesetItemAttributes as updateVariablesetItemAttributesDal,
+} from "@/dal/dataset-variableset";
 import { assertUserIsAdmin } from "@/lib/dal";
 import { ServerActionFailureException } from "@/lib/exception";
 
@@ -45,4 +56,20 @@ export async function removeVariableFromVariableset(variablesetId: string, varia
   assertUserIsAdmin();
 
   await removeVariableFromSet(variablesetId, variableId);
+}
+
+export async function updateVariablesetItemAttributes(
+  variablesetId: string,
+  variableId: string,
+  attributes: CreateDatasetVariablesetItemData["attributes"]
+) {
+  assertUserIsAdmin();
+
+  const updated = await updateVariablesetItemAttributesDal(variablesetId, variableId, attributes);
+
+  if (!updated) {
+    throw new ServerActionFailureException("Failed to update variableset item attributes");
+  }
+
+  return updated;
 }

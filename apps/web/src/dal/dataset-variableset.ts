@@ -145,6 +145,7 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
       valueLabels: datasetVariable.valueLabels,
       missingValues: datasetVariable.missingValues,
       orderIndex: datasetVariablesetItem.orderIndex,
+      attributes: datasetVariablesetItem.attributes,
     })
     .from(datasetVariable)
     .innerJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
@@ -234,6 +235,12 @@ async function addVariableToSetFn(variablesetId: string, variableId: string, ord
     variablesetId,
     variableId,
     orderIndex,
+    attributes: {
+      allowedStatistics: {
+        distribution: true,
+        mean: false,
+      },
+    },
   };
 
   await db.insert(datasetVariablesetItem).values(insertData);
@@ -247,6 +254,26 @@ async function removeVariableFromSetFn(variablesetId: string, variableId: string
     );
 }
 
+async function updateVariablesetItemAttributesFn(
+  variablesetId: string,
+  variableId: string,
+  attributes: CreateDatasetVariablesetItemData["attributes"]
+) {
+  const [updated] = await db
+    .update(datasetVariablesetItem)
+    .set({ attributes })
+    .where(
+      and(eq(datasetVariablesetItem.variablesetId, variablesetId), eq(datasetVariablesetItem.variableId, variableId))
+    )
+    .returning();
+
+  if (!updated) {
+    throw new DalException("Failed to update variableset item attributes");
+  }
+
+  return updated;
+}
+
 // Exported functions with appropriate auth checks
 export const listByDataset = withSessionCheck(listByDatasetFn);
 export const getHierarchy = withSessionCheck(getHierarchyFn);
@@ -258,3 +285,4 @@ export const getVariablesInSet = withSessionCheck(getVariablesInSetFn);
 export const getUnassignedVariables = withSessionCheck(getUnassignedVariablesFn);
 export const addVariableToSet = withAdminCheck(addVariableToSetFn);
 export const removeVariableFromSet = withAdminCheck(removeVariableFromSetFn);
+export const updateVariablesetItemAttributes = withAdminCheck(updateVariablesetItemAttributesFn);

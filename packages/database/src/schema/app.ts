@@ -222,7 +222,12 @@ export type DatasetVariableset = z.infer<typeof selectDatasetVariablesetSchema>;
 export type UpdateDatasetVariablesetData = z.infer<typeof updateDatasetVariablesetSchema>;
 
 export const datasetVariablesetItemAttributes = z.object({
-  allowedStatistics: z.enum(["distribution", "mean"]),
+  allowedStatistics: z
+    .object({
+      distribution: z.boolean(),
+      mean: z.boolean(),
+    })
+    .default({ distribution: true, mean: false }),
 });
 
 export type DatasetVariablesetItemAttributes = z.infer<typeof datasetVariablesetItemAttributes>;
@@ -249,8 +254,12 @@ export const datasetVariablesetItem = pgTable(
   ]
 );
 
-export const insertDatasetVariablesetItemSchema = createInsertSchema(datasetVariablesetItem);
-export const selectDatasetVariablesetItemSchema = createSelectSchema(datasetVariablesetItem);
+export const insertDatasetVariablesetItemSchema = createInsertSchema(datasetVariablesetItem).extend({
+  attributes: datasetVariablesetItemAttributes.optional(),
+});
+export const selectDatasetVariablesetItemSchema = createSelectSchema(datasetVariablesetItem).extend({
+  attributes: datasetVariablesetItemAttributes.nullable(),
+});
 
 export type CreateDatasetVariablesetItemData = z.infer<typeof insertDatasetVariablesetItemSchema>;
 export type DatasetVariablesetItem = z.infer<typeof selectDatasetVariablesetItemSchema>;

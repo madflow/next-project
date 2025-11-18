@@ -352,6 +352,21 @@
     }
   },
   "adminDatasetVariableset": {
+    "allowedStatistics": {
+      "cancel": "Abbrechen",
+      "configure": "Konfigurieren",
+      "description": "Wählen Sie aus, welche Statistiken für diese Variable verfügbar sein sollen",
+      "distribution": "Verteilung",
+      "error": "Fehler beim Aktualisieren der erlaubten Statistiken",
+      "mean": "Mittelwert",
+      "save": "Speichern",
+      "saving": "Wird gespeichert...",
+      "success": "Erlaubte Statistiken erfolgreich aktualisiert",
+      "title": "Erlaubte Statistiken konfigurieren",
+      "validation": {
+        "atLeastOne": "Mindestens eine Statistik muss ausgewählt sein"
+      }
+    },
     "assignVariables": "Variablen zuweisen",
     "assignment": {
       "addToSet": "Zu Set hinzufügen",

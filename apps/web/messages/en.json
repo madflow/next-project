@@ -352,6 +352,21 @@
     }
   },
   "adminDatasetVariableset": {
+    "allowedStatistics": {
+      "cancel": "Cancel",
+      "configure": "Configure",
+      "description": "Select which statistics should be available for this variable",
+      "distribution": "Distribution",
+      "error": "Failed to update allowed statistics",
+      "mean": "Mean",
+      "save": "Save",
+      "saving": "Saving...",
+      "success": "Allowed statistics updated successfully",
+      "title": "Configure Allowed Statistics",
+      "validation": {
+        "atLeastOne": "At least one statistic must be selected"
+      }
+    },
     "assignVariables": "Assign Variables",
     "assignment": {
       "addToSet": "Add to Set",
