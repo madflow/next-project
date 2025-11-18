@@ -244,7 +244,11 @@ export const datasetVariablesetItem = pgTable(
     variableId: uuid("variable_id")
       .notNull()
       .references(() => datasetVariable.id, { onDelete: "cascade" }),
-    attributes: jsonb("attributes").$type<DatasetVariablesetItemAttributes>(),
+    attributes: jsonb("attributes")
+      .$type<DatasetVariablesetItemAttributes>()
+      .default({
+        allowedStatistics: { distribution: true, mean: false },
+      }),
     orderIndex: integer("order_index").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
