@@ -75,7 +75,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.0.0",
     "@types/react": "19.2.3",
-    "@types/react-dom": "19.2.2",
+    "@types/react-dom": "19.2.3",
     "eslint": "^9.29.0",
     "tsx": "^4.20.3",
     "tw-animate-css": "^1.3.4",
