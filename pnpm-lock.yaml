@@ -350,8 +350,8 @@ importers:
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.4)
       react-email:
-        specifier: 5.0.2
-        version: 5.0.2
+        specifier: 5.0.3
+        version: 5.0.3
 
   packages/eslint-config:
     devDependencies:
@@ -5975,8 +5975,8 @@ packages:
     peerDependencies:
       react: ^19.2.0
 
-  react-email@5.0.2:
-    resolution: {integrity: sha512-f4E0ulWy8D5HORl7x/ZSRVW8U0dUxIQ9Yv3sDGV4W/G7y8j6kKNS4lohYtPCLOhA+2i0bfp8O6tIMEhLwuSC3Q==}
+  react-email@5.0.3:
+    resolution: {integrity: sha512-LSeLmzBNMrKhLfr8156113tVM/MOslfE8uj4/9t28IYMwoVDJisXaRZAS2ahkhTnBAv/CvGcXLR37+DLD6aATg==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
@@ -13168,7 +13168,7 @@ snapshots:
       react: 19.2.0
       scheduler: 0.27.0
 
-  react-email@5.0.2:
+  react-email@5.0.3:
     dependencies:
       '@babel/parser': 7.28.5
       '@babel/traverse': 7.28.5
