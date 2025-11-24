@@ -10,7 +10,7 @@ export const {
   useActiveOrganization,
   useListOrganizations,
   changePassword,
-  forgetPassword,
+  requestPasswordReset,
   getSession,
   resetPassword,
   sendVerificationEmail,

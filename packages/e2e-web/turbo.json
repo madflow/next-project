@@ -1,0 +1,17 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["CI", "BASE_URL", "E2E_BASE_URL", "SMTP_SERVER_API"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"]
+    },
+    "dev": {
+      "env": ["CI", "BASE_URL", "E2E_BASE_URL", "SMTP_SERVER_API"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"]
+    },
+    "lint": {
+      "env": ["E2E_BASE_URL", "SMTP_SERVER_API"]
+    }
+  }
+}

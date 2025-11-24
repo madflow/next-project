@@ -133,6 +133,7 @@ export const invitation = pgTable("invitations", {
   email: text("email").notNull(),
   role: text("role"),
   status: text("status").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   inviterId: uuid("inviter_id")
     .notNull()
