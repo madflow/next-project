@@ -99,12 +99,12 @@ export function NavUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 size-4" />
-              <Link data-testid="app.nav-user.account" href="/user/account">
+            <Link data-testid="app.nav-user.account" href="/user/account">
+              <DropdownMenuItem className="cursor-pointer">
+                <User className="mr-2 size-4" />
                 {t("account")}
-              </Link>
-            </DropdownMenuItem>
+              </DropdownMenuItem>
+            </Link>
             {isImpersonating && (
               <DropdownMenuItem
                 onClick={handleStopImpersonating}
