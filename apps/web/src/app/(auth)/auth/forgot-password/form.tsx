@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Locale } from "@/i18n/config";
-import { forgetPassword } from "@/lib/auth-client";
+import { requestPasswordReset } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { ForgotPasswordFormData, ForgotPasswordSchema } from "./schema";
 
@@ -27,7 +27,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
   });
 
   const handleSubmit = async (values: ForgotPasswordFormData) => {
-    await forgetPassword({
+    await requestPasswordReset({
       email: values.email,
       redirectTo: "/auth/reset-password",
     });
