@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "lsp": {
+    "tailwind": {
+      "command": ["npx", "tailwindcss-language-server", "--stdio"],
+      "extensions": ["tsx"]
+    }
+  },
+  "mcp": {}
+}
