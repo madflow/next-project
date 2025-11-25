@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
@@ -21,23 +21,22 @@ export function MultiVariableCharts({
   datasetId,
   onStatsRequestAction,
 }: MultiVariableChartsProps) {
+  // Create a stable key from variables to detect changes
+  const variablesKey = variables
+    .map((v) => v.id)
+    .sort()
+    .join(",");
+
   const [splitVariables, setSplitVariables] = useState<Record<string, string | null>>({});
-  const prevVariableIdsRef = useRef<string>("");
+  const [currentVariablesKey, setCurrentVariablesKey] = useState(variablesKey);
 
-  // Clear split variables when switching to different variables to prevent stale selections
-  useEffect(() => {
-    const currentVariableIds = variables
-      .map((v) => v.id)
-      .sort()
-      .join(",");
-
-    // Only reset if we're switching to different variables
-    if (prevVariableIdsRef.current !== "" && prevVariableIdsRef.current !== currentVariableIds) {
-      setSplitVariables({});
-    }
-
-    prevVariableIdsRef.current = currentVariableIds;
-  }, [variables]);
+  // Reset split variables when variables change (using setState during render pattern)
+  if (currentVariablesKey !== variablesKey && currentVariablesKey !== "") {
+    setSplitVariables({});
+    setCurrentVariablesKey(variablesKey);
+  } else if (currentVariablesKey === "") {
+    setCurrentVariablesKey(variablesKey);
+  }
 
   if (variables.length === 0) {
     return <div className="text-muted-foreground">{"No variables selected"}</div>;

@@ -713,6 +713,7 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
         dataTransfer.items.add(file);
       }
 
+      // eslint-disable-next-line react-hooks/immutability -- Modifying DOM element, not React state
       inputElement.files = dataTransfer.files;
       inputElement.dispatchEvent(new Event("change", { bubbles: true }));
     },
@@ -752,6 +753,7 @@ function FileUploadDropzone(props: FileUploadDropzoneProps) {
         dataTransfer.items.add(file);
       }
 
+      // eslint-disable-next-line react-hooks/immutability -- Modifying DOM element, not React state
       inputElement.files = dataTransfer.files;
       inputElement.dispatchEvent(new Event("change", { bubbles: true }));
     },

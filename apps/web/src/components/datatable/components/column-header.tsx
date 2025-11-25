@@ -1,7 +1,7 @@
 import { Column } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
@@ -38,36 +38,30 @@ export function DataTableColumnHeader<TData, TValue>({
   return (
     <div className={cn("flex items-center space-x-2 select-none", className)}>
       <span>{translatedTitle}</span>
-      <TooltipProvider delayDuration={1000}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              tabIndex={0}
-              aria-label={tooltipText}
-              className="m-0 flex cursor-pointer items-center border-0 bg-transparent p-0"
-              onClick={handleSortClick}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") handleSortClick(e);
-              }}>
-              {isSorted === "asc" ? (
-                <ArrowUp className="size-4" />
-              ) : isSorted === "desc" ? (
-                <ArrowDown className="size-4" />
-              ) : (
-                <ChevronsUpDown className="size-4 opacity-50" />
-              )}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent
-            side="right"
-            align="center"
-            className="text-muted-foreground bg-background border-border border"
-            hideArrow>
-            {tooltipText}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger
+          tabIndex={0}
+          aria-label={tooltipText}
+          onClick={handleSortClick}
+          className="cursor-pointer focus:outline-none"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") handleSortClick(e);
+          }}>
+          {isSorted === "asc" ? (
+            <ArrowUp className="size-4" />
+          ) : isSorted === "desc" ? (
+            <ArrowDown className="size-4" />
+          ) : (
+            <ChevronsUpDown className="size-4 opacity-50" />
+          )}
+        </TooltipTrigger>
+        <TooltipContent
+          side="right"
+          align="center"
+          className="text-muted-foreground bg-background border-border border">
+          {tooltipText}
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 }
