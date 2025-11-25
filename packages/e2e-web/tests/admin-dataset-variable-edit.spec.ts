@@ -25,6 +25,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     // Search for the "age" variable
     await page.getByTestId("app.datatable.search-input").click();
     await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.waitForLoadState("networkidle");
 
     // Click the edit button for the age variable
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
