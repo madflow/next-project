@@ -142,10 +142,16 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
           <Field>
             <FieldLabel>{t("formLabels.organization")}</FieldLabel>
             <FieldGroup>
-              <OrganizationSelect
-                onValueChangeAction={(value) => form.setValue("organizationId", value)}
-                defaultValue={form.watch("organizationId")}
-              />
+              {(() => {
+                // eslint-disable-next-line react-hooks/incompatible-library -- React Hook Form watch() is a known limitation
+                const watchedOrgId = form.watch("organizationId");
+                return (
+                  <OrganizationSelect
+                    onValueChangeAction={(value) => form.setValue("organizationId", value)}
+                    defaultValue={watchedOrgId}
+                  />
+                );
+              })()}
             </FieldGroup>
             <FieldError errors={[form.formState.errors.organizationId]} />
           </Field>

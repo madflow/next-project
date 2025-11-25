@@ -12,7 +12,7 @@ import {
   SheetIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis, YAxis } from "recharts";
 import {
   Card,
@@ -120,41 +120,42 @@ export function AdhocChart({
     });
   }, [variable, stats]);
 
-  const [selectedChartType, setSelectedChartType] = useState<AnalysisChartType>(() => {
-    return chartSelection.defaultChartType;
-  });
-
-  const prevVariableIdRef = useRef(variable.id);
-  const prevHasSplitVariableRef = useRef<boolean>(false);
-
-  useEffect(() => {
-    // Check if this variable has split variable stats
+  // Derive the selected chart type based on chart selection
+  const selectedChartType = useMemo(() => {
     const targetVariable = stats.find((item) => item.variable === variable.name);
     const hasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
 
-    // Reset chart type when:
-    // 1. Variable changes, OR
-    // 2. Split variable status changes (from split to non-split or vice versa)
-    const variableChanged = prevVariableIdRef.current !== variable.id;
-    const splitVariableStatusChanged = prevHasSplitVariableRef.current !== hasSplitVariable;
+    const newChartSelection = determineChartSelection({
+      variable,
+      stats,
+      hasSplitVariable,
+      attributes: variable.attributes,
+    });
 
-    if (variableChanged || splitVariableStatusChanged) {
-      const newChartSelection = determineChartSelection({
-        variable,
-        stats,
-        hasSplitVariable,
-        attributes: variable.attributes,
-      });
+    return newChartSelection.defaultChartType;
+  }, [variable, stats]);
 
-      // Always reset to default when split variable status changes or current selection not available
-      if (splitVariableStatusChanged || !newChartSelection.availableChartTypes.includes(selectedChartType)) {
-        setSelectedChartType(newChartSelection.defaultChartType);
-      }
+  // Detect when variable or split status changes for reset key
+  const targetVariable = useMemo(() => stats.find((item) => item.variable === variable.name), [stats, variable.name]);
+  const hasSplitVariable = useMemo(
+    () => Boolean(targetVariable && isSplitVariableStats(targetVariable.stats)),
+    [targetVariable]
+  );
 
-      prevVariableIdRef.current = variable.id;
-      prevHasSplitVariableRef.current = hasSplitVariable;
-    }
-  }, [variable.id, variable, stats, selectedChartType]);
+  // Create a reset key that changes when we want to reset user selection
+  const resetKey = `${variable.id}-${hasSplitVariable}`;
+
+  const [userSelectedChartType, setUserSelectedChartType] = useState<AnalysisChartType | null>(null);
+  const [currentResetKey, setCurrentResetKey] = useState(resetKey);
+
+  // Reset user selection when reset key changes (derived from variable id and split status)
+  if (currentResetKey !== resetKey) {
+    setUserSelectedChartType(null);
+    setCurrentResetKey(resetKey);
+  }
+
+  // Get the actual selected chart type
+  const actualSelectedChartType = userSelectedChartType || selectedChartType;
 
   const chartConfig = {
     percentage: {
@@ -205,7 +206,7 @@ export function AdhocChart({
   }
 
   function renderChart() {
-    switch (selectedChartType) {
+    switch (actualSelectedChartType) {
       case "bar":
         return (
           <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
@@ -349,7 +350,7 @@ export function AdhocChart({
     }
   };
 
-  if (selectedChartType === "metrics" || selectedChartType === "meanBar") {
+  if (actualSelectedChartType === "metrics" || actualSelectedChartType === "meanBar") {
     return (
       <div {...props}>
         <Tabs defaultValue="chart" className="w-full">
@@ -371,8 +372,8 @@ export function AdhocChart({
                   <CardAction>
                     <ToggleGroup
                       type="single"
-                      value={selectedChartType}
-                      onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
+                      value={actualSelectedChartType}
+                      onValueChange={(value) => value && setUserSelectedChartType(value as AnalysisChartType)}
                       size="sm"
                       data-testid="chart-type-selector">
                       {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
@@ -384,8 +385,8 @@ export function AdhocChart({
                   </CardAction>
                 )}
               </CardHeader>
-              <CardContent data-testid={`chart-content-${selectedChartType}`}>
-                {selectedChartType === "metrics" ? (
+              <CardContent data-testid={`chart-content-${actualSelectedChartType}`}>
+                {actualSelectedChartType === "metrics" ? (
                   <MetricsCards variable={variable} stats={stats} datasetId={datasetId} renderAsContent />
                 ) : (
                   <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} renderAsContent ref={ref} />
@@ -464,8 +465,8 @@ export function AdhocChart({
                 <CardAction>
                   <ToggleGroup
                     type="single"
-                    value={selectedChartType}
-                    onValueChange={(value) => value && setSelectedChartType(value as AnalysisChartType)}
+                    value={actualSelectedChartType}
+                    onValueChange={(value) => value && setUserSelectedChartType(value as AnalysisChartType)}
                     size="sm"
                     data-testid="chart-type-selector">
                     {chartSelection.availableChartTypes.map((chartType: AnalysisChartType) => (
@@ -477,7 +478,7 @@ export function AdhocChart({
                 </CardAction>
               )}
             </CardHeader>
-            <CardContent data-testid={`chart-content-${selectedChartType}`}>{renderChart()}</CardContent>
+            <CardContent data-testid={`chart-content-${actualSelectedChartType}`}>{renderChart()}</CardContent>
             <CardFooter className="flex items-center justify-between border-t">
               <div>
                 {datasetId && onSplitVariableChangeAction && chartSelection.canUseSplitVariable && (

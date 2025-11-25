@@ -19,26 +19,23 @@ type AdHocAnalysisProps = {
 };
 
 export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
-  const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
-  const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
-  const [statsData, setStatsData] = useState<Record<string, StatsResponse>>({});
-
   const t = useTranslations("projectAdhocAnalysis");
   const { setActiveTheme } = useThemeConfig();
   const { restoreState, saveDataset, saveCurrentSelection } = useAdhocPersistence(project.id);
 
-  // Restore state from localStorage on mount
+  // Initialize state from localStorage
+  const restoredState = restoreState();
+  const [selectedDataset, setSelectedDataset] = useState<string | null>(restoredState?.selectedDataset || null);
+  const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
+  const [statsData, setStatsData] = useState<Record<string, StatsResponse>>({});
+
+  // Set theme on mount if needed
   useEffect(() => {
-    const restoredState = restoreState();
-    if (restoredState) {
-      if (restoredState.selectedDataset) {
-        setSelectedDataset(restoredState.selectedDataset);
-      }
-      if (restoredState.selectedTheme && restoredState.selectedTheme !== "default") {
-        setActiveTheme(restoredState.selectedTheme);
-      }
+    if (restoredState?.selectedTheme && restoredState.selectedTheme !== "default") {
+      setActiveTheme(restoredState.selectedTheme);
     }
-  }, [restoreState, setActiveTheme]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
 
   const { mutate } = useDatasetStats(selectedDataset || "", {
     onError: (error) => {
