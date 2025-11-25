@@ -78,7 +78,7 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
       </div>
 
       <Card className="rounded-md shadow-xs">
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex items-center gap-2">
             <ProjectSelect onValueChange={setSelectedProject} organizationId={organizationId} />
             <Button onClick={handleAddToProject} disabled={!selectedProject || isAddingToProject}>

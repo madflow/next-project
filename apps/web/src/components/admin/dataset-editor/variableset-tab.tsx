@@ -77,7 +77,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
         <p className="text-muted-foreground text-sm">{t("description")}</p>
       </div>
 
-      <div className="w-3/4">
+      <div className="w-full">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Variable Sets Tree */}
           <Card className="h-fit rounded-md shadow-xs lg:col-span-1">
