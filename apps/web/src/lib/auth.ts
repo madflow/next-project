@@ -125,7 +125,7 @@ export const auth = betterAuth({
     storage: "database",
     enabled: true,
     window: 10,
-    max: 200,
+    max: 1000,
   },
   emailVerification: {
     sendOnSignUp: true,
