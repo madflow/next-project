@@ -274,7 +274,6 @@ async function updateVariablesetItemAttributesFn(
   return updated;
 }
 
-// Exported functions with appropriate auth checks
 export const listByDataset = withSessionCheck(listByDatasetFn);
 export const getHierarchy = withSessionCheck(getHierarchyFn);
 export const find = withSessionCheck(findFn);
