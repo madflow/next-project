@@ -121,12 +121,10 @@ export const auth = betterAuth({
       },
     },
   },
-  // rateLimit: {
-  //   storage: "database",
-  //   enabled: true,
-  //   window: 10,
-  //   max: 1000,
-  // },
+  rateLimit: {
+    storage: "database",
+    enabled: false,
+  },
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async (data: { user: { email: string; locale?: string }; url: string }, request) => {
