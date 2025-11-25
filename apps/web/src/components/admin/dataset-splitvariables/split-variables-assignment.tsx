@@ -92,7 +92,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
 
   return (
     <div className="w-full">
-      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Available Variables */}
         <Card className="rounded-md shadow-xs lg:col-span-1">
           <CardHeader className="pb-3">
@@ -154,7 +154,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
         </Card>
 
         {/* Assigned Split Variables */}
-        <Card className="rounded-md shadow-xs lg:col-span-1">
+        <Card className="rounded-md shadow-xs lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle>{t("assignment.assigned")}</CardTitle>
             <div className="relative">
