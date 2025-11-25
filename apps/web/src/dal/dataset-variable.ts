@@ -34,11 +34,15 @@ async function updateFn(id: string, data: UpdateDatasetData) {
   return updatedVariable;
 }
 
+async function removeFn(id: string) {
+  await db.delete(entity).where(eq(entity.id, id));
+}
+
 async function findFn(id: string) {
   const [result] = await db.select().from(entity).where(eq(entity.id, id)).limit(1);
   return result;
 }
 
 export const find = withSessionCheck(findFn);
-
+export const remove = withAdminCheck(removeFn);
 export const update = withAdminCheck(updateFn);

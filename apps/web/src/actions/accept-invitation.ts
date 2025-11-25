@@ -9,7 +9,6 @@ import { auth } from "@/lib/auth";
 
 export async function acceptInvitationAfterSignup(invitationId: string) {
   try {
-    // Get the current user
     const session = await auth.api.getSession({
       headers: await headers(),
     });
@@ -36,7 +35,6 @@ export async function acceptInvitationAfterSignup(invitationId: string) {
       .limit(1);
 
     if (existingMember) {
-      // User is already a member, nothing to do
       return { success: true, message: "Already a member" };
     }
 
