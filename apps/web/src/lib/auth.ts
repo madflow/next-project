@@ -125,13 +125,7 @@ export const auth = betterAuth({
     storage: "database",
     enabled: true,
     window: 10,
-    max: 100,
-    customRules: {
-      "/sign-in/email": {
-        window: 10,
-        max: 25,
-      },
-    },
+    max: 200,
   },
   emailVerification: {
     sendOnSignUp: true,
