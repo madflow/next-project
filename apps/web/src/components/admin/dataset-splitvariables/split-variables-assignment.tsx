@@ -91,7 +91,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
   };
 
   return (
-    <div className="w-3/4">
+    <div className="w-full">
       <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Available Variables */}
         <Card className="rounded-md shadow-xs lg:col-span-1">
