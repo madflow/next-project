@@ -78,7 +78,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
       </div>
 
       <div className="w-full">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Variable Sets Tree */}
           <Card className="h-fit rounded-md shadow-xs lg:col-span-1">
             <CardHeader>
@@ -115,7 +115,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
           </Card>
 
           {/* Variable Assignment */}
-          <Card className="h-fit rounded-md shadow-xs lg:col-span-1">
+          <Card className="h-fit rounded-md shadow-xs lg:col-span-2">
             <CardHeader>
               <CardTitle>{t("assignVariables")}</CardTitle>
               <CardDescription>{t("assignment.description")}</CardDescription>
