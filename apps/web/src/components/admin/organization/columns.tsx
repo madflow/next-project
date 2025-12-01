@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
+import { Pencil, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { remove } from "@/actions/organization";
@@ -16,7 +16,14 @@ export const columns: ColumnDef<Organization>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="organization.columns.name" />,
     cell: function Cell({ cell }) {
       const name = cell.getValue<string>();
-      return <Link href={`/admin/organizations/${cell.row.original.id}/members`}>{name}</Link>;
+      return (
+        <Link
+          href={`/admin/organizations/${cell.row.original.id}/members`}
+          className="text-primary flex cursor-pointer items-center gap-1 hover:underline">
+          {name}
+          <Users className="h-3 w-3" />
+        </Link>
+      );
     },
   },
   {
@@ -27,6 +34,7 @@ export const columns: ColumnDef<Organization>[] = [
       return (
         <Link
           href={`/admin/organizations/${cell.row.original.id}/members`}
+          className="text-primary cursor-pointer hover:underline"
           data-testid={`admin.organizations.list.link-${slug}`}>
           {slug}
         </Link>

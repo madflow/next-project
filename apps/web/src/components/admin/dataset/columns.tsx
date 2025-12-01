@@ -19,8 +19,11 @@ export const columns: ColumnDef<Dataset>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.name" />,
     cell: function Cell({ row }) {
       return (
-        <Link className="font-medium" href={`/admin/datasets/${row.original.id}/editor`}>
+        <Link
+          href={`/admin/datasets/${row.original.id}/editor`}
+          className="text-primary flex cursor-pointer items-center gap-1 font-medium hover:underline">
           {row.original.name}
+          <Pencil className="h-3 w-3" />
         </Link>
       );
     },
