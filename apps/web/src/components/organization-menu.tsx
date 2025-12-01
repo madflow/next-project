@@ -107,6 +107,7 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
             </DropdownMenuTrigger>
             <DropdownMenuContent
               className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+              data-testid="app.organization-switcher.menu"
               align="start"
               side={isMobile ? "bottom" : "right"}
               sideOffset={4}>
