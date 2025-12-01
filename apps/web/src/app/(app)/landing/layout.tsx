@@ -8,7 +8,7 @@ export default async function ProjectLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarLayout SidebarComponent={AppSidebar} SiteHeaderComponent={SiteHeader} siteHeaderTitle="Landing">
+    <SidebarLayout SidebarComponent={AppSidebar} SiteHeaderComponent={SiteHeader}>
       {children}
     </SidebarLayout>
   );

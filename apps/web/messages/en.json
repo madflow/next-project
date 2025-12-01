@@ -914,6 +914,8 @@
     "title": "{name} members"
   },
   "pageLanding": {
+    "emptyDescription": "Select an organization and project from the sidebar to get started.",
+    "emptyTitle": "Welcome",
     "title": "Global landing page"
   },
   "pageProjectAdhoc": {
