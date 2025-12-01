@@ -1,20 +1,13 @@
 "use client";
 
-import { Building2, FileIcon, Folder, GanttChartIcon, HouseIcon, MenuIcon, WrenchIcon } from "lucide-react";
+import { Building2, FileIcon, Folder, GanttChartIcon, HouseIcon, WrenchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavPrimary } from "@/components/nav-primary";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getNavData = (t: (t: any) => string) => ({
@@ -62,14 +55,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <MenuIcon className="!size-5" />
-            <span className="text-base font-semibold">{t("adminMenu")}</span>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+      <SidebarHeader />
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavPrimary items={data.documents} title={t("sections")} />
