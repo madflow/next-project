@@ -11,7 +11,10 @@ export function TableBodyComponent<TData>({ rows, columnsLength }: TableBodyProp
     <TableBody>
       {rows.length ? (
         rows.map((row) => (
-          <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+          <TableRow
+            key={row.id}
+            data-state={row.getIsSelected() && "selected"}
+            className="hover:bg-muted/50 transition-colors">
             {row.getVisibleCells().map((cell) => (
               <TableCell key={cell.id} className={cell.column.columnDef.meta?.className}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
