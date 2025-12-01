@@ -35,6 +35,9 @@
     "e2e:deps": {
       "cache": false
     },
+    "e2e:single": {
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
