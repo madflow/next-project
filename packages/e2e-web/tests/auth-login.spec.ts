@@ -18,12 +18,12 @@ test("login", async ({ page }) => {
   }
   await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
   // expect to navigate to /dasboard
-  await expect(page).toHaveURL("/landing");
+  await expect(page).toHaveURL("/project/test-project/adhoc");
   await logoutUser(page);
 
   await loginUser(page, testUsers.admin.email, testUsers.admin.password);
   // expect to navigate to /dasboard
-  await expect(page).toHaveURL("/landing");
+  await expect(page).toHaveURL("/project/test-project/adhoc");
 
   await logoutUser(page);
 });
