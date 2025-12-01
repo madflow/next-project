@@ -25,7 +25,7 @@ test.describe("Admin Projects", () => {
     await page.getByTestId("admin.projects.new.form.name").press("Tab");
     await page.getByTestId("admin.projects.new.form.slug").fill(projectSlug);
     await page.getByRole("combobox", { name: "Organization" }).click();
-    await page.getByTestId("org-option-test-organization").getByText("Test Organization").click();
+    await page.getByTestId("org-option-test-organization-2").getByText("Test Organization 2").click();
 
     // Submit the form
     const createResponse = page.waitForResponse(
