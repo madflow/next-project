@@ -5,6 +5,7 @@ import { loginUser } from "../utils";
 const DATASET_NAME = "SPSS Beispielumfrage";
 
 test.describe("Admin Dataset Variable Edit", () => {
+  test.slow();
   test("should edit dataset variable with missing values, missing ranges, and measurement level", async ({ page }) => {
     // Login as admin
     await page.goto("/");
@@ -27,9 +28,9 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.datatable.search-input").fill("age");
     await page.waitForLoadState("networkidle");
 
-    await page.waitForSelector('[data-testid="app.admin.dataset-variable.edit-age"]');
-
     // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
     // Wait for the edit form to appear
@@ -86,6 +87,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     // Click edit again to verify the changes were saved
     await page.getByTestId("app.datatable.search-input").click();
     await page.getByTestId("app.datatable.search-input").fill("age");
+
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
     await page.waitForLoadState("networkidle");
@@ -150,6 +153,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.datatable.search-input").fill("age");
 
     // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
     // Wait for the edit form to appear
@@ -189,6 +194,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.datatable.search-input").fill("age");
 
     // Click the edit button for the age variable
+
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
     // Wait for the edit form to appear

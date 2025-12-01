@@ -70,13 +70,6 @@ test.describe("Admin Dataset Split Variables", () => {
 
     // Only proceed if there are available variables
     const addButtons = page.getByTestId("admin.dataset.splitvariables.assignment.add");
-    const addButtonCount = await addButtons.count();
-
-    if (addButtonCount === 0) {
-      // Skip test if no variables available
-      console.log("Skipping test - no available variables to assign");
-      return;
-    }
 
     // Get the first available variable and assign it
     const firstAddButton = addButtons.first();
@@ -112,12 +105,6 @@ test.describe("Admin Dataset Split Variables", () => {
 
     // Check if we have variables to assign
     const addButtons = page.getByTestId("admin.dataset.splitvariables.assignment.add");
-    const addButtonCount = await addButtons.count();
-
-    if (addButtonCount === 0) {
-      console.log("Skipping test - no available variables to assign and then remove");
-      return;
-    }
 
     // First assign a variable to have something to remove
     const firstAddButton = addButtons.first();
@@ -158,11 +145,6 @@ test.describe("Admin Dataset Split Variables", () => {
     // Check if we have variables to test search with
     const addButtons = page.getByTestId("admin.dataset.splitvariables.assignment.add");
     const initialAvailableCount = await addButtons.count();
-
-    if (initialAvailableCount === 0) {
-      console.log("Skipping search test - no available variables to search");
-      return;
-    }
 
     // Test search in available variables section
     const availableSearchInput = page.getByPlaceholder("Search variables...").first();
