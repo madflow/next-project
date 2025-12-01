@@ -66,10 +66,19 @@ test.describe("Organization members", () => {
 
       // Test each organization and its projects
       for (const org of testCase.organizations) {
-        // Select organization
         const organizationSwitcher = page.getByTestId("app.organization-switcher");
-        await organizationSwitcher.click();
-        await page.getByText(org.name, { exact: true }).click();
+
+        // Only switch organizations if user has multiple orgs
+        // For single-org users, the org is already selected by default
+        if (testCase.organizations.length > 1) {
+          // Check if we need to switch (org not already selected)
+          const currentOrgText = await organizationSwitcher.locator("span").textContent();
+          if (currentOrgText !== org.name) {
+            // Open dropdown and select the organization
+            await organizationSwitcher.click();
+            await page.getByTestId("app.organization-switcher.menu").getByText(org.name, { exact: true }).click();
+          }
+        }
 
         // Verify organization is selected
         await expect(organizationSwitcher.locator("span")).toHaveText(org.name);
