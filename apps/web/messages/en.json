@@ -792,7 +792,7 @@
         "title": "Delete organization"
       },
       "deleting": "Deleting...",
-      "description": "Are you sure you want to delete the organization &ldquo;{name}&rdquo;? This action cannot be undone.",
+      "description": "Are you sure you want to delete the organization \"{name}\"? This action cannot be undone.",
       "error": "Failed to delete organization",
       "title": "Delete Organization"
     },
@@ -947,7 +947,7 @@
         "title": "Delete project"
       },
       "deleting": "Deleting...",
-      "description": "Are you sure you want to delete the project &ldquo;{name}&rdquo;? This action cannot be undone.",
+      "description": "Are you sure you want to delete the project \"{name}\"? This action cannot be undone.",
       "error": "Failed to delete project",
       "title": "Delete Project"
     },

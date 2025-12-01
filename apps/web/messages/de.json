@@ -792,7 +792,7 @@
         "title": "Organisation löschen"
       },
       "deleting": "Wird gelöscht...",
-      "description": "Sind Sie sicher, dass Sie die Organisation &ldquo;{name}&rdquo; löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "description": "Sind Sie sicher, dass Sie die Organisation \"{name}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
       "error": "Löschen der Organisation fehlgeschlagen",
       "title": "Organisation löschen"
     },
@@ -947,7 +947,7 @@
         "title": "Projekt löschen"
       },
       "deleting": "Wird gelöscht...",
-      "description": "Sind Sie sicher, dass Sie das Projekt &ldquo;{name}&rdquo; löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "description": "Sind Sie sicher, dass Sie das Projekt \"{name}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
       "error": "Löschen des Projekts fehlgeschlagen",
       "title": "Projekt löschen"
     },
