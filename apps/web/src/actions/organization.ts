@@ -13,7 +13,7 @@ import { auth } from "@/lib/auth";
 import { assertUserIsAdmin } from "@/lib/dal";
 
 export async function create(data: CreateData) {
-  assertUserIsAdmin();
+  await assertUserIsAdmin();
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -34,11 +34,11 @@ export async function create(data: CreateData) {
 }
 
 export async function update(id: string, data: UpdateData) {
-  assertUserIsAdmin();
+  await assertUserIsAdmin();
   await db.update(entity).set(data).where(eq(entity.id, id));
 }
 
 export async function remove(id: string) {
-  assertUserIsAdmin();
+  await assertUserIsAdmin();
   await db.delete(entity).where(eq(entity.id, id));
 }

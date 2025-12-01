@@ -180,7 +180,7 @@ A comprehensive list of improvements identified across code organization, qualit
   - Issue: `AUTH_SECRET: z.string().default("")` allows empty secrets
   - Fix: `AUTH_SECRET: z.string().min(32, "AUTH_SECRET must be at least 32 characters")`
 
-- [ ] **Await assertUserIsAdmin() calls**
+- [x] **Await assertUserIsAdmin() calls**
   - File: `apps/web/src/actions/user.ts` (line 16)
   - Issue: `assertUserIsAdmin()` not awaited, potentially bypassed auth
   - Fix: Add `await` before all `assertUserIsAdmin()` calls

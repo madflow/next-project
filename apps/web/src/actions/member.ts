@@ -12,7 +12,7 @@ type AddMemberData = {
 };
 
 export async function addMember(organizationId: string, data: AddMemberData) {
-  assertUserIsAdmin();
+  await assertUserIsAdmin();
 
   // Check if the organization exists
   const [org] = await db.select().from(organizationTable).where(eq(organizationTable.id, organizationId)).limit(1);
@@ -50,7 +50,7 @@ export async function addMember(organizationId: string, data: AddMemberData) {
 }
 
 export async function updateMemberRole(organizationId: string, userId: string, role: "admin" | "owner" | "member") {
-  assertUserIsAdmin();
+  await assertUserIsAdmin();
 
   await db
     .update(memberTable)
@@ -64,7 +64,7 @@ export async function updateMemberRole(organizationId: string, userId: string, r
 }
 
 export async function removeMember(memberId: string) {
-  assertUserIsAdmin();
+  await assertUserIsAdmin();
 
   // Get the member to find the organizationId for revalidation
   const [member] = await db.select().from(memberTable).where(eq(memberTable.id, memberId)).limit(1);
