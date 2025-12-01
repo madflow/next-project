@@ -464,7 +464,6 @@
     }
   },
   "adminSidebar": {
-    "adminMenu": "Admin-Menü",
     "navItems": {
       "admin": "Admin",
       "app": "App",
