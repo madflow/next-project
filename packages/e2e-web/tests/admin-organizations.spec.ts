@@ -20,7 +20,7 @@ test.describe("Admin organizations", () => {
       slug: "e2e-organization-2-" + Date.now(),
     };
     await page.goto("/");
-    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await loginUser(page, testUsers.adminInNoOrg.email, testUsers.adminInNoOrg.password);
     await page.goto("/admin/organizations/new");
     await expect(page.getByTestId("admin.organizations.new.page")).toBeVisible();
     await page.getByTestId("admin.organizations.new.form.name").fill(newOrganization.name);
