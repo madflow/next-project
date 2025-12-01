@@ -16,7 +16,14 @@ export async function loginUser(page: Page, email: string, password: string) {
   await page.waitForSelector("data-testid=auth.login.form.email");
   await page.getByTestId("auth.login.form.email").fill(email);
   await page.getByTestId("auth.login.form.password").fill(password);
+
+  const getSessionResponse = page.waitForResponse(
+    (response) => response.url().includes("/api/auth/get-session") && response.status() === 200
+  );
   await page.getByTestId("auth.login.form.submit").click();
+
+  await getSessionResponse;
+
   await page.waitForLoadState("networkidle");
   await page.waitForSelector("data-testid=app.sidebar.user-menu-trigger");
 }
