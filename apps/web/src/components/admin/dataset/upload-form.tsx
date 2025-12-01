@@ -8,7 +8,7 @@ import { useEffect, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { uploadDataset } from "@/actions/dataset";
+import { uploadDatasetWithFormData } from "@/actions/dataset";
 import { TextArrayEditor } from "@/components/form/text-array-editor";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -122,37 +122,29 @@ export function DatasetUploadForm() {
 
     setIsUploading(true);
 
-    const uploadDataSchema = z.object({
-      file: z.instanceof(File),
-      name: z.string().min(1),
-      organizationId: z.string().min(1),
-      description: z.string().optional(),
-      missingValues: z.array(z.string()).nullable(),
-      contentType: z.string().min(1),
-    });
-
-    const parseResult = uploadDataSchema.safeParse({
-      file: selectedFile,
-      name: data.name,
-      organizationId: data.organizationId,
-      description: data.description,
-      missingValues: data.missingValues,
-      contentType: "application/octet-stream",
-    });
-
-    if (!parseResult.success) {
-      toast.error(parseResult.error.message);
-      setIsUploading(false);
-      return;
-    }
-
     try {
-      const result = await uploadDataset(parseResult.data);
+      // Use FormData to properly handle file uploads
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append("name", data.name);
+      formData.append("organizationId", data.organizationId);
+      formData.append("contentType", "application/octet-stream");
+
+      if (data.description) {
+        formData.append("description", data.description);
+      }
+
+      if (data.missingValues) {
+        formData.append("missingValues", JSON.stringify(data.missingValues));
+      }
+
+      const result = await uploadDatasetWithFormData(formData);
 
       if (result.success) {
         toast.success(t("messages.success"));
         router.push("/admin/datasets");
       } else {
+        console.error("Upload error:", result);
         toast.error(result.error || t("messages.error"));
       }
     } catch (error) {

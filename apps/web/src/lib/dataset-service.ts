@@ -72,6 +72,18 @@ export async function createDataset({
   id,
 }: CreateDatasetParams): Promise<CreateDatasetResult> {
   try {
+    // Validate file exists and is not null
+    if (!file) {
+      throw new ServerActionValidationException(
+        "File is required but was null. This may be due to Next.js server action size limits. Try uploading a smaller file or using a different upload method."
+      );
+    }
+
+    // Validate file has required properties
+    if (!file.name || typeof file.size !== "number") {
+      throw new ServerActionValidationException("Invalid file object. File name or size is missing.");
+    }
+
     // Validate file type
     if (!ALLOWED_FILE_TYPES.includes(contentType) && !file.name.match(/\.(sav)$/i)) {
       throw new ServerActionValidationException("Invalid file type. Allowed types: .sav");
