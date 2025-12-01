@@ -149,19 +149,15 @@ test.describe("API Users", () => {
     test("orders by email", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      const response = await page.request.get("/api/users?order=email.asc");
-      expect(response.status()).toBe(200);
-      const data = await response.json();
+      const asc = await page.request.get("/api/users?order=email.asc");
+      expect(asc.status()).toBe(200);
+      const ascData = await asc.json();
 
-      const emails = data.rows.map((r) => r.email);
+      const desc = await page.request.get("/api/users?order=email.desc");
+      expect(desc.status()).toBe(200);
+      const descData = await desc.json();
 
-      // Verify specific known orderings that PostgreSQL produces
-      const accountDeleterIndex = emails.indexOf("accountdeleter@example.com");
-      const accountInNoOrgIndex = emails.indexOf("account-in-no-org@example.com");
-
-      if (accountDeleterIndex !== -1 && accountInNoOrgIndex !== -1) {
-        expect(accountDeleterIndex).toBeLessThan(accountInNoOrgIndex);
-      }
+      expect(ascData.rows[0].email).toBe(descData.rows[descData.rows.length - 1].email);
     });
 
     test("orders by creation date", async ({ page }) => {
