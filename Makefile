@@ -147,3 +147,12 @@ dev-init:
 	s3cmd --no-check-certificate -c .config/s3cfg.local mb s3://app
 	make migrate
 	make seed
+
+## Run a single e2e test. Usage: make e2e-single TEST=login
+.PHONY: e2e-single
+e2e-single:
+	@if [ -z "$(TEST)" ]; then \
+		echo "Error: TEST parameter is required. Usage: make e2e-single TEST=login"; \
+		exit 1; \
+	fi
+	pnpm run e2e:single -- $(TEST)

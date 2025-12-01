@@ -13,6 +13,7 @@
     "db:push": "turbo run db:push",
     "db:studio": "turbo run db:studio",
     "e2e": "turbo run e2e",
+    "e2e:single": "turbo run e2e:single --",
     "e2e:deps": "turbo run e2e:deps",
     "seed": "turbo run seed",
     "stub": "turbo run stub",
