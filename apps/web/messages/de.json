@@ -914,6 +914,8 @@
     "title": "Mitglieder von {name}"
   },
   "pageLanding": {
+    "emptyDescription": "Wählen Sie eine Organisation und ein Projekt aus der Seitenleiste aus, um zu beginnen.",
+    "emptyTitle": "Willkommen",
     "title": "Globale Startseite"
   },
   "pageProjectAdhoc": {
