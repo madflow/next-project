@@ -20,6 +20,50 @@ type UploadDatasetParams = {
   missingValues: string[] | null;
 };
 
+/**
+ * Upload dataset using FormData to properly handle file uploads
+ */
+export async function uploadDatasetWithFormData(formData: FormData): Promise<UploadDatasetResult> {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new ServerActionNotAuthorizedException("Unauthorized");
+  }
+
+  if (session.user.role !== USER_ADMIN_ROLE) {
+    throw new ServerActionNotAuthorizedException("Unauthorized");
+  }
+
+  // Extract data from FormData
+  const file = formData.get("file") as File | null;
+  const name = formData.get("name") as string;
+  const organizationId = formData.get("organizationId") as string;
+  const description = formData.get("description") as string | undefined;
+  const contentType = formData.get("contentType") as string;
+  const missingValuesJson = formData.get("missingValues") as string | null;
+
+  if (!file) {
+    return {
+      success: false,
+      error: "No file provided",
+    };
+  }
+
+  const missingValues = missingValuesJson ? JSON.parse(missingValuesJson) : null;
+
+  return await createDataset({
+    file,
+    name,
+    organizationId,
+    description,
+    contentType,
+    missingValues,
+    userId: session.user.id,
+  });
+}
+
 export async function addToProject(datasetId: string, projectId: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
