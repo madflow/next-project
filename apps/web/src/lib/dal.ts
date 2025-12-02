@@ -1,5 +1,5 @@
 import "server-only";
-import { SQL, and, asc, count, desc, eq, getTableColumns, ilike, or } from "drizzle-orm";
+import { SQL, and, asc, count, desc, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
 import { AnyPgColumn, AnyPgTable } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { cache } from "react";
@@ -142,7 +142,8 @@ export function createList(table: AnyPgTable, schema: ZodType) {
         if (!column) {
           continue;
         }
-        whereOrConditions.push(ilike(column, `%${search}%`));
+        const escapedSearch = search.replace(/[%_]/g, "\\$&");
+        whereOrConditions.push(ilike(column, `%${escapedSearch}%`));
       }
     }
 
