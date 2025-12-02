@@ -15,9 +15,10 @@ import {
   transformToRechartsStackedBarData,
   transformToSplitVariableStackedBarData,
 } from "@/lib/analysis-bridge";
-import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { PERCENTAGE_CHART_DECIMALS, YAXIS_LABEL_MAX_WIDTH, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
+import { TruncatedYAxisTick } from "./truncated-yaxis-tick";
 
 type HorizontalStackedBarAdhocProps = {
   variable: DatasetVariable;
@@ -98,8 +99,8 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              fontSize={10}
-              width={100}
+              width={YAXIS_LABEL_MAX_WIDTH}
+              tick={<TruncatedYAxisTick />}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             {splitData.length > 0 &&
@@ -178,8 +179,8 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            fontSize={10}
-            width={100}
+            width={YAXIS_LABEL_MAX_WIDTH}
+            tick={<TruncatedYAxisTick />}
           />
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
           {stackedData.map((_, index) => (

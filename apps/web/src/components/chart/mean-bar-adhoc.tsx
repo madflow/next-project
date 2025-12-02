@@ -9,10 +9,11 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { extractVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
-import { MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { MEAN_BAR_DECIMALS, YAXIS_LABEL_MAX_WIDTH, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
+import { TruncatedYAxisTick } from "./truncated-yaxis-tick";
 
 type MeanBarAdhocProps = {
   variable: DatasetVariable;
@@ -118,8 +119,8 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            fontSize={10}
-            width={200}
+            width={YAXIS_LABEL_MAX_WIDTH}
+            tick={<TruncatedYAxisTick />}
           />
           <Bar dataKey="value" fill="var(--color-value)">
             <LabelList
