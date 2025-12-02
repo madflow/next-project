@@ -1,3 +1,4 @@
+-- Custom SQL migration file, put your code below! --
 -- Migration to set default attributes for dataset_variableset_items
 -- This ensures all existing records have the default attributes when the field is null or empty
 
@@ -21,3 +22,4 @@ SET "attributes" = jsonb_set(
 WHERE "attributes" IS NOT NULL
   AND "attributes" != '{}'::jsonb
   AND ("attributes"->'allowedStatistics' IS NULL OR "attributes"->'allowedStatistics' = 'null'::jsonb);
+
