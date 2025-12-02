@@ -24,6 +24,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingVariableset, setEditingVariableset] = useState<DatasetVariableset | undefined>();
+  const [assignmentKey, setAssignmentKey] = useState(0);
 
   const {
     data: hierarchyResponse,
@@ -57,6 +58,15 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
     refetch();
   };
 
+  const handleDeleteSet = (deletedSetId: string) => {
+    // Clear selection if the deleted set was selected
+    if (selectedSetId === deletedSetId) {
+      setSelectedSetId(null);
+    }
+    // Force refresh assignments to reload unassigned variables
+    setAssignmentKey((prev) => prev + 1);
+  };
+
   // Flatten hierarchy for parent selection
   const flattenHierarchy = (nodes: VariablesetTreeNode[]): VariablesetTreeNode[] => {
     const result: VariablesetTreeNode[] = [];
@@ -85,15 +95,13 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
               <CardTitle>{t("editTitle")}</CardTitle>
               <CardDescription>{t("editDescription")}</CardDescription>
               <CardAction>
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleCreateSet}
-                    data-testid="admin.dataset.variableset.create"
-                    className="cursor-pointer">
-                    {t("createSet")}
-                  </Button>
-                  <ExportImportActions datasetId={datasetId} onImportSuccess={handleRefresh} />
-                </div>
+                <Button
+                  onClick={handleCreateSet}
+                  data-testid="admin.dataset.variableset.create"
+                  className="cursor-pointer">
+                  {t("createSet")}
+                </Button>
+                <ExportImportActions datasetId={datasetId} onImportSuccess={handleRefresh} />
               </CardAction>
             </CardHeader>
             <CardContent className="p-4">
@@ -109,6 +117,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
                   onSelectSet={setSelectedSetId}
                   onEditSet={handleEditSet}
                   onRefresh={handleRefresh}
+                  onDeleteSet={handleDeleteSet}
                 />
               )}
             </CardContent>
@@ -121,7 +130,12 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
               <CardDescription>{t("assignment.description")}</CardDescription>
             </CardHeader>
             <CardContent className="p-4">
-              <VariableAssignment datasetId={datasetId} selectedSetId={selectedSetId} onRefresh={handleRefresh} />
+              <VariableAssignment
+                key={assignmentKey}
+                datasetId={datasetId}
+                selectedSetId={selectedSetId}
+                onRefresh={handleRefresh}
+              />
             </CardContent>
           </Card>
         </div>
