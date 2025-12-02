@@ -2,7 +2,9 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { dataset, datasetVariable, datasetVariableset, datasetVariablesetItem } from "@repo/database/schema";
+import type { DatasetVariablesetItemAttributes } from "@repo/database/schema";
 import type {
+  VariableItemExport,
   VariableSetExport,
   VariableSetExportFile,
   VariableSetImportOptions,
@@ -33,6 +35,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
       setParentId: datasetVariableset.parentId,
       setOrderIndex: datasetVariableset.orderIndex,
       variableName: datasetVariable.name,
+      variableAttributes: datasetVariablesetItem.attributes,
     })
     .from(datasetVariableset)
     .leftJoin(datasetVariablesetItem, eq(datasetVariableset.id, datasetVariablesetItem.variablesetId))
@@ -62,7 +65,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
       description: string | null;
       parentId: string | null;
       orderIndex: number;
-      variables: string[];
+      variables: VariableItemExport[];
     }
   >();
 
@@ -78,7 +81,14 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
     }
 
     if (row.variableName) {
-      variableSetMap.get(row.setId)!.variables.push(row.variableName);
+      const variableItem: VariableItemExport = {
+        name: row.variableName,
+      };
+      // Only include attributes if they exist
+      if (row.variableAttributes) {
+        variableItem.attributes = row.variableAttributes as DatasetVariablesetItemAttributes;
+      }
+      variableSetMap.get(row.setId)!.variables.push(variableItem);
     }
   });
 
@@ -88,7 +98,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
     description: set.description,
     parentName: set.parentId ? parentMap.get(set.parentId) || null : null,
     orderIndex: set.orderIndex,
-    variables: set.variables.sort(), // Sort variables for consistency
+    variables: set.variables.sort((a, b) => a.name.localeCompare(b.name)), // Sort variables for consistency
   }));
 
   return {
@@ -176,19 +186,22 @@ export async function importVariableSets(
         }
 
         // Validate variables
-        const validVariableIds: string[] = [];
+        const validVariables: { id: string; attributes?: DatasetVariablesetItemAttributes }[] = [];
         const unmatchedVariables: string[] = [];
 
-        for (const variableName of importSet.variables) {
-          const variableId = variableNameToIdMap.get(variableName);
+        for (const variableItem of importSet.variables) {
+          const variableId = variableNameToIdMap.get(variableItem.name);
           if (variableId) {
-            validVariableIds.push(variableId);
+            validVariables.push({
+              id: variableId,
+              attributes: variableItem.attributes,
+            });
           } else {
-            unmatchedVariables.push(variableName);
+            unmatchedVariables.push(variableItem.name);
           }
         }
 
-        if (validVariableIds.length === 0 && importSet.variables.length > 0) {
+        if (validVariables.length === 0 && importSet.variables.length > 0) {
           result.summary.failedSets++;
           result.details.push({
             setName: importSet.name,
@@ -218,13 +231,14 @@ export async function importVariableSets(
         const createdSetId = createdSetResult[0]!.id;
         createdSetsMap.set(importSet.name, createdSetId);
 
-        // Create variable set items
-        if (validVariableIds.length > 0) {
+        // Create variable set items with attributes
+        if (validVariables.length > 0) {
           await db.insert(datasetVariablesetItem).values(
-            validVariableIds.map((variableId, index) => ({
+            validVariables.map((variable, index) => ({
               variablesetId: createdSetId,
-              variableId,
+              variableId: variable.id,
               orderIndex: index,
+              ...(variable.attributes && { attributes: variable.attributes }),
             }))
           );
         }

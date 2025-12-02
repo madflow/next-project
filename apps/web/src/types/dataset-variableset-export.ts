@@ -1,11 +1,25 @@
 import { z } from "zod";
 
+// Schema for attributes - matches datasetVariablesetItemAttributes from @repo/database/schema
+export const VariableItemAttributesExportSchema = z.object({
+  allowedStatistics: z.object({
+    distribution: z.boolean(),
+    mean: z.boolean(),
+  }),
+});
+
+// Schema for a variable item with optional attributes
+export const VariableItemExportSchema = z.object({
+  name: z.string(),
+  attributes: VariableItemAttributesExportSchema.optional(),
+});
+
 export const VariableSetExportSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   parentName: z.string().nullable(),
   orderIndex: z.number(),
-  variables: z.array(z.string()),
+  variables: z.array(VariableItemExportSchema),
 });
 
 export const VariableSetExportFileSchema = z.object({
@@ -43,6 +57,8 @@ export const VariableSetImportResultSchema = z.object({
   ),
 });
 
+export type VariableItemAttributesExport = z.infer<typeof VariableItemAttributesExportSchema>;
+export type VariableItemExport = z.infer<typeof VariableItemExportSchema>;
 export type VariableSetExport = z.infer<typeof VariableSetExportSchema>;
 export type VariableSetExportFile = z.infer<typeof VariableSetExportFileSchema>;
 export type VariableSetImportOptions = z.infer<typeof VariableSetImportOptionsSchema>;

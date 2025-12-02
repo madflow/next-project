@@ -15,6 +15,7 @@ interface VariablesetTreeProps {
   onSelectSet: (setId: string | null) => void;
   onEditSet: (variableset: DatasetVariableset) => void;
   onRefresh: () => void;
+  onDeleteSet?: (deletedSetId: string) => void;
 }
 
 interface TreeNodeProps {
@@ -24,9 +25,10 @@ interface TreeNodeProps {
   onSelectSet: (setId: string | null) => void;
   onEditSet: (variableset: DatasetVariableset) => void;
   onRefresh: () => void;
+  onDeleteSet?: (deletedSetId: string) => void;
 }
 
-function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRefresh }: TreeNodeProps) {
+function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRefresh, onDeleteSet }: TreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const hasChildren = node.children.length > 0;
   const isSelected = selectedSetId === node.id;
@@ -112,7 +114,14 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
             <span className="sr-only">{"Edit"}</span>
           </Button>
 
-          <DeleteVariablesetDialog variablesetId={node.id} variablesetName={node.name} onSuccess={onRefresh} />
+          <DeleteVariablesetDialog
+            variablesetId={node.id}
+            variablesetName={node.name}
+            onSuccess={() => {
+              onRefresh();
+              onDeleteSet?.(node.id);
+            }}
+          />
         </div>
       </div>
 
@@ -127,6 +136,7 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
               onSelectSet={onSelectSet}
               onEditSet={onEditSet}
               onRefresh={onRefresh}
+              onDeleteSet={onDeleteSet}
             />
           ))}
         </div>
@@ -142,6 +152,7 @@ export function VariablesetTree({
   onSelectSet,
   onEditSet,
   onRefresh,
+  onDeleteSet,
 }: VariablesetTreeProps) {
   const t = useTranslations("adminDatasetVariableset");
 
@@ -166,6 +177,7 @@ export function VariablesetTree({
           onSelectSet={onSelectSet}
           onEditSet={onEditSet}
           onRefresh={onRefresh}
+          onDeleteSet={onDeleteSet}
         />
       ))}
     </div>
