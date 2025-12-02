@@ -35,11 +35,12 @@ export type DatasetVariablesetWithDetails = DatasetVariableset & {
 };
 
 export type VariablesetTreeNode = {
-  id: string;
-  name: string;
+  children: VariablesetTreeNode[];
   description?: string | null;
+  id: string;
+  level: number;
+  name: string;
+  orderIndex?: number | null;
   parentId?: string | null;
   variableCount: number;
-  children: VariablesetTreeNode[];
-  level: number;
 };

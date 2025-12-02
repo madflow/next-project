@@ -141,7 +141,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         </Suspense>
       )}
       {selectedDataset && !currentSelection && (
-        <Empty className="flex w-64 max-w-128 min-w-64 flex-col gap-4">
+        <Empty className="flex w-64 max-w-lg min-w-64 flex-col gap-4">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <FolderXIcon />
