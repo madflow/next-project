@@ -151,7 +151,9 @@ export async function createDataset({
         default: columnLabel,
       };
 
-      const missingRanges = metadata.missing_ranges[columnName] ?? null;
+      // Wrap missing ranges in an object with the column name as key, matching the expected MissingRanges type
+      const rawMissingRanges = metadata.missing_ranges[columnName];
+      const missingRanges = rawMissingRanges ? { [columnName]: rawMissingRanges } : null;
 
       const insertVariable = insertDatasetVariableSchema.parse({
         name: columnName,

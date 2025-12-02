@@ -271,13 +271,29 @@ async def get_dataset_stats(
 
                     # Get missing values for split variable
                     split_variable_missing_values = split_variable_obj.missing_values  # type: ignore
-                    split_variable_missing_ranges = split_variable_obj.missing_ranges  # type: ignore
+                    # Extract split variable missing_ranges array from the object structure
+                    split_missing_ranges_raw = split_variable_obj.missing_ranges
+                    split_variable_missing_ranges = (
+                        split_missing_ranges_raw.get(split_var)
+                        if isinstance(split_missing_ranges_raw, dict)
+                        else None
+                    )
+
+                # Extract missing_ranges array from the object structure
+                # DB stores: { variableName: [{ lo, hi }, ...] }
+                # Service expects: [{ lo, hi }, ...]
+                missing_ranges_raw = dataset_variable.missing_ranges
+                missing_ranges = (
+                    missing_ranges_raw.get(var_request.variable)
+                    if isinstance(missing_ranges_raw, dict)
+                    else None
+                )
 
                 stats = stats_service.describe_var(
                     df,
                     var_request.variable,
                     missing_values=dataset_variable.missing_values,  # type: ignore
-                    missing_ranges=dataset_variable.missing_ranges,  # type: ignore
+                    missing_ranges=missing_ranges,
                     value_labels=dataset_variable.value_labels,  # type: ignore
                     split_variable=split_var,
                     split_variable_value_labels=split_variable_value_labels,
