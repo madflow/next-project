@@ -22,10 +22,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 
+const CATEGORY_OPTIONS = ["general", "multi_response", "matrix"] as const;
+
 const formSchema = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
   description: z.string().optional(),
   parentId: z.string().optional(),
+  category: z.enum(CATEGORY_OPTIONS),
 });
 
 const NO_PARENT_VALUE = "__NO_PARENT__";
@@ -58,6 +61,7 @@ export function VariablesetForm({
       name: "",
       description: "",
       parentId: NO_PARENT_VALUE,
+      category: "general",
     },
   });
 
@@ -68,12 +72,14 @@ export function VariablesetForm({
         name: variableset.name,
         description: variableset.description || "",
         parentId: variableset.parentId || NO_PARENT_VALUE,
+        category: variableset.category,
       });
     } else {
       form.reset({
         name: "",
         description: "",
         parentId: NO_PARENT_VALUE,
+        category: "general",
       });
     }
   }, [variableset, form]);
@@ -87,6 +93,7 @@ export function VariablesetForm({
           name: data.name,
           description: data.description || null,
           parentId,
+          category: data.category,
         });
         toast.success(t("form.updateSuccess"));
       } else {
@@ -96,6 +103,7 @@ export function VariablesetForm({
           parentId,
           datasetId,
           orderIndex: 0,
+          category: data.category,
         });
         toast.success(t("form.createSuccess"));
       }
@@ -105,6 +113,7 @@ export function VariablesetForm({
         name: "",
         description: "",
         parentId: NO_PARENT_VALUE,
+        category: "general",
       });
       onSuccess?.();
     } catch (error) {
@@ -119,6 +128,7 @@ export function VariablesetForm({
         name: "",
         description: "",
         parentId: NO_PARENT_VALUE,
+        category: "general",
       });
     }
     onOpenChange(newOpen);
@@ -189,7 +199,7 @@ export function VariablesetForm({
                 <FieldLabel htmlFor={field.name}>{t("form.parent")}</FieldLabel>
                 <FieldGroup>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id={field.name}>
+                    <SelectTrigger id={field.name} className="w-full">
                       <SelectValue placeholder={t("form.selectParent")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -198,6 +208,31 @@ export function VariablesetForm({
                         <SelectItem key={parent.id} value={parent.id}>
                           {"  ".repeat(parent.level)}
                           {parent.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="category"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>{t("form.category")}</FieldLabel>
+                <FieldGroup>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id={field.name} className="w-full">
+                      <SelectValue placeholder={t("form.selectCategory")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORY_OPTIONS.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
                         </SelectItem>
                       ))}
                     </SelectContent>

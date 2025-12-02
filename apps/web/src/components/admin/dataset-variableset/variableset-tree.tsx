@@ -53,6 +53,7 @@ function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRe
       orderIndex: 0,
       createdAt: new Date(),
       updatedAt: null,
+      category: node.category,
     });
   };
 
