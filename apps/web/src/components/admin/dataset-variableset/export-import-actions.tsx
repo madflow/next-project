@@ -1,11 +1,17 @@
 "use client";
 
-import { CheckCircle, Download, EllipsisVertical, Upload, XCircle } from "lucide-react";
+import { Check, Download, EllipsisVertical, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
-import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import type { VariableSetImportOptions, VariableSetImportResult } from "@/types/dataset-variableset-export";
 
 interface ExportImportActionsProps {
@@ -159,7 +166,7 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
           <div className="space-y-4">
             {!importResult && (
               <>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="file-upload">{t("importDialog.selectFile")}</Label>
                   <input
                     ref={fileInputRef}
@@ -167,18 +174,18 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
                     type="file"
                     accept=".json"
                     onChange={handleFileSelect}
-                    className="mt-1 w-full rounded-md border border-gray-300 p-2"
+                    className="border-input bg-background file:text-foreground placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
 
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="conflict-resolution">{t("importDialog.conflictResolution")}</Label>
                   <Select
                     value={conflictResolution}
                     onValueChange={(value: VariableSetImportOptions["conflictResolution"]) =>
                       setConflictResolution(value)
                     }>
-                    <SelectTrigger className="mt-1 w-full">
+                    <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -189,105 +196,113 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
                   </Select>
                 </div>
 
-                <div className="flex justify-end gap-2">
+                <DialogFooter className="gap-2 pt-2 sm:gap-0">
                   <Button variant="outline" onClick={() => setImportOpen(false)}>
                     {t("importDialog.cancel")}
                   </Button>
-                  <Button
-                    onClick={handleImport}
-                    disabled={!selectedFile || isImporting}
-                    className="flex items-center gap-2">
+                  <Button onClick={handleImport} disabled={!selectedFile || isImporting}>
                     {isImporting && (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     )}
                     {t("import")}
                   </Button>
-                </div>
+                </DialogFooter>
               </>
             )}
 
             {isImporting && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                  <span>{t("importDialog.importing")}</span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-gray-200">
-                  <div className="h-2 animate-pulse rounded-full bg-blue-600" style={{ width: "100%" }}></div>
+              <div className="flex items-center justify-center py-8">
+                <div className="flex items-center gap-3">
+                  <div className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+                  <span className="text-muted-foreground text-sm">{t("importDialog.importing")}</span>
                 </div>
               </div>
             )}
 
             {importResult && (
               <div className="space-y-4">
-                <Alert className={importResult.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                      importResult.success ? "bg-primary/10" : "bg-destructive/10"
+                    }`}>
                     {importResult.success ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <Check className="text-primary h-4 w-4" />
                     ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
+                      <X className="text-destructive h-4 w-4" />
                     )}
-                    <span className="font-medium">
+                  </div>
+                  <div>
+                    <p className="font-medium">
                       {importResult.success ? t("importDialog.importCompleted") : t("importDialog.importFailed")}
-                    </span>
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {t("importDialog.summary.totalSets")}
+                      {": "}
+                      {importResult.summary.totalSets}
+                    </p>
                   </div>
-                </Alert>
+                </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">{t("importDialog.summary.totalSets")}</span>{" "}
-                    {importResult.summary.totalSets}
+                <Separator />
+
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("importDialog.summary.created")}</span>
+                    <span className="font-medium">{importResult.summary.createdSets}</span>
                   </div>
-                  <div>
-                    <span className="font-medium text-green-600">{t("importDialog.summary.created")}</span>{" "}
-                    {importResult.summary.createdSets}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("importDialog.summary.updated")}</span>
+                    <span className="font-medium">{importResult.summary.updatedSets}</span>
                   </div>
-                  <div>
-                    <span className="font-medium text-blue-600">{t("importDialog.summary.updated")}</span>{" "}
-                    {importResult.summary.updatedSets}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("importDialog.summary.skipped")}</span>
+                    <span className="font-medium">{importResult.summary.skippedSets}</span>
                   </div>
-                  <div>
-                    <span className="font-medium text-yellow-600">{t("importDialog.summary.skipped")}</span>{" "}
-                    {importResult.summary.skippedSets}
-                  </div>
-                  <div>
-                    <span className="font-medium text-red-600">{t("importDialog.summary.failed")}</span>{" "}
-                    {importResult.summary.failedSets}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("importDialog.summary.failed")}</span>
+                    <span className="font-medium">{importResult.summary.failedSets}</span>
                   </div>
                 </div>
 
                 {importResult.warnings.length > 0 && (
-                  <div>
-                    <h4 className="mb-2 font-medium text-yellow-600">{t("importDialog.warnings")}</h4>
-                    <ul className="list-disc space-y-1 pl-4 text-sm">
-                      {importResult.warnings.map((warning, index) => (
-                        <li key={index} className="text-yellow-700">
-                          {warning}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                        {t("importDialog.warnings")}
+                      </p>
+                      <ul className="text-muted-foreground space-y-1 text-sm">
+                        {importResult.warnings.map((warning, index) => (
+                          <li key={index}>{warning}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
                 )}
 
                 {importResult.errors.length > 0 && (
-                  <div>
-                    <h4 className="mb-2 font-medium text-red-600">{t("importDialog.errors")}</h4>
-                    <ul className="list-disc space-y-1 pl-4 text-sm">
-                      {importResult.errors.map((error, index) => (
-                        <li key={index} className="text-red-700">
-                          {error}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-destructive mb-2 text-xs font-medium tracking-wide uppercase">
+                        {t("importDialog.errors")}
+                      </p>
+                      <ul className="text-muted-foreground space-y-1 text-sm">
+                        {importResult.errors.map((error, index) => (
+                          <li key={index}>{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
                 )}
 
-                <div className="flex justify-end gap-2">
+                <DialogFooter className="gap-2 pt-2 sm:gap-0">
                   <Button variant="outline" onClick={resetImport}>
                     {t("importDialog.importAnother")}
                   </Button>
                   <Button onClick={() => setImportOpen(false)}>{t("importDialog.close")}</Button>
-                </div>
+                </DialogFooter>
               </div>
             )}
           </div>
