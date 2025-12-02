@@ -104,7 +104,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
       <Card>
         <CardHeader>
           <MetricHelp metricKey="mean">
-            <CardDescription>{t("mean")}</CardDescription>
+            <CardDescription className="hyphens-auto">{t("mean")}</CardDescription>
           </MetricHelp>
           <CardTitle>{formatDecimal(variableStats?.mean)}</CardTitle>
         </CardHeader>
@@ -112,7 +112,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
       <Card>
         <CardHeader>
           <MetricHelp metricKey="stdev">
-            <CardDescription>{t("stdev")}</CardDescription>
+            <CardDescription className="hyphens-auto">{t("stdev")}</CardDescription>
           </MetricHelp>
           <CardTitle>{formatDecimal(variableStats?.std)}</CardTitle>
         </CardHeader>
