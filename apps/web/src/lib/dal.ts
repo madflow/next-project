@@ -1,5 +1,5 @@
 import "server-only";
-import { SQL, and, asc, count, desc, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
+import { SQL, and, asc, count, desc, eq, getTableColumns, ilike, or } from "drizzle-orm";
 import { AnyPgColumn, AnyPgTable } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { cache } from "react";
