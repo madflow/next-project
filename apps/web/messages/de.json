@@ -435,6 +435,7 @@
     },
     "form": {
       "cancel": "Abbrechen",
+      "category": "Kategorie",
       "create": "Erstellen",
       "createDescription": "Erstellen Sie ein neues Variablen-Set um verwandte Variablen zu gruppieren",
       "createError": "Fehler beim Erstellen des Variablen-Sets",
@@ -447,6 +448,7 @@
       "noParent": "Kein übergeordnetes Set (Hauptebene)",
       "parent": "Übergeordnetes Set",
       "saving": "Wird gespeichert...",
+      "selectCategory": "Kategorie auswählen",
       "selectParent": "Übergeordnetes Set auswählen",
       "update": "Aktualisieren",
       "updateError": "Fehler beim Aktualisieren des Variablen-Sets",

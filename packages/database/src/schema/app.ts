@@ -194,7 +194,7 @@ export const datasetVariablesetCategoryEnum = pgEnum("dataset_variableset_catego
   "matrix",
 ] as const);
 
-export type DatasetVariablesetCategory = z.infer<typeof datasetVariablesetCategoryEnum>;
+export type DatasetVariablesetCategory = (typeof datasetVariablesetCategoryEnum.enumValues)[number];
 
 export const datasetVariableset = pgTable(
   "dataset_variablesets",

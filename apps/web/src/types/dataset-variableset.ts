@@ -2,6 +2,7 @@ import {
   type CreateDatasetVariablesetData,
   type CreateDatasetVariablesetItemData,
   type DatasetVariableset,
+  type DatasetVariablesetCategory,
   type DatasetVariablesetItem,
   type UpdateDatasetVariablesetData,
   insertDatasetVariablesetItemSchema,
@@ -18,6 +19,7 @@ export {
   updateDatasetVariablesetSchema,
   // Variable set types
   type DatasetVariableset,
+  type DatasetVariablesetCategory,
   type CreateDatasetVariablesetData,
   type UpdateDatasetVariablesetData,
   // Variable set item schemas
@@ -35,6 +37,7 @@ export type DatasetVariablesetWithDetails = DatasetVariableset & {
 };
 
 export type VariablesetTreeNode = {
+  category: "general" | "multi_response" | "matrix";
   children: VariablesetTreeNode[];
   description?: string | null;
   id: string;

@@ -435,6 +435,7 @@
     },
     "form": {
       "cancel": "Cancel",
+      "category": "Category",
       "create": "Create",
       "createDescription": "Create a new variable set to group related variables",
       "createError": "Failed to create variable set",
@@ -447,6 +448,7 @@
       "noParent": "No Parent (Root Level)",
       "parent": "Parent Set",
       "saving": "Saving...",
+      "selectCategory": "Select category",
       "selectParent": "Select parent set",
       "update": "Update",
       "updateError": "Failed to update variable set",
