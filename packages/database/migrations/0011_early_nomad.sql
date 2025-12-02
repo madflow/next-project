@@ -1,0 +1,2 @@
+CREATE TYPE "public"."dataset_variableset_category" AS ENUM('general', 'multi_response', 'matrix');--> statement-breakpoint
+ALTER TABLE "dataset_variablesets" ADD COLUMN "category" "dataset_variableset_category" DEFAULT 'general' NOT NULL;
