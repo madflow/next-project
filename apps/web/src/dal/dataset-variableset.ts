@@ -45,7 +45,7 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
     .leftJoin(datasetVariablesetItem, eq(entity.id, datasetVariablesetItem.variablesetId))
     .where(eq(entity.datasetId, datasetId))
     .groupBy(entity.id, entity.name, entity.description, entity.parentId, entity.orderIndex)
-    .orderBy(entity.orderIndex, entity.name);
+    .orderBy(entity.orderIndex, entity.id);
 
   // Build hierarchy tree
   const nodeMap = new Map<string, VariablesetTreeNode>();
@@ -54,13 +54,14 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
   // First pass: create all nodes
   for (const set of variablesets) {
     const node: VariablesetTreeNode = {
-      id: set.id,
-      name: set.name,
+      children: [],
       description: set.description,
+      id: set.id,
+      level: 0,
+      name: set.name,
+      orderIndex: set.orderIndex,
       parentId: set.parentId,
       variableCount: set.variableCount,
-      children: [],
-      level: 0,
     };
     nodeMap.set(set.id, node);
   }
@@ -274,6 +275,7 @@ async function updateVariablesetItemAttributesFn(
   return updated;
 }
 
+// Exported functions with appropriate auth checks
 export const listByDataset = withSessionCheck(listByDatasetFn);
 export const getHierarchy = withSessionCheck(getHierarchyFn);
 export const find = withSessionCheck(findFn);

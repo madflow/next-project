@@ -25,6 +25,9 @@ export function useDatasetVariableColumns() {
     {
       accessorKey: "label",
       header: ({ column }) => <DataTableColumnHeader column={column} title="adminDatasetEditor.columns.label" />,
+      cell: function Cell({ row }) {
+        return <div className="whitespace-break-spaces">{row.original.label}</div>;
+      },
     },
     {
       accessorKey: "type",

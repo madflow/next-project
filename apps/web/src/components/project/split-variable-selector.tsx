@@ -70,8 +70,12 @@ export function SplitVariableSelector({
           </TooltipContent>
         </Tooltip>
         <Select value={selectedSplitVariable || "none"} onValueChange={handleValueChange}>
-          <SelectTrigger id="split-variable-select" className={compact ? "h-8 w-auto min-w-[180px]" : "h-8 flex-1"}>
-            <SelectValue placeholder={t("placeholder")}>{getSelectedLabel()}</SelectValue>
+          <SelectTrigger
+            id="split-variable-select"
+            className={compact ? "h-8 w-auto max-w-[250px] min-w-[180px]" : "h-8 flex-1"}>
+            <SelectValue placeholder={t("placeholder")}>
+              <span className="truncate">{getSelectedLabel()}</span>
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">{t("none")}</SelectItem>
