@@ -188,6 +188,14 @@ export type CreateDatasetProjectData = z.infer<typeof insertDatasetProjectSchema
 export type DatasetProject = z.infer<typeof selectDatasetProjectSchema>;
 export type UpdateDatasetProjectData = z.infer<typeof updateDatasetProjectSchema>;
 
+export const datasetVariablesetCategoryEnum = pgEnum("dataset_variableset_category", [
+  "general",
+  "multi_response",
+  "matrix",
+] as const);
+
+export type DatasetVariablesetCategory = z.infer<typeof datasetVariablesetCategoryEnum>;
+
 export const datasetVariableset = pgTable(
   "dataset_variablesets",
   {
@@ -205,6 +213,7 @@ export const datasetVariableset = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
     orderIndex: integer("order_index").notNull().default(0),
+    category: datasetVariablesetCategoryEnum().notNull().default("general"),
   },
   (table) => [
     uniqueIndex("dataset_variableset_name_dataset_idx").on(table.name, table.datasetId),
