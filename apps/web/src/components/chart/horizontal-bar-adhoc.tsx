@@ -7,10 +7,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsBarData } from "@/lib/analysis-bridge";
-import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { PERCENTAGE_CHART_DECIMALS, YAXIS_LABEL_MAX_WIDTH, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
+import { TruncatedYAxisTick } from "./truncated-yaxis-tick";
 
 type BarAdhocProps = {
   variable: DatasetVariable;
@@ -61,8 +62,8 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              fontSize={10}
-              width={200}
+              width={YAXIS_LABEL_MAX_WIDTH}
+              tick={<TruncatedYAxisTick />}
             />
             <Bar dataKey="percentage" fill="var(--color-percentage)">
               <LabelList

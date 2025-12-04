@@ -37,7 +37,7 @@ import { useAppContext } from "@/context/app-context";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { isSplitVariableStats, transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
-import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { PERCENTAGE_CHART_DECIMALS, YAXIS_LABEL_MAX_WIDTH, formatChartValue } from "@/lib/chart-constants";
 import { determineChartSelection } from "@/lib/chart-selection";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
@@ -48,6 +48,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
+import { TruncatedYAxisTick } from "./truncated-yaxis-tick";
 import { UnsupportedChartPlaceholder } from "./unsupported-chart-placeholder";
 
 type AdhocChartProps = {
@@ -262,8 +263,8 @@ export function AdhocChart({
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-                fontSize={10}
-                width={200}
+                width={YAXIS_LABEL_MAX_WIDTH}
+                tick={<TruncatedYAxisTick />}
               />
               <Bar dataKey="percentage" fill="var(--color-percentage)">
                 <LabelList
