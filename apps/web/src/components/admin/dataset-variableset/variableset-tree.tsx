@@ -1,12 +1,20 @@
 "use client";
 
-import { ChevronDown, ChevronRight, Edit, Folder, FolderOpen } from "lucide-react";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { Folder } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
-import { DeleteVariablesetDialog } from "./delete-variableset-dialog";
+import { SortableVariablesetNode } from "./sortable-variableset-node";
 
 interface VariablesetTreeProps {
   nodes: VariablesetTreeNode[];
@@ -16,6 +24,7 @@ interface VariablesetTreeProps {
   onEditSet: (variableset: DatasetVariableset) => void;
   onRefresh: () => void;
   onDeleteSet?: (deletedSetId: string) => void;
+  onReorder?: (parentId: string | null, reorderedIds: string[]) => Promise<void>;
 }
 
 interface TreeNodeProps {
@@ -26,123 +35,152 @@ interface TreeNodeProps {
   onEditSet: (variableset: DatasetVariableset) => void;
   onRefresh: () => void;
   onDeleteSet?: (deletedSetId: string) => void;
+  onReorder?: (parentId: string | null, reorderedIds: string[]) => Promise<void>;
 }
 
-function TreeNode({ node, datasetId, selectedSetId, onSelectSet, onEditSet, onRefresh, onDeleteSet }: TreeNodeProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const hasChildren = node.children.length > 0;
-  const isSelected = selectedSetId === node.id;
+interface SortableListProps {
+  nodes: VariablesetTreeNode[];
+  parentId: string | null;
+  datasetId: string;
+  selectedSetId?: string | null;
+  onSelectSet: (setId: string | null) => void;
+  onEditSet: (variableset: DatasetVariableset) => void;
+  onRefresh: () => void;
+  onDeleteSet?: (deletedSetId: string) => void;
+  onReorder?: (parentId: string | null, reorderedIds: string[]) => Promise<void>;
+}
 
-  const handleToggle = () => {
-    if (hasChildren) {
-      setIsExpanded(!isExpanded);
+function SortableList({
+  nodes,
+  parentId,
+  datasetId,
+  selectedSetId,
+  onSelectSet,
+  onEditSet,
+  onRefresh,
+  onDeleteSet,
+  onReorder,
+}: SortableListProps) {
+  const [localNodes, setLocalNodes] = useState(nodes);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  // Update local nodes when props change
+  useEffect(() => {
+    setLocalNodes(nodes);
+  }, [nodes]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // 5px movement required to start dragging
+      },
+    })
+  );
+
+  const handleDragStart = (event: DragEndEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = localNodes.findIndex((node) => node.id === active.id);
+    const newIndex = localNodes.findIndex((node) => node.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
+
+    // Optimistically update local state
+    const reorderedNodes = arrayMove(localNodes, oldIndex, newIndex);
+    setLocalNodes(reorderedNodes);
+
+    // Call the reorder callback
+    if (onReorder) {
+      try {
+        const reorderedIds = reorderedNodes.map((node) => node.id);
+        await onReorder(parentId, reorderedIds);
+      } catch {
+        // Revert on error
+        setLocalNodes(nodes);
+      }
     }
   };
 
-  const handleSelect = () => {
-    onSelectSet(node.id);
-  };
-
-  const handleEdit = () => {
-    onEditSet({
-      id: node.id,
-      name: node.name,
-      description: node.description || null,
-      parentId: node.parentId || null,
-      datasetId,
-      orderIndex: 0,
-      createdAt: new Date(),
-      updatedAt: null,
-      category: node.category,
-    });
-  };
+  const activeNode = activeId ? localNodes.find((node) => node.id === activeId) : null;
 
   return (
-    <div className="select-none">
-      <div
-        className={`group hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 ${
-          isSelected ? "bg-accent" : ""
-        }`}
-        style={{ paddingLeft: `${node.level * 20 + 8}px` }}
-        onClick={handleSelect}
-        data-testid={`admin.dataset.variableset.tree.item.${node.id}`}>
-        <div
-          className="flex h-4 w-4 items-center justify-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleToggle();
-          }}>
-          {hasChildren ? (
-            isExpanded ? (
-              <ChevronDown className="text-muted-foreground h-3 w-3" />
-            ) : (
-              <ChevronRight className="text-muted-foreground h-3 w-3" />
-            )
-          ) : (
-            <div className="h-3 w-3" />
-          )}
-        </div>
-
-        <div className="flex h-4 w-4 items-center justify-center">
-          {hasChildren && isExpanded ? (
-            <FolderOpen className="text-muted-foreground h-4 w-4" />
-          ) : (
-            <Folder className="text-muted-foreground h-4 w-4" />
-          )}
-        </div>
-
-        <span
-          className="flex-1 truncate text-sm font-medium"
-          data-testid={`admin.dataset.variableset.tree.name.${node.id}`}>
-          {node.name}
-        </span>
-
-        <Badge variant="secondary" className="text-xs">
-          {node.variableCount}
-        </Badge>
-
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit();
-            }}
-            data-testid="admin.dataset.variableset.tree.edit">
-            <Edit className="h-3 w-3" />
-            <span className="sr-only">{"Edit"}</span>
-          </Button>
-
-          <DeleteVariablesetDialog
-            variablesetId={node.id}
-            variablesetName={node.name}
-            onSuccess={() => {
-              onRefresh();
-              onDeleteSet?.(node.id);
-            }}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}>
+      <SortableContext items={localNodes.map((node) => node.id)} strategy={verticalListSortingStrategy}>
+        {localNodes.map((node) => (
+          <TreeNode
+            key={node.id}
+            node={node}
+            datasetId={datasetId}
+            selectedSetId={selectedSetId}
+            onSelectSet={onSelectSet}
+            onEditSet={onEditSet}
+            onRefresh={onRefresh}
+            onDeleteSet={onDeleteSet}
+            onReorder={onReorder}
           />
-        </div>
-      </div>
+        ))}
+      </SortableContext>
+      <DragOverlay>
+        {activeNode ? (
+          <div className="bg-background rounded-md border px-2 py-1 opacity-80 shadow-lg">
+            <span className="text-sm font-medium">{activeNode.name}</span>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
 
-      {hasChildren && isExpanded && (
-        <div>
-          {node.children.map((child) => (
-            <TreeNode
-              key={child.id}
-              node={child}
-              datasetId={datasetId}
-              selectedSetId={selectedSetId}
-              onSelectSet={onSelectSet}
-              onEditSet={onEditSet}
-              onRefresh={onRefresh}
-              onDeleteSet={onDeleteSet}
-            />
-          ))}
-        </div>
+function TreeNode({
+  node,
+  datasetId,
+  selectedSetId,
+  onSelectSet,
+  onEditSet,
+  onRefresh,
+  onDeleteSet,
+  onReorder,
+}: TreeNodeProps) {
+  const hasChildren = node.children.length > 0;
+
+  return (
+    <SortableVariablesetNode
+      node={node}
+      datasetId={datasetId}
+      selectedSetId={selectedSetId}
+      onSelectSet={onSelectSet}
+      onEditSet={onEditSet}
+      onRefresh={onRefresh}
+      onDeleteSet={onDeleteSet}>
+      {hasChildren && (
+        <SortableList
+          nodes={node.children}
+          parentId={node.id}
+          datasetId={datasetId}
+          selectedSetId={selectedSetId}
+          onSelectSet={onSelectSet}
+          onEditSet={onEditSet}
+          onRefresh={onRefresh}
+          onDeleteSet={onDeleteSet}
+          onReorder={onReorder}
+        />
       )}
-    </div>
+    </SortableVariablesetNode>
   );
 }
 
@@ -154,6 +192,7 @@ export function VariablesetTree({
   onEditSet,
   onRefresh,
   onDeleteSet,
+  onReorder,
 }: VariablesetTreeProps) {
   const t = useTranslations("adminDatasetVariableset");
 
@@ -169,18 +208,17 @@ export function VariablesetTree({
 
   return (
     <div className="space-y-1">
-      {nodes.map((node) => (
-        <TreeNode
-          key={node.id}
-          node={node}
-          datasetId={datasetId}
-          selectedSetId={selectedSetId}
-          onSelectSet={onSelectSet}
-          onEditSet={onEditSet}
-          onRefresh={onRefresh}
-          onDeleteSet={onDeleteSet}
-        />
-      ))}
+      <SortableList
+        nodes={nodes}
+        parentId={null}
+        datasetId={datasetId}
+        selectedSetId={selectedSetId}
+        onSelectSet={onSelectSet}
+        onEditSet={onEditSet}
+        onRefresh={onRefresh}
+        onDeleteSet={onDeleteSet}
+        onReorder={onReorder}
+      />
     </div>
   );
 }

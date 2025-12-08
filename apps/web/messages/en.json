@@ -455,6 +455,9 @@
       "updateSuccess": "Variable set updated successfully"
     },
     "noSets": "No variable sets found",
+    "reorder": {
+      "failed": "Failed to reorder items"
+    },
     "searchPlaceholder": "Search variable sets",
     "title": "Variable Sets",
     "tree": {
