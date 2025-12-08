@@ -68,18 +68,6 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
   const isLoading = isOrgsLoading || isSwitching;
   const displayName = activeOrganization?.name || t("organizationSwitcher.label");
 
-  if (isLoading) {
-    return (
-      <Button variant="ghost" size="sm" className="w-full justify-start" disabled>
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      </Button>
-    );
-  }
-
-  if (!organizations) {
-    return null;
-  }
-
   return (
     <>
       {activeOrganization && canCreateInvitations && (
@@ -92,14 +80,14 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild disabled={isLoading}>
+            <DropdownMenuTrigger asChild disabled={isLoading || !organizations}>
               <Button
                 variant="ghost"
                 size="sm"
                 data-testid="app.organization-switcher"
                 className={cn("w-full justify-between px-3", "hover:bg-accent hover:text-accent-foreground")}>
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}
                   <span className="max-w-[140px] truncate">{displayName}</span>
                 </div>
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
