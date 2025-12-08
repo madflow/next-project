@@ -11,6 +11,7 @@ export const VariableItemAttributesExportSchema = z.object({
 // Schema for a variable item with optional attributes
 export const VariableItemExportSchema = z.object({
   name: z.string(),
+  orderIndex: z.number(),
   attributes: VariableItemAttributesExportSchema.optional(),
 });
 

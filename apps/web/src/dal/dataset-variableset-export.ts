@@ -35,6 +35,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
       setParentId: datasetVariableset.parentId,
       setOrderIndex: datasetVariableset.orderIndex,
       variableName: datasetVariable.name,
+      variableOrderIndex: datasetVariablesetItem.orderIndex,
       variableAttributes: datasetVariablesetItem.attributes,
     })
     .from(datasetVariableset)
@@ -80,9 +81,10 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
       });
     }
 
-    if (row.variableName) {
+    if (row.variableName && row.variableOrderIndex !== null) {
       const variableItem: VariableItemExport = {
         name: row.variableName,
+        orderIndex: row.variableOrderIndex,
       };
       // Only include attributes if they exist
       if (row.variableAttributes) {
@@ -98,7 +100,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
     description: set.description,
     parentName: set.parentId ? parentMap.get(set.parentId) || null : null,
     orderIndex: set.orderIndex,
-    variables: set.variables.sort((a, b) => a.name.localeCompare(b.name)), // Sort variables for consistency
+    variables: set.variables.sort((a, b) => a.orderIndex - b.orderIndex), // Sort variables by orderIndex
   }));
 
   return {
@@ -106,7 +108,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
       datasetId: datasetInfo.id,
       datasetName: datasetInfo.name,
       exportedAt: new Date().toISOString(),
-      version: "1.0",
+      version: "2.0",
     },
     variableSets,
   };
@@ -186,7 +188,7 @@ export async function importVariableSets(
         }
 
         // Validate variables
-        const validVariables: { id: string; attributes?: DatasetVariablesetItemAttributes }[] = [];
+        const validVariables: { id: string; orderIndex: number; attributes?: DatasetVariablesetItemAttributes }[] = [];
         const unmatchedVariables: string[] = [];
 
         for (const variableItem of importSet.variables) {
@@ -194,6 +196,7 @@ export async function importVariableSets(
           if (variableId) {
             validVariables.push({
               id: variableId,
+              orderIndex: variableItem.orderIndex,
               attributes: variableItem.attributes,
             });
           } else {
@@ -234,10 +237,10 @@ export async function importVariableSets(
         // Create variable set items with attributes
         if (validVariables.length > 0) {
           await db.insert(datasetVariablesetItem).values(
-            validVariables.map((variable, index) => ({
+            validVariables.map((variable) => ({
               variablesetId: createdSetId,
               variableId: variable.id,
-              orderIndex: index,
+              orderIndex: variable.orderIndex,
               ...(variable.attributes && { attributes: variable.attributes }),
             }))
           );
