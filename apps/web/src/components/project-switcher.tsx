@@ -45,22 +45,18 @@ export function ProjectSwitcher({ activeProject, organizationId, onSelect }: Pro
 
   const displayName = activeProject?.name || t("projectSwitcher.label");
 
-  if (isProjectsLoading) {
-    return null;
-  }
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild disabled={projects.length === 0}>
+          <DropdownMenuTrigger asChild disabled={projects.length === 0 || isProjectsLoading}>
             <Button
               variant="ghost"
               data-testid="app.project-switcher"
               size="sm"
               className={cn("w-full justify-between px-3", "hover:bg-accent hover:text-accent-foreground")}>
               <div className="flex items-center gap-2">
-                <Folder className="h-4 w-4" />
+                {isProjectsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Folder className="h-4 w-4" />}
                 <span className="max-w-[140px] truncate">{displayName}</span>
               </div>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
