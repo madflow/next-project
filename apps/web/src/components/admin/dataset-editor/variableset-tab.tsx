@@ -108,7 +108,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
             <CardHeader>
               <CardTitle>{t("editTitle")}</CardTitle>
               <CardDescription>{t("editDescription")}</CardDescription>
-              <CardAction>
+              <CardAction className="mt-2 flex items-center space-x-2">
                 <Button
                   onClick={handleCreateSet}
                   data-testid="admin.dataset.variableset.create"
