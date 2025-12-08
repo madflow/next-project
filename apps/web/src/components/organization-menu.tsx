@@ -102,7 +102,7 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
               <div className="text-muted-foreground px-2 py-1.5 text-sm font-medium">
                 {t("organizationSwitcher.switch")}
               </div>
-              {organizations?.length > 0 ? (
+              {organizations && organizations.length > 0 ? (
                 organizations.map((org) => (
                   <DropdownMenuItem
                     key={org.id}
