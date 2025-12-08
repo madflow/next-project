@@ -164,6 +164,7 @@ export function VariablesetForm({
                     id={field.name}
                     placeholder={t("form.namePlaceholder")}
                     aria-invalid={fieldState.invalid}
+                    data-testid="admin.dataset.variableset.form.name"
                   />
                 </FieldGroup>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -184,6 +185,7 @@ export function VariablesetForm({
                     placeholder={t("form.descriptionPlaceholder")}
                     rows={3}
                     aria-invalid={fieldState.invalid}
+                    data-testid="admin.dataset.variableset.form.description"
                   />
                 </FieldGroup>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -199,7 +201,10 @@ export function VariablesetForm({
                 <FieldLabel htmlFor={field.name}>{t("form.parent")}</FieldLabel>
                 <FieldGroup>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id={field.name} className="w-full">
+                    <SelectTrigger
+                      id={field.name}
+                      className="w-full"
+                      data-testid="admin.dataset.variableset.form.parent">
                       <SelectValue placeholder={t("form.selectParent")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -226,7 +231,10 @@ export function VariablesetForm({
                 <FieldLabel htmlFor={field.name}>{t("form.category")}</FieldLabel>
                 <FieldGroup>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id={field.name} className="w-full">
+                    <SelectTrigger
+                      id={field.name}
+                      className="w-full"
+                      data-testid="admin.dataset.variableset.form.category">
                       <SelectValue placeholder={t("form.selectCategory")} />
                     </SelectTrigger>
                     <SelectContent>
