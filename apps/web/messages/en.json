@@ -760,6 +760,9 @@
       "title": "Standard Deviation"
     }
   },
+  "multiResponseChart": {
+    "title": "{name} - Multi Response"
+  },
   "navUser": {
     "account": "Account",
     "error": {

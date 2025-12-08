@@ -163,3 +163,63 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
 
   return rechartsData;
 }
+
+// Transform multiple variables into multi-response chart data
+// Extracts only value=1 percentages from each variable
+export function transformToMultiResponseData(
+  variables: Array<DatasetVariable & { orderIndex?: number | null }>,
+  statsData: Record<string, StatsResponse>
+) {
+  const rechartsData = variables
+    .map((variable) => {
+      const stats = statsData[variable.name];
+      if (!stats || stats.length === 0) {
+        return null;
+      }
+
+      const targetVariable = stats[0];
+      if (!targetVariable) {
+        return null;
+      }
+
+      // Handle split variable stats - we don't support this for multi-response
+      if (isSplitVariableStats(targetVariable.stats)) {
+        return null;
+      }
+
+      const variableStats = targetVariable.stats as VariableStats;
+      if (!variableStats.frequency_table) {
+        return null;
+      }
+
+      // Find the frequency item where value equals 1
+      // Handle various formats: 1, "1", 1.0, "1.0", etc.
+      const valueOneItem = variableStats.frequency_table.find((item) => {
+        const itemValue = item.value;
+        // Direct comparison
+        if (itemValue === 1 || itemValue === "1") return true;
+        // String comparison
+        const strValue = itemValue.toString();
+        if (strValue === "1" || strValue === "1.0") return true;
+        // Parse as float and compare
+        const numValue = parseFloat(strValue);
+        return !isNaN(numValue) && numValue === 1;
+      });
+
+      const percentage = valueOneItem ? valueOneItem.percentages : 0;
+      const count = valueOneItem ? valueOneItem.counts : 0;
+
+      return {
+        label: variable.label || variable.name,
+        variableName: variable.name,
+        percentage: Math.round(percentage * 100) / 100, // Round to 2 decimal places
+        count: count,
+        orderIndex: variable.orderIndex ?? 0,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null)
+    // Sort by orderIndex ascending (lowest first)
+    .sort((a, b) => a.orderIndex - b.orderIndex);
+
+  return rechartsData;
+}
