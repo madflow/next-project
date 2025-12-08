@@ -45,8 +45,8 @@ test.describe("Admin Dataset Variable Sets", () => {
     await page.getByTestId("admin.dataset.variableset.create").click();
 
     // Fill in the form
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
-    await page.getByRole("textbox", { name: /description/i }).fill(setDescription);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.description").fill(setDescription);
 
     // Submit the form
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
@@ -63,7 +63,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create parent set first
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(parentSetName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(parentSetName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: parentSetName })
@@ -71,10 +71,10 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create child set with parent
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(childSetName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(childSetName);
 
     // Select parent from dropdown
-    await page.getByRole("combobox").click();
+    await page.getByTestId("admin.dataset.variableset.form.parent").click();
     await page.getByRole("option", { name: parentSetName }).click();
 
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
@@ -95,7 +95,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a set first
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(originalSetName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(originalSetName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: originalSetName })
@@ -105,9 +105,9 @@ test.describe("Admin Dataset Variable Sets", () => {
     await page.getByTestId("admin.dataset.variableset.tree.edit").first().click();
 
     // Update the name and description
-    await page.getByRole("textbox", { name: /name/i }).clear();
-    await page.getByRole("textbox", { name: /name/i }).fill(updatedSetName);
-    await page.getByRole("textbox", { name: /description/i }).fill(updatedDescription);
+    await page.getByTestId("admin.dataset.variableset.form.name").clear();
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(updatedSetName);
+    await page.getByTestId("admin.dataset.variableset.form.description").fill(updatedDescription);
 
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
 
@@ -125,7 +125,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a variable set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
@@ -150,7 +150,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a variable set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
@@ -180,7 +180,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a variable set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
@@ -203,7 +203,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Start creating a set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
 
     // Cancel the form
     await page.getByTestId("admin.dataset.variableset.form.cancel").click();
@@ -219,7 +219,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a variable set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
@@ -243,7 +243,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create root set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(rootSetName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(rootSetName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: rootSetName })
@@ -251,8 +251,8 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create first child set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(childSet1Name);
-    await page.getByRole("combobox").click();
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(childSet1Name);
+    await page.getByTestId("admin.dataset.variableset.form.parent").click();
     await page.getByRole("option", { name: rootSetName }).click();
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
@@ -261,8 +261,8 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create second child set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(childSet2Name);
-    await page.getByRole("combobox").click();
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(childSet2Name);
+    await page.getByTestId("admin.dataset.variableset.form.parent").click();
     await page.getByRole("option", { name: rootSetName }).click();
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
@@ -271,8 +271,8 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create grandchild set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(grandchildSetName);
-    await page.getByRole("combobox").click();
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(grandchildSetName);
+    await page.getByTestId("admin.dataset.variableset.form.parent").click();
     await page.getByRole("option", { name: childSet1Name }).click();
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
@@ -310,7 +310,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a variable set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
@@ -357,7 +357,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a variable set and assign some variables to it
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
@@ -423,7 +423,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a variable set
     await page.getByTestId("admin.dataset.variableset.create").click();
-    await page.getByRole("textbox", { name: /name/i }).fill(setName);
+    await page.getByTestId("admin.dataset.variableset.form.name").fill(setName);
     await page.getByTestId("admin.dataset.variableset.form.submit").click();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
