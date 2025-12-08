@@ -760,6 +760,9 @@
       "title": "Standardabweichung"
     }
   },
+  "multiResponseChart": {
+    "title": "{name} - Mehrfachantworten"
+  },
   "navUser": {
     "account": "Konto",
     "error": {

@@ -5,6 +5,7 @@ import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
 import { AdhocChart } from "./adhoc-chart";
+import { MultiResponseChart } from "./multi-response-chart";
 
 type MultiVariableChartsProps = {
   variables: DatasetVariableWithAttributes[];
@@ -86,9 +87,23 @@ export function MultiVariableCharts({
     );
   }
 
+  const isMultiResponse = variableset?.category === "multi_response";
+
   return (
     <div className="flex flex-col gap-4">
-      {variableset && (
+      {/* Multi-response aggregate chart FIRST */}
+      {isMultiResponse && (
+        <MultiResponseChart
+          variables={variables}
+          statsData={statsData}
+          variablesetName={variableset.name}
+          variablesetDescription={variableset.description}
+          className="w-[600px]"
+        />
+      )}
+
+      {/* Variableset header for non-multi-response sets */}
+      {variableset && !isMultiResponse && (
         <div className="mb-4">
           <h2 className="text-xl font-semibold">{variableset.name}</h2>
           {variableset.description && <p className="text-muted-foreground mt-1 text-sm">{variableset.description}</p>}
