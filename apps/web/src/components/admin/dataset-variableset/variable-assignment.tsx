@@ -74,7 +74,8 @@ function SortableVariableItem({ variable, selectedSetId, onRemove, onRefresh, is
         {...attributes}
         {...listeners}
         className="text-muted-foreground mt-0.5 flex h-6 w-4 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100 active:cursor-grabbing"
-        onClick={(e) => e.stopPropagation()}>
+        onClick={(e) => e.stopPropagation()}
+        data-testid="admin.dataset.variableset.variable.drag-handle">
         <GripVertical className="h-3 w-3" />
       </div>
       <Button
