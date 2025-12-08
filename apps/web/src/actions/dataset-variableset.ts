@@ -10,6 +10,8 @@ import {
   create,
   remove,
   removeVariableFromSet,
+  reorderVariablesetItems,
+  reorderVariablesets,
   update,
   updateVariablesetItemAttributes as updateVariablesetItemAttributesDal,
 } from "@/dal/dataset-variableset";
@@ -59,4 +61,24 @@ export async function updateVariablesetItemAttributes(
   }
 
   return updated;
+}
+
+export async function reorderVariablesetsAction(datasetId: string, parentId: string | null, reorderedIds: string[]) {
+  const result = await reorderVariablesets(datasetId, parentId, reorderedIds);
+
+  if (!result || !result.success) {
+    throw new ServerActionFailureException("Failed to reorder variablesets");
+  }
+
+  return result;
+}
+
+export async function reorderVariablesetItemsAction(variablesetId: string, reorderedVariableIds: string[]) {
+  const result = await reorderVariablesetItems(variablesetId, reorderedVariableIds);
+
+  if (!result || !result.success) {
+    throw new ServerActionFailureException("Failed to reorder variableset items");
+  }
+
+  return result;
 }

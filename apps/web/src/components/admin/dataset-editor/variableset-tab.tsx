@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
+import { reorderVariablesetsAction } from "@/actions/dataset-variableset";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQueryApi } from "@/hooks/use-query-api";
@@ -67,6 +69,18 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
     setAssignmentKey((prev) => prev + 1);
   };
 
+  const handleReorder = async (parentId: string | null, reorderedIds: string[]) => {
+    try {
+      await reorderVariablesetsAction(datasetId, parentId, reorderedIds);
+      // Optionally refetch to ensure consistency
+      await refetch();
+    } catch (error) {
+      console.error("Failed to reorder variablesets:", error);
+      toast.error(t("reorder.failed"));
+      throw error; // Re-throw to trigger optimistic update revert
+    }
+  };
+
   // Flatten hierarchy for parent selection
   const flattenHierarchy = (nodes: VariablesetTreeNode[]): VariablesetTreeNode[] => {
     const result: VariablesetTreeNode[] = [];
@@ -118,6 +132,7 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
                   onEditSet={handleEditSet}
                   onRefresh={handleRefresh}
                   onDeleteSet={handleDeleteSet}
+                  onReorder={handleReorder}
                 />
               )}
             </CardContent>

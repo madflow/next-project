@@ -277,6 +277,72 @@ async function updateVariablesetItemAttributesFn(
   return updated;
 }
 
+async function reorderVariablesetsFn(datasetId: string, parentId: string | null, reorderedIds: string[]) {
+  // Verify all IDs belong to the dataset and have the same parent
+  const variablesets = await db
+    .select()
+    .from(entity)
+    .where(and(eq(entity.datasetId, datasetId), parentId ? eq(entity.parentId, parentId) : isNull(entity.parentId)));
+
+  const existingIds = new Set(variablesets.map((v) => v.id));
+  const invalidIds = reorderedIds.filter((id) => !existingIds.has(id));
+
+  if (invalidIds.length > 0) {
+    throw new DalException("Some variablesets do not belong to the specified parent");
+  }
+
+  // Update order indexes in a transaction
+  await db.transaction(async (tx) => {
+    for (let i = 0; i < reorderedIds.length; i++) {
+      const id = reorderedIds[i];
+      if (!id) continue;
+      await tx
+        .update(entity)
+        .set({
+          orderIndex: i,
+          updatedAt: new Date(),
+        })
+        .where(eq(entity.id, id));
+    }
+  });
+
+  return { success: true };
+}
+
+async function reorderVariablesetItemsFn(variablesetId: string, reorderedVariableIds: string[]) {
+  // Verify all variable IDs are in the variableset
+  const items = await db
+    .select()
+    .from(datasetVariablesetItem)
+    .where(eq(datasetVariablesetItem.variablesetId, variablesetId));
+
+  const existingIds = new Set(items.map((item) => item.variableId));
+  const invalidIds = reorderedVariableIds.filter((id) => !existingIds.has(id));
+
+  if (invalidIds.length > 0) {
+    throw new DalException("Some variables do not belong to the specified variableset");
+  }
+
+  // Update order indexes in a transaction
+  await db.transaction(async (tx) => {
+    for (let i = 0; i < reorderedVariableIds.length; i++) {
+      const variableId = reorderedVariableIds[i];
+      if (!variableId) continue;
+      await tx
+        .update(datasetVariablesetItem)
+        .set({ orderIndex: i })
+        .where(
+          and(
+            eq(datasetVariablesetItem.variablesetId, variablesetId),
+            eq(datasetVariablesetItem.variableId, variableId)
+          )
+        );
+    }
+  });
+
+  return { success: true };
+}
+
 // Exported functions with appropriate auth checks
 export const listByDataset = withSessionCheck(listByDatasetFn);
 export const getHierarchy = withSessionCheck(getHierarchyFn);
@@ -289,3 +355,5 @@ export const getUnassignedVariables = withSessionCheck(getUnassignedVariablesFn)
 export const addVariableToSet = withAdminCheck(addVariableToSetFn);
 export const removeVariableFromSet = withAdminCheck(removeVariableFromSetFn);
 export const updateVariablesetItemAttributes = withAdminCheck(updateVariablesetItemAttributesFn);
+export const reorderVariablesets = withAdminCheck(reorderVariablesetsFn);
+export const reorderVariablesetItems = withAdminCheck(reorderVariablesetItemsFn);

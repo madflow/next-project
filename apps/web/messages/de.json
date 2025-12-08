@@ -455,6 +455,9 @@
       "updateSuccess": "Variablen-Set erfolgreich aktualisiert"
     },
     "noSets": "Keine Variablen-Sets gefunden",
+    "reorder": {
+      "failed": "Fehler beim Neuordnen der Elemente"
+    },
     "searchPlaceholder": "Variablen-Sets suchen",
     "title": "Variablen-Sets",
     "tree": {
