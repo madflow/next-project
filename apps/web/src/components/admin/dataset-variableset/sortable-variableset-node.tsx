@@ -82,7 +82,8 @@ export function SortableVariablesetNode({
           {...attributes}
           {...listeners}
           className="text-muted-foreground flex h-4 w-4 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100 active:cursor-grabbing"
-          onClick={(e) => e.stopPropagation()}>
+          onClick={(e) => e.stopPropagation()}
+          data-testid="admin.dataset.variableset.tree.drag-handle">
           <GripVertical className="h-3 w-3" />
         </div>
 
