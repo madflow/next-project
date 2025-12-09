@@ -41,7 +41,7 @@ export function MultiResponseChart({
   const chartData = transformToMultiResponseData(variables, statsData, countedValue);
 
   return (
-    <Card className="shadow-xs" {...props}>
+    <Card className="shadow-xs" data-testid="multi-response-chart" {...props}>
       <CardHeader>
         <CardTitle>{variablesetName}</CardTitle>
         {variablesetDescription && <p className="text-muted-foreground mt-1 text-sm">{variablesetDescription}</p>}

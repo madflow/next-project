@@ -138,7 +138,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
     }
 
     return (
-      <Card className="shadow-xs" {...props}>
+      <Card className="shadow-xs" data-testid="mean-chart" {...props}>
         <CardHeader>
           <CardTitle>{variable.label ?? variable.name}</CardTitle>
           {getSplitVariableDescription(variable, stats) && (
