@@ -2,6 +2,22 @@ import { matchesCountedValue } from "@/lib/multi-response-utils";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
 
+// Helper function to sort categories in ascending order (numeric if possible, otherwise alphabetic)
+function sortCategoriesAscending(categories: string[]): string[] {
+  return [...categories].sort((a, b) => {
+    try {
+      const numA = parseFloat(a);
+      const numB = parseFloat(b);
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return numA - numB; // Numeric sort
+      }
+    } catch {
+      // Fall back to string sort
+    }
+    return a.localeCompare(b); // String sort
+  });
+}
+
 // Helper function to check if stats data is split variable format
 export function isSplitVariableStats(stats: unknown): stats is {
   split_variable: string;
@@ -118,18 +134,7 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
 
   // Get categories and sort them in ascending order
   const categories = Object.keys(splitStats.categories);
-  const sortedCategories = categories.sort((a, b) => {
-    try {
-      const numA = parseFloat(a);
-      const numB = parseFloat(b);
-      if (!isNaN(numA) && !isNaN(numB)) {
-        return numA - numB; // Numeric sort
-      }
-    } catch {
-      // Fall back to string sort
-    }
-    return a.localeCompare(b); // String sort
-  });
+  const sortedCategories = sortCategoriesAscending(categories);
 
   // Create a separate bar for each split category
   const rechartsData = sortedCategories
@@ -270,18 +275,7 @@ export function transformToMultiResponseIndividualStackedBarData(
 
   // Get categories and sort them in ascending order
   const categories = Object.keys(splitStats.categories);
-  const sortedCategories = categories.sort((a, b) => {
-    try {
-      const numA = parseFloat(a);
-      const numB = parseFloat(b);
-      if (!isNaN(numA) && !isNaN(numB)) {
-        return numA - numB; // Numeric sort
-      }
-    } catch {
-      // Fall back to string sort
-    }
-    return a.localeCompare(b); // String sort
-  });
+  const sortedCategories = sortCategoriesAscending(categories);
 
   // For each split category, extract only the countedValue
   const rechartsData = sortedCategories
@@ -290,10 +284,7 @@ export function transformToMultiResponseIndividualStackedBarData(
       if (!categoryStats?.frequency_table) return null;
 
       // Find the counted value in this category's frequency table
-      const valueItem = categoryStats.frequency_table.find((item) => {
-        const itemNum = typeof item.value === "number" ? item.value : parseFloat(item.value.toString());
-        return !isNaN(itemNum) && itemNum === countedValue;
-      });
+      const valueItem = categoryStats.frequency_table.find((item) => matchesCountedValue(item.value, countedValue));
 
       const categoryLabel = splitVariableLabels[category] || category;
 

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
-import { loginUser, sleep } from "../utils";
+import { loginUser } from "../utils";
 
 test.describe("Admin Dataset Missing Ranges Import", () => {
   test("should import missing ranges from SPSS file during dataset upload", async ({ page }) => {

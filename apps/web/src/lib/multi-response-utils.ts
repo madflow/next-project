@@ -6,7 +6,7 @@ import type { DatasetVariablesetAttributes } from "@repo/database/schema";
  * @returns The counted value to use for multi-response analysis (defaults to 1)
  */
 export function parseCountedValue(attributes?: DatasetVariablesetAttributes | null): number {
-  return attributes?.multiResponse?.countedValue ? parseFloat(attributes.multiResponse.countedValue) : 1;
+  return attributes?.multiResponse?.countedValue ?? 1;
 }
 
 /**
