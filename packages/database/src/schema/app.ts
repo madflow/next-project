@@ -196,6 +196,15 @@ export const datasetVariablesetCategoryEnum = pgEnum("dataset_variableset_catego
 
 export type DatasetVariablesetCategory = (typeof datasetVariablesetCategoryEnum.enumValues)[number];
 
+export const datasetVariablesetAttributes = z.object({
+  multi_response: z
+    .object({
+      type: z.enum(["dichotomies", "categories"]),
+      countValue: z.string(),
+    })
+    .optional(),
+});
+
 export const datasetVariableset = pgTable(
   "dataset_variablesets",
   {
@@ -214,6 +223,7 @@ export const datasetVariableset = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }),
     orderIndex: integer("order_index").notNull().default(0),
     category: datasetVariablesetCategoryEnum().notNull().default("general"),
+    attributes: jsonb("attributes").$type<z.infer<typeof datasetVariablesetAttributes>>(),
   },
   (table) => [
     uniqueIndex("dataset_variableset_name_dataset_idx").on(table.name, table.datasetId),
