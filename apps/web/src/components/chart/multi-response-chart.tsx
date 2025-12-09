@@ -17,6 +17,7 @@ type MultiResponseChartProps = {
   statsData: Record<string, StatsResponse>;
   variablesetName: string;
   variablesetDescription?: string | null;
+  countedValue?: number;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function MultiResponseChart({
@@ -24,6 +25,7 @@ export function MultiResponseChart({
   statsData,
   variablesetName,
   variablesetDescription,
+  countedValue = 1,
   ...props
 }: MultiResponseChartProps) {
   const t = useTranslations("chartMetricsCard");
@@ -36,7 +38,7 @@ export function MultiResponseChart({
     },
   } satisfies ChartConfig;
 
-  const chartData = transformToMultiResponseData(variables, statsData);
+  const chartData = transformToMultiResponseData(variables, statsData, countedValue);
 
   return (
     <Card className="shadow-xs" {...props}>

@@ -165,10 +165,12 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
 }
 
 // Transform multiple variables into multi-response chart data
-// Extracts only value=1 percentages from each variable
+// Extracts only value={countedValue} percentages from each variable
+// For split variable stats, aggregates across all categories to get overall percentage
 export function transformToMultiResponseData(
   variables: Array<DatasetVariable & { orderIndex?: number | null }>,
-  statsData: Record<string, StatsResponse>
+  statsData: Record<string, StatsResponse>,
+  countedValue: number = 1
 ) {
   const rechartsData = variables
     .map((variable) => {
@@ -182,9 +184,42 @@ export function transformToMultiResponseData(
         return null;
       }
 
-      // Handle split variable stats - we don't support this for multi-response
+      // Handle split variable stats - aggregate across all split categories
       if (isSplitVariableStats(targetVariable.stats)) {
-        return null;
+        const splitStats = targetVariable.stats;
+        let totalCount = 0;
+        let totalCountedValueCount = 0;
+
+        // Iterate through all split categories and aggregate
+        Object.values(splitStats.categories).forEach((categoryStats) => {
+          if (categoryStats.frequency_table) {
+            // Find the counted value in this category
+            const valueItem = categoryStats.frequency_table.find((item) => {
+              const itemNum = typeof item.value === "number" ? item.value : parseFloat(item.value.toString());
+              return !isNaN(itemNum) && itemNum === countedValue;
+            });
+
+            if (valueItem) {
+              totalCountedValueCount += valueItem.counts;
+            }
+
+            // Sum all counts in this category to get total
+            categoryStats.frequency_table.forEach((item) => {
+              totalCount += item.counts;
+            });
+          }
+        });
+
+        // Calculate overall percentage
+        const percentage = totalCount > 0 ? (totalCountedValueCount / totalCount) * 100 : 0;
+
+        return {
+          label: variable.label || variable.name,
+          variableName: variable.name,
+          percentage: Math.round(percentage * 100) / 100, // Round to 2 decimal places
+          count: totalCountedValueCount,
+          orderIndex: variable.orderIndex ?? 0,
+        };
       }
 
       const variableStats = targetVariable.stats as VariableStats;
@@ -192,22 +227,20 @@ export function transformToMultiResponseData(
         return null;
       }
 
-      // Find the frequency item where value equals 1
-      // Handle various formats: 1, "1", 1.0, "1.0", etc.
-      const valueOneItem = variableStats.frequency_table.find((item) => {
+      // Find the frequency item where value equals the configured counted value
+      // Handle both integer and float formats (e.g., 1 matches both "1" and "1.0")
+      const valueItem = variableStats.frequency_table.find((item) => {
         const itemValue = item.value;
-        // Direct comparison
-        if (itemValue === 1 || itemValue === "1") return true;
-        // String comparison
-        const strValue = itemValue.toString();
-        if (strValue === "1" || strValue === "1.0") return true;
-        // Parse as float and compare
-        const numValue = parseFloat(strValue);
-        return !isNaN(numValue) && numValue === 1;
+
+        // Parse item value as number
+        const itemNum = typeof itemValue === "number" ? itemValue : parseFloat(itemValue.toString());
+
+        // Compare numerically
+        return !isNaN(itemNum) && itemNum === countedValue;
       });
 
-      const percentage = valueOneItem ? valueOneItem.percentages : 0;
-      const count = valueOneItem ? valueOneItem.counts : 0;
+      const percentage = valueItem ? valueItem.percentages : 0;
+      const count = valueItem ? valueItem.counts : 0;
 
       return {
         label: variable.label || variable.name,
@@ -220,6 +253,105 @@ export function transformToMultiResponseData(
     .filter((item): item is NonNullable<typeof item> => item !== null)
     // Sort by orderIndex ascending (lowest first)
     .sort((a, b) => a.orderIndex - b.orderIndex);
+
+  return rechartsData;
+}
+
+// Helper function to find counted value in frequency table
+function findCountedValueInFrequencyTable(
+  variableConfig: DatasetVariable,
+  statsData: StatsResponse,
+  countedValue: number
+) {
+  const stats = extractVariableStats(variableConfig, statsData);
+  if (!stats || !stats.frequency_table) {
+    return null;
+  }
+
+  return stats.frequency_table.find((item) => {
+    const itemNum = typeof item.value === "number" ? item.value : parseFloat(item.value.toString());
+    return !isNaN(itemNum) && itemNum === countedValue;
+  });
+}
+
+// Transform single multi-response variable to show only countedValue
+export function transformToMultiResponseIndividualBarData(
+  variableConfig: DatasetVariable,
+  statsData: StatsResponse,
+  countedValue: number = 1
+) {
+  const valueItem = findCountedValueInFrequencyTable(variableConfig, statsData, countedValue);
+
+  // Return 0% bar if value not found
+  return [
+    {
+      label: "", // Empty label - we don't show the value label
+      value: countedValue,
+      count: valueItem ? valueItem.counts : 0,
+      percentage: valueItem ? valueItem.percentages : 0,
+    },
+  ];
+}
+
+// Transform multi-response variable with split variable (stacked bars)
+export function transformToMultiResponseIndividualStackedBarData(
+  variableConfig: DatasetVariable,
+  statsData: StatsResponse,
+  countedValue: number = 1
+) {
+  const targetVariable = statsData.find((item) => item.variable === variableConfig.name);
+  if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
+    return [];
+  }
+
+  const splitStats = targetVariable.stats;
+  const splitVariableLabels = splitStats.split_variable_labels || {};
+
+  // Get categories and sort them in ascending order
+  const categories = Object.keys(splitStats.categories);
+  const sortedCategories = categories.sort((a, b) => {
+    try {
+      const numA = parseFloat(a);
+      const numB = parseFloat(b);
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return numA - numB; // Numeric sort
+      }
+    } catch {
+      // Fall back to string sort
+    }
+    return a.localeCompare(b); // String sort
+  });
+
+  // For each split category, extract only the countedValue
+  const rechartsData = sortedCategories
+    .map((category, categoryIndex) => {
+      const categoryStats = splitStats.categories[category];
+      if (!categoryStats?.frequency_table) return null;
+
+      // Find the counted value in this category's frequency table
+      const valueItem = categoryStats.frequency_table.find((item) => {
+        const itemNum = typeof item.value === "number" ? item.value : parseFloat(item.value.toString());
+        return !isNaN(itemNum) && itemNum === countedValue;
+      });
+
+      const categoryLabel = splitVariableLabels[category] || category;
+
+      return {
+        category: categoryLabel,
+        categoryKey: category,
+        categoryIndex: categoryIndex,
+        segments: [
+          {
+            segment: "counted",
+            value: valueItem ? valueItem.percentages : 0,
+            label: "\u200B", // Zero-width space - don't show value label but avoid fallback to dataKey
+            count: valueItem ? valueItem.counts : 0,
+            color: `hsl(var(--chart-1))`, // Single color
+          },
+        ],
+      };
+    })
+    .filter(Boolean);
 
   return rechartsData;
 }

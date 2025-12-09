@@ -436,6 +436,8 @@
     "form": {
       "cancel": "Abbrechen",
       "category": "Kategorie",
+      "countedValue": "Gezählter Wert",
+      "countedValueHelp": "Der numerische Wert, der 'ausgewählt' in Ihren Daten darstellt",
       "create": "Erstellen",
       "createDescription": "Erstellen Sie ein neues Variablen-Set um verwandte Variablen zu gruppieren",
       "createError": "Fehler beim Erstellen des Variablen-Sets",

@@ -46,4 +46,5 @@ export type VariablesetTreeNode = {
   orderIndex?: number | null;
   parentId?: string | null;
   variableCount: number;
+  attributes?: DatasetVariableset["attributes"];
 };

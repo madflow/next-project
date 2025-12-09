@@ -36,7 +36,12 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAppContext } from "@/context/app-context";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
-import { isSplitVariableStats, transformToRechartsBarData, transformToRechartsPieData } from "@/lib/analysis-bridge";
+import {
+  isSplitVariableStats,
+  transformToMultiResponseIndividualBarData,
+  transformToRechartsBarData,
+  transformToRechartsPieData,
+} from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { determineChartSelection } from "@/lib/chart-selection";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
@@ -56,6 +61,8 @@ type AdhocChartProps = {
   datasetId?: string;
   selectedSplitVariable?: string | null;
   onSplitVariableChangeAction?: (splitVariable: string | null) => void;
+  isMultiResponseIndividual?: boolean;
+  countedValue?: number;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export function AdhocChart({
@@ -64,6 +71,8 @@ export function AdhocChart({
   datasetId,
   selectedSplitVariable,
   onSplitVariableChangeAction,
+  isMultiResponseIndividual = false,
+  countedValue = 1,
   ...props
 }: AdhocChartProps) {
   const t = useTranslations("projectAdhocAnalysis");
@@ -117,8 +126,9 @@ export function AdhocChart({
       stats,
       hasSplitVariable,
       attributes: variable.attributes,
+      isMultiResponseIndividual,
     });
-  }, [variable, stats]);
+  }, [variable, stats, isMultiResponseIndividual]);
 
   // Derive the selected chart type based on chart selection
   const selectedChartType = useMemo(() => {
@@ -130,10 +140,11 @@ export function AdhocChart({
       stats,
       hasSplitVariable,
       attributes: variable.attributes,
+      isMultiResponseIndividual,
     });
 
     return newChartSelection.defaultChartType;
-  }, [variable, stats]);
+  }, [variable, stats, isMultiResponseIndividual]);
 
   // Detect when variable or split status changes for reset key
   const targetVariable = useMemo(() => stats.find((item) => item.variable === variable.name), [stats, variable.name]);
@@ -235,15 +246,25 @@ export function AdhocChart({
           </ChartContainer>
         );
 
-      case "horizontalBar":
+      case "horizontalBar": {
+        // Use different transformation for multi-response individual
+        const horizontalBarData = isMultiResponseIndividual
+          ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
+          : transformToRechartsBarData(variable, stats);
+
         return (
-          <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
+          <ChartContainer
+            config={chartConfig}
+            ref={ref}
+            data-export-filename={variable.name}
+            className={isMultiResponseIndividual ? "h-[100px]" : undefined}>
             <BarChart
               layout="vertical"
               margin={{ left: 0 }}
               barCategoryGap={1}
               accessibilityLayer
-              data={transformToRechartsBarData(variable, stats)}>
+              data={horizontalBarData}
+              barSize={isMultiResponseIndividual ? 20 : undefined}>
               <CartesianGrid vertical={true} horizontal={false} />
               <XAxis
                 domain={[0, 100]}
@@ -263,7 +284,8 @@ export function AdhocChart({
                 tickMargin={10}
                 axisLine={false}
                 fontSize={10}
-                width={200}
+                width={isMultiResponseIndividual ? 0 : 200}
+                hide={isMultiResponseIndividual}
               />
               <Bar dataKey="percentage" fill="var(--color-percentage)">
                 <LabelList
@@ -277,9 +299,18 @@ export function AdhocChart({
             </BarChart>
           </ChartContainer>
         );
+      }
 
       case "horizontalStackedBar":
-        return <HorizontalStackedBarAdhoc variable={variable} stats={stats} ref={ref} />;
+        return (
+          <HorizontalStackedBarAdhoc
+            variable={variable}
+            stats={stats}
+            ref={ref}
+            isMultiResponseIndividual={isMultiResponseIndividual}
+            countedValue={countedValue}
+          />
+        );
 
       case "pie": {
         const pieData = transformToRechartsPieData(variable, stats);
@@ -368,7 +399,7 @@ export function AdhocChart({
                 {getSplitVariableDescription(variable, stats) && (
                   <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
                 )}
-                {chartSelection.availableChartTypes.length > 1 && (
+                {chartSelection.availableChartTypes.length > 1 && !isMultiResponseIndividual && (
                   <CardAction>
                     <ToggleGroup
                       type="single"
@@ -461,7 +492,7 @@ export function AdhocChart({
               {getSplitVariableDescription(variable, stats) && (
                 <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
               )}
-              {chartSelection.availableChartTypes.length > 1 && (
+              {chartSelection.availableChartTypes.length > 1 && !isMultiResponseIndividual && (
                 <CardAction>
                   <ToggleGroup
                     type="single"

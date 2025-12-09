@@ -22,6 +22,8 @@ export interface ChartSelectionCriteria {
   hasSplitVariable?: boolean;
   /** Variable attributes including allowed statistics configuration */
   attributes?: DatasetVariablesetItemAttributes | null;
+  /** Whether this is a multi-response individual chart (simplified view) */
+  isMultiResponseIndividual?: boolean;
 }
 
 export interface ChartSelectionResult {
@@ -204,7 +206,26 @@ function sortChartsByPriority(chartTypes: AnalysisChartType[]): AnalysisChartTyp
  * Main function to determine chart selection for a variable
  */
 export function determineChartSelection(criteria: ChartSelectionCriteria): ChartSelectionResult {
-  const { variable, stats, hasSplitVariable = false, attributes } = criteria;
+  const { variable, stats, hasSplitVariable = false, attributes, isMultiResponseIndividual = false } = criteria;
+
+  // Override for multi-response individual charts - only horizontal bar allowed
+  if (isMultiResponseIndividual) {
+    // Check if split variable is present in the data
+    const targetVariable = stats.find((item) => item.variable === variable.name);
+    const actuallyHasSplitVariable = Boolean(targetVariable && isSplitVariableStats(targetVariable.stats));
+
+    // For multi-response individual: only horizontal bar (or stacked if split)
+    const availableChartTypes: AnalysisChartType[] = actuallyHasSplitVariable
+      ? ["horizontalStackedBar"]
+      : ["horizontalBar"];
+
+    return {
+      availableChartTypes,
+      defaultChartType: availableChartTypes[0]!,
+      canUseSplitVariable: true, // Always allow split variables for multi-response
+      showUnsupportedPlaceholder: false,
+    };
+  }
 
   // Check if variable type is supported (numeric types only)
   if (!isNumericVariableType(variable.type)) {
