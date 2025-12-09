@@ -82,12 +82,16 @@ export function MultiVariableCharts({
           onSplitVariableChangeAction={(splitVariable: string | null) =>
             handleSplitVariableChange(variable.name, splitVariable)
           }
+          isMultiResponseIndividual={false}
         />
       </div>
     );
   }
 
   const isMultiResponse = variableset?.category === "multi_response";
+  const countedValue = variableset?.attributes?.multiResponse?.countedValue
+    ? parseFloat(variableset.attributes.multiResponse.countedValue)
+    : 1;
 
   return (
     <div className="flex flex-col gap-4">
@@ -98,6 +102,7 @@ export function MultiVariableCharts({
           statsData={statsData}
           variablesetName={variableset.name}
           variablesetDescription={variableset.description}
+          countedValue={countedValue}
           className="w-[600px]"
         />
       )}
@@ -122,6 +127,8 @@ export function MultiVariableCharts({
             onSplitVariableChangeAction={(splitVariable: string | null) =>
               handleSplitVariableChange(variable.name, splitVariable)
             }
+            isMultiResponseIndividual={isMultiResponse}
+            countedValue={countedValue}
           />
         );
       })}

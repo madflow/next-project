@@ -65,6 +65,7 @@ export function SortableVariablesetNode({
       createdAt: new Date(),
       updatedAt: null,
       category: node.category,
+      attributes: node.attributes || null,
     });
   };
 

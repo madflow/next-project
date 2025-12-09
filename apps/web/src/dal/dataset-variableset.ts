@@ -40,12 +40,21 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
       parentId: entity.parentId,
       orderIndex: entity.orderIndex,
       category: entity.category,
+      attributes: entity.attributes,
       variableCount: sql<number>`COALESCE(COUNT(${datasetVariablesetItem.variableId}), 0)`,
     })
     .from(entity)
     .leftJoin(datasetVariablesetItem, eq(entity.id, datasetVariablesetItem.variablesetId))
     .where(eq(entity.datasetId, datasetId))
-    .groupBy(entity.id, entity.name, entity.description, entity.parentId, entity.orderIndex, entity.category)
+    .groupBy(
+      entity.id,
+      entity.name,
+      entity.description,
+      entity.parentId,
+      entity.orderIndex,
+      entity.category,
+      entity.attributes
+    )
     .orderBy(entity.orderIndex, entity.id);
 
   // Build hierarchy tree
@@ -64,6 +73,7 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
       orderIndex: set.orderIndex,
       parentId: set.parentId,
       variableCount: set.variableCount,
+      attributes: set.attributes,
     };
     nodeMap.set(set.id, node);
   }

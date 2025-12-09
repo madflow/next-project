@@ -436,6 +436,8 @@
     "form": {
       "cancel": "Cancel",
       "category": "Category",
+      "countedValue": "Counted Value",
+      "countedValueHelp": "The numeric value that represents 'selected' in your data",
       "create": "Create",
       "createDescription": "Create a new variable set to group related variables",
       "createError": "Failed to create variable set",

@@ -29,6 +29,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   parentId: z.string().optional(),
   category: z.enum(CATEGORY_OPTIONS),
+  countedValue: z.preprocess((val) => (val === "" || val === undefined || val === null ? 1 : Number(val)), z.number()),
 });
 
 const NO_PARENT_VALUE = "__NO_PARENT__";
@@ -56,14 +57,19 @@ export function VariablesetForm({
   const isEditing = !!variableset;
 
   const form = useForm<FormData>({
+    // @ts-expect-error - zod preprocess causes type mismatch with react-hook-form
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
       parentId: NO_PARENT_VALUE,
       category: "general",
+      countedValue: 1,
     },
   });
+
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const selectedCategory = form.watch("category");
 
   // Update form values when variableset prop changes
   useEffect(() => {
@@ -73,6 +79,9 @@ export function VariablesetForm({
         description: variableset.description || "",
         parentId: variableset.parentId || NO_PARENT_VALUE,
         category: variableset.category,
+        countedValue: variableset.attributes?.multiResponse?.countedValue
+          ? parseFloat(variableset.attributes.multiResponse.countedValue)
+          : 1,
       });
     } else {
       form.reset({
@@ -80,6 +89,7 @@ export function VariablesetForm({
         description: "",
         parentId: NO_PARENT_VALUE,
         category: "general",
+        countedValue: 1,
       });
     }
   }, [variableset, form]);
@@ -88,22 +98,29 @@ export function VariablesetForm({
     try {
       const parentId = data.parentId === NO_PARENT_VALUE ? null : data.parentId || null;
 
+      const updateData = {
+        name: data.name,
+        description: data.description || null,
+        parentId,
+        category: data.category,
+        ...(data.category === "multi_response" && {
+          attributes: {
+            multiResponse: {
+              type: "dichotomies" as const,
+              countedValue: data.countedValue?.toString() || "1",
+            },
+          },
+        }),
+      };
+
       if (isEditing) {
-        await updateVariableset(variableset.id, {
-          name: data.name,
-          description: data.description || null,
-          parentId,
-          category: data.category,
-        });
+        await updateVariableset(variableset.id, updateData);
         toast.success(t("form.updateSuccess"));
       } else {
         await createVariableset({
-          name: data.name,
-          description: data.description || null,
-          parentId,
+          ...updateData,
           datasetId,
           orderIndex: 0,
-          category: data.category,
         });
         toast.success(t("form.createSuccess"));
       }
@@ -114,6 +131,7 @@ export function VariablesetForm({
         description: "",
         parentId: NO_PARENT_VALUE,
         category: "general",
+        countedValue: 1,
       });
       onSuccess?.();
     } catch (error) {
@@ -129,6 +147,7 @@ export function VariablesetForm({
         description: "",
         parentId: NO_PARENT_VALUE,
         category: "general",
+        countedValue: 1,
       });
     }
     onOpenChange(newOpen);
@@ -151,6 +170,7 @@ export function VariablesetForm({
           <DialogDescription>{isEditing ? t("form.editDescription") : t("form.createDescription")}</DialogDescription>
         </DialogHeader>
 
+        {/* @ts-expect-error - zod preprocess causes type mismatch with react-hook-form */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Controller
             name="name"
@@ -250,6 +270,33 @@ export function VariablesetForm({
               </Field>
             )}
           />
+
+          {/* Counted Value field - only shown for multi_response category */}
+          {selectedCategory === "multi_response" && (
+            <Controller
+              name="countedValue"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>{t("form.countedValue")}</FieldLabel>
+                  <FieldGroup>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="number"
+                      step="any"
+                      placeholder="1"
+                      aria-invalid={fieldState.invalid}
+                      data-testid="admin.dataset.variableset.form.countedValue"
+                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 1)}
+                    />
+                  </FieldGroup>
+                  <p className="text-muted-foreground mt-1 text-xs">{t("form.countedValueHelp")}</p>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          )}
 
           <DialogFooter className="gap-2 sm:gap-0">
             <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
