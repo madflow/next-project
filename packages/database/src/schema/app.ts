@@ -197,10 +197,10 @@ export const datasetVariablesetCategoryEnum = pgEnum("dataset_variableset_catego
 export type DatasetVariablesetCategory = (typeof datasetVariablesetCategoryEnum.enumValues)[number];
 
 export const datasetVariablesetAttributes = z.object({
-  multi_response: z
+  multiResponse: z
     .object({
       type: z.enum(["dichotomies", "categories"]),
-      countValue: z.string(),
+      countedValue: z.string(),
     })
     .optional(),
 });

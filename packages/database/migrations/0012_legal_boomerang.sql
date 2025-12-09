@@ -1,0 +1,1 @@
+ALTER TABLE "dataset_variablesets" ADD COLUMN "attributes" jsonb;
