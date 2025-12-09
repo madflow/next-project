@@ -234,9 +234,15 @@ export const datasetVariableset = pgTable(
   ]
 );
 
-export const insertDatasetVariablesetSchema = createInsertSchema(datasetVariableset);
-export const selectDatasetVariablesetSchema = createSelectSchema(datasetVariableset);
-export const updateDatasetVariablesetSchema = createUpdateSchema(datasetVariableset);
+export const insertDatasetVariablesetSchema = createInsertSchema(datasetVariableset).extend({
+  attributes: datasetVariablesetAttributes.optional(),
+});
+export const selectDatasetVariablesetSchema = createSelectSchema(datasetVariableset).extend({
+  attributes: datasetVariablesetAttributes.nullable(),
+});
+export const updateDatasetVariablesetSchema = createUpdateSchema(datasetVariableset).extend({
+  attributes: datasetVariablesetAttributes.optional(),
+});
 
 export type CreateDatasetVariablesetData = z.infer<typeof insertDatasetVariablesetSchema>;
 export type DatasetVariableset = z.infer<typeof selectDatasetVariablesetSchema>;
