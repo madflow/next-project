@@ -253,18 +253,13 @@ export function AdhocChart({
           : transformToRechartsBarData(variable, stats);
 
         return (
-          <ChartContainer
-            config={chartConfig}
-            ref={ref}
-            data-export-filename={variable.name}
-            className={isMultiResponseIndividual ? "h-[100px]" : undefined}>
+          <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
             <BarChart
               layout="vertical"
               margin={{ left: 0 }}
               barCategoryGap={1}
               accessibilityLayer
-              data={horizontalBarData}
-              barSize={isMultiResponseIndividual ? 20 : undefined}>
+              data={horizontalBarData}>
               <CartesianGrid vertical={true} horizontal={false} />
               <XAxis
                 domain={[0, 100]}
