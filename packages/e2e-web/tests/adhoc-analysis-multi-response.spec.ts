@@ -27,13 +27,12 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Wait for variable groups to load
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(3000);
 
-    // Find "Informationsquellen" variable group
+    // Find "Informationsquellen" variable group and wait for it to be visible
     const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
 
     // Verify the group exists
-    await expect(informationsquellenGroup).toBeVisible();
+    await expect(informationsquellenGroup).toBeVisible({ timeout: 5000 });
     console.log("✓ Found Informationsquellen variable group");
 
     // Click on the Informationsquellen variableset to select it
@@ -41,11 +40,10 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Wait for the multi-response chart to load
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(3000);
 
     // Assert that the multi-response chart is displayed
     const multiResponseChart = page.getByTestId("multi-response-chart");
-    await expect(multiResponseChart).toBeVisible();
+    await expect(multiResponseChart).toBeVisible({ timeout: 5000 });
     console.log("✓ Multi-response chart is displayed");
 
     // Verify the chart title contains "Informationsquellen"
@@ -98,11 +96,10 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Wait for variable groups to load
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(3000);
 
     // Find "Informationsquellen" variable group
     const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
-    await expect(informationsquellenGroup).toBeVisible();
+    await expect(informationsquellenGroup).toBeVisible({ timeout: 5000 });
 
     // Find the expand button (chevron icon) for the Informationsquellen group
     // The expand button is a sibling of the group button
@@ -114,13 +111,15 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Click to expand the group
     await expandButton.click();
-    await page.waitForTimeout(1000);
 
     console.log("✓ Expanded Informationsquellen group");
 
     // Try to find one of the variables in the group
     // The variables should have labels, so we'll look for any variable item
     const variableItems = page.locator('[data-testid^="variable-item-"]');
+
+    // Wait for at least one variable item to be visible
+    await expect(variableItems.first()).toBeVisible({ timeout: 3000 });
     const variableCount = await variableItems.count();
 
     expect(variableCount).toBeGreaterThan(0);
@@ -135,11 +134,10 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Wait for analysis to load
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(3000);
 
     // Verify that a chart is displayed (could be any chart type depending on the variable)
     const anyChart = page.locator('[data-testid*="chart"], [data-testid*="visualization"], [class*="recharts"]');
-    await expect(anyChart.first()).toBeVisible();
+    await expect(anyChart.first()).toBeVisible({ timeout: 5000 });
     console.log("✓ Individual variable chart is displayed");
 
     console.log("\n✓ Individual variable selection test completed successfully");

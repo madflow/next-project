@@ -6,6 +6,11 @@ export const MEAN_BAR_DECIMALS = 1;
 export const METRICS_CARD_DECIMALS = 1;
 
 /**
+ * Chart layout constants
+ */
+export const CHART_Y_AXIS_WIDTH = 200;
+
+/**
  * Format a chart value with the specified number of decimal places
  * @param value - The numeric value to format
  * @param decimals - The number of decimal places
