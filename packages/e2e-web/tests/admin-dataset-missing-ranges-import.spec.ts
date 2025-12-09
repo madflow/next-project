@@ -46,8 +46,6 @@ test.describe("Admin Dataset Missing Ranges Import", () => {
     // Wait for the edit form to appear
     await page.waitForLoadState("networkidle");
 
-    return;
-
     // Verify missing ranges were imported from the SPSS file
     // The demo.sav file defines missing ranges for "internet": [{ lo: 8.0, hi: 8.0 }, { lo: 9.0, hi: 9.0 }]
     const missingRangesGroup = page.getByRole("group").filter({ hasText: "Missing Ranges" });
