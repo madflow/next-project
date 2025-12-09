@@ -153,8 +153,11 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
         let splitVarFound = false;
 
         for (const varName of commonSplitVars) {
-          const splitVarOption = page.getByText(varName);
           const splitVarTestId = page.getByTestId(`split-variable-${varName}`);
+          // Use getByRole to find the option within a select/combobox context
+          const splitVarOption = page.getByRole("option", { name: varName });
+          // Fallback to exact text match to avoid matching "Familienstand (marital)" when looking for "Familienstand"
+          const splitVarExactText = page.getByText(varName, { exact: true });
 
           if ((await splitVarTestId.count()) > 0) {
             console.log(`✓ Found '${varName}' in split options (via test ID)`);
@@ -162,8 +165,13 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
             splitVarFound = true;
             break;
           } else if ((await splitVarOption.count()) > 0) {
-            console.log(`✓ Found '${varName}' option via text`);
+            console.log(`✓ Found '${varName}' option via role`);
             await splitVarOption.click();
+            splitVarFound = true;
+            break;
+          } else if ((await splitVarExactText.count()) > 0) {
+            console.log(`✓ Found '${varName}' option via exact text`);
+            await splitVarExactText.first().click();
             splitVarFound = true;
             break;
           }
