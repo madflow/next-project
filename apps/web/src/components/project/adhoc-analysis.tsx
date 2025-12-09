@@ -27,7 +27,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const restoredState = restoreState();
   const [selectedDataset, setSelectedDataset] = useState<string | null>(restoredState?.selectedDataset || null);
   const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
-  const [statsData, setStatsData] = useState<Record<string, StatsResponse>>({});
+  const [baseStatsData, setBaseStatsData] = useState<Record<string, StatsResponse>>({});
+  const [splitStatsData, setSplitStatsData] = useState<Record<string, StatsResponse>>({});
 
   // Set theme on mount if needed
   useEffect(() => {
@@ -66,7 +67,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
                 newStatsData[variable.name] = [data[index]];
               }
             });
-            setStatsData(newStatsData);
+            setBaseStatsData(newStatsData);
+            setSplitStatsData({}); // Reset split stats when new variables are selected
           },
         });
       }
@@ -75,7 +77,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
 
   const handleSelectionChange = (selection: SelectionItem) => {
     setCurrentSelection(selection);
-    setStatsData({});
+    setBaseStatsData({});
+    setSplitStatsData({});
     saveCurrentSelection(selection);
   };
 
@@ -90,10 +93,20 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         onSuccess: (data) => {
           const responseItem = data[0];
           if (responseItem) {
-            setStatsData((prev) => ({
-              ...prev,
-              [variableName]: [responseItem],
-            }));
+            if (splitVariable) {
+              // Split variable applied - update splitStatsData
+              setSplitStatsData((prev) => ({
+                ...prev,
+                [variableName]: [responseItem],
+              }));
+            } else {
+              // Split variable removed - remove from splitStatsData
+              setSplitStatsData((prev) => {
+                const updated = { ...prev };
+                delete updated[variableName];
+                return updated;
+              });
+            }
           }
         },
       });
@@ -114,7 +127,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           onValueChangeAction={(value) => {
             setSelectedDataset(value || null);
             setCurrentSelection(null);
-            setStatsData({});
+            setBaseStatsData({});
+            setSplitStatsData({});
             saveDataset(value || null);
 
             // If value is empty (dataset was deleted), also clear the stored selection
@@ -131,7 +145,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         <Suspense fallback={<BarSkeleton />}>
           <MultiVariableCharts
             variables={selectedVariables}
-            statsData={statsData}
+            baseStatsData={baseStatsData}
+            splitStatsData={splitStatsData}
             variableset={
               currentSelection?.type === "set" ? currentSelection.variableset : currentSelection?.parentVariableset
             }

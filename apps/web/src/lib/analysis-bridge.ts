@@ -167,7 +167,7 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
 
 // Transform multiple variables into multi-response chart data
 // Extracts only value={countedValue} percentages from each variable
-// For split variable stats, aggregates across all categories to get overall percentage
+// This function expects simple (non-split) stats data only
 export function transformToMultiResponseData(
   variables: Array<DatasetVariable & { orderIndex?: number | null }>,
   statsData: Record<string, StatsResponse>,
@@ -185,41 +185,13 @@ export function transformToMultiResponseData(
         return null;
       }
 
-      // Handle split variable stats - aggregate across all split categories
+      // This function should only receive simple stats (no splits)
+      // If split stats are detected, throw an error as this indicates incorrect usage
       if (isSplitVariableStats(targetVariable.stats)) {
-        const splitStats = targetVariable.stats;
-        let totalCount = 0;
-        let totalCountedValueCount = 0;
-
-        // Iterate through all split categories and aggregate
-        Object.values(splitStats.categories).forEach((categoryStats) => {
-          if (categoryStats.frequency_table) {
-            // Find the counted value in this category
-            const valueItem = categoryStats.frequency_table.find((item) =>
-              matchesCountedValue(item.value, countedValue)
-            );
-
-            if (valueItem) {
-              totalCountedValueCount += valueItem.counts;
-            }
-
-            // Sum all counts in this category to get total
-            categoryStats.frequency_table.forEach((item) => {
-              totalCount += item.counts;
-            });
-          }
-        });
-
-        // Calculate overall percentage
-        const percentage = totalCount > 0 ? (totalCountedValueCount / totalCount) * 100 : 0;
-
-        return {
-          label: variable.label || variable.name,
-          variableName: variable.name,
-          percentage: Math.round(percentage * 100) / 100, // Round to 2 decimal places
-          count: totalCountedValueCount,
-          orderIndex: variable.orderIndex ?? 0,
-        };
+        throw new Error(
+          `transformToMultiResponseData received split stats for variable ${variable.name}. ` +
+            `Aggregate charts must not receive split variable stats. This is a bug in the data flow.`
+        );
       }
 
       const variableStats = targetVariable.stats as VariableStats;

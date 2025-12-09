@@ -10,7 +10,8 @@ import { MultiResponseChart } from "./multi-response-chart";
 
 type MultiVariableChartsProps = {
   variables: DatasetVariableWithAttributes[];
-  statsData: Record<string, StatsResponse>;
+  baseStatsData: Record<string, StatsResponse>;
+  splitStatsData: Record<string, StatsResponse>;
   variableset?: VariablesetTreeNode;
   datasetId: string;
   onStatsRequestAction: (variableName: string, splitVariable?: string) => void;
@@ -18,7 +19,8 @@ type MultiVariableChartsProps = {
 
 export function MultiVariableCharts({
   variables,
-  statsData,
+  baseStatsData,
+  splitStatsData,
   variableset,
   datasetId,
   onStatsRequestAction,
@@ -45,7 +47,7 @@ export function MultiVariableCharts({
   }
 
   // Check if any variable is missing stats data and suspend if so
-  const hasAllStats = variables.every((variable) => statsData[variable.name]);
+  const hasAllStats = variables.every((variable) => baseStatsData[variable.name]);
   if (!hasAllStats) {
     // Create a suspended promise that will resolve when data is available
     throw new Promise(() => {}); // This will trigger Suspense
@@ -65,7 +67,7 @@ export function MultiVariableCharts({
     const variable = variables[0];
     if (!variable) return <div className="text-muted-foreground">{"No variable selected"}</div>;
 
-    const stats = statsData[variable.name]!; // We know it exists due to hasAllStats check
+    const stats = splitStatsData[variable.name] || baseStatsData[variable.name]!; // We know it exists due to hasAllStats check
     return (
       <div className="flex flex-col gap-4">
         {variableset && (
@@ -101,7 +103,7 @@ export function MultiVariableCharts({
       {showMultiResponseAggregate && (
         <MultiResponseChart
           variables={variables}
-          statsData={statsData}
+          statsData={baseStatsData}
           variablesetName={variableset.name}
           variablesetDescription={variableset.description}
           countedValue={countedValue}
@@ -117,7 +119,7 @@ export function MultiVariableCharts({
         </div>
       )}
       {variables.map((variable) => {
-        const stats = statsData[variable.name]!; // We know it exists due to hasAllStats check
+        const stats = splitStatsData[variable.name] || baseStatsData[variable.name]!; // We know it exists due to hasAllStats check
         return (
           <AdhocChart
             key={variable.id}
