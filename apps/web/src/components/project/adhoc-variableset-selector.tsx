@@ -86,7 +86,8 @@ function VariablesetNode({
 
         <button
           className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm font-medium transition-colors"
-          onClick={() => onSelectSet(node)}>
+          onClick={() => onSelectSet(node)}
+          data-testid={`variable-group-${node.name}`}>
           {node.name}
         </button>
 
@@ -106,7 +107,8 @@ function VariablesetNode({
               style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
               <button
                 className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
-                onClick={() => onSelectVariable(variable, node)}>
+                onClick={() => onSelectVariable(variable, node)}
+                data-testid={`variable-item-${variable.label}`}>
                 {variable.label}
               </button>
             </div>

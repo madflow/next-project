@@ -231,7 +231,13 @@ async function createDatasetVariableSets(datasetId: string) {
     {
       name: "Mediennutzung",
       description: "Medienkonsum und Informationsquellen",
-      variables: ["news", "news1", "news2", "news3", "news4", "news5", "tvhours"],
+      variables: ["news", "tvhours"],
+    },
+    {
+      name: "Informationsquellen",
+      description: "Informationsquellen für Nachrichten",
+      variables: ["news5", "news4", "news3", "news2", "news1"],
+      category: "multi_response" as const,
     },
     {
       name: "Lebensstil",
@@ -258,6 +264,7 @@ async function createDatasetVariableSets(datasetId: string) {
         description: variableSet.description,
         datasetId: datasetId,
         orderIndex: i,
+        ...(variableSet.category && { category: variableSet.category }),
       })
       .returning();
 
