@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { parseCountedValue } from "@/lib/multi-response-utils";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
@@ -88,15 +89,16 @@ export function MultiVariableCharts({
     );
   }
 
+  // Extract conditions for clarity
   const isMultiResponse = variableset?.category === "multi_response";
-  const countedValue = variableset?.attributes?.multiResponse?.countedValue
-    ? parseFloat(variableset.attributes.multiResponse.countedValue)
-    : 1;
+  const countedValue = parseCountedValue(variableset?.attributes);
+  const showVariablesetHeader = variableset && !isMultiResponse;
+  const showMultiResponseAggregate = isMultiResponse;
 
   return (
     <div className="flex flex-col gap-4">
       {/* Multi-response aggregate chart FIRST */}
-      {isMultiResponse && (
+      {showMultiResponseAggregate && (
         <MultiResponseChart
           variables={variables}
           statsData={statsData}
@@ -108,7 +110,7 @@ export function MultiVariableCharts({
       )}
 
       {/* Variableset header for non-multi-response sets */}
-      {variableset && !isMultiResponse && (
+      {showVariablesetHeader && (
         <div className="mb-4">
           <h2 className="text-xl font-semibold">{variableset.name}</h2>
           {variableset.description && <p className="text-muted-foreground mt-1 text-sm">{variableset.description}</p>}

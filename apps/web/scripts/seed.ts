@@ -196,6 +196,9 @@ async function createDatasetVariableSets(datasetId: string) {
   // eslint-disable-next-line
   const variableMap = new Map(variables.map((v: any) => [v.name, v.id]));
 
+  // Define news variables once for reuse
+  const newsVariables = ["news1", "news2", "news3", "news4", "news5"];
+
   // Define variable sets with their variables
   const variableSets = [
     {
@@ -236,7 +239,7 @@ async function createDatasetVariableSets(datasetId: string) {
     {
       name: "Informationsquellen",
       description: "Informationsquellen für Nachrichten",
-      variables: ["news5", "news4", "news3", "news2", "news1"],
+      variables: [...newsVariables].reverse(),
       category: "multi_response" as const,
     },
     {

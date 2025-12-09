@@ -9,7 +9,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { extractVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
-import { MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { CHART_Y_AXIS_WIDTH, MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -119,7 +119,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
             tickMargin={10}
             axisLine={false}
             fontSize={10}
-            width={200}
+            width={CHART_Y_AXIS_WIDTH}
           />
           <Bar dataKey="value" fill="var(--color-value)">
             <LabelList

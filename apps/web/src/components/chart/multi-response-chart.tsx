@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
-import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -78,7 +78,7 @@ export function MultiResponseChart({
               tickMargin={10}
               axisLine={false}
               fontSize={10}
-              width={200}
+              width={CHART_Y_AXIS_WIDTH}
             />
             <Bar dataKey="percentage" fill="var(--color-percentage)">
               <LabelList

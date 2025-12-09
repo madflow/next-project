@@ -1,3 +1,4 @@
+import { matchesCountedValue } from "@/lib/multi-response-utils";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
 
@@ -194,10 +195,9 @@ export function transformToMultiResponseData(
         Object.values(splitStats.categories).forEach((categoryStats) => {
           if (categoryStats.frequency_table) {
             // Find the counted value in this category
-            const valueItem = categoryStats.frequency_table.find((item) => {
-              const itemNum = typeof item.value === "number" ? item.value : parseFloat(item.value.toString());
-              return !isNaN(itemNum) && itemNum === countedValue;
-            });
+            const valueItem = categoryStats.frequency_table.find((item) =>
+              matchesCountedValue(item.value, countedValue)
+            );
 
             if (valueItem) {
               totalCountedValueCount += valueItem.counts;
@@ -229,15 +229,7 @@ export function transformToMultiResponseData(
 
       // Find the frequency item where value equals the configured counted value
       // Handle both integer and float formats (e.g., 1 matches both "1" and "1.0")
-      const valueItem = variableStats.frequency_table.find((item) => {
-        const itemValue = item.value;
-
-        // Parse item value as number
-        const itemNum = typeof itemValue === "number" ? itemValue : parseFloat(itemValue.toString());
-
-        // Compare numerically
-        return !isNaN(itemNum) && itemNum === countedValue;
-      });
+      const valueItem = variableStats.frequency_table.find((item) => matchesCountedValue(item.value, countedValue));
 
       const percentage = valueItem ? valueItem.percentages : 0;
       const count = valueItem ? valueItem.counts : 0;
@@ -268,10 +260,7 @@ function findCountedValueInFrequencyTable(
     return null;
   }
 
-  return stats.frequency_table.find((item) => {
-    const itemNum = typeof item.value === "number" ? item.value : parseFloat(item.value.toString());
-    return !isNaN(itemNum) && itemNum === countedValue;
-  });
+  return stats.frequency_table.find((item) => matchesCountedValue(item.value, countedValue));
 }
 
 // Transform single multi-response variable to show only countedValue

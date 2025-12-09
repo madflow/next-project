@@ -205,6 +205,8 @@ export const datasetVariablesetAttributes = z.object({
     .optional(),
 });
 
+export type DatasetVariablesetAttributes = z.infer<typeof datasetVariablesetAttributes>;
+
 export const datasetVariableset = pgTable(
   "dataset_variablesets",
   {
