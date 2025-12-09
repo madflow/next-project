@@ -79,9 +79,7 @@ export function VariablesetForm({
         description: variableset.description || "",
         parentId: variableset.parentId || NO_PARENT_VALUE,
         category: variableset.category,
-        countedValue: variableset.attributes?.multiResponse?.countedValue
-          ? parseFloat(variableset.attributes.multiResponse.countedValue)
-          : 1,
+        countedValue: variableset.attributes?.multiResponse?.countedValue ?? 1,
       });
     } else {
       form.reset({
@@ -107,7 +105,7 @@ export function VariablesetForm({
           attributes: {
             multiResponse: {
               type: "dichotomies" as const,
-              countedValue: data.countedValue?.toString() || "1",
+              countedValue: data.countedValue ?? 1,
             },
           },
         }),

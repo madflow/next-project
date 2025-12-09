@@ -200,7 +200,7 @@ export const datasetVariablesetAttributes = z.object({
   multiResponse: z
     .object({
       type: z.enum(["dichotomies", "categories"]),
-      countedValue: z.string(),
+      countedValue: z.coerce.number().min(0).finite(),
     })
     .optional(),
 });

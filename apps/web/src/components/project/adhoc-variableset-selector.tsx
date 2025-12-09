@@ -72,7 +72,12 @@ function VariablesetNode({
   return (
     <div className="select-none">
       <div className="flex items-center gap-2 py-1" style={{ paddingLeft: `${level * 16}px` }}>
-        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => onToggleExpand(node.id)}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0"
+          onClick={() => onToggleExpand(node.id)}
+          data-testid={`variable-group-expand-${node.name}`}>
           {node.children.length > 0 || node.variableCount > 0 ? (
             isExpanded ? (
               <ChevronDown className="h-4 w-4" />

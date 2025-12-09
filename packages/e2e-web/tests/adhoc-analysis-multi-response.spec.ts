@@ -101,13 +101,8 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
     await expect(informationsquellenGroup).toBeVisible({ timeout: 5000 });
 
-    // Find the expand button (chevron icon) for the Informationsquellen group
-    // The expand button is a sibling of the group button
-    const expandButton = page
-      .locator('[data-testid="variable-group-Informationsquellen"]')
-      .locator("..")
-      .getByRole("button")
-      .first();
+    // Use dedicated data-testid for the expand button
+    const expandButton = page.getByTestId("variable-group-expand-Informationsquellen");
 
     // Click to expand the group
     await expandButton.click();
