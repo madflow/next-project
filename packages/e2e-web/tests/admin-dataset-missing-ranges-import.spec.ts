@@ -51,10 +51,12 @@ test.describe("Admin Dataset Missing Ranges Import", () => {
     const missingRangesGroup = page.getByRole("group").filter({ hasText: "Missing Ranges" });
 
     // Check that the first range (8-8) was imported
-    await expect(missingRangesGroup.locator('input[readonly][value="8"]')).toBeVisible();
+    // Each range has 2 inputs (lo and hi), so we expect exactly 2 inputs with value "8"
+    await expect(missingRangesGroup.locator('input[readonly][value="8"]')).toHaveCount(2);
 
     // Check that the second range (9-9) was imported
-    await expect(missingRangesGroup.locator('input[readonly][value="9"]')).toBeVisible();
+    // Each range has 2 inputs (lo and hi), so we expect exactly 2 inputs with value "9"
+    await expect(missingRangesGroup.locator('input[readonly][value="9"]')).toHaveCount(2);
 
     // Verify there are exactly 4 readonly inputs (2 ranges × 2 inputs each: lo and hi)
     const readonlyInputs = missingRangesGroup.locator("input[readonly]");
