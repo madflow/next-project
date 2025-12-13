@@ -180,7 +180,9 @@ test.describe("Email Translations", () => {
     await page.waitForLoadState("networkidle");
 
     await page.getByTestId("app.organization-switcher").click();
-    await page.getByTestId("app.organization-switcher.invite").click();
+    const inviteButton = page.getByTestId("app.organization-switcher.invite");
+    await inviteButton.waitFor({ state: "visible", timeout: 5000 });
+    await inviteButton.click();
     await page.getByTestId("admin.users.invite.form.email").fill(newUserEmail);
     const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
     await page.getByTestId("admin.users.invite.form.submit").click();
@@ -213,7 +215,9 @@ test.describe("Email Translations", () => {
     await page.waitForLoadState("networkidle");
 
     await page.getByTestId("app.organization-switcher").click();
-    await page.getByTestId("app.organization-switcher.invite").click();
+    const inviteButton = page.getByTestId("app.organization-switcher.invite");
+    await inviteButton.waitFor({ state: "visible", timeout: 5000 });
+    await inviteButton.click();
     await page.getByTestId("admin.users.invite.form.email").fill(newUserEmail);
     const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
     await page.getByTestId("admin.users.invite.form.submit").click();
