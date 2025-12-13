@@ -400,8 +400,7 @@ test.describe("Admin Dataset Variable Sets", () => {
       // Test search in assigned section
       await assignedSearchInput.fill("nonexistent");
       await page.waitForFunction(() => {
-        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.remove"]').length;
-        return count >= 0; // Wait for search to process
+        return true; // Brief wait for UI to settle after search
       });
       const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
@@ -409,8 +408,7 @@ test.describe("Admin Dataset Variable Sets", () => {
       // Clear search in assigned section
       await assignedSearchInput.clear();
       await page.waitForFunction(() => {
-        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.remove"]').length;
-        return count >= 0; // Wait for search to process
+        return true; // Brief wait for UI to settle after clear
       });
       const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(restoredAssignedCount).toBe(initialAssignedCount);
@@ -423,8 +421,7 @@ test.describe("Admin Dataset Variable Sets", () => {
     if (initialAvailableCount > 0) {
       await availableSearchInput.fill("age");
       await page.waitForFunction(() => {
-        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.add"]').length;
-        return count >= 0; // Wait for search to process
+        return true; // Brief wait for UI to settle after search
       });
       const filteredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(filteredAvailableCount).toBeLessThanOrEqual(initialAvailableCount);
@@ -432,8 +429,7 @@ test.describe("Admin Dataset Variable Sets", () => {
       // Clear search in available section
       await availableSearchInput.clear();
       await page.waitForFunction(() => {
-        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.add"]').length;
-        return count >= 0; // Wait for search to process
+        return true; // Brief wait for UI to settle after clear
       });
       const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(restoredAvailableCount).toBe(initialAvailableCount);

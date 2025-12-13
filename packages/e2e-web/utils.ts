@@ -67,9 +67,9 @@ export async function selectDataset(page: Page, datasetName: string) {
   await waitForElementVisible(page, "app.dropdown.dataset.trigger");
   await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-  // Wait for dropdown options to be visible
-  await page.waitForSelector(`text=${datasetName}`, { state: "visible" });
-  await page.getByText(datasetName).click();
+  // Wait for dropdown option to be visible and click it
+  await page.getByRole("option", { name: datasetName }).waitFor({ state: "visible" });
+  await page.getByRole("option", { name: datasetName }).click();
 
   // Verify dataset is selected
   const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
@@ -127,8 +127,7 @@ export async function waitForChart(page: Page, timeout = 5000) {
     '[data-testid*="chart"]',
     '[data-testid*="visualization"]',
     '[class*="recharts"]',
-    "canvas",
-    "svg",
+    '[data-testid*="content"]', // For chart-content-* containers
   ];
 
   for (const selector of chartSelectors) {

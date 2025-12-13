@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { Locator, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser, selectDataset, selectVariable, waitForChart } from "../utils";
 
