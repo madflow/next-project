@@ -1,6 +1,6 @@
 import { Page, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
-import { loginUser } from "../utils";
+import { loginUser, waitForElementVisible } from "../utils";
 
 /**
  * Helper function to drag a variableset from one position to another using the drag handle
@@ -12,7 +12,7 @@ async function dragVariablesetFromHandle(page: Page, sourceIndex: number, target
 
   // Hover over source item to make drag handle visible
   await items.nth(sourceIndex).hover();
-  await page.waitForTimeout(300);
+  await waitForElementVisible(page, "admin.dataset.variableset.tree.drag-handle");
 
   const dragHandle = dragHandles.nth(sourceIndex);
   const targetItem = items.nth(targetIndex);
@@ -27,11 +27,11 @@ async function dragVariablesetFromHandle(page: Page, sourceIndex: number, target
   // Perform drag using mouse events
   await page.mouse.move(dragHandleBox.x + dragHandleBox.width / 2, dragHandleBox.y + dragHandleBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(100);
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-  await page.waitForTimeout(100);
   await page.mouse.up();
-  await page.waitForTimeout(500);
+
+  // Wait for drag operation to complete by waiting for the DOM to stabilize
+  await page.waitForLoadState("networkidle");
 }
 
 /**
@@ -44,7 +44,7 @@ async function dragVariableFromHandle(page: Page, sourceIndex: number, targetInd
 
   // Hover over source item to make drag handle visible
   await assignedItems.nth(sourceIndex).hover();
-  await page.waitForTimeout(300);
+  await waitForElementVisible(page, "admin.dataset.variableset.variable.drag-handle");
 
   const dragHandle = dragHandles.nth(sourceIndex);
   const targetItem = assignedItems.nth(targetIndex);
@@ -59,11 +59,11 @@ async function dragVariableFromHandle(page: Page, sourceIndex: number, targetInd
   // Perform drag using mouse events
   await page.mouse.move(dragHandleBox.x + dragHandleBox.width / 2, dragHandleBox.y + dragHandleBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(100);
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-  await page.waitForTimeout(100);
   await page.mouse.up();
-  await page.waitForTimeout(500);
+
+  // Wait for drag operation to complete by waiting for DOM to stabilize
+  await page.waitForLoadState("networkidle");
 }
 
 test.describe("Admin Dataset Variableset Reordering", () => {
@@ -267,7 +267,10 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
     for (let i = 0; i < 4; i++) {
       await addButtons.nth(0).click();
-      await page.waitForTimeout(300);
+      // Wait for assignment to complete by checking for remove button
+      await page.waitForFunction((index) => {
+        return document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.remove"]').length > index;
+      }, i);
     }
 
     // Verify we have 4 assigned variables
@@ -296,8 +299,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Select the set again
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
-    await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
-    await page.waitForTimeout(500);
+    await waitForElementVisible(page, "admin.dataset.variableset.assigned.variables.list");
 
     const persistedOrder = await assignedItems.allTextContents();
     expect(persistedOrder[0]).toBe(initialOrder[3]);
@@ -324,7 +326,8 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     // Assign a variable
     const addButton = page.getByTestId("admin.dataset.variableset.assignment.add").first();
     await addButton.click();
-    await page.waitForTimeout(500);
+    // Wait for assignment to complete
+    await waitForElementVisible(page, "admin.dataset.variableset.assignment.remove");
 
     // Get the assigned variable item and drag handle
     const assignedItem = page.locator('[data-testid*="admin.dataset.variableset.assigned.variable"]').first();

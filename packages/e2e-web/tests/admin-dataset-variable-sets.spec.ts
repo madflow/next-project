@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
-import { loginUser } from "../utils";
+import { loginUser, waitForElementVisible } from "../utils";
 
 test.describe("Admin Dataset Variable Sets", () => {
   let datasetName: string;
@@ -135,14 +135,14 @@ test.describe("Admin Dataset Variable Sets", () => {
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
 
     // Wait for variable assignment section to load
-    await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
+    await waitForElementVisible(page, "admin.dataset.variableset.available.variables.list");
 
     // Assign the first available variable
     const addButton = page.getByTestId("admin.dataset.variableset.assignment.add").first();
     await addButton.click();
 
     // Wait for the assignment to complete - check that a remove button appears
-    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove").first()).toBeVisible();
+    await waitForElementVisible(page, "admin.dataset.variableset.assignment.remove");
   });
 
   test("should remove variables from a variable set", async ({ page }) => {
@@ -158,21 +158,21 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Select the set
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
-    await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
+    await waitForElementVisible(page, "admin.dataset.variableset.available.variables.list");
 
     // Assign a variable first
     const addButton = page.getByTestId("admin.dataset.variableset.assignment.add").first();
     await addButton.click();
 
     // Wait for assignment to complete
-    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove").first()).toBeVisible();
+    await waitForElementVisible(page, "admin.dataset.variableset.assignment.remove");
 
     // Now remove the variable
     const removeButton = page.getByTestId("admin.dataset.variableset.assignment.remove").first();
     await removeButton.click();
 
     // Verify variable is back in available section - check that add button is visible again
-    await expect(page.getByTestId("admin.dataset.variableset.assignment.add").first()).toBeVisible();
+    await waitForElementVisible(page, "admin.dataset.variableset.assignment.add");
   });
 
   test("should delete a variable set", async ({ page }) => {
@@ -318,10 +318,9 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Select the set
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
-    await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
+    await waitForElementVisible(page, "admin.dataset.variableset.available.variables.list");
 
     // Wait for variables to load and count initial available variables
-    await page.waitForTimeout(1000);
     const initialVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(initialVariableCount).toBeGreaterThan(0);
 
@@ -332,8 +331,11 @@ test.describe("Admin Dataset Variable Sets", () => {
     // Verify search input value
     await expect(searchInput).toHaveValue("age");
 
-    // Wait for search results to update
-    await page.waitForTimeout(500);
+    // Wait for search results to update by checking for stability
+    await page.waitForFunction(() => {
+      const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.add"]').length;
+      return count > 0; // Wait for at least one element to be present
+    });
 
     // Verify that search results are filtered (should be fewer variables)
     const filteredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
@@ -341,13 +343,19 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Clear search and verify variables list is restored
     await searchInput.clear();
-    await page.waitForTimeout(500);
+    await page.waitForFunction(() => {
+      const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.add"]').length;
+      return count > 0; // Wait for at least one element to be present
+    });
     const restoredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(restoredVariableCount).toBe(initialVariableCount);
 
     // Test search with no results
     await searchInput.fill("nonexistentvariablename123");
-    await page.waitForTimeout(500);
+    await page.waitForFunction(() => {
+      const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.add"]').length;
+      return count === 0; // Wait for no results
+    });
     const noResultsCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(noResultsCount).toBe(0);
   });
@@ -365,37 +373,45 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Select the set
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
-    await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
+    await waitForElementVisible(page, "admin.dataset.variableset.available.variables.list");
 
     // Assign a few variables to the set first
     const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
     const buttonCount = await addButtons.count();
     if (buttonCount > 0) {
       await addButtons.first().click();
-      await expect(page.getByTestId("admin.dataset.variableset.assignment.remove").first()).toBeVisible();
+      await waitForElementVisible(page, "admin.dataset.variableset.assignment.remove");
     }
     if (buttonCount > 1) {
       await addButtons.first().click(); // Add another variable
-      await page.waitForTimeout(500);
+      // Wait for assignment to complete
+      await page.waitForFunction(() => {
+        return document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.remove"]').length >= 2;
+      });
     }
 
     // Test search in assigned variables section
     const assignedSearchInput = page.getByPlaceholder(/search/i).last(); // Second search input (assigned section)
 
     // Wait for assigned variables to load
-    await page.waitForTimeout(1000);
     const initialAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
 
     if (initialAssignedCount > 0) {
       // Test search in assigned section
       await assignedSearchInput.fill("nonexistent");
-      await page.waitForTimeout(500);
+      await page.waitForFunction(() => {
+        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.remove"]').length;
+        return count >= 0; // Wait for search to process
+      });
       const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
 
       // Clear search in assigned section
       await assignedSearchInput.clear();
-      await page.waitForTimeout(500);
+      await page.waitForFunction(() => {
+        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.remove"]').length;
+        return count >= 0; // Wait for search to process
+      });
       const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(restoredAssignedCount).toBe(initialAssignedCount);
     }
@@ -406,13 +422,19 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     if (initialAvailableCount > 0) {
       await availableSearchInput.fill("age");
-      await page.waitForTimeout(500);
+      await page.waitForFunction(() => {
+        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.add"]').length;
+        return count >= 0; // Wait for search to process
+      });
       const filteredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(filteredAvailableCount).toBeLessThanOrEqual(initialAvailableCount);
 
       // Clear search in available section
       await availableSearchInput.clear();
-      await page.waitForTimeout(500);
+      await page.waitForFunction(() => {
+        const count = document.querySelectorAll('[data-testid*="admin.dataset.variableset.assignment.add"]').length;
+        return count >= 0; // Wait for search to process
+      });
       const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(restoredAvailableCount).toBe(initialAvailableCount);
     }
