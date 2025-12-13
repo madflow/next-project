@@ -19,7 +19,7 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     await selectDataset(page, "SPSS Beispielumfrage");
 
     // Find "Informationsquellen" variable group and wait for it to be visible
-    await waitForElementVisible(page, "variable-group-Informationsquellen");
+    const informationsquellenGroup = await waitForElementVisible(page, "variable-group-Informationsquellen");
 
     // Click on the Informationsquellen variableset to select it
     await informationsquellenGroup.click();

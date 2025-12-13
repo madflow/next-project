@@ -68,9 +68,13 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
 
       for (const selector of splitSelectors) {
         if ((await selector.count()) > 0) {
-          await selector.click();
-          splitFound = true;
-          break;
+          try {
+            await selector.click();
+            splitFound = true;
+            break;
+          } catch {
+            // Not clickable/actionable; try next selector
+          }
         }
       }
 
