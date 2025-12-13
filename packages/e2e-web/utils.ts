@@ -7,10 +7,6 @@ assert(SMTP_SERVER_API);
 
 const smtpServerApi = new MailpitClient(SMTP_SERVER_API);
 
-export async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export async function loginUser(page: Page, email: string, password: string) {
   await page.waitForLoadState("networkidle");
   await page.waitForSelector("data-testid=auth.login.form.email");
