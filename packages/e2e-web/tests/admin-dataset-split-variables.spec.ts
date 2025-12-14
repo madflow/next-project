@@ -66,7 +66,7 @@ test.describe("Admin Dataset Split Variables", () => {
     const availableEmpty = page.getByTestId("admin.dataset.splitvariables.available.empty");
 
     // Wait for one of them to be visible
-    await Promise.race([await expect(availableList).toBeVisible(), await expect(availableEmpty).toBeVisible()]);
+    await expect(availableList.or(availableEmpty)).toBeVisible();
 
     // Only proceed if there are available variables
     const addButtons = page.getByTestId("admin.dataset.splitvariables.assignment.add");
@@ -101,7 +101,7 @@ test.describe("Admin Dataset Split Variables", () => {
     const availableList = page.getByTestId("admin.dataset.splitvariables.available.variables.list");
     const availableEmpty = page.getByTestId("admin.dataset.splitvariables.available.empty");
 
-    await Promise.race([await expect(availableList).toBeVisible(), await expect(availableEmpty).toBeVisible()]);
+    await expect(availableList.or(availableEmpty)).toBeVisible();
 
     // Check if we have variables to assign
     const addButtons = page.getByTestId("admin.dataset.splitvariables.assignment.add");
@@ -140,7 +140,7 @@ test.describe("Admin Dataset Split Variables", () => {
     const availableList = page.getByTestId("admin.dataset.splitvariables.available.variables.list");
     const availableEmpty = page.getByTestId("admin.dataset.splitvariables.available.empty");
 
-    await Promise.race([await expect(availableList).toBeVisible(), await expect(availableEmpty).toBeVisible()]);
+    await expect(availableList.or(availableEmpty)).toBeVisible();
 
     // Check if we have variables to test search with
     const addButtons = page.getByTestId("admin.dataset.splitvariables.assignment.add");
