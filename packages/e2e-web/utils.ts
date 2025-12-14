@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { MailpitClient } from "mailpit-api";
 import assert from "node:assert";
 
@@ -8,7 +8,7 @@ assert(SMTP_SERVER_API);
 const smtpServerApi = new MailpitClient(SMTP_SERVER_API);
 
 export async function loginUser(page: Page, email: string, password: string) {
-  await page.waitForLoadState("networkidle");
+  // Use web-first assertions instead of manual waits
   await page.waitForSelector("data-testid=auth.login.form.email");
   await page.getByTestId("auth.login.form.email").fill(email);
   await page.getByTestId("auth.login.form.password").fill(password);
@@ -20,15 +20,13 @@ export async function loginUser(page: Page, email: string, password: string) {
 
   await getSessionResponse;
 
-  await page.waitForLoadState("networkidle");
-  await page.waitForSelector("data-testid=app.sidebar.user-menu-trigger");
+  await expect(page.getByTestId("app.sidebar.user-menu-trigger")).toBeVisible();
 }
 
 export async function logoutUser(page: Page) {
   await page.getByTestId("app.sidebar.user-menu-trigger").click();
   await page.getByTestId("app.sign-out").click();
-  await page.waitForLoadState("networkidle");
-  await page.waitForSelector("data-testid=auth.login.form.submit");
+  await expect(page.getByTestId("auth.login.form.submit")).toBeVisible();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

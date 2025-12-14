@@ -21,11 +21,12 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
     "@eslint/js": "^9.28.0",
     "@playwright/test": "^1.53.1",
+    "@repo/eslint-config": "workspace:*",
     "@types/node": "^24.10.1",
     "eslint": "^9.29.0",
+    "eslint-plugin-playwright": "^2.4.0",
     "globals": "^16.2.0",
     "typescript-eslint": "^8.34.1"
   },
