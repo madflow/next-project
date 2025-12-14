@@ -12,7 +12,6 @@ async function inviteUser(page: Page, userEmail: string) {
   const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
   await page.getByTestId("admin.users.invite.form.submit").click();
   await inviteResponsePromise;
-  await page.waitForLoadState("networkidle");
   await page.getByTestId("invite-user-modal.close").click();
 }
 
@@ -21,7 +20,6 @@ async function selectOrganization(page: Page, orgName: string) {
   await organizationSwitcher.click();
   await page.getByText(orgName, { exact: true }).click();
   await expect(organizationSwitcher.locator("span")).toHaveText(orgName);
-  await page.waitForTimeout(250);
 }
 
 async function visitAcceptPageFromEmail(page: Page, userEmail: string) {

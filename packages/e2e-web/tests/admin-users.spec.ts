@@ -15,14 +15,11 @@ test.describe("Admin users", () => {
     const testEmail = `test-${Date.now()}@example.com`;
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-    await page.waitForLoadState("networkidle");
 
     // Navigate to create user page
     await page.goto("/admin/users/new");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.users.new.page")).toBeVisible();
 
     // Fill in the form
@@ -36,9 +33,7 @@ test.describe("Admin users", () => {
 
     // Edit the user
     await page.getByRole("textbox", { name: "Search" }).fill(testEmail);
-    await page.waitForLoadState("networkidle");
     await page.getByTestId(`admin.users.list.edit-${testEmail}`).click();
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.users.edit.page")).toBeVisible();
 
     // Update user details
@@ -49,7 +44,6 @@ test.describe("Admin users", () => {
     await page.getByTestId("admin.users.edit.form.submit").click();
 
     await page.getByRole("textbox", { name: "Search" }).fill(updatedEmail);
-    await page.waitForLoadState("networkidle");
     // Wait for the updated user to appear in the list
     await expect(page.getByTestId(`admin.users.list.edit-${updatedEmail}`)).toBeVisible({ timeout: 10000 });
   });

@@ -12,7 +12,6 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Navigate to adhoc analysis
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Click dataset dropdown trigger
@@ -26,7 +25,6 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
 
     // Wait for variable groups to load
-    await page.waitForLoadState("networkidle");
 
     // Find "Informationsquellen" variable group and wait for it to be visible
     const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
@@ -39,7 +37,6 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     await informationsquellenGroup.click();
 
     // Wait for the multi-response chart to load
-    await page.waitForLoadState("networkidle");
 
     // Assert that the multi-response chart is displayed
     const multiResponseChart = page.getByTestId("multi-response-chart");
@@ -81,7 +78,6 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Navigate to adhoc analysis
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Click dataset dropdown trigger
@@ -95,7 +91,6 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
 
     // Wait for variable groups to load
-    await page.waitForLoadState("networkidle");
 
     // Find "Informationsquellen" variable group
     const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
@@ -128,7 +123,6 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     await firstVariable.click();
 
     // Wait for analysis to load
-    await page.waitForLoadState("networkidle");
 
     // Verify that a chart is displayed (could be any chart type depending on the variable)
     const anyChart = page.locator('[data-testid*="chart"], [data-testid*="visualization"], [class*="recharts"]');

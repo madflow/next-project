@@ -12,7 +12,6 @@ async function dragVariablesetFromHandle(page: Page, sourceIndex: number, target
 
   // Hover over source item to make drag handle visible
   await items.nth(sourceIndex).hover();
-  await page.waitForTimeout(300);
 
   const dragHandle = dragHandles.nth(sourceIndex);
   const targetItem = items.nth(targetIndex);
@@ -27,11 +26,8 @@ async function dragVariablesetFromHandle(page: Page, sourceIndex: number, target
   // Perform drag using mouse events
   await page.mouse.move(dragHandleBox.x + dragHandleBox.width / 2, dragHandleBox.y + dragHandleBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(100);
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-  await page.waitForTimeout(100);
   await page.mouse.up();
-  await page.waitForTimeout(500);
 }
 
 /**
@@ -44,7 +40,6 @@ async function dragVariableFromHandle(page: Page, sourceIndex: number, targetInd
 
   // Hover over source item to make drag handle visible
   await assignedItems.nth(sourceIndex).hover();
-  await page.waitForTimeout(300);
 
   const dragHandle = dragHandles.nth(sourceIndex);
   const targetItem = assignedItems.nth(targetIndex);
@@ -59,11 +54,8 @@ async function dragVariableFromHandle(page: Page, sourceIndex: number, targetInd
   // Perform drag using mouse events
   await page.mouse.move(dragHandleBox.x + dragHandleBox.width / 2, dragHandleBox.y + dragHandleBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(100);
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-  await page.waitForTimeout(100);
   await page.mouse.up();
-  await page.waitForTimeout(500);
 }
 
 test.describe("Admin Dataset Variableset Reordering", () => {
@@ -79,7 +71,6 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Create a test dataset
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     await page.getByTestId("admin.datasets.create.upload").click();
@@ -98,7 +89,6 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Navigate to Variable Sets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
   });
 
   test("should reorder top-level variablesets", async ({ page }) => {
@@ -146,9 +136,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Re-query items after reload
     const persistedItems = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
@@ -208,9 +196,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Re-query items after reload
     const persistedItems = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
@@ -267,7 +253,6 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
     for (let i = 0; i < 4; i++) {
       await addButtons.nth(0).click();
-      await page.waitForTimeout(300);
     }
 
     // Verify we have 4 assigned variables
@@ -290,14 +275,11 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Select the set again
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
     await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
-    await page.waitForTimeout(500);
 
     const persistedOrder = await assignedItems.allTextContents();
     expect(persistedOrder[0]).toBe(initialOrder[3]);
@@ -324,7 +306,6 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     // Assign a variable
     const addButton = page.getByTestId("admin.dataset.variableset.assignment.add").first();
     await addButton.click();
-    await page.waitForTimeout(500);
 
     // Get the assigned variable item and drag handle
     const assignedItem = page.locator('[data-testid*="admin.dataset.variableset.assigned.variable"]').first();
@@ -370,11 +351,9 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Navigate to variables tab
     await page.getByTestId("app.admin.editor.variables.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Navigate back to variablesets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Verify order is still preserved
     texts = await items.allTextContents();
