@@ -20,7 +20,6 @@ async function selectOrganization(page: Page, orgName: string) {
   await organizationSwitcher.click();
   await page.getByText(orgName, { exact: true }).click();
   await expect(organizationSwitcher.locator("span")).toHaveText(orgName);
-  await page.waitForTimeout(250);
 }
 
 async function visitAcceptPageFromEmail(page: Page, userEmail: string) {

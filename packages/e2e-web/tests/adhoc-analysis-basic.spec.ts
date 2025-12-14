@@ -25,7 +25,6 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
 
     // Wait for variable groups to load
-    await page.waitForTimeout(3000);
 
     // Try to find "Demografische Daten" variable group
     const demografischeGroup = page.getByTestId("variable-group-Demografische Daten");
@@ -44,7 +43,6 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
         await alterVariable.click();
 
         // Wait for analysis to load
-        await page.waitForTimeout(2000);
 
         // Check if a Mean Chart or any analysis visualization appears
         const meanChart = page.getByTestId("mean-chart");
@@ -75,7 +73,6 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
 
         // Optionally expand the first available group and select first variable
         await anyVariableGroup.click();
-        await page.waitForTimeout(1000);
 
         const firstVariable = page.locator('[data-testid^="variable-item-"]').first();
         if ((await firstVariable.count()) > 0) {
