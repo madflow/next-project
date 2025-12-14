@@ -12,7 +12,7 @@ async function dragVariablesetFromHandle(page: Page, sourceIndex: number, target
 
   // Hover over source item to make drag handle visible
   await items.nth(sourceIndex).hover();
-  await page.waitForTimeout(300);
+  await expect(dragHandles.nth(sourceIndex)).toBeVisible();
 
   const dragHandle = dragHandles.nth(sourceIndex);
   const targetItem = items.nth(targetIndex);
@@ -27,11 +27,10 @@ async function dragVariablesetFromHandle(page: Page, sourceIndex: number, target
   // Perform drag using mouse events
   await page.mouse.move(dragHandleBox.x + dragHandleBox.width / 2, dragHandleBox.y + dragHandleBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(100);
+  // Wait for the drag handle to indicate it's active/pressed
+  await expect(dragHandle).toHaveAttribute("aria-pressed", "true");
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-  await page.waitForTimeout(100);
   await page.mouse.up();
-  await page.waitForTimeout(500);
 }
 
 /**
@@ -44,7 +43,7 @@ async function dragVariableFromHandle(page: Page, sourceIndex: number, targetInd
 
   // Hover over source item to make drag handle visible
   await assignedItems.nth(sourceIndex).hover();
-  await page.waitForTimeout(300);
+  await expect(dragHandles.nth(sourceIndex)).toBeVisible();
 
   const dragHandle = dragHandles.nth(sourceIndex);
   const targetItem = assignedItems.nth(targetIndex);
@@ -59,11 +58,10 @@ async function dragVariableFromHandle(page: Page, sourceIndex: number, targetInd
   // Perform drag using mouse events
   await page.mouse.move(dragHandleBox.x + dragHandleBox.width / 2, dragHandleBox.y + dragHandleBox.height / 2);
   await page.mouse.down();
-  await page.waitForTimeout(100);
+  // Wait for the drag handle to indicate it's active/pressed
+  await expect(dragHandle).toHaveAttribute("aria-pressed", "true");
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 10 });
-  await page.waitForTimeout(100);
   await page.mouse.up();
-  await page.waitForTimeout(500);
 }
 
 test.describe("Admin Dataset Variableset Reordering", () => {
@@ -79,13 +77,12 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Create a test dataset
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     await page.getByTestId("admin.datasets.create.upload").click();
     const uploadFile = page.getByTestId("file-upload-input");
     await uploadFile.setInputFiles("testdata/spss/demo.sav");
-    await page.waitForSelector("data-testid=app.admin.dataset.selected-file");
+    await expect(page.getByTestId("app.admin.dataset.selected-file")).toBeVisible();
     await page.getByTestId("app.admin.dataset.name-input").fill(datasetName);
     await page.getByTestId("app.admin.dataset.organization-trigger").click();
     await page.getByTestId("org-option-test-organization").click();
@@ -98,7 +95,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Navigate to Variable Sets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByTestId("admin.dataset.variableset.create")).toBeVisible();
   });
 
   test("should reorder top-level variablesets", async ({ page }) => {
@@ -130,34 +127,29 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Get initial order
     const items = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
-    const initialTexts = await items.allTextContents();
-    expect(initialTexts[0]).toContain(set1Name);
-    expect(initialTexts[1]).toContain(set2Name);
-    expect(initialTexts[2]).toContain(set3Name);
+    await expect(items.first()).toContainText(set1Name);
+    await expect(items.nth(1)).toContainText(set2Name);
+    await expect(items.nth(2)).toContainText(set3Name);
 
     // Drag set C (index 2) to position of set A (index 0) using the drag handle
     await dragVariablesetFromHandle(page, 2, 0);
 
     // Verify new order is C, A, B
-    const newTexts = await items.allTextContents();
-    expect(newTexts[0]).toContain(set3Name);
-    expect(newTexts[1]).toContain(set1Name);
-    expect(newTexts[2]).toContain(set2Name);
+    await expect(items.first()).toContainText(set3Name);
+    await expect(items.nth(1)).toContainText(set1Name);
+    await expect(items.nth(2)).toContainText(set2Name);
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Re-query items after reload
     const persistedItems = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
     await expect(persistedItems).toHaveCount(3);
 
-    const persistedTexts = await persistedItems.allTextContents();
-    expect(persistedTexts[0]).toContain(set3Name);
-    expect(persistedTexts[1]).toContain(set1Name);
-    expect(persistedTexts[2]).toContain(set2Name);
+    await expect(persistedItems.first()).toContainText(set3Name);
+    await expect(persistedItems.nth(1)).toContainText(set1Name);
+    await expect(persistedItems.nth(2)).toContainText(set2Name);
   });
 
   test("should reorder child variablesets within same parent", async ({ page }) => {
@@ -188,39 +180,34 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Get all tree items - parent is first, then children
     const items = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
-    const initialTexts = await items.allTextContents();
 
     // Verify parent is first, then children in order A, B, C
-    expect(initialTexts[0]).toContain(parentSetName);
-    expect(initialTexts[1]).toContain(child1Name);
-    expect(initialTexts[2]).toContain(child2Name);
-    expect(initialTexts[3]).toContain(child3Name);
+    await expect(items.first()).toContainText(parentSetName);
+    await expect(items.nth(1)).toContainText(child1Name);
+    await expect(items.nth(2)).toContainText(child2Name);
+    await expect(items.nth(3)).toContainText(child3Name);
 
     // Drag child C (index 3) to position of child A (index 1)
     await dragVariablesetFromHandle(page, 3, 1);
 
     // Verify new order: parent, then C, A, B
-    const newTexts = await items.allTextContents();
-    expect(newTexts[0]).toContain(parentSetName);
-    expect(newTexts[1]).toContain(child3Name);
-    expect(newTexts[2]).toContain(child1Name);
-    expect(newTexts[3]).toContain(child2Name);
+    await expect(items.first()).toContainText(parentSetName);
+    await expect(items.nth(1)).toContainText(child3Name);
+    await expect(items.nth(2)).toContainText(child1Name);
+    await expect(items.nth(3)).toContainText(child2Name);
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Re-query items after reload
     const persistedItems = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
     await expect(persistedItems).toHaveCount(4);
 
-    const persistedTexts = await persistedItems.allTextContents();
-    expect(persistedTexts[0]).toContain(parentSetName);
-    expect(persistedTexts[1]).toContain(child3Name);
-    expect(persistedTexts[2]).toContain(child1Name);
-    expect(persistedTexts[3]).toContain(child2Name);
+    await expect(persistedItems.first()).toContainText(parentSetName);
+    await expect(persistedItems.nth(1)).toContainText(child3Name);
+    await expect(persistedItems.nth(2)).toContainText(child1Name);
+    await expect(persistedItems.nth(3)).toContainText(child2Name);
   });
 
   test("should show drag handle on hover for variableset", async ({ page }) => {
@@ -267,7 +254,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
     for (let i = 0; i < 4; i++) {
       await addButtons.nth(0).click();
-      await page.waitForTimeout(300);
+      await expect(page.locator('[data-testid*="admin.dataset.variableset.assigned.variable"]').nth(i)).toBeVisible();
     }
 
     // Verify we have 4 assigned variables
@@ -282,28 +269,24 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     await dragVariableFromHandle(page, 3, 0);
 
     // Verify new order
-    const newOrder = await assignedItems.allTextContents();
-    expect(newOrder[0]).toBe(initialOrder[3]);
-    expect(newOrder[1]).toBe(initialOrder[0]);
-    expect(newOrder[2]).toBe(initialOrder[1]);
-    expect(newOrder[3]).toBe(initialOrder[2]);
+    await expect(assignedItems.first()).toHaveText(initialOrder[3]);
+    await expect(assignedItems.nth(1)).toHaveText(initialOrder[0]);
+    await expect(assignedItems.nth(2)).toHaveText(initialOrder[1]);
+    await expect(assignedItems.nth(3)).toHaveText(initialOrder[2]);
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Select the set again
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
     await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
-    await page.waitForTimeout(500);
+    await expect(assignedItems.first()).toBeVisible();
 
-    const persistedOrder = await assignedItems.allTextContents();
-    expect(persistedOrder[0]).toBe(initialOrder[3]);
-    expect(persistedOrder[1]).toBe(initialOrder[0]);
-    expect(persistedOrder[2]).toBe(initialOrder[1]);
-    expect(persistedOrder[3]).toBe(initialOrder[2]);
+    await expect(assignedItems.first()).toHaveText(initialOrder[3]);
+    await expect(assignedItems.nth(1)).toHaveText(initialOrder[0]);
+    await expect(assignedItems.nth(2)).toHaveText(initialOrder[1]);
+    await expect(assignedItems.nth(3)).toHaveText(initialOrder[2]);
   });
 
   test("should show drag handle on hover for assigned variables", async ({ page }) => {
@@ -324,10 +307,10 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     // Assign a variable
     const addButton = page.getByTestId("admin.dataset.variableset.assignment.add").first();
     await addButton.click();
-    await page.waitForTimeout(500);
+    const assignedItem = page.locator('[data-testid*="admin.dataset.variableset.assigned.variable"]').first();
+    await expect(assignedItem).toBeVisible();
 
     // Get the assigned variable item and drag handle
-    const assignedItem = page.locator('[data-testid*="admin.dataset.variableset.assigned.variable"]').first();
     const dragHandle = page.getByTestId("admin.dataset.variableset.variable.drag-handle").first();
 
     // Drag handle should be hidden initially (opacity-0)
@@ -364,22 +347,18 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     await dragVariablesetFromHandle(page, 1, 0);
 
     // Verify order
-    let texts = await items.allTextContents();
-    expect(texts[0]).toContain(set2Name);
-    expect(texts[1]).toContain(set1Name);
+    await expect(items.first()).toContainText(set2Name);
+    await expect(items.nth(1)).toContainText(set1Name);
 
     // Navigate to variables tab
     await page.getByTestId("app.admin.editor.variables.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Navigate back to variablesets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Verify order is still preserved
-    texts = await items.allTextContents();
-    expect(texts[0]).toContain(set2Name);
-    expect(texts[1]).toContain(set1Name);
+    await expect(items.first()).toContainText(set2Name);
+    await expect(items.nth(1)).toContainText(set1Name);
   });
 
   test("should reorder multiple times in succession", async ({ page }) => {
@@ -401,23 +380,20 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // First reorder: move set3 to top
     await dragVariablesetFromHandle(page, 2, 0);
-    let texts = await items.allTextContents();
-    expect(texts[0]).toContain(set3Name);
-    expect(texts[1]).toContain(set1Name);
-    expect(texts[2]).toContain(set2Name);
+    await expect(items.first()).toContainText(set3Name);
+    await expect(items.nth(1)).toContainText(set1Name);
+    await expect(items.nth(2)).toContainText(set2Name);
 
     // Second reorder: move set2 to top
     await dragVariablesetFromHandle(page, 2, 0);
-    texts = await items.allTextContents();
-    expect(texts[0]).toContain(set2Name);
-    expect(texts[1]).toContain(set3Name);
-    expect(texts[2]).toContain(set1Name);
+    await expect(items.first()).toContainText(set2Name);
+    await expect(items.nth(1)).toContainText(set3Name);
+    await expect(items.nth(2)).toContainText(set1Name);
 
     // Third reorder: move set1 to middle
     await dragVariablesetFromHandle(page, 2, 1);
-    texts = await items.allTextContents();
-    expect(texts[0]).toContain(set2Name);
-    expect(texts[1]).toContain(set1Name);
-    expect(texts[2]).toContain(set3Name);
+    await expect(items.first()).toContainText(set2Name);
+    await expect(items.nth(1)).toContainText(set1Name);
+    await expect(items.nth(2)).toContainText(set3Name);
   });
 });
