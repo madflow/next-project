@@ -37,7 +37,6 @@ test.describe("User Account", () => {
 
     // Navigate to account page
     await page.goto("/user/account");
-    await page.waitForTimeout(1000);
 
     // Update name using test ID
     const newName = `Test User ${Date.now()}`;
@@ -49,7 +48,6 @@ test.describe("User Account", () => {
 
     // Submit the form
     await page.getByTestId("app.user.account.profile.update").click();
-    await page.waitForLoadState("networkidle");
 
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
 
@@ -87,8 +85,6 @@ test.describe("User Account", () => {
     // Submit the password update form
     await page.getByTestId("app.user.account.password.update").click();
 
-    await page.waitForLoadState("networkidle");
-
     await logoutUser(page);
 
     // Log in with the new password
@@ -114,8 +110,10 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.email").fill(newEmail);
 
     // Submit the form
+    // http://localhost:3000/api/auth/change-email
+    const updateEmailPromise = page.waitForResponse(/change-email/);
     await page.getByTestId("app.user.account.email.update").click();
-    await page.waitForLoadState("networkidle");
+    await updateEmailPromise;
 
     // Wait for the verification email (sent to the old email address)
     const searchMessages = await smtpServerApi.searchMessages({
@@ -143,10 +141,7 @@ test.describe("User Account", () => {
     await page.goto("/");
     await loginUser(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
 
-    await page.waitForLoadState("networkidle");
-
     await page.goto("/user/account");
-    await page.waitForLoadState("networkidle");
 
     const avatarContainer = page.getByTestId("app.user.account.avatar-container");
     await avatarContainer.waitFor({ state: "visible", timeout: 15001 });

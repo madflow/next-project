@@ -15,7 +15,6 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a test dataset
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     await page.getByTestId("admin.datasets.create.upload").click();
@@ -34,7 +33,6 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Navigate to Variable Sets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
   });
 
   test("should create a new variable set successfully", async ({ page }) => {
@@ -321,7 +319,6 @@ test.describe("Admin Dataset Variable Sets", () => {
     await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
 
     // Wait for variables to load and count initial available variables
-    await page.waitForTimeout(1000);
     const initialVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(initialVariableCount).toBeGreaterThan(0);
 
@@ -333,7 +330,6 @@ test.describe("Admin Dataset Variable Sets", () => {
     await expect(searchInput).toHaveValue("age");
 
     // Wait for search results to update
-    await page.waitForTimeout(500);
 
     // Verify that search results are filtered (should be fewer variables)
     const filteredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
@@ -341,13 +337,19 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Clear search and verify variables list is restored
     await searchInput.clear();
-    await page.waitForTimeout(500);
     const restoredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(restoredVariableCount).toBe(initialVariableCount);
 
     // Test search with no results
+    // http://localhost:3000/api/datasets/0198e639-3e96-734b-b0db-af0c4350a2c4/variables/unassigned?limit=100&offset=0&search=nonexistentvariablename123
+    const searchResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes("/variables/unassigned") &&
+        response.request().url().includes("search=nonexistentvariablename123") &&
+        response.status() === 200
+    );
     await searchInput.fill("nonexistentvariablename123");
-    await page.waitForTimeout(500);
+    await searchResponsePromise;
     const noResultsCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(noResultsCount).toBe(0);
   });
@@ -376,26 +378,22 @@ test.describe("Admin Dataset Variable Sets", () => {
     }
     if (buttonCount > 1) {
       await addButtons.first().click(); // Add another variable
-      await page.waitForTimeout(500);
     }
 
     // Test search in assigned variables section
     const assignedSearchInput = page.getByPlaceholder(/search/i).last(); // Second search input (assigned section)
 
     // Wait for assigned variables to load
-    await page.waitForTimeout(1000);
     const initialAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
 
     if (initialAssignedCount > 0) {
       // Test search in assigned section
       await assignedSearchInput.fill("nonexistent");
-      await page.waitForTimeout(500);
       const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
 
       // Clear search in assigned section
       await assignedSearchInput.clear();
-      await page.waitForTimeout(500);
       const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(restoredAssignedCount).toBe(initialAssignedCount);
     }
@@ -406,13 +404,11 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     if (initialAvailableCount > 0) {
       await availableSearchInput.fill("age");
-      await page.waitForTimeout(500);
       const filteredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(filteredAvailableCount).toBeLessThanOrEqual(initialAvailableCount);
 
       // Clear search in available section
       await availableSearchInput.clear();
-      await page.waitForTimeout(500);
       const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(restoredAvailableCount).toBe(initialAvailableCount);
     }
@@ -431,9 +427,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Navigate to variables tab and back
     await page.getByTestId("app.admin.editor.variables.tab").click();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Verify the set still exists
     await expect(

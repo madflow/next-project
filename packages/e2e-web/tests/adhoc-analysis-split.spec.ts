@@ -10,7 +10,6 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
 
     // Navigate to adhoc analysis
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Click dataset dropdown trigger
@@ -24,8 +23,6 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
 
     // Wait for variable groups to load
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(3000);
 
     // Check if any variable groups are available
     const anyVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
@@ -46,7 +43,6 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
         const groupText = await group.textContent();
         console.log(`Expanding group ${i}: "${groupText}"`);
         await group.click();
-        await page.waitForTimeout(500);
 
         // Get all variables in this group
         const variablesInGroup = page.locator('[data-testid^="variable-item-"]');
@@ -87,8 +83,6 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
             targetVariableFound = true;
 
             // Wait for analysis to load
-            await page.waitForLoadState("networkidle");
-            await page.waitForTimeout(2000);
 
             break;
           }
@@ -104,8 +98,6 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
         targetVariableFound = true;
 
         // Wait for analysis to load
-        await page.waitForLoadState("networkidle");
-        await page.waitForTimeout(2000);
       }
 
       // Only proceed with split testing if we have a variable selected
@@ -146,7 +138,6 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
         }
 
         // Wait for split options to appear
-        await page.waitForTimeout(1000);
 
         // Look for common split variables in options
         const commonSplitVars = ["Familienstand", "Geschlecht", "Gender", "Alter", "Age"];
@@ -194,8 +185,6 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
 
         if (splitVarFound) {
           // Wait for split analysis to load
-          await page.waitForLoadState("networkidle");
-          await page.waitForTimeout(3000);
 
           // Verify that split analysis is displayed
           const splitAnalysis = page.locator(

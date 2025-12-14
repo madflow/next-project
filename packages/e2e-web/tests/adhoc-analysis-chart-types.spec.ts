@@ -10,7 +10,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
 
     // Navigate to adhoc analysis
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Click dataset dropdown trigger
@@ -39,8 +38,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
     await expect(datasetTrigger).toContainText(selectedDataset);
 
     // Wait for variable groups to load
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(3000);
 
     // Check if any variable groups are available
     const anyVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
@@ -59,7 +56,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
         const groupText = await group.textContent();
         console.log(`Expanding group ${i}: "${groupText}"`);
         await group.click();
-        await page.waitForTimeout(500);
 
         // Look for specific variable if using Politische Einstellungen
         if (selectedDataset === "Politische Einstellungen") {
@@ -90,8 +86,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
 
       if (chartVariableFound) {
         // Wait for analysis to load
-        await page.waitForLoadState("networkidle");
-        await page.waitForTimeout(3000);
 
         // Look for chart type selector/switcher
         console.log("Looking for chart type selector...");
@@ -120,7 +114,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
         if (chartSelector) {
           // Click to open chart type options
           await chartSelector.click();
-          await page.waitForTimeout(1000);
 
           // Define the chart types we want to test
           const chartTypes = [
@@ -155,8 +148,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
                 optionFound = true;
 
                 // Wait for chart to render
-                await page.waitForLoadState("networkidle");
-                await page.waitForTimeout(2000);
 
                 // Verify the chart type is applied
                 const chartContainer = page
@@ -174,7 +165,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
                   // Try to click the selector again for next option
                   if ((await chartSelector.count()) > 0) {
                     await chartSelector.click();
-                    await page.waitForTimeout(500);
                   }
                 }
 

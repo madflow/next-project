@@ -15,7 +15,6 @@ test.describe("Admin Dataset Split Variables", () => {
 
     // Create a test dataset
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     await page.getByTestId("admin.datasets.create.upload").click();
@@ -34,7 +33,6 @@ test.describe("Admin Dataset Split Variables", () => {
 
     // Navigate to Split Variables tab
     await page.getByTestId("app.admin.editor.splitvariables.tab").click();
-    await page.waitForLoadState("networkidle");
   });
 
   test("should navigate to split variables tab and display assignment interface", async ({ page }) => {
