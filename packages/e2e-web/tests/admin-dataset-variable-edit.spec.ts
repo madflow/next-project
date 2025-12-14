@@ -229,14 +229,14 @@ test.describe("Admin Dataset Variable Edit", () => {
     await removeMissingValueButton.click();
 
     // Verify missing value was removed
-    await expect(missingValuesGroup.locator('input[readonly][value="999"]')).not.toBeVisible();
+    await expect(missingValuesGroup.locator('input[readonly][value="999"]')).toBeHidden();
 
     // Remove the missing range by clicking the X button in the missing ranges group
     const removeMissingRangeButton = missingRangesGroup.getByRole("button").last();
     await removeMissingRangeButton.click();
 
     // Verify missing range was removed
-    await expect(missingRangesGroup.locator('input[readonly][value="500"]')).not.toBeVisible();
-    await expect(missingRangesGroup.locator('input[readonly][value="600"]')).not.toBeVisible();
+    await expect(missingRangesGroup.locator('input[readonly][value="500"]')).toBeHidden();
+    await expect(missingRangesGroup.locator('input[readonly][value="600"]')).toBeHidden();
   });
 });

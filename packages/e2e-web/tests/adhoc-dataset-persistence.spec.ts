@@ -64,8 +64,7 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
 
       const datasetTriggerAfterReload = page.getByTestId("app.dropdown.dataset.trigger");
       // Either shows the persisted dataset name or falls back to placeholder if dataset was deleted
-      const triggerText = await datasetTriggerAfterReload.textContent();
-      expect(triggerText).toBeTruthy();
+      await expect(datasetTriggerAfterReload).not.toHaveText("");
     } else {
       // No datasets available, should show placeholder
       const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
