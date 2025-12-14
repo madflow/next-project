@@ -144,6 +144,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     // Search for and click on the test dataset
     await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
     await page.getByRole("link", { name: DATASET_NAME }).click();
+    await page.waitForURL("**/admin/datasets/**");
 
     // Wait for the dataset editor page to load
     await page.waitForLoadState("networkidle");
@@ -186,6 +187,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
     await page.getByRole("link", { name: DATASET_NAME }).click();
 
+    await page.waitForURL("**/admin/datasets/**");
     // Wait for the dataset editor page to load
     await page.waitForLoadState("networkidle");
 
