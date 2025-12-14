@@ -4,7 +4,7 @@ import { loginUser } from "../utils";
 
 const TEST_ENDPOINT = "/api/datasets/0198e639-3e96-734b-b0db-af0c4350a2c4/variables";
 
-test.describe("Api access dataset variables ", () => {
+test.describe("Api access dataset variables", () => {
   test.describe.configure({ mode: "parallel" });
 
   test("deny logged in as regular user", async ({ page }) => {

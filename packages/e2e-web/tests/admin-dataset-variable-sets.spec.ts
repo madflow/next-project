@@ -117,7 +117,7 @@ test.describe("Admin Dataset Variable Sets", () => {
     ).toBeVisible();
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: originalSetName })
-    ).not.toBeVisible();
+    ).toBeHidden();
   });
 
   test("should assign variables to a variable set", async ({ page }) => {
@@ -195,7 +195,7 @@ test.describe("Admin Dataset Variable Sets", () => {
     // Verify the set is no longer visible in the tree
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
-    ).not.toBeVisible();
+    ).toBeHidden();
   });
 
   test("should cancel variable set creation", async ({ page }) => {
@@ -211,7 +211,7 @@ test.describe("Admin Dataset Variable Sets", () => {
     // Verify the set was not created - should not be in tree
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
-    ).not.toBeVisible();
+    ).toBeHidden();
   });
 
   test("should cancel variable set deletion", async ({ page }) => {
