@@ -79,7 +79,6 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Create a test dataset
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     await page.getByTestId("admin.datasets.create.upload").click();
@@ -98,7 +97,6 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Navigate to Variable Sets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
   });
 
   test("should reorder top-level variablesets", async ({ page }) => {
@@ -146,9 +144,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Re-query items after reload
     const persistedItems = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
@@ -208,9 +204,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Re-query items after reload
     const persistedItems = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
@@ -290,9 +284,7 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Refresh and verify persistence
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Select the set again
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
@@ -370,11 +362,9 @@ test.describe("Admin Dataset Variableset Reordering", () => {
 
     // Navigate to variables tab
     await page.getByTestId("app.admin.editor.variables.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Navigate back to variablesets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Verify order is still preserved
     texts = await items.allTextContents();

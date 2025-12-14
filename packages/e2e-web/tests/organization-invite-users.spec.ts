@@ -12,7 +12,6 @@ async function inviteUser(page: Page, userEmail: string) {
   const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
   await page.getByTestId("admin.users.invite.form.submit").click();
   await inviteResponsePromise;
-  await page.waitForLoadState("networkidle");
   await page.getByTestId("invite-user-modal.close").click();
 }
 

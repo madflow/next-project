@@ -5,7 +5,6 @@ import { extractLinkFromMessage, loginUser, logoutUser, smtpServerApi } from "..
 async function switchLocale(page: Page, language: "German" | "Englisch") {
   await page.getByTestId("app.locale-switcher").click();
   await page.getByRole("option", { name: language }).click();
-  await page.waitForLoadState("networkidle");
 }
 
 async function getLatestEmail(email: string) {
@@ -23,7 +22,6 @@ test.describe("Email Translations", () => {
     const password = crypto.randomUUID();
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
 
@@ -34,7 +32,6 @@ test.describe("Email Translations", () => {
     await page.getByTestId("auth.sign-up.form.name").fill("E2E User EN");
     await page.getByTestId("auth.sign-up.form.submit").click();
 
-    await page.waitForLoadState("networkidle");
 
     const message = await getLatestEmail(userEmail);
     expect(message.Subject).toBe("Email Verification");
@@ -47,7 +44,6 @@ test.describe("Email Translations", () => {
     const password = crypto.randomUUID();
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     await switchLocale(page, "German");
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
@@ -59,7 +55,6 @@ test.describe("Email Translations", () => {
     await page.getByTestId("auth.sign-up.form.name").fill("E2E User DE");
     await page.getByTestId("auth.sign-up.form.submit").click();
 
-    await page.waitForLoadState("networkidle");
 
     const message = await getLatestEmail(userEmail);
     expect(message.Subject).toBe("E-Mail-Verifizierung");
@@ -71,7 +66,6 @@ test.describe("Email Translations", () => {
     const userEmail = testUsers.regularUser.email;
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
 
@@ -79,7 +73,6 @@ test.describe("Email Translations", () => {
     await page.getByTestId("auth.forgot-password.form.email").fill(userEmail);
     await page.getByTestId("auth.forgot-password.form.submit").click();
 
-    await page.waitForLoadState("networkidle");
 
     const message = await getLatestEmail(userEmail);
     expect(message.Subject).toBe("Reset your password");
@@ -91,7 +84,6 @@ test.describe("Email Translations", () => {
     const userEmail = testUsers.regularUser.email;
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     await switchLocale(page, "German");
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
@@ -100,7 +92,6 @@ test.describe("Email Translations", () => {
     await page.getByTestId("auth.forgot-password.form.email").fill(userEmail);
     await page.getByTestId("auth.forgot-password.form.submit").click();
 
-    await page.waitForLoadState("networkidle");
 
     const message = await getLatestEmail(userEmail);
     expect(message.Subject).toBe("Passwort zurücksetzen");
@@ -114,7 +105,6 @@ test.describe("Email Translations", () => {
 
     await page.goto("/");
     await loginUser(page, userEmail, testUsers.emailChanger.password);
-    await page.waitForLoadState("networkidle");
 
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
 
@@ -122,7 +112,6 @@ test.describe("Email Translations", () => {
     await page.waitForURL(/\/user\/account/);
     await page.getByTestId("app.user.account.email").fill(newEmail);
     await page.getByTestId("app.user.account.email.update").click();
-    await page.waitForLoadState("networkidle");
 
     const message = await getLatestEmail(userEmail);
     expect(message.Subject).toBe("Confirm your new email address");
@@ -142,7 +131,6 @@ test.describe("Email Translations", () => {
     await page.goto("/");
     await switchLocale(page, "German");
     await loginUser(page, userEmail, testUsers.emailChanger.password);
-    await page.waitForLoadState("networkidle");
 
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
 
@@ -150,7 +138,6 @@ test.describe("Email Translations", () => {
     await page.waitForURL(/\/user\/account/);
     await page.getByTestId("app.user.account.email").fill(newEmail);
     await page.getByTestId("app.user.account.email.update").click();
-    await page.waitForLoadState("networkidle");
 
     const message = await getLatestEmail(userEmail);
     expect(message.Subject).toBe("Bestätigen Sie Ihre neue E-Mail-Adresse");
@@ -169,7 +156,6 @@ test.describe("Email Translations", () => {
     const orgName = "Test Organization 3";
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
 
@@ -177,7 +163,6 @@ test.describe("Email Translations", () => {
 
     await page.getByTestId("app.organization-switcher").click();
     await page.getByText(orgName, { exact: true }).click();
-    await page.waitForLoadState("networkidle");
 
     await page.getByTestId("app.organization-switcher").click();
     const inviteButton = page.getByTestId("app.organization-switcher.invite");
@@ -187,7 +172,6 @@ test.describe("Email Translations", () => {
     const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
     await page.getByTestId("admin.users.invite.form.submit").click();
     await inviteResponsePromise;
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("invite-user-modal.close").click();
 
     const message = await getLatestEmail(newUserEmail);
@@ -203,7 +187,6 @@ test.describe("Email Translations", () => {
     const orgName = "Test Organization 3";
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
 
     await switchLocale(page, "German");
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
@@ -212,7 +195,6 @@ test.describe("Email Translations", () => {
 
     await page.getByTestId("app.organization-switcher").click();
     await page.getByText(orgName, { exact: true }).click();
-    await page.waitForLoadState("networkidle");
 
     await page.getByTestId("app.organization-switcher").click();
     const inviteButton = page.getByTestId("app.organization-switcher.invite");
@@ -222,7 +204,6 @@ test.describe("Email Translations", () => {
     const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
     await page.getByTestId("admin.users.invite.form.submit").click();
     await inviteResponsePromise;
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("invite-user-modal.close").click();
 
     const message = await getLatestEmail(newUserEmail);

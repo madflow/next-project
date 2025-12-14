@@ -9,7 +9,6 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Verify that the dataset selection shows placeholder text by default
@@ -18,7 +17,6 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
 
     // Test page reload - should still show placeholder
     await page.reload();
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     const datasetTriggerAfterReload = page.getByTestId("app.dropdown.dataset.trigger");
@@ -26,9 +24,7 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
 
     // Test navigation - should still show placeholder
     await page.goBack();
-    await page.waitForLoadState("networkidle");
     await page.goForward();
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     const datasetTriggerAfterNavigation = page.getByTestId("app.dropdown.dataset.trigger");
@@ -41,7 +37,6 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Click dataset dropdown
@@ -59,7 +54,6 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
 
       // Test page reload - should persist selection
       await page.reload();
-      await page.waitForLoadState("networkidle");
       await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
       const datasetTriggerAfterReload = page.getByTestId("app.dropdown.dataset.trigger");

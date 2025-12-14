@@ -10,7 +10,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
 
     // Navigate to adhoc analysis
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Click dataset dropdown trigger
@@ -39,7 +38,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
     await expect(datasetTrigger).toContainText(selectedDataset);
 
     // Wait for variable groups to load
-    await page.waitForLoadState("networkidle");
     await page.waitForTimeout(3000);
 
     // Check if any variable groups are available
@@ -90,7 +88,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
 
       if (chartVariableFound) {
         // Wait for analysis to load
-        await page.waitForLoadState("networkidle");
         await page.waitForTimeout(3000);
 
         // Look for chart type selector/switcher
@@ -155,7 +152,6 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
                 optionFound = true;
 
                 // Wait for chart to render
-                await page.waitForLoadState("networkidle");
                 await page.waitForTimeout(2000);
 
                 // Verify the chart type is applied

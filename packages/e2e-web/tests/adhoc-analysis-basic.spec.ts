@@ -12,7 +12,6 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
 
     // Navigate to adhoc analysis
     await page.goto("/project/test-project/adhoc");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     // Click dataset dropdown trigger
@@ -26,7 +25,6 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
 
     // Wait for variable groups to load
-    await page.waitForLoadState("networkidle");
     await page.waitForTimeout(3000);
 
     // Try to find "Demografische Daten" variable group
@@ -46,7 +44,6 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
         await alterVariable.click();
 
         // Wait for analysis to load
-        await page.waitForLoadState("networkidle");
         await page.waitForTimeout(2000);
 
         // Check if a Mean Chart or any analysis visualization appears
@@ -83,7 +80,6 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
         const firstVariable = page.locator('[data-testid^="variable-item-"]').first();
         if ((await firstVariable.count()) > 0) {
           await firstVariable.click();
-          await page.waitForLoadState("networkidle");
           console.log("✓ Selected first available variable from first available group");
         }
       } else {

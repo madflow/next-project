@@ -8,7 +8,6 @@ test.describe("Admin Datasets", () => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
     await page.getByTestId("admin.datasets.create.upload").click();
     const uploadFile = page.getByTestId("file-upload-input");

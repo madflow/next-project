@@ -12,7 +12,6 @@ test.describe("Admin Dataset Missing Ranges Import", () => {
 
     // Navigate to the datasets page
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     // Upload the demo.sav file which has missing ranges for the "internet" variable
@@ -27,11 +26,9 @@ test.describe("Admin Dataset Missing Ranges Import", () => {
 
     // Wait for the dataset list to appear and navigation to complete
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.waitForLoadState("networkidle");
 
     // Search for and click on the newly created dataset
     await page.getByTestId("app.datatable.search-input").fill(datasetName);
-    await page.waitForLoadState("networkidle");
     await page.getByRole("link", { name: datasetName }).click();
 
     // Wait for the dataset editor page to load
@@ -42,9 +39,6 @@ test.describe("Admin Dataset Missing Ranges Import", () => {
     // Click the edit button for the internet variable
     await page.getByTestId("app.admin.dataset-variable.edit-internet").waitFor({ state: "visible", timeout: 5000 });
     await page.getByTestId("app.admin.dataset-variable.edit-internet").click();
-
-    // Wait for the edit form to appear
-    await page.waitForLoadState("networkidle");
 
     // Verify missing ranges were imported from the SPSS file
     // The demo.sav file defines missing ranges for "internet": [{ lo: 8.0, hi: 8.0 }, { lo: 9.0, hi: 9.0 }]

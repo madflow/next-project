@@ -15,7 +15,6 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Create a test dataset
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     await page.getByTestId("admin.datasets.create.upload").click();
@@ -34,7 +33,6 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Navigate to Variable Sets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
   });
 
   test("should create a new variable set successfully", async ({ page }) => {
@@ -431,9 +429,7 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Navigate to variables tab and back
     await page.getByTestId("app.admin.editor.variables.tab").click();
-    await page.waitForLoadState("networkidle");
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
-    await page.waitForLoadState("networkidle");
 
     // Verify the set still exists
     await expect(

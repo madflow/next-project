@@ -4,7 +4,6 @@ test.describe.configure({ mode: "parallel" });
 test.describe("Locale Switcher on Login Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
   });
 
   test("should switch between English and German", async ({ page }) => {

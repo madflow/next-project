@@ -13,7 +13,6 @@ test.describe("Admin Dataset Variable Edit", () => {
 
     // Navigate to the datasets page
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     // Search for and click on the test dataset
@@ -21,12 +20,10 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("link", { name: DATASET_NAME }).click();
 
     // Wait for the dataset editor page to load
-    await page.waitForLoadState("networkidle");
 
     // Search for the "age" variable
     await page.getByTestId("app.datatable.search-input").click();
     await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.waitForLoadState("networkidle");
 
     // Click the edit button for the age variable
     await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
@@ -34,7 +31,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
     // Wait for the edit form to appear
-    await page.waitForLoadState("networkidle");
 
     // Add missing values - locate the spinbutton within the Missing Values group
     const missingValuesGroup = page.getByRole("group").filter({ hasText: "Missing Values" });
@@ -79,7 +75,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
 
     // Wait for the save to complete and return to the dataset editor
-    await page.waitForLoadState("networkidle");
 
     // Verify we're back on the dataset editor page
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
@@ -91,7 +86,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
-    await page.waitForLoadState("networkidle");
 
     // Verify missing values are still there
     const missingValuesGroupRecheck = page.getByRole("group").filter({ hasText: "Missing Values" });
@@ -128,7 +122,6 @@ test.describe("Admin Dataset Variable Edit", () => {
 
     // Save cleanup changes
     await page.getByRole("button", { name: "Save changes" }).click();
-    await page.waitForLoadState("networkidle");
   });
 
   test("should validate missing ranges (low must be <= high)", async ({ page }) => {
@@ -138,7 +131,6 @@ test.describe("Admin Dataset Variable Edit", () => {
 
     // Navigate to the datasets page
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     // Search for and click on the test dataset
@@ -147,7 +139,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.waitForURL("**/admin/datasets/**");
 
     // Wait for the dataset editor page to load
-    await page.waitForLoadState("networkidle");
 
     // Search for the "age" variable
     await page.getByTestId("app.datatable.search-input").click();
@@ -159,7 +150,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
     // Wait for the edit form to appear
-    await page.waitForLoadState("networkidle");
 
     // Try to add an invalid missing range (high < low)
     const missingRangesGroup = page.getByRole("group").filter({ hasText: "Missing Ranges" });
@@ -180,7 +170,6 @@ test.describe("Admin Dataset Variable Edit", () => {
 
     // Navigate to the datasets page
     await page.goto("/admin/datasets");
-    await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     // Search for and click on the test dataset
@@ -189,7 +178,6 @@ test.describe("Admin Dataset Variable Edit", () => {
 
     await page.waitForURL("**/admin/datasets/**");
     // Wait for the dataset editor page to load
-    await page.waitForLoadState("networkidle");
 
     // Search for the "age" variable
     await page.getByTestId("app.datatable.search-input").click();
@@ -201,7 +189,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
     // Wait for the edit form to appear
-    await page.waitForLoadState("networkidle");
 
     // Add a missing value
     const missingValuesGroup = page.getByRole("group").filter({ hasText: "Missing Values" });

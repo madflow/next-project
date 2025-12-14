@@ -8,7 +8,6 @@ assert(SMTP_SERVER_API);
 const smtpServerApi = new MailpitClient(SMTP_SERVER_API);
 
 export async function loginUser(page: Page, email: string, password: string) {
-  await page.waitForLoadState("networkidle");
   await page.waitForSelector("data-testid=auth.login.form.email");
   await page.getByTestId("auth.login.form.email").fill(email);
   await page.getByTestId("auth.login.form.password").fill(password);
@@ -20,14 +19,12 @@ export async function loginUser(page: Page, email: string, password: string) {
 
   await getSessionResponse;
 
-  await page.waitForLoadState("networkidle");
   await page.waitForSelector("data-testid=app.sidebar.user-menu-trigger");
 }
 
 export async function logoutUser(page: Page) {
   await page.getByTestId("app.sidebar.user-menu-trigger").click();
   await page.getByTestId("app.sign-out").click();
-  await page.waitForLoadState("networkidle");
   await page.waitForSelector("data-testid=auth.login.form.submit");
 }
 
