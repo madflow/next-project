@@ -341,7 +341,15 @@ test.describe("Admin Dataset Variable Sets", () => {
     expect(restoredVariableCount).toBe(initialVariableCount);
 
     // Test search with no results
+    // http://localhost:3000/api/datasets/0198e639-3e96-734b-b0db-af0c4350a2c4/variables/unassigned?limit=100&offset=0&search=nonexistentvariablename123
+    const searchResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes("/variables/unassigned") &&
+        response.request().url().includes("search=nonexistentvariablename123") &&
+        response.status() === 200
+    );
     await searchInput.fill("nonexistentvariablename123");
+    await searchResponsePromise;
     const noResultsCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(noResultsCount).toBe(0);
   });
