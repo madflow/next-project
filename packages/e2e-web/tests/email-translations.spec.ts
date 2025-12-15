@@ -8,15 +8,29 @@ async function switchLocale(page: Page, language: "German" | "Englisch") {
 }
 
 async function getLatestEmail(email: string) {
-  const searchMessages = await smtpServerApi.searchMessages({
-    query: `to:"${email}"`,
-  });
-  expect(searchMessages.messages.length).toBeGreaterThan(0);
-  return searchMessages.messages[0];
+  let tries = 0;
+  const maxTries = 5;
+  const delay = 1000; // 1 second
+
+  while (tries < maxTries) {
+    const searchMessages = await smtpServerApi.searchMessages({
+      query: `to:"${email}"`,
+    });
+    if (searchMessages.messages.length > 0) {
+      return searchMessages.messages[0];
+    }
+    tries++;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+  return null;
 }
 
 test.describe.configure({ mode: "parallel" });
 test.describe("Email Translations", () => {
+  test.afterAll(async () => {
+    await smtpServerApi.deleteMessages();
+  });
+
   test("email verification email should be sent in English when locale is English", async ({ page }) => {
     const userEmail = `e2e-email-verify-en-${Date.now()}@example.com`;
     const password = crypto.randomUUID();
@@ -30,11 +44,13 @@ test.describe("Email Translations", () => {
     await page.getByTestId("auth.sign-up.form.password").fill(password);
     await page.getByTestId("auth.sign-up.form.confirm-password").fill(password);
     await page.getByTestId("auth.sign-up.form.name").fill("E2E User EN");
+    // http://localhost:3000/api/auth/sign-up/email
+    const signupResponsePromise = page.waitForResponse("api/auth/sign-up/email");
     await page.getByTestId("auth.sign-up.form.submit").click();
-
+    await signupResponsePromise;
 
     const message = await getLatestEmail(userEmail);
-    expect(message.Subject).toBe("Email Verification");
+    expect(message?.Subject).toBe("Email Verification");
 
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
   });
@@ -53,11 +69,13 @@ test.describe("Email Translations", () => {
     await page.getByTestId("auth.sign-up.form.password").fill(password);
     await page.getByTestId("auth.sign-up.form.confirm-password").fill(password);
     await page.getByTestId("auth.sign-up.form.name").fill("E2E User DE");
-    await page.getByTestId("auth.sign-up.form.submit").click();
 
+    const signupResponsePromise = page.waitForResponse("api/auth/sign-up/email");
+    await page.getByTestId("auth.sign-up.form.submit").click();
+    await signupResponsePromise;
 
     const message = await getLatestEmail(userEmail);
-    expect(message.Subject).toBe("E-Mail-Verifizierung");
+    expect(message?.Subject).toBe("E-Mail-Verifizierung");
 
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
   });
@@ -71,11 +89,12 @@ test.describe("Email Translations", () => {
 
     await page.goto("/auth/forgot-password");
     await page.getByTestId("auth.forgot-password.form.email").fill(userEmail);
+    const resetResponsePromise = page.waitForResponse("api/auth/request-password-reset");
     await page.getByTestId("auth.forgot-password.form.submit").click();
-
+    await resetResponsePromise;
 
     const message = await getLatestEmail(userEmail);
-    expect(message.Subject).toBe("Reset your password");
+    expect(message?.Subject).toBe("Reset your password");
 
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
   });
@@ -90,11 +109,13 @@ test.describe("Email Translations", () => {
 
     await page.goto("/auth/forgot-password");
     await page.getByTestId("auth.forgot-password.form.email").fill(userEmail);
-    await page.getByTestId("auth.forgot-password.form.submit").click();
 
+    const resetResponsePromise = page.waitForResponse("api/auth/request-password-reset");
+    await page.getByTestId("auth.forgot-password.form.submit").click();
+    await resetResponsePromise;
 
     const message = await getLatestEmail(userEmail);
-    expect(message.Subject).toBe("Passwort zurücksetzen");
+    expect(message?.Subject).toBe("Passwort zurücksetzen");
 
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
   });
@@ -111,7 +132,9 @@ test.describe("Email Translations", () => {
     await page.goto("/user/account");
     await page.waitForURL(/\/user\/account/);
     await page.getByTestId("app.user.account.email").fill(newEmail);
+    const changeEmailResponsePromise = page.waitForResponse("api/auth/change-email");
     await page.getByTestId("app.user.account.email.update").click();
+    await changeEmailResponsePromise;
 
     const message = await getLatestEmail(userEmail);
     expect(message.Subject).toBe("Confirm your new email address");
@@ -140,7 +163,7 @@ test.describe("Email Translations", () => {
     await page.getByTestId("app.user.account.email.update").click();
 
     const message = await getLatestEmail(userEmail);
-    expect(message.Subject).toBe("Bestätigen Sie Ihre neue E-Mail-Adresse");
+    expect(message?.Subject).toBe("Bestätigen Sie Ihre neue E-Mail-Adresse");
 
     const verifyLink = await extractLinkFromMessage(message, "verify-email");
     expect(verifyLink).toBeTruthy();
@@ -150,10 +173,12 @@ test.describe("Email Translations", () => {
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${newEmail}"` });
   });
 
-  test("organization invite email should be sent in English when inviter locale is English", async ({ page }) => {
+  test("organization invite email should be sent in English when inviter locale is English", async ({ context }) => {
     const newUserEmail = `e2e-invite-en-${Date.now()}@example.com`;
     const inviterEmail = testUsers.accountMultipleOrgs.email;
     const orgName = "Test Organization 3";
+
+    const page = await context.newPage();
 
     await page.goto("/");
 
@@ -164,6 +189,7 @@ test.describe("Email Translations", () => {
     await page.getByTestId("app.organization-switcher").click();
     await page.getByText(orgName, { exact: true }).click();
 
+    await page.getByTestId("app.organization-switcher").waitFor({ state: "visible", timeout: 5000 });
     await page.getByTestId("app.organization-switcher").click();
     const inviteButton = page.getByTestId("app.organization-switcher.invite");
     await inviteButton.waitFor({ state: "visible", timeout: 5000 });
@@ -175,7 +201,7 @@ test.describe("Email Translations", () => {
     await page.getByTestId("invite-user-modal.close").click();
 
     const message = await getLatestEmail(newUserEmail);
-    expect(message.Subject).toBe("You have been invited");
+    expect(message?.Subject).toBe("You have been invited");
 
     await logoutUser(page);
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${newUserEmail}"` });
@@ -207,7 +233,7 @@ test.describe("Email Translations", () => {
     await page.getByTestId("invite-user-modal.close").click();
 
     const message = await getLatestEmail(newUserEmail);
-    expect(message.Subject).toBe("Sie wurden eingeladen");
+    expect(message?.Subject).toBe("Sie wurden eingeladen");
 
     await logoutUser(page);
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${newUserEmail}"` });
