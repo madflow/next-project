@@ -299,17 +299,14 @@ export async function getCurrentUserOrganizations(): Promise<z.infer<typeof sele
 
   const db = await getAuthenticatedClient();
 
-  const foundOrganizations = [];
   const userOrganizations = await db
-    .select()
+    .select({ organizations: organization })
     .from(organization)
     .innerJoin(member, eq(member.organizationId, organization.id))
     .innerJoin(entity, eq(member.userId, entity.id))
     .where(eq(member.userId, userId));
 
-  for (const { organizations: org } of userOrganizations) {
-    foundOrganizations.push(org);
-  }
-
-  return foundOrganizations;
+  return userOrganizations.map((uo) => {
+    return uo.organizations;
+  });
 }
