@@ -113,9 +113,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].projects.name.toLowerCase()).toContain("test");
-      }
+      expect(data.rows[0].projects.name.toLowerCase()).toContain("test");
     });
   });
 
@@ -128,9 +126,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        expect(data.rows[0].projects.name <= data.rows[1].projects.name).toBe(true);
-      }
+      expect(data.rows[0].projects.name <= data.rows[1].projects.name).toBe(true);
     });
 
     test("orders by project name descending", async ({ page }) => {
@@ -141,9 +137,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        expect(data.rows[0].projects.name >= data.rows[1].projects.name).toBe(true);
-      }
+      expect(data.rows[0].projects.name >= data.rows[1].projects.name).toBe(true);
     });
 
     test("orders by organization name using joined table syntax", async ({ page }) => {
@@ -167,11 +161,9 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        const firstDate = new Date(data.rows[0].projects.createdAt);
-        const secondDate = new Date(data.rows[1].projects.createdAt);
-        expect(firstDate >= secondDate).toBe(true);
-      }
+      const firstDate = new Date(data.rows[0].projects.createdAt);
+      const secondDate = new Date(data.rows[1].projects.createdAt);
+      expect(firstDate >= secondDate).toBe(true);
     });
 
     test("handles multiple order criteria", async ({ page }) => {
@@ -206,9 +198,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].projects.name).toBe("Test Project");
-      }
+      expect(data.rows[0].projects.name).toBe("Test Project");
     });
 
     test("filters by project slug", async ({ page }) => {
@@ -219,9 +209,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].projects.slug).toBe("test-project");
-      }
+      expect(data.rows[0].projects.slug).toBe("test-project");
     });
 
     test("filters by organization name using joined table syntax", async ({ page }) => {
@@ -232,10 +220,8 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0]).toHaveProperty("organizations");
-        expect(data.rows[0].organizations.name).toBe("Test Organization");
-      }
+      expect(data.rows[0]).toHaveProperty("organizations");
+      expect(data.rows[0].organizations.name).toBe("Test Organization");
     });
 
     test("filters by organization slug using joined table syntax", async ({ page }) => {
@@ -246,9 +232,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].organizations.slug).toBe("test-organization");
-      }
+      expect(data.rows[0].organizations.slug).toBe("test-organization");
     });
 
     test("applies multiple filters with AND logic", async ({ page }) => {
@@ -259,10 +243,8 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].projects.name).toBe("Test Project");
-        expect(data.rows[0].organizations.name).toBe("Test Organization");
-      }
+      expect(data.rows[0].projects.name).toBe("Test Project");
+      expect(data.rows[0].organizations.name).toBe("Test Organization");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
@@ -314,9 +296,7 @@ test.describe("API Projects", () => {
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
-      if (data.rows.length > 0) {
-        expect(data.rows[0].organizations.name).toBe("Test Organization");
-      }
+      expect(data.rows[0].organizations.name).toBe("Test Organization");
     });
   });
 
@@ -347,18 +327,16 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        const project = data.rows[0];
-        expect(project).toHaveProperty("projects");
-        expect(project.projects).toHaveProperty("id");
-        expect(project.projects).toHaveProperty("name");
-        expect(project.projects).toHaveProperty("slug");
-        expect(project.projects).toHaveProperty("organizationId");
-        expect(project).toHaveProperty("organizations");
-        expect(project.organizations).toHaveProperty("id");
-        expect(project.organizations).toHaveProperty("name");
-        expect(project.organizations).toHaveProperty("slug");
-      }
+      const project = data.rows[0];
+      expect(project).toHaveProperty("projects");
+      expect(project.projects).toHaveProperty("id");
+      expect(project.projects).toHaveProperty("name");
+      expect(project.projects).toHaveProperty("slug");
+      expect(project.projects).toHaveProperty("organizationId");
+      expect(project).toHaveProperty("organizations");
+      expect(project.organizations).toHaveProperty("id");
+      expect(project.organizations).toHaveProperty("name");
+      expect(project.organizations).toHaveProperty("slug");
     });
 
     test("count accuracy with filters", async ({ page }) => {
@@ -386,10 +364,8 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].projects.id).toBe("0198e5a9-a975-7ac3-9eec-a70e2a3df131");
-        expect(data.rows[0].organizations.id).toBe("0198e5a9-39c8-70db-9c7d-e11ab6d9aea7");
-      }
+      expect(data.rows[0].projects.id).toBe("0198e5a9-a975-7ac3-9eec-a70e2a3df131");
+      expect(data.rows[0].organizations.id).toBe("0198e5a9-39c8-70db-9c7d-e11ab6d9aea7");
     });
   });
 });
