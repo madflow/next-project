@@ -362,29 +362,27 @@ test.describe("API Stats Endpoint", () => {
 
       expect(Array.isArray(data)).toBe(true);
 
-      if (data.length > 0) {
-        const stat = data[0];
-        expect(stat).toHaveProperty("variable");
-        expect(stat).toHaveProperty("stats");
+      const stat = data[0];
+      expect(stat).toHaveProperty("variable");
+      expect(stat).toHaveProperty("stats");
 
-        const stats = stat.stats;
-        expect(stats).toHaveProperty("max");
-        expect(stats).toHaveProperty("mean");
-        expect(stats).toHaveProperty("median");
-        expect(stats).toHaveProperty("min");
-        expect(stats).toHaveProperty("std");
-        expect(stats).toHaveProperty("range");
-        expect(stats).toHaveProperty("count");
+      const stats = stat.stats;
+      expect(stats).toHaveProperty("max");
+      expect(stats).toHaveProperty("mean");
+      expect(stats).toHaveProperty("median");
+      expect(stats).toHaveProperty("min");
+      expect(stats).toHaveProperty("std");
+      expect(stats).toHaveProperty("range");
+      expect(stats).toHaveProperty("count");
 
-        expect(typeof stat.variable).toBe("string");
-        expect(typeof stats.max).toBe("number");
-        expect(typeof stats.mean).toBe("number");
-        expect(typeof stats.median).toBe("number");
-        expect(typeof stats.min).toBe("number");
-        expect(typeof stats.std).toBe("number");
-        expect(typeof stats.range).toBe("number");
-        expect(typeof stats.count).toBe("number");
-      }
+      expect(typeof stat.variable).toBe("string");
+      expect(typeof stats.max).toBe("number");
+      expect(typeof stats.mean).toBe("number");
+      expect(typeof stats.median).toBe("number");
+      expect(typeof stats.min).toBe("number");
+      expect(typeof stats.std).toBe("number");
+      expect(typeof stats.range).toBe("number");
+      expect(typeof stats.count).toBe("number");
     });
   });
 });
