@@ -110,7 +110,10 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.email").fill(newEmail);
 
     // Submit the form
+    // http://localhost:3000/api/auth/change-email
+    const updateEmailPromise = page.waitForResponse(/change-email/);
     await page.getByTestId("app.user.account.email.update").click();
+    await updateEmailPromise;
 
     // Wait for the verification email (sent to the old email address)
     const searchMessages = await smtpServerApi.searchMessages({
