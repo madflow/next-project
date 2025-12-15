@@ -16,8 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAppContext } from "@/context/app-context";
+import { useCurrentuserOrganizations } from "@/hooks/use-currentuser-organizations";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { organization, useListOrganizations } from "@/lib/auth-client";
+import { organization } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { InviteUserModal } from "./invite-user-modal";
 import { SidebarMenu, SidebarMenuItem } from "./ui/sidebar";
@@ -29,7 +30,7 @@ type OrganizationMenuProps = {
 export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) {
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { data: organizations = [], isPending: isOrgsLoading } = useListOrganizations();
+  const { data: organizations = [], isPending: isOrgsLoading } = useCurrentuserOrganizations();
 
   const [isSwitching, setIsSwitching] = useState(false);
   const [openInvitationModal, setOpenInvitationModal] = useState(false);

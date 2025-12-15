@@ -1,7 +1,13 @@
 import "server-only";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { user as entity, selectUserSchema } from "@repo/database/schema";
+import {
+  user as entity,
+  member,
+  organization,
+  selectOrganizationSchema,
+  selectUserSchema,
+} from "@repo/database/schema";
 import { createFind, createList, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/lib/dal";
 import { DalNotAuthorizedException } from "@/lib/exception";
 
@@ -252,3 +258,58 @@ export const getUserWithContext = async (): Promise<
     };
   }
 };
+
+export async function getCurrentUser(): Promise<UserDetails | null> {
+  const sessionUser = await getSessionUser();
+
+  if (!sessionUser) {
+    return null;
+  }
+  const db = await getAuthenticatedClient();
+  const [user] = await db.select().from(entity).where(eq(entity.id, sessionUser.id)).limit(1);
+  if (!user) {
+    return null;
+  }
+
+  const parsed = userDetailsSchema.safeParse({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    emailVerified: user.emailVerified,
+    image: user.image,
+    role: user.role,
+    locale: user.locale,
+  });
+
+  if (parsed.success) {
+    return parsed.data;
+  } else {
+    return null;
+  }
+}
+
+export async function getCurrentUserOrganizations(): Promise<z.infer<typeof selectOrganizationSchema>[]> {
+  const sessionUser = await getSessionUser();
+
+  if (!sessionUser) {
+    return [];
+  }
+
+  const userId = sessionUser.id;
+
+  const db = await getAuthenticatedClient();
+
+  const foundOrganizations = [];
+  const userOrganizations = await db
+    .select()
+    .from(organization)
+    .innerJoin(member, eq(member.organizationId, organization.id))
+    .innerJoin(entity, eq(member.userId, entity.id))
+    .where(eq(member.userId, userId));
+
+  for (const { organizations: org } of userOrganizations) {
+    foundOrganizations.push(org);
+  }
+
+  return foundOrganizations;
+}
