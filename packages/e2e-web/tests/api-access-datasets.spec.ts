@@ -161,7 +161,7 @@ test.describe("API Datasets", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/datasets?name=demo.sav");
+      const response = await page.request.get("/api/datasets?filename=demo.sav");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
