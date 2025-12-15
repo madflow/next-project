@@ -59,7 +59,9 @@ test.describe("Organization members", () => {
       await loginUser(page, user.email, user.password);
 
       // If user has no organizations, verify no organization is selected
+      // eslint-disable-next-line playwright/no-conditional-in-test
       if (testCase.organizations.length === 0) {
+        // eslint-disable-next-line
         await expect(page.getByTestId("app.organization-switcher")).toContainText("Select organization");
         return;
       }
@@ -70,9 +72,11 @@ test.describe("Organization members", () => {
 
         // Only switch organizations if user has multiple orgs
         // For single-org users, the org is already selected by default
+        // eslint-disable-next-line playwright/no-conditional-in-test
         if (testCase.organizations.length > 1) {
           // Check if we need to switch (org not already selected)
           const currentOrgText = await organizationSwitcher.locator("span").textContent();
+          // eslint-disable-next-line playwright/no-conditional-in-test
           if (currentOrgText !== org.name) {
             // Open dropdown and select the organization
             await organizationSwitcher.click();
