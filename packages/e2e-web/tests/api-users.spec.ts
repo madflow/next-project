@@ -113,6 +113,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].name.toLowerCase()).toContain("admin");
     });
   });
@@ -126,6 +127,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].name <= data.rows[1].name).toBe(true);
     });
 
@@ -137,6 +139,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].name >= data.rows[1].name).toBe(true);
     });
 
@@ -162,6 +165,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       const firstDate = new Date(data.rows[0].createdAt);
       const secondDate = new Date(data.rows[1].createdAt);
       expect(firstDate >= secondDate).toBe(true);
@@ -199,6 +203,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].name).toBe("Admin User");
     });
 
@@ -210,6 +215,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].email).toBe("admin@example.com");
     });
 
@@ -221,6 +227,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].role).toBe("admin");
     });
 
@@ -232,6 +239,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].role).toBe("admin");
       expect(data.rows[0].name).toBe("Admin User");
     });
@@ -283,6 +291,7 @@ test.describe("API Users", () => {
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].role).toBe("user");
     });
   });
@@ -314,6 +323,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       const user = data.rows[0];
       expect(user).toHaveProperty("id");
       expect(user).toHaveProperty("name");
@@ -348,6 +358,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].email).toBe("admin@example.com");
       expect(data.rows[0].role).toBe("admin");
     });

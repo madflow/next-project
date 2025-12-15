@@ -137,6 +137,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].projects.name >= data.rows[1].projects.name).toBe(true);
     });
 
@@ -161,6 +162,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       const firstDate = new Date(data.rows[0].projects.createdAt);
       const secondDate = new Date(data.rows[1].projects.createdAt);
       expect(firstDate >= secondDate).toBe(true);
@@ -327,6 +329,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       const project = data.rows[0];
       expect(project).toHaveProperty("projects");
       expect(project.projects).toHaveProperty("id");
