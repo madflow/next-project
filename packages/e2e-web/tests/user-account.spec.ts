@@ -144,9 +144,9 @@ test.describe("User Account", () => {
     await page.goto("/user/account");
 
     const avatarContainer = page.getByTestId("app.user.account.avatar-container");
-    await avatarContainer.waitFor({ state: "visible", timeout: 15001 });
+    await avatarContainer.waitFor({ state: "visible", timeout: 5000 });
 
-    await page.waitForSelector("data-testid=app.user.account.avatar-upload-button");
+    await page.getByTestId("app.user.account.avatar-upload-button").waitFor({ state: "visible" });
     await page.getByTestId("app.user.account.avatar-upload-button").click();
 
     const fileInput = page.getByTestId("app.user.account.avatar-file-input");
@@ -163,14 +163,14 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.avatar-save-button").click();
     await uploadPromise;
 
-    await page.waitForSelector("data-testid=app.user.account.avatar-container");
+    await page.getByTestId("app.user.account.avatar-container").waitFor({ state: "visible" });
     await expect(page.getByTestId("app.user.account.avatar-container")).toBeVisible();
     const avatarExistsResponse = page.waitForResponse(
       /\/api\/users\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/avatars\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.svg/i
     );
     await page.reload();
     await avatarExistsResponse;
-    await page.waitForSelector("data-testid=app.user.account.avatar-container");
+    await page.getByTestId("app.user.account.avatar-container").waitFor({ state: "visible" });
     await expect(page.getByTestId("app.user.account.avatar-container")).toBeVisible();
   });
 
