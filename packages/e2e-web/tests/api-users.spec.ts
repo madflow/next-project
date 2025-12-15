@@ -113,9 +113,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].name.toLowerCase()).toContain("admin");
-      }
+      expect(data.rows[0].name.toLowerCase()).toContain("admin");
     });
   });
 
@@ -128,9 +126,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        expect(data.rows[0].name <= data.rows[1].name).toBe(true);
-      }
+      expect(data.rows[0].name <= data.rows[1].name).toBe(true);
     });
 
     test("orders by user name descending", async ({ page }) => {
@@ -141,9 +137,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        expect(data.rows[0].name >= data.rows[1].name).toBe(true);
-      }
+      expect(data.rows[0].name >= data.rows[1].name).toBe(true);
     });
 
     test("orders by email", async ({ page }) => {
@@ -168,11 +162,9 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        const firstDate = new Date(data.rows[0].createdAt);
-        const secondDate = new Date(data.rows[1].createdAt);
-        expect(firstDate >= secondDate).toBe(true);
-      }
+      const firstDate = new Date(data.rows[0].createdAt);
+      const secondDate = new Date(data.rows[1].createdAt);
+      expect(firstDate >= secondDate).toBe(true);
     });
 
     test("handles multiple order criteria", async ({ page }) => {
@@ -207,9 +199,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].name).toBe("Admin User");
-      }
+      expect(data.rows[0].name).toBe("Admin User");
     });
 
     test("filters by user email", async ({ page }) => {
@@ -220,9 +210,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].email).toBe("admin@example.com");
-      }
+      expect(data.rows[0].email).toBe("admin@example.com");
     });
 
     test("filters by user role", async ({ page }) => {
@@ -233,9 +221,7 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].role).toBe("admin");
-      }
+      expect(data.rows[0].role).toBe("admin");
     });
 
     test("applies multiple filters with AND logic", async ({ page }) => {
@@ -246,10 +232,8 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].role).toBe("admin");
-        expect(data.rows[0].name).toBe("Admin User");
-      }
+      expect(data.rows[0].role).toBe("admin");
+      expect(data.rows[0].name).toBe("Admin User");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
@@ -299,9 +283,7 @@ test.describe("API Users", () => {
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
-      if (data.rows.length > 0) {
-        expect(data.rows[0].role).toBe("user");
-      }
+      expect(data.rows[0].role).toBe("user");
     });
   });
 
@@ -332,15 +314,13 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        const user = data.rows[0];
-        expect(user).toHaveProperty("id");
-        expect(user).toHaveProperty("name");
-        expect(user).toHaveProperty("email");
-        expect(user).toHaveProperty("role");
-        expect(user).toHaveProperty("createdAt");
-        expect(user).toHaveProperty("updatedAt");
-      }
+      const user = data.rows[0];
+      expect(user).toHaveProperty("id");
+      expect(user).toHaveProperty("name");
+      expect(user).toHaveProperty("email");
+      expect(user).toHaveProperty("role");
+      expect(user).toHaveProperty("createdAt");
+      expect(user).toHaveProperty("updatedAt");
     });
 
     test("count accuracy with filters", async ({ page }) => {
@@ -368,10 +348,8 @@ test.describe("API Users", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].email).toBe("admin@example.com");
-        expect(data.rows[0].role).toBe("admin");
-      }
+      expect(data.rows[0].email).toBe("admin@example.com");
+      expect(data.rows[0].role).toBe("admin");
     });
   });
 });
