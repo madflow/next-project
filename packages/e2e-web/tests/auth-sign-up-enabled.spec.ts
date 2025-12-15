@@ -49,6 +49,7 @@ test("sign-up", async ({ page }) => {
   const linkCheck = await smtpServerApi.linkCheck(message.ID);
   let verifyLink = "";
   for (const link of linkCheck.Links) {
+    // eslint-disable-next-line
     if (link.URL.includes("verify-email")) {
       verifyLink = link.URL;
     }
