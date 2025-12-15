@@ -336,7 +336,14 @@ test.describe("Admin Dataset Variable Sets", () => {
     expect(filteredVariableCount).toBeLessThanOrEqual(initialVariableCount);
 
     // Clear search and verify variables list is restored
+    const searchResponsePromiseClear = page.waitForResponse(
+      (response) =>
+        response.url().includes("/variables/unassigned") &&
+        response.request().url().includes("search") === false &&
+        response.status() === 200
+    );
     await searchInput.clear();
+    await searchResponsePromiseClear;
     const restoredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
     expect(restoredVariableCount).toBe(initialVariableCount);
 
@@ -371,14 +378,9 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     // Assign a few variables to the set first
     const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
-    const buttonCount = await addButtons.count();
-    if (buttonCount > 0) {
-      await addButtons.first().click();
-      await expect(page.getByTestId("admin.dataset.variableset.assignment.remove").first()).toBeVisible();
-    }
-    if (buttonCount > 1) {
-      await addButtons.first().click(); // Add another variable
-    }
+    await addButtons.first().click();
+    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove").first()).toBeVisible();
+    await addButtons.first().click(); // Add another variable
 
     // Test search in assigned variables section
     const assignedSearchInput = page.getByPlaceholder(/search/i).last(); // Second search input (assigned section)
