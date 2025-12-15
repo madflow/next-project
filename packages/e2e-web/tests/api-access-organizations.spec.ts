@@ -136,6 +136,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].name >= data.rows[1].name).toBe(true);
     });
 
@@ -147,6 +148,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].slug <= data.rows[1].slug).toBe(true);
     });
 
@@ -158,6 +160,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       const firstDate = new Date(data.rows[0].createdAt);
       const secondDate = new Date(data.rows[1].createdAt);
       expect(firstDate >= secondDate).toBe(true);
@@ -301,6 +304,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       const organization = data.rows[0];
       expect(organization).toHaveProperty("id");
       expect(organization).toHaveProperty("name");

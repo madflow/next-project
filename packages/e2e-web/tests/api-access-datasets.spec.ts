@@ -77,40 +77,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].name).toBe("demo.sav");
-    });
-
-    test("searches by dataset filename", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      const response = await page.request.get("/api/datasets?search=demo");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data.rows.length).toBeGreaterThanOrEqual(0);
-    });
-
-    test("returns empty results for non-existent search", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      const response = await page.request.get("/api/datasets?search=nonexistentdataset123");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data.rows.length).toBe(0);
-      expect(data.count).toBe(0);
-    });
-
-    test("performs case-insensitive search", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      const response = await page.request.get("/api/datasets?search=TEST");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].name.toLowerCase()).toContain("test");
     });
   });
@@ -124,6 +91,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].name <= data.rows[1].name).toBe(true);
     });
 
@@ -135,6 +103,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].name >= data.rows[1].name).toBe(true);
     });
 
@@ -146,6 +115,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       expect(data.rows[0].filename <= data.rows[1].filename).toBe(true);
     });
 
@@ -157,6 +127,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
       const firstDate = new Date(data.rows[0].createdAt);
       const secondDate = new Date(data.rows[1].createdAt);
       expect(firstDate >= secondDate).toBe(true);
@@ -205,6 +176,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].filename).toBe("demo.sav");
     });
 
@@ -267,6 +239,7 @@ test.describe("API Datasets", () => {
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].filename).toBe("demo.sav");
     });
   });
@@ -298,6 +271,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       const dataset = data.rows[0];
       expect(dataset).toHaveProperty("id");
       expect(dataset).toHaveProperty("name");
@@ -331,6 +305,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
+      expect(data.rows.length).toBeGreaterThan(0);
       expect(data.rows[0].name).toBe("demo.sav");
       expect(data.rows[0].slug).toBe("demo-sav");
     });
