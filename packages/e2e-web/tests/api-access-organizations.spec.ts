@@ -112,9 +112,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].name.toLowerCase()).toContain("test");
-      }
+      expect(data.rows[0].name.toLowerCase()).toContain("test");
     });
   });
 
@@ -127,9 +125,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        expect(data.rows[0].name <= data.rows[1].name).toBe(true);
-      }
+      expect(data.rows[0].name <= data.rows[1].name).toBe(true);
     });
 
     test("orders by organization name descending", async ({ page }) => {
@@ -140,9 +136,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        expect(data.rows[0].name >= data.rows[1].name).toBe(true);
-      }
+      expect(data.rows[0].name >= data.rows[1].name).toBe(true);
     });
 
     test("orders by organization slug", async ({ page }) => {
@@ -153,9 +147,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        expect(data.rows[0].slug <= data.rows[1].slug).toBe(true);
-      }
+      expect(data.rows[0].slug <= data.rows[1].slug).toBe(true);
     });
 
     test("orders by creation date", async ({ page }) => {
@@ -166,11 +158,9 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 1) {
-        const firstDate = new Date(data.rows[0].createdAt);
-        const secondDate = new Date(data.rows[1].createdAt);
-        expect(firstDate >= secondDate).toBe(true);
-      }
+      const firstDate = new Date(data.rows[0].createdAt);
+      const secondDate = new Date(data.rows[1].createdAt);
+      expect(firstDate >= secondDate).toBe(true);
     });
 
     test("handles multiple order criteria", async ({ page }) => {
@@ -205,9 +195,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].name).toBe("Test Organization");
-      }
+      expect(data.rows[0].name).toBe("Test Organization");
     });
 
     test("filters by organization slug", async ({ page }) => {
@@ -218,9 +206,7 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].slug).toBe("test-organization");
-      }
+      expect(data.rows[0].slug).toBe("test-organization");
     });
 
     test("applies multiple filters with AND logic", async ({ page }) => {
@@ -231,10 +217,8 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].name).toBe("Test Organization");
-        expect(data.rows[0].slug).toBe("test-organization");
-      }
+      expect(data.rows[0].name).toBe("Test Organization");
+      expect(data.rows[0].slug).toBe("test-organization");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
@@ -286,9 +270,7 @@ test.describe("API Organizations", () => {
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
-      if (data.rows.length > 0) {
-        expect(data.rows[0].slug).toBe("test-organization");
-      }
+      expect(data.rows[0].slug).toBe("test-organization");
     });
   });
 
@@ -319,13 +301,11 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        const organization = data.rows[0];
-        expect(organization).toHaveProperty("id");
-        expect(organization).toHaveProperty("name");
-        expect(organization).toHaveProperty("slug");
-        expect(organization).toHaveProperty("createdAt");
-      }
+      const organization = data.rows[0];
+      expect(organization).toHaveProperty("id");
+      expect(organization).toHaveProperty("name");
+      expect(organization).toHaveProperty("slug");
+      expect(organization).toHaveProperty("createdAt");
     });
 
     test("count accuracy with filters", async ({ page }) => {
@@ -353,10 +333,8 @@ test.describe("API Organizations", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      if (data.rows.length > 0) {
-        expect(data.rows[0].name).toBe("Test Organization");
-        expect(data.rows[0].slug).toBe("test-organization");
-      }
+      expect(data.rows[0].name).toBe("Test Organization");
+      expect(data.rows[0].slug).toBe("test-organization");
     });
   });
 });
