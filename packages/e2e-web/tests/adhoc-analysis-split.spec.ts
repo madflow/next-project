@@ -1,10 +1,9 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/no-conditional-expect */
-import { Locator, expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 test.describe("Adhoc Analysis - Split Functionality", () => {
-  test("should select SPSS Beispielumfrage dataset and test split functionality", async ({ page }) => {
+  test("should select SPSS Beispielumfrage dataset", async ({ page }) => {
     // Login as admin
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
@@ -22,193 +21,126 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     // Verify dataset is selected
     const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
+  });
 
-    // Wait for variable groups to load
+  test("should display variable groups for SPSS Beispielumfrage dataset", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-    // Check if any variable groups are available
-    const anyVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
+    // Navigate to adhoc analysis
+    await page.goto("/project/test-project/adhoc");
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
-    if ((await anyVariableGroup.count()) > 0) {
-      console.log("✓ Variable groups found for SPSS Beispielumfrage dataset");
+    // Click dataset dropdown trigger
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-      // Since we don't know the exact variable names, let's explore available variables
-      // First, expand all groups and look for any variables that could be used for split testing
-      const allVariableGroups = page.locator('[data-testid^="variable-group-"]');
-      const groupCount = await allVariableGroups.count();
+    // Select "SPSS Beispielumfrage" dataset
+    await page.getByText("SPSS Beispielumfrage").click();
 
-      let targetVariableFound = false;
-      let firstAvailableVariable: Locator | null = null;
+    // Wait for and verify variable groups are available
+    const firstVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
+    await expect(firstVariableGroup).toBeVisible();
+  });
 
-      for (let i = 0; i < groupCount; i++) {
-        const group = allVariableGroups.nth(i);
-        const groupText = await group.textContent();
-        console.log(`Expanding group ${i}: "${groupText}"`);
-        await group.click();
+  test("should select a variable from SPSS Beispielumfrage dataset", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-        // Get all variables in this group
-        const variablesInGroup = page.locator('[data-testid^="variable-item-"]');
-        const variableCount = await variablesInGroup.count();
+    // Navigate to adhoc analysis
+    await page.goto("/project/test-project/adhoc");
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
-        console.log(`Found ${variableCount} variables in group "${groupText}"`);
+    // Click dataset dropdown trigger
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-        for (let j = 0; j < Math.min(variableCount, 3); j++) {
-          // Log first 3 variables
-          const variable = variablesInGroup.nth(j);
-          const variableText = await variable.textContent();
-          console.log(`  Variable ${j}: "${variableText}"`);
+    // Select "SPSS Beispielumfrage" dataset
+    await page.getByText("SPSS Beispielumfrage").click();
 
-          if (!firstAvailableVariable) {
-            firstAvailableVariable = variable;
-          }
-        }
+    // Wait for variable groups to be visible
+    const firstVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
+    await expect(firstVariableGroup).toBeVisible();
 
-        // Look for common variable names that might work for splitting
-        const commonSplitVariables = [
-          "Geschlecht",
-          "Gender",
-          "Alter",
-          "Age",
-          "Familienstand",
-          "Marital",
-          "Education",
-          "Bildung",
-          "Beruf",
-          "Occupation",
-        ];
+    // Expand the first variable group
+    await firstVariableGroup.click();
 
-        for (const varName of commonSplitVariables) {
-          const targetVariable = page.getByTestId(`variable-item-${varName}`);
-          if ((await targetVariable.count()) > 0) {
-            console.log(`✓ Found potential split variable: '${varName}'`);
-            await targetVariable.click();
-            targetVariableFound = true;
+    // Select the first available variable
+    const firstVariable = page.locator('[data-testid^="variable-item-"]').first();
+    await expect(firstVariable).toBeVisible();
+    await firstVariable.click();
 
-            // Wait for analysis to load
+    // Verify analysis loaded (page should still show the dataset)
+    const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
+    await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
+  });
 
-            break;
-          }
-        }
+  test("should select Alter variable for split analysis", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-        if (targetVariableFound) break;
-      }
+    // Navigate to adhoc analysis
+    await page.goto("/project/test-project/adhoc");
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
-      // If no specific variable found, use the first available one
-      if (!targetVariableFound && firstAvailableVariable) {
-        console.log("✓ Using first available variable for split testing");
-        await firstAvailableVariable.click();
-        targetVariableFound = true;
+    // Click dataset dropdown trigger
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-        // Wait for analysis to load
-      }
+    // Select "SPSS Beispielumfrage" dataset
+    await page.getByText("SPSS Beispielumfrage").click();
 
-      // Only proceed with split testing if we have a variable selected
-      if (targetVariableFound) {
-        // Now look for split functionality
-        // Check if there's a split button or dropdown
-        const splitButton = page.getByTestId("split-button");
-        const splitDropdown = page.getByTestId("split-dropdown");
-        const splitTrigger = page.locator('[data-testid*="split"]').first();
+    // Wait for variable groups
+    const firstVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
+    await expect(firstVariableGroup).toBeVisible();
 
-        if ((await splitButton.count()) > 0) {
-          console.log("✓ Found split button");
-          await splitButton.click();
-        } else if ((await splitDropdown.count()) > 0) {
-          console.log("✓ Found split dropdown");
-          await splitDropdown.click();
-        } else if ((await splitTrigger.count()) > 0) {
-          console.log("✓ Found split trigger");
-          await splitTrigger.click();
-        } else {
-          console.log("ℹ Split functionality not found via standard test IDs, looking for alternative selectors");
+    // Expand first group
+    await firstVariableGroup.click();
 
-          // Look for split functionality using text or other selectors
-          const splitByText = page.getByText("Split", { exact: false });
-          const splitByRole = page.getByRole("button", { name: /split/i });
+    // Select "Alter" variable specifically
+    const alterVariable = page.getByTestId("variable-item-Alter");
+    await expect(alterVariable).toBeVisible();
+    await alterVariable.click();
 
-          if ((await splitByText.count()) > 0) {
-            console.log("✓ Found split functionality via text");
-            await splitByText.first().click();
-          } else if ((await splitByRole.count()) > 0) {
-            console.log("✓ Found split functionality via role");
-            await splitByRole.first().click();
-          } else {
-            console.log(
-              "⚠ Split functionality not found - this might indicate the feature is not yet implemented or uses different selectors"
-            );
-          }
-        }
+    // Verify dataset is still selected
+    const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
+    await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
+  });
 
-        // Wait for split options to appear
+  test("should access split functionality with Familienstand", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-        // Look for common split variables in options
-        const commonSplitVars = ["Familienstand", "Geschlecht", "Gender", "Alter", "Age"];
-        let splitVarFound = false;
+    // Navigate to adhoc analysis
+    await page.goto("/project/test-project/adhoc");
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
-        for (const varName of commonSplitVars) {
-          const splitVarTestId = page.getByTestId(`split-variable-${varName}`);
-          // Use getByRole to find the option within a select/combobox context
-          const splitVarOption = page.getByRole("option", { name: varName });
-          // Fallback to exact text match to avoid matching "Familienstand (marital)" when looking for "Familienstand"
-          const splitVarExactText = page.getByText(varName, { exact: true });
+    // Click dataset dropdown trigger
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-          if ((await splitVarTestId.count()) > 0) {
-            console.log(`✓ Found '${varName}' in split options (via test ID)`);
-            await splitVarTestId.click();
-            splitVarFound = true;
-            break;
-          } else if ((await splitVarOption.count()) > 0) {
-            console.log(`✓ Found '${varName}' option via role`);
-            await splitVarOption.click();
-            splitVarFound = true;
-            break;
-          } else if ((await splitVarExactText.count()) > 0) {
-            console.log(`✓ Found '${varName}' option via exact text`);
-            await splitVarExactText.first().click();
-            splitVarFound = true;
-            break;
-          }
-        }
+    // Select "SPSS Beispielumfrage" dataset
+    await page.getByText("SPSS Beispielumfrage").click();
 
-        if (!splitVarFound) {
-          console.log("ℹ No common split variables found, looking for any available options");
+    // Wait for variable groups
+    const firstVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
+    await expect(firstVariableGroup).toBeVisible();
 
-          // Log available split options for debugging
-          const splitOptions = page.locator('[data-testid*="split-variable-"], [data-testid*="variable-"]');
-          const optionCount = await splitOptions.count();
-          console.log(`Available split options count: ${optionCount}`);
+    // Expand first group
+    await firstVariableGroup.click();
 
-          if (optionCount > 0) {
-            console.log("Using first available split variable as fallback");
-            await splitOptions.first().click();
-            splitVarFound = true;
-          }
-        }
+    // Select "Alter" variable
+    const alterVariable = page.getByTestId("variable-item-Alter");
+    await expect(alterVariable).toBeVisible();
+    await alterVariable.click();
 
-        if (splitVarFound) {
-          // Wait for split analysis to load
+    // Look for split functionality by text
+    const splitText = page.getByText("Familienstand", { exact: true });
+    await expect(splitText).toBeVisible();
+    await splitText.first().click();
 
-          // Verify that split analysis is displayed
-          const splitAnalysis = page.locator(
-            '[data-testid*="split"], [data-testid*="chart"], [data-testid*="analysis"]'
-          );
-          const splitVisualization = page.locator('[data-testid*="visualization"]');
-
-          if ((await splitAnalysis.count()) > 0) {
-            console.log("✓ Split analysis visualization displayed");
-            await expect(splitAnalysis.first()).toBeVisible();
-          } else if ((await splitVisualization.count()) > 0) {
-            console.log("✓ Analysis visualization displayed");
-            await expect(splitVisualization.first()).toBeVisible();
-          } else {
-            console.log("ℹ Split analysis visualization not yet available");
-          }
-        }
-      }
-    } else {
-      console.log("ℹ No variable groups available for SPSS Beispielumfrage dataset (dataset may still be processing)");
-    }
-
-    // Test passes if we successfully navigated and selected the dataset
+    // Verify dataset is still selected
+    const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
   });
 });
