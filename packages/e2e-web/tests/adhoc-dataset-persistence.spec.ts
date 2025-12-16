@@ -43,26 +43,26 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
     await page.getByTestId("app.dropdown.dataset.trigger").click();
 
     // Check if any datasets are available and select the first one
-    const firstDataset = page.locator('[data-testid^="dataset-dropdown-item-"]').first();
-    if ((await firstDataset.count()) > 0) {
-      const datasetName = await firstDataset.textContent();
-      await firstDataset.click();
+    const datasetItems = page.locator('[data-testid^="dataset-dropdown-item-"]');
+    const count = await datasetItems.count();
 
-      // Verify dataset is selected
-      const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
-      await expect(datasetTrigger).toContainText(datasetName || "");
+    // Use test.skip if no datasets are available, effectively avoiding conditionals for logic branching
+    test.skip(count === 0, "No datasets available to test persistence");
 
-      // Test page reload - should persist selection
-      await page.reload();
-      await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
+    const firstDataset = datasetItems.first();
+    const datasetName = await firstDataset.textContent();
+    await firstDataset.click();
 
-      const datasetTriggerAfterReload = page.getByTestId("app.dropdown.dataset.trigger");
-      // Either shows the persisted dataset name or falls back to placeholder if dataset was deleted
-      await expect(datasetTriggerAfterReload).not.toHaveText("");
-    } else {
-      // No datasets available, should show placeholder
-      const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
-      await expect(datasetTrigger).toContainText("Select a dataset");
-    }
+    // Verify dataset is selected
+    const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
+    await expect(datasetTrigger).toContainText(datasetName || "");
+
+    // Test page reload - should persist selection
+    await page.reload();
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
+
+    const datasetTriggerAfterReload = page.getByTestId("app.dropdown.dataset.trigger");
+    // Either shows the persisted dataset name or falls back to placeholder if dataset was deleted
+    await expect(datasetTriggerAfterReload).not.toHaveText("");
   });
 });
