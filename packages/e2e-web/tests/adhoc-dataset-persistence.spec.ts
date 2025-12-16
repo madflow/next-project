@@ -42,16 +42,11 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
     // Click dataset dropdown
     await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-    // Locate all available datasets in the dropdown
-    const datasetItems = page.locator('[data-testid^="dataset-dropdown-item-"]');
-    const count = await datasetItems.count();
+    // Select the first dataset - at least one dataset must exist in the test environment
+    const firstDataset = page.locator('[data-testid^="dataset-dropdown-item-"]').first();
 
-    // Skip test if no datasets exist - this avoids conditional branching in test logic
-    // which is flagged by playwright/no-conditional-in-test ESLint rule
-    test.skip(count === 0, "No datasets available to test persistence");
-
-    // At this point, at least one dataset exists - select the first one
-    const firstDataset = datasetItems.first();
+    // Wait for and get the dataset name
+    await expect(firstDataset).toBeVisible();
     const datasetName = await firstDataset.textContent();
 
     // Ensure dataset name exists and is not empty
