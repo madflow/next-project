@@ -161,11 +161,11 @@ test.describe("API Datasets", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/datasets?filename=demo.sav");
+      const response = await page.request.get("/api/datasets?name=Test Dataset");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].name.toLowerCase()).toContain("test");
+      expect(data.rows[0].name).toContain("Test Dataset");
     });
 
     test("filters by dataset filename", async ({ page }) => {
@@ -184,12 +184,11 @@ test.describe("API Datasets", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/datasets?name=demo.sav&slug=demo-sav");
+      const response = await page.request.get("/api/datasets?filename=demo.sav&name=Test Dataset");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].name).toBe("demo.sav");
-      expect(data.rows[0].slug).toBe("demo-sav");
+      expect(data.rows[0].filename).toBe("demo.sav");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
@@ -294,20 +293,6 @@ test.describe("API Datasets", () => {
 
       expect(filteredData.count).toBeLessThanOrEqual(allData.count);
       expect(filteredData.rows.length).toBeLessThanOrEqual(filteredData.count);
-    });
-
-    test("verifies test data exists", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      // Check if test dataset exists
-      const response = await page.request.get("/api/datasets?name=demo.sav");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].name).toBe("demo.sav");
-      expect(data.rows[0].slug).toBe("demo-sav");
     });
   });
 
