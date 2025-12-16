@@ -14,7 +14,7 @@
     "e2e:debug": "playwright test --debug",
     "e2e:ui": "playwright test --ui",
     "e2e:deps": "playwright install --with-deps",
-    "lint": "eslint ."
+    "lint": "eslint --max-warnings=0 ."
   },
   "keywords": [],
   "author": "",
