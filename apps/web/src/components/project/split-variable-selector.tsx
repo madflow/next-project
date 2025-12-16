@@ -56,7 +56,7 @@ export function SplitVariableSelector({
   };
 
   return (
-    <div className={compact ? "flex items-center gap-2" : "space-y-1"}>
+    <div className={compact ? "flex items-center gap-2" : "space-y-1"} data-testid="split-variable-selector">
       <div className="flex items-center gap-2">
         <Label htmlFor="split-variable-select" className="min-w-fit text-sm font-medium">
           {t("label")}
@@ -72,20 +72,23 @@ export function SplitVariableSelector({
         <Select value={selectedSplitVariable || "none"} onValueChange={handleValueChange}>
           <SelectTrigger
             id="split-variable-select"
+            data-testid="split-dropdown"
             className={compact ? "h-8 w-auto max-w-[250px] min-w-[180px]" : "h-8 flex-1"}>
             <SelectValue placeholder={t("placeholder")}>
               <span className="truncate">{getSelectedLabel()}</span>
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">{t("none")}</SelectItem>
+            <SelectItem value="none" data-testid="split-variable-none">
+              {t("none")}
+            </SelectItem>
             {isLoading && (
               <SelectItem value="loading" disabled>
                 {"Loading..."}
               </SelectItem>
             )}
             {splitVariables.map((variable) => (
-              <SelectItem key={variable.id} value={variable.name}>
+              <SelectItem key={variable.id} value={variable.name} data-testid={`split-variable-${variable.name}`}>
                 {variable.label} {"("}
                 {variable.name}
                 {")"}

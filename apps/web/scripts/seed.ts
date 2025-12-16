@@ -292,6 +292,12 @@ async function createDatasetVariableSets(datasetId: string) {
           variablesetId: variableSetId,
           variableId: variableId,
           orderIndex: j,
+          attributes: {
+            allowedStatistics: {
+              distribution: true,
+              mean: true,
+            },
+          },
         });
       } else {
         console.warn(`Variable not found: ${variableName}`);

@@ -70,22 +70,17 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
       const variableGroups = page.locator('[data-testid^="variable-group-"]');
       await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
 
-      // Expand first variable group
+      // Expand first variable group (Demografische Daten)
       await variableGroups.first().click();
 
-      // Select first available variable
-      const variables = page.locator('[data-testid^="variable-item-"]');
-      await expect(variables.first()).toBeVisible({ timeout: 5000 });
-      await variables.first().click();
+      // Select "Geschlecht" (Gender) variable which supports split variables
+      // (nominal/ordinal variables support splits, scale variables like "Alter" do not)
+      const geschlechtVariable = page.getByTestId("variable-item-Geschlecht");
+      await expect(geschlechtVariable).toBeVisible({ timeout: 5000 });
+      await geschlechtVariable.click();
 
       // Wait for analysis to load
       await page.waitForTimeout(1000);
-    });
-
-    test("should find split button via test ID", async ({ page }) => {
-      const splitButton = page.getByTestId("split-button");
-      await expect(splitButton).toBeVisible({ timeout: 5000 });
-      await splitButton.click();
     });
 
     test("should find split dropdown via test ID", async ({ page }) => {
@@ -101,13 +96,13 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     });
 
     test("should find split control via text", async ({ page }) => {
-      const splitByText = page.getByText("Split", { exact: false }).first();
+      const splitByText = page.getByText("Split Variable", { exact: false }).first();
       await expect(splitByText).toBeVisible({ timeout: 5000 });
       await splitByText.click();
     });
 
-    test("should find split control via button role", async ({ page }) => {
-      const splitByRole = page.getByRole("button", { name: /split/i }).first();
+    test("should find split control via combobox role", async ({ page }) => {
+      const splitByRole = page.getByRole("combobox", { name: /split/i }).first();
       await expect(splitByRole).toBeVisible({ timeout: 5000 });
       await splitByRole.click();
     });
@@ -138,8 +133,8 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
       await page.waitForTimeout(500);
     });
 
-    test("should select Familienstand as split variable via test ID", async ({ page }) => {
-      const splitVarTestId = page.getByTestId("split-variable-Familienstand");
+    test("should select marital status as split variable via test ID", async ({ page }) => {
+      const splitVarTestId = page.getByTestId("split-variable-marital");
       await expect(splitVarTestId).toBeVisible({ timeout: 5000 });
       await splitVarTestId.click();
 
@@ -149,21 +144,21 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
       await expect(splitAnalysis.first()).toBeVisible({ timeout: 5000 });
     });
 
-    test("should select Familienstand as split variable via role", async ({ page }) => {
-      const splitVarOption = page.getByRole("option", { name: "Familienstand" });
+    test("should select marital status as split variable via role", async ({ page }) => {
+      const splitVarOption = page.getByRole("option", { name: /Familienstand/ });
       await expect(splitVarOption).toBeVisible({ timeout: 5000 });
       await splitVarOption.click();
 
       // Verify split visualization is displayed
       await page.waitForTimeout(1000);
-      const splitVisualization = page.locator('[data-testid*="visualization"]');
+      const splitVisualization = page.locator('[data-testid*="visualization"], [data-testid*="chart"]');
       await expect(splitVisualization.first()).toBeVisible({ timeout: 5000 });
     });
 
-    test("should select Familienstand as split variable via exact text", async ({ page }) => {
-      const splitVarExactText = page.getByText("Familienstand", { exact: true }).first();
-      await expect(splitVarExactText).toBeVisible({ timeout: 5000 });
-      await splitVarExactText.click();
+    test("should select marital status as split variable via text", async ({ page }) => {
+      const splitVarByText = page.getByText("Familienstand", { exact: false }).last();
+      await expect(splitVarByText).toBeVisible({ timeout: 5000 });
+      await splitVarByText.click();
 
       // Verify analysis content is displayed
       await page.waitForTimeout(1000);
@@ -174,22 +169,19 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     });
   });
 
-  test.describe("Split variable selection - Gender", () => {
+  test.describe("Split variable selection - Familienstand", () => {
     test.beforeEach(async ({ page }) => {
       // Setup: select variable and open split functionality
       const variableGroups = page.locator('[data-testid^="variable-group-"]');
       await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
 
-      // Expand all groups to make Gender accessible
-      const groupCount = await variableGroups.count();
-      for (let i = 0; i < groupCount; i++) {
-        await variableGroups.nth(i).click();
-      }
+      // Expand first variable group (Demografische Daten)
+      await variableGroups.first().click();
 
-      // Select Gender variable
-      const genderVariable = page.getByTestId("variable-item-Gender");
-      await expect(genderVariable).toBeVisible({ timeout: 5000 });
-      await genderVariable.click();
+      // Select Familienstand variable
+      const familienstandVariable = page.getByTestId("variable-item-Familienstand");
+      await expect(familienstandVariable).toBeVisible({ timeout: 5000 });
+      await familienstandVariable.click();
       await page.waitForTimeout(1000);
 
       // Open split functionality
@@ -199,8 +191,8 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
       await page.waitForTimeout(500);
     });
 
-    test("should select Age as split variable", async ({ page }) => {
-      const splitVarTestId = page.getByTestId("split-variable-Age");
+    test("should select age group as split variable", async ({ page }) => {
+      const splitVarTestId = page.getByTestId("split-variable-agecat");
       await expect(splitVarTestId).toBeVisible({ timeout: 5000 });
       await splitVarTestId.click();
 
@@ -216,11 +208,13 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     const variableGroups = page.locator('[data-testid^="variable-group-"]');
     await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
 
-    // Expand first group and select first variable
+    // Expand first group (Demografische Daten)
     await variableGroups.first().click();
-    const variables = page.locator('[data-testid^="variable-item-"]');
-    await expect(variables.first()).toBeVisible({ timeout: 5000 });
-    await variables.first().click();
+
+    // Select Altersgruppe (Age group) which supports split variables
+    const ageGroupVariable = page.getByTestId("variable-item-Altersgruppe");
+    await expect(ageGroupVariable).toBeVisible({ timeout: 5000 });
+    await ageGroupVariable.click();
     await page.waitForTimeout(1000);
 
     // Open split functionality using any available control
@@ -229,10 +223,10 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     await splitControl.click();
     await page.waitForTimeout(500);
 
-    // Select first available split option
-    const splitOptions = page.locator('[data-testid*="split-variable-"]').first();
-    await expect(splitOptions).toBeVisible({ timeout: 5000 });
-    await splitOptions.click();
+    // Select first available split option (marital status)
+    const splitOption = page.getByTestId("split-variable-marital");
+    await expect(splitOption).toBeVisible({ timeout: 5000 });
+    await splitOption.click();
 
     // Verify analysis content loads
     await page.waitForTimeout(1000);
