@@ -32,20 +32,33 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
   let testDatasetId: string;
 
   test.beforeAll(async ({ browser }) => {
-    // Get an existing dataset ID by calling the API as admin
+    // Get a dataset with variable sets by calling the API as admin
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-    const response = await page.request.get("/api/datasets?limit=1");
+    const response = await page.request.get("/api/datasets");
     const data = await response.json();
 
-    if (data.rows && data.rows.length > 0) {
-      testDatasetId = data.rows[0].id;
-    } else {
-      throw new Error("No datasets found in test environment");
+    expect(data.rows).toBeDefined();
+    expect(data.rows.length).toBeGreaterThan(0);
+
+    // Find a dataset that has variable sets by checking each one
+    let foundDatasetId: string | null = null;
+    for (const dataset of data.rows) {
+      const vsResponse = await page.request.get(`/api/datasets/${dataset.id}/variablesets/export`);
+      if (vsResponse.status() === 200) {
+        const exportData = await vsResponse.json();
+        if (exportData.variableSets && exportData.variableSets.length > 0) {
+          foundDatasetId = dataset.id;
+          break;
+        }
+      }
     }
+
+    expect(foundDatasetId).not.toBeNull();
+    testDatasetId = foundDatasetId!;
 
     await context.close();
   });
@@ -63,12 +76,14 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       // Verify metadata version is 2.0
       expect(exportData.metadata.version).toBe("2.0");
 
+      // Verify variableSets exist and have at least one item
+      expect(exportData.variableSets).toBeDefined();
+      expect(exportData.variableSets.length).toBeGreaterThan(0);
+
       // Verify each variableset has orderIndex
-      if (exportData.variableSets && exportData.variableSets.length > 0) {
-        for (const variableSet of exportData.variableSets) {
-          expect(variableSet.orderIndex).toBeDefined();
-          expect(typeof variableSet.orderIndex).toBe("number");
-        }
+      for (const variableSet of exportData.variableSets) {
+        expect(variableSet.orderIndex).toBeDefined();
+        expect(typeof variableSet.orderIndex).toBe("number");
       }
     });
 
@@ -81,16 +96,19 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
 
       const exportData = (await response.json()) as ExportData;
 
+      // Verify variableSets exist and have at least one item
+      expect(exportData.variableSets).toBeDefined();
+      expect(exportData.variableSets.length).toBeGreaterThan(0);
+
+      // Find a variableSet with variables
+      const setWithVariables = exportData.variableSets.find((vs) => vs.variables && vs.variables.length > 0);
+      expect(setWithVariables).toBeDefined();
+      expect(setWithVariables!.variables.length).toBeGreaterThan(0);
+
       // Verify each variable has orderIndex
-      if (exportData.variableSets && exportData.variableSets.length > 0) {
-        for (const variableSet of exportData.variableSets) {
-          if (variableSet.variables && variableSet.variables.length > 0) {
-            for (const variable of variableSet.variables) {
-              expect(variable.orderIndex).toBeDefined();
-              expect(typeof variable.orderIndex).toBe("number");
-            }
-          }
-        }
+      for (const variable of setWithVariables!.variables) {
+        expect(variable.orderIndex).toBeDefined();
+        expect(typeof variable.orderIndex).toBe("number");
       }
     });
 
@@ -103,17 +121,20 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
 
       const exportData = (await response.json()) as ExportData;
 
+      // Verify variableSets exist and have at least one item
+      expect(exportData.variableSets).toBeDefined();
+      expect(exportData.variableSets.length).toBeGreaterThan(0);
+
+      // Find a variableSet with multiple variables
+      const setWithMultipleVars = exportData.variableSets.find((vs) => vs.variables && vs.variables.length > 1);
+      expect(setWithMultipleVars).toBeDefined();
+      expect(setWithMultipleVars!.variables.length).toBeGreaterThan(1);
+
       // Verify variables are sorted by orderIndex
-      if (exportData.variableSets && exportData.variableSets.length > 0) {
-        for (const variableSet of exportData.variableSets) {
-          if (variableSet.variables && variableSet.variables.length > 1) {
-            const orderIndices = variableSet.variables.map((v) => v.orderIndex);
-            // Check if array is sorted in ascending order
-            for (let i = 0; i < orderIndices.length - 1; i++) {
-              expect(orderIndices[i]).toBeLessThanOrEqual(orderIndices[i + 1]);
-            }
-          }
-        }
+      const orderIndices = setWithMultipleVars!.variables.map((v) => v.orderIndex);
+      // Check if array is sorted in ascending order
+      for (let i = 0; i < orderIndices.length - 1; i++) {
+        expect(orderIndices[i]).toBeLessThanOrEqual(orderIndices[i + 1]);
       }
     });
   });
@@ -128,11 +149,9 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       expect(exportResponse.status()).toBe(200);
       const exportData = (await exportResponse.json()) as ExportData;
 
-      // Skip test if no variablesets exist
-      if (!exportData.variableSets || exportData.variableSets.length === 0) {
-        test.skip();
-        return;
-      }
+      // Verify variablesets exist
+      expect(exportData.variableSets).toBeDefined();
+      expect(exportData.variableSets.length).toBeGreaterThan(0);
 
       // Modify the variableset names to avoid conflicts
       const modifiedExport: ExportData = {
@@ -166,28 +185,13 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
 
       // Find the imported variablesets
       const importedSets = verifyExportData.variableSets.filter((vs) => vs.name.endsWith("_imported"));
+      expect(importedSets.length).toBe(modifiedExport.variableSets.length);
 
-      // Verify orderIndex is preserved
-      for (let i = 0; i < modifiedExport.variableSets.length; i++) {
-        const originalSet = modifiedExport.variableSets[i];
-        if (!originalSet) continue;
+      // Verify orderIndex is preserved for each imported set
+      for (const originalSet of modifiedExport.variableSets) {
         const importedSet = importedSets.find((vs) => vs.name === originalSet.name);
-
-        if (importedSet) {
-          expect(importedSet.orderIndex).toBe(originalSet.orderIndex);
-        }
-      }
-
-      // Cleanup: delete the imported variablesets
-      for (const importedSet of importedSets) {
-        const variablesetListResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets`);
-        const variablesets = (await variablesetListResponse.json()) as VariableSet[];
-        const setToDelete = variablesets.find((vs) => vs.name === importedSet.name);
-
-        if (setToDelete) {
-          // Delete via the UI or API endpoint if available
-          // For now, we'll leave cleanup as a manual step or implement if needed
-        }
+        expect(importedSet).toBeDefined();
+        expect(importedSet!.orderIndex).toBe(originalSet.orderIndex);
       }
     });
 
@@ -200,19 +204,15 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       expect(exportResponse.status()).toBe(200);
       const exportData = (await exportResponse.json()) as ExportData;
 
-      // Skip test if no variablesets with variables exist
-      const setsWithVariables = exportData.variableSets?.filter((vs) => vs.variables && vs.variables.length > 0);
-      if (!setsWithVariables || setsWithVariables.length === 0) {
-        test.skip();
-        return;
-      }
+      // Find a variableset with variables
+      const setsWithVariables = exportData.variableSets.filter((vs) => vs.variables && vs.variables.length > 0);
+      expect(setsWithVariables.length).toBeGreaterThan(0);
 
       // Take the first variableset with variables and rename it
       const originalSet = setsWithVariables[0];
-      if (!originalSet) {
-        test.skip();
-        return;
-      }
+      expect(originalSet).toBeDefined();
+      expect(originalSet.variables.length).toBeGreaterThan(0);
+
       const modifiedExport: ExportData = {
         ...exportData,
         variableSets: [
@@ -247,27 +247,37 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       const importedSet = verifyExportData.variableSets.find((vs) => vs.name === `${originalSet.name}_order_test`);
 
       expect(importedSet).toBeDefined();
-      expect(importedSet?.variables.length).toBe(originalSet.variables.length);
+      expect(importedSet!.variables.length).toBe(originalSet.variables.length);
 
       // Verify each variable's orderIndex matches
-      for (let i = 0; i < originalSet.variables.length; i++) {
-        const originalVar = originalSet.variables[i];
-        if (!originalVar) continue;
-        const importedVar = importedSet?.variables.find((v) => v.name === originalVar.name);
-
+      for (const originalVar of originalSet.variables) {
+        const importedVar = importedSet!.variables.find((v) => v.name === originalVar.name);
         expect(importedVar).toBeDefined();
-        expect(importedVar?.orderIndex).toBe(originalVar.orderIndex);
+        expect(importedVar!.orderIndex).toBe(originalVar.orderIndex);
       }
 
       // Also verify that variables are in the same order
       const originalNames = originalSet.variables.map((v) => v.name);
-      const importedNames = importedSet?.variables.map((v) => v.name);
+      const importedNames = importedSet!.variables.map((v) => v.name);
       expect(importedNames).toEqual(originalNames);
     });
 
     test("import handles version 2.0 format correctly", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+      // First get existing variables from the dataset to use in the test
+      const existingExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      expect(existingExportResponse.status()).toBe(200);
+      const existingExportData = (await existingExportResponse.json()) as ExportData;
+
+      // Find a variableset with at least 3 variables to use in our test
+      const setWithVars = existingExportData.variableSets.find((vs) => vs.variables && vs.variables.length >= 3);
+      expect(setWithVars).toBeDefined();
+      expect(setWithVars!.variables.length).toBeGreaterThanOrEqual(3);
+
+      // Take the first 3 variables and reorder them
+      const variables = setWithVars!.variables.slice(0, 3);
 
       // Create a v2.0 format export with explicit orderIndex values
       const v2Export: ExportData = {
@@ -285,15 +295,15 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
             orderIndex: 100,
             variables: [
               {
-                name: "age",
+                name: variables[0].name,
                 orderIndex: 2,
               },
               {
-                name: "gender",
+                name: variables[1].name,
                 orderIndex: 0,
               },
               {
-                name: "income",
+                name: variables[2].name,
                 orderIndex: 1,
               },
             ],
@@ -311,33 +321,25 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
         },
       });
 
-      // Accept either 200 (success) or 400 (validation error if variables don't exist)
-      expect([200, 400].includes(importResponse.status())).toBe(true);
+      expect(importResponse.status()).toBe(200);
+      const importResult = await importResponse.json();
 
-      if (importResponse.status() === 200) {
-        const importResult = (await importResponse.json()) as {
-          success: boolean;
-          summary: { createdSets: number };
-        };
+      expect(importResult.success).toBe(true);
+      expect(importResult.summary.createdSets).toBe(1);
 
-        // If successful, verify the imported data
-        if (importResult.summary.createdSets > 0) {
-          const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
-          const verifyExportData = (await verifyExportResponse.json()) as ExportData;
+      // Verify the imported data
+      const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      const verifyExportData = (await verifyExportResponse.json()) as ExportData;
 
-          const importedSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_V2_Format");
+      const importedSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_V2_Format");
+      expect(importedSet).toBeDefined();
+      expect(importedSet!.orderIndex).toBe(100);
 
-          if (importedSet) {
-            expect(importedSet.orderIndex).toBe(100);
-
-            // Verify variables are sorted by their orderIndex
-            const variableNames = importedSet.variables.map((v) => v.name);
-            expect(variableNames[0]).toBe("gender"); // orderIndex 0
-            expect(variableNames[1]).toBe("income"); // orderIndex 1
-            expect(variableNames[2]).toBe("age"); // orderIndex 2
-          }
-        }
-      }
+      // Verify variables are sorted by their orderIndex
+      const variableNames = importedSet!.variables.map((v) => v.name);
+      expect(variableNames[0]).toBe(variables[1].name); // orderIndex 0
+      expect(variableNames[1]).toBe(variables[2].name); // orderIndex 1
+      expect(variableNames[2]).toBe(variables[0].name); // orderIndex 2
     });
   });
 });
