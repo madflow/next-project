@@ -407,7 +407,7 @@ test.describe("Admin Dataset Variable Sets", () => {
         (response) =>
           response.url().includes("/variablesets/") &&
           response.url().includes("/variables") &&
-          response.request().url().includes("search") === false &&
+          !response.request().url().includes("search") &&
           response.status() === 200
       );
       await assignedSearchInput.clear();
@@ -436,7 +436,7 @@ test.describe("Admin Dataset Variable Sets", () => {
       const clearAvailableResponsePromise = page.waitForResponse(
         (response) =>
           response.url().includes("/variables/unassigned") &&
-          response.request().url().includes("search") === false &&
+          !response.request().url().includes("search") &&
           response.status() === 200
       );
       await availableSearchInput.clear();
