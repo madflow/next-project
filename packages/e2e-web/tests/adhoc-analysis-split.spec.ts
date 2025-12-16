@@ -1,9 +1,9 @@
-import { Locator, expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 test.describe("Adhoc Analysis - Split Functionality", () => {
-  test("should select SPSS Beispielumfrage dataset and test split functionality", async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     // Login as admin
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
@@ -21,193 +21,224 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     // Verify dataset is selected
     const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
+  });
 
+  test("should display variable groups for dataset", async ({ page }) => {
+    // Wait for and verify variable groups are available
+    const variableGroups = page.locator('[data-testid^="variable-group-"]');
+    await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
+
+    // Verify we have at least one variable group
+    await expect(variableGroups).not.toHaveCount(0);
+  });
+
+  test("should expand variable group and display variables", async ({ page }) => {
     // Wait for variable groups to load
+    const variableGroups = page.locator('[data-testid^="variable-group-"]');
+    await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
 
-    // Check if any variable groups are available
-    const anyVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
+    // Expand first variable group
+    await variableGroups.first().click();
 
-    if ((await anyVariableGroup.count()) > 0) {
-      console.log("✓ Variable groups found for SPSS Beispielumfrage dataset");
+    // Verify variables are displayed
+    const variables = page.locator('[data-testid^="variable-item-"]');
+    await expect(variables.first()).toBeVisible({ timeout: 5000 });
+    await expect(variables).not.toHaveCount(0);
+  });
 
-      // Since we don't know the exact variable names, let's explore available variables
-      // First, expand all groups and look for any variables that could be used for split testing
-      const allVariableGroups = page.locator('[data-testid^="variable-group-"]');
-      const groupCount = await allVariableGroups.count();
+  test("should select a variable and load analysis", async ({ page }) => {
+    // Wait for variable groups to load
+    const variableGroups = page.locator('[data-testid^="variable-group-"]');
+    await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
 
-      let targetVariableFound = false;
-      let firstAvailableVariable: Locator | null = null;
+    // Expand first variable group
+    await variableGroups.first().click();
 
+    // Select first available variable
+    const variables = page.locator('[data-testid^="variable-item-"]');
+    await expect(variables.first()).toBeVisible({ timeout: 5000 });
+    await variables.first().click();
+
+    // Verify analysis area is present (it should show some content after variable selection)
+    // This is a basic check that something happens after clicking a variable
+    await page.waitForTimeout(1000);
+  });
+
+  test.describe("Split functionality discovery", () => {
+    test.beforeEach(async ({ page }) => {
+      // Wait for variable groups to load
+      const variableGroups = page.locator('[data-testid^="variable-group-"]');
+      await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
+
+      // Expand first variable group
+      await variableGroups.first().click();
+
+      // Select first available variable
+      const variables = page.locator('[data-testid^="variable-item-"]');
+      await expect(variables.first()).toBeVisible({ timeout: 5000 });
+      await variables.first().click();
+
+      // Wait for analysis to load
+      await page.waitForTimeout(1000);
+    });
+
+    test("should find split button via test ID", async ({ page }) => {
+      const splitButton = page.getByTestId("split-button");
+      await expect(splitButton).toBeVisible({ timeout: 5000 });
+      await splitButton.click();
+    });
+
+    test("should find split dropdown via test ID", async ({ page }) => {
+      const splitDropdown = page.getByTestId("split-dropdown");
+      await expect(splitDropdown).toBeVisible({ timeout: 5000 });
+      await splitDropdown.click();
+    });
+
+    test("should find split control via partial test ID", async ({ page }) => {
+      const splitTrigger = page.locator('[data-testid*="split"]').first();
+      await expect(splitTrigger).toBeVisible({ timeout: 5000 });
+      await splitTrigger.click();
+    });
+
+    test("should find split control via text", async ({ page }) => {
+      const splitByText = page.getByText("Split", { exact: false }).first();
+      await expect(splitByText).toBeVisible({ timeout: 5000 });
+      await splitByText.click();
+    });
+
+    test("should find split control via button role", async ({ page }) => {
+      const splitByRole = page.getByRole("button", { name: /split/i }).first();
+      await expect(splitByRole).toBeVisible({ timeout: 5000 });
+      await splitByRole.click();
+    });
+  });
+
+  test.describe("Split variable selection - Geschlecht", () => {
+    test.beforeEach(async ({ page }) => {
+      // Setup: select variable and open split functionality
+      const variableGroups = page.locator('[data-testid^="variable-group-"]');
+      await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
+
+      // Expand all groups to make Geschlecht accessible
+      const groupCount = await variableGroups.count();
       for (let i = 0; i < groupCount; i++) {
-        const group = allVariableGroups.nth(i);
-        const groupText = await group.textContent();
-        console.log(`Expanding group ${i}: "${groupText}"`);
-        await group.click();
-
-        // Get all variables in this group
-        const variablesInGroup = page.locator('[data-testid^="variable-item-"]');
-        const variableCount = await variablesInGroup.count();
-
-        console.log(`Found ${variableCount} variables in group "${groupText}"`);
-
-        for (let j = 0; j < Math.min(variableCount, 3); j++) {
-          // Log first 3 variables
-          const variable = variablesInGroup.nth(j);
-          const variableText = await variable.textContent();
-          console.log(`  Variable ${j}: "${variableText}"`);
-
-          if (!firstAvailableVariable) {
-            firstAvailableVariable = variable;
-          }
-        }
-
-        // Look for common variable names that might work for splitting
-        const commonSplitVariables = [
-          "Geschlecht",
-          "Gender",
-          "Alter",
-          "Age",
-          "Familienstand",
-          "Marital",
-          "Education",
-          "Bildung",
-          "Beruf",
-          "Occupation",
-        ];
-
-        for (const varName of commonSplitVariables) {
-          const targetVariable = page.getByTestId(`variable-item-${varName}`);
-          if ((await targetVariable.count()) > 0) {
-            console.log(`✓ Found potential split variable: '${varName}'`);
-            await targetVariable.click();
-            targetVariableFound = true;
-
-            // Wait for analysis to load
-
-            break;
-          }
-        }
-
-        if (targetVariableFound) break;
+        await variableGroups.nth(i).click();
       }
 
-      // If no specific variable found, use the first available one
-      if (!targetVariableFound && firstAvailableVariable) {
-        console.log("✓ Using first available variable for split testing");
-        await firstAvailableVariable.click();
-        targetVariableFound = true;
+      // Select Geschlecht variable
+      const geschlechtVariable = page.getByTestId("variable-item-Geschlecht");
+      await expect(geschlechtVariable).toBeVisible({ timeout: 5000 });
+      await geschlechtVariable.click();
+      await page.waitForTimeout(1000);
 
-        // Wait for analysis to load
+      // Open split functionality
+      const splitControls = page.locator('[data-testid*="split"]').first();
+      await expect(splitControls).toBeVisible({ timeout: 5000 });
+      await splitControls.click();
+      await page.waitForTimeout(500);
+    });
+
+    test("should select Familienstand as split variable via test ID", async ({ page }) => {
+      const splitVarTestId = page.getByTestId("split-variable-Familienstand");
+      await expect(splitVarTestId).toBeVisible({ timeout: 5000 });
+      await splitVarTestId.click();
+
+      // Verify split analysis is displayed
+      await page.waitForTimeout(1000);
+      const splitAnalysis = page.locator('[data-testid*="split"], [data-testid*="chart"], [data-testid*="analysis"]');
+      await expect(splitAnalysis.first()).toBeVisible({ timeout: 5000 });
+    });
+
+    test("should select Familienstand as split variable via role", async ({ page }) => {
+      const splitVarOption = page.getByRole("option", { name: "Familienstand" });
+      await expect(splitVarOption).toBeVisible({ timeout: 5000 });
+      await splitVarOption.click();
+
+      // Verify split visualization is displayed
+      await page.waitForTimeout(1000);
+      const splitVisualization = page.locator('[data-testid*="visualization"]');
+      await expect(splitVisualization.first()).toBeVisible({ timeout: 5000 });
+    });
+
+    test("should select Familienstand as split variable via exact text", async ({ page }) => {
+      const splitVarExactText = page.getByText("Familienstand", { exact: true }).first();
+      await expect(splitVarExactText).toBeVisible({ timeout: 5000 });
+      await splitVarExactText.click();
+
+      // Verify analysis content is displayed
+      await page.waitForTimeout(1000);
+      const analysisElements = page.locator(
+        '[data-testid*="split"], [data-testid*="chart"], [data-testid*="analysis"], [data-testid*="visualization"]'
+      );
+      await expect(analysisElements.first()).toBeVisible({ timeout: 5000 });
+    });
+  });
+
+  test.describe("Split variable selection - Gender", () => {
+    test.beforeEach(async ({ page }) => {
+      // Setup: select variable and open split functionality
+      const variableGroups = page.locator('[data-testid^="variable-group-"]');
+      await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
+
+      // Expand all groups to make Gender accessible
+      const groupCount = await variableGroups.count();
+      for (let i = 0; i < groupCount; i++) {
+        await variableGroups.nth(i).click();
       }
 
-      // Only proceed with split testing if we have a variable selected
-      if (targetVariableFound) {
-        // Now look for split functionality
-        // Check if there's a split button or dropdown
-        const splitButton = page.getByTestId("split-button");
-        const splitDropdown = page.getByTestId("split-dropdown");
-        const splitTrigger = page.locator('[data-testid*="split"]').first();
+      // Select Gender variable
+      const genderVariable = page.getByTestId("variable-item-Gender");
+      await expect(genderVariable).toBeVisible({ timeout: 5000 });
+      await genderVariable.click();
+      await page.waitForTimeout(1000);
 
-        if ((await splitButton.count()) > 0) {
-          console.log("✓ Found split button");
-          await splitButton.click();
-        } else if ((await splitDropdown.count()) > 0) {
-          console.log("✓ Found split dropdown");
-          await splitDropdown.click();
-        } else if ((await splitTrigger.count()) > 0) {
-          console.log("✓ Found split trigger");
-          await splitTrigger.click();
-        } else {
-          console.log("ℹ Split functionality not found via standard test IDs, looking for alternative selectors");
+      // Open split functionality
+      const splitControls = page.locator('[data-testid*="split"]').first();
+      await expect(splitControls).toBeVisible({ timeout: 5000 });
+      await splitControls.click();
+      await page.waitForTimeout(500);
+    });
 
-          // Look for split functionality using text or other selectors
-          const splitByText = page.getByText("Split", { exact: false });
-          const splitByRole = page.getByRole("button", { name: /split/i });
+    test("should select Age as split variable", async ({ page }) => {
+      const splitVarTestId = page.getByTestId("split-variable-Age");
+      await expect(splitVarTestId).toBeVisible({ timeout: 5000 });
+      await splitVarTestId.click();
 
-          if ((await splitByText.count()) > 0) {
-            console.log("✓ Found split functionality via text");
-            await splitByText.first().click();
-          } else if ((await splitByRole.count()) > 0) {
-            console.log("✓ Found split functionality via role");
-            await splitByRole.first().click();
-          } else {
-            console.log(
-              "⚠ Split functionality not found - this might indicate the feature is not yet implemented or uses different selectors"
-            );
-          }
-        }
+      // Verify split analysis is displayed
+      await page.waitForTimeout(1000);
+      const splitAnalysis = page.locator('[data-testid*="split"], [data-testid*="chart"], [data-testid*="analysis"]');
+      await expect(splitAnalysis.first()).toBeVisible({ timeout: 5000 });
+    });
+  });
 
-        // Wait for split options to appear
+  test("should select first available split option as fallback", async ({ page }) => {
+    // Setup: select variable and open split functionality
+    const variableGroups = page.locator('[data-testid^="variable-group-"]');
+    await expect(variableGroups.first()).toBeVisible({ timeout: 10000 });
 
-        // Look for common split variables in options
-        const commonSplitVars = ["Familienstand", "Geschlecht", "Gender", "Alter", "Age"];
-        let splitVarFound = false;
+    // Expand first group and select first variable
+    await variableGroups.first().click();
+    const variables = page.locator('[data-testid^="variable-item-"]');
+    await expect(variables.first()).toBeVisible({ timeout: 5000 });
+    await variables.first().click();
+    await page.waitForTimeout(1000);
 
-        for (const varName of commonSplitVars) {
-          const splitVarTestId = page.getByTestId(`split-variable-${varName}`);
-          // Use getByRole to find the option within a select/combobox context
-          const splitVarOption = page.getByRole("option", { name: varName });
-          // Fallback to exact text match to avoid matching "Familienstand (marital)" when looking for "Familienstand"
-          const splitVarExactText = page.getByText(varName, { exact: true });
+    // Open split functionality using any available control
+    const splitControl = page.locator('[data-testid*="split"]').first();
+    await expect(splitControl).toBeVisible({ timeout: 5000 });
+    await splitControl.click();
+    await page.waitForTimeout(500);
 
-          if ((await splitVarTestId.count()) > 0) {
-            console.log(`✓ Found '${varName}' in split options (via test ID)`);
-            await splitVarTestId.click();
-            splitVarFound = true;
-            break;
-          } else if ((await splitVarOption.count()) > 0) {
-            console.log(`✓ Found '${varName}' option via role`);
-            await splitVarOption.click();
-            splitVarFound = true;
-            break;
-          } else if ((await splitVarExactText.count()) > 0) {
-            console.log(`✓ Found '${varName}' option via exact text`);
-            await splitVarExactText.first().click();
-            splitVarFound = true;
-            break;
-          }
-        }
+    // Select first available split option
+    const splitOptions = page.locator('[data-testid*="split-variable-"]').first();
+    await expect(splitOptions).toBeVisible({ timeout: 5000 });
+    await splitOptions.click();
 
-        if (!splitVarFound) {
-          console.log("ℹ No common split variables found, looking for any available options");
-
-          // Log available split options for debugging
-          const splitOptions = page.locator('[data-testid*="split-variable-"], [data-testid*="variable-"]');
-          const optionCount = await splitOptions.count();
-          console.log(`Available split options count: ${optionCount}`);
-
-          if (optionCount > 0) {
-            console.log("Using first available split variable as fallback");
-            await splitOptions.first().click();
-            splitVarFound = true;
-          }
-        }
-
-        if (splitVarFound) {
-          // Wait for split analysis to load
-
-          // Verify that split analysis is displayed
-          const splitAnalysis = page.locator(
-            '[data-testid*="split"], [data-testid*="chart"], [data-testid*="analysis"]'
-          );
-          const splitVisualization = page.locator('[data-testid*="visualization"]');
-
-          if ((await splitAnalysis.count()) > 0) {
-            console.log("✓ Split analysis visualization displayed");
-            await expect(splitAnalysis.first()).toBeVisible();
-          } else if ((await splitVisualization.count()) > 0) {
-            console.log("✓ Analysis visualization displayed");
-            await expect(splitVisualization.first()).toBeVisible();
-          } else {
-            console.log("ℹ Split analysis visualization not yet available");
-          }
-        }
-      }
-    } else {
-      console.log("ℹ No variable groups available for SPSS Beispielumfrage dataset (dataset may still be processing)");
-    }
-
-    // Test passes if we successfully navigated and selected the dataset
-    await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
+    // Verify analysis content loads
+    await page.waitForTimeout(1000);
+    const analysisContent = page.locator(
+      '[data-testid*="split"], [data-testid*="chart"], [data-testid*="analysis"], [data-testid*="visualization"]'
+    );
+    await expect(analysisContent.first()).toBeVisible({ timeout: 5000 });
   });
 });
