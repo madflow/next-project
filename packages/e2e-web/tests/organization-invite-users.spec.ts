@@ -6,7 +6,10 @@ import { smtpServerApi } from "../utils";
 const orgWithPermission = "Test Organization 3";
 
 async function inviteUser(page: Page, userEmail: string) {
+  // /api/auth/organization/get-full-organization
+  const getOrgResponsePromise = page.waitForResponse("api/auth/organization/get-full-organization");
   await page.getByTestId("app.organization-switcher").click();
+  await getOrgResponsePromise;
   await page.getByTestId("app.organization-switcher.invite").click();
   await page.getByTestId("admin.users.invite.form.email").fill(userEmail);
   const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");

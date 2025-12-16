@@ -220,7 +220,11 @@ test.describe("Email Translations", () => {
     await loginUser(page, inviterEmail, testUsers.accountMultipleOrgs.password);
 
     await page.getByTestId("app.organization-switcher").click();
+
+    // /api/auth/organization/get-full-organization
+    const orgResponsePromise = page.waitForResponse("api/auth/organization/get-full-organization");
     await page.getByText(orgName, { exact: true }).click();
+    await orgResponsePromise;
 
     await page.getByTestId("app.organization-switcher").click();
     const inviteButton = page.getByTestId("app.organization-switcher.invite");
