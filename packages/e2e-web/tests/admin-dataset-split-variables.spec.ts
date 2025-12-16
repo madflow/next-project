@@ -20,7 +20,7 @@ test.describe("Admin Dataset Split Variables", () => {
     await page.getByTestId("admin.datasets.create.upload").click();
     const uploadFile = page.getByTestId("file-upload-input");
     await uploadFile.setInputFiles("testdata/spss/demo.sav");
-    await page.waitForSelector("data-testid=app.admin.dataset.selected-file");
+    await expect(page.getByTestId("app.admin.dataset.selected-file")).toBeVisible();
     await page.getByTestId("app.admin.dataset.name-input").fill(datasetName);
     await page.getByTestId("app.admin.dataset.organization-trigger").click();
     await page.getByTestId("org-option-test-organization").click();
@@ -176,36 +176,38 @@ test.describe("Admin Dataset Split Variables", () => {
     // Wait for variables to be restored
     await expect(addButtons).toHaveCount(initialAvailableCount);
 
-    // Assign a couple of variables first if available
-    const buttonCount = await addButtons.count();
-    if (buttonCount > 0) {
-      await addButtons.first().click();
-      await expect(page.getByTestId("admin.dataset.splitvariables.assignment.remove").first()).toBeVisible();
-    }
-    if (buttonCount > 1) {
-      await addButtons.first().click();
-      await expect(page.getByTestId("admin.dataset.splitvariables.assignment.remove")).toHaveCount(2);
-    }
+    // Assign two variables to test search functionality in assigned section
+    // Ensure we have at least 2 variables available for this test
+    await expect(addButtons).toHaveCount(initialAvailableCount, { timeout: 5000 });
+
+    // Assign first variable
+    await addButtons.first().click();
+    await expect(page.getByTestId("admin.dataset.splitvariables.assignment.remove").first()).toBeVisible();
+
+    // Assign second variable
+    await addButtons.first().click();
+    await expect(page.getByTestId("admin.dataset.splitvariables.assignment.remove")).toHaveCount(2);
 
     // Test search in assigned variables section
     const assignedSearchInput = page.getByPlaceholder("Search variables...").last();
     const removeButtons = page.getByTestId("admin.dataset.splitvariables.assignment.remove");
     const initialAssignedCount = await removeButtons.count();
 
-    if (initialAssignedCount > 0) {
-      await assignedSearchInput.fill("nonexistent");
-      await expect(assignedSearchInput).toHaveValue("nonexistent");
+    // Verify we have assigned variables
+    expect(initialAssignedCount).toBeGreaterThan(0);
 
-      // Wait for search to filter assigned variables
-      const filteredAssignedCount = await removeButtons.count();
-      expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
+    await assignedSearchInput.fill("nonexistent");
+    await expect(assignedSearchInput).toHaveValue("nonexistent");
 
-      // Clear assigned search
-      await assignedSearchInput.clear();
-      await expect(assignedSearchInput).toHaveValue("");
+    // Wait for search to filter assigned variables
+    const filteredAssignedCount = await removeButtons.count();
+    expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
 
-      // Wait for assigned list to be restored
-      await expect(removeButtons).toHaveCount(initialAssignedCount);
-    }
+    // Clear assigned search
+    await assignedSearchInput.clear();
+    await expect(assignedSearchInput).toHaveValue("");
+
+    // Wait for assigned list to be restored
+    await expect(removeButtons).toHaveCount(initialAssignedCount);
   });
 });
