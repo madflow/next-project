@@ -1,3 +1,4 @@
+/* eslint-disable playwright/no-conditional-in-test, playwright/no-conditional-expect */
 import { Locator, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
