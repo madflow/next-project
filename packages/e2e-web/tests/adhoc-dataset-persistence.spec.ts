@@ -47,7 +47,8 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
 
     // Wait for and get the dataset name
     await expect(firstDataset).toBeVisible();
-    const datasetName = await firstDataset.textContent();
+    // Need textContent() to extract value for later comparison, not just assertion
+    const datasetName = await firstDataset.textContent(); // eslint-disable-line playwright/prefer-web-first-assertions
 
     // Ensure dataset name exists and is not empty
     expect(datasetName).toBeTruthy();
