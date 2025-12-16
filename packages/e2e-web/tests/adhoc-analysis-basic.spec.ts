@@ -3,9 +3,7 @@ import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 test.describe("Adhoc Analysis - Basic Functionality", () => {
-  test("should navigate to adhoc analysis, select SPSS Beispielumfrage dataset, and attempt to expand Demografische Daten and select Alter variable", async ({
-    page,
-  }) => {
+  test("should navigate to adhoc analysis and select SPSS Beispielumfrage dataset", async ({ page }) => {
     // Login as admin
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
@@ -17,77 +15,55 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
     // Click dataset dropdown trigger
     await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-    // Select "SPSS Beispielumfrage" dataset using text
+    // Select "SPSS Beispielumfrage" dataset - MUST exist from seed
     await page.getByText("SPSS Beispielumfrage").click();
 
     // Verify dataset is selected
     const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
+  });
 
-    // Wait for variable groups to load
+  test("should expand Demografische Daten group and display variables", async ({ page }) => {
+    // Setup: Login and select dataset
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/project/test-project/adhoc");
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
+    await page.getByText("SPSS Beispielumfrage").click();
 
-    // Try to find "Demografische Daten" variable group
+    // Assert "Demografische Daten" group exists (seeded deterministically)
     const demografischeGroup = page.getByTestId("variable-group-Demografische Daten");
+    await expect(demografischeGroup).toBeVisible();
 
-    if ((await demografischeGroup.count()) > 0) {
-      // If "Demografische Daten" group exists, expand it
-      await expect(demografischeGroup).toBeVisible();
-      await demografischeGroup.click();
+    // Expand the group using the expand button
+    const expandButton = page.getByTestId("variable-group-expand-Demografische Daten");
+    await expandButton.click();
 
-      // Try to find "Alter" variable
-      const alterVariable = page.getByTestId("variable-item-Alter");
+    // Assert specific variables are visible (using labels from SPSS metadata)
+    await expect(page.getByTestId("variable-item-Alter")).toBeVisible();
+    await expect(page.getByTestId("variable-item-Geschlecht")).toBeVisible();
+    await expect(page.getByTestId("variable-item-Familienstand")).toBeVisible();
+  });
 
-      if ((await alterVariable.count()) > 0) {
-        // If "Alter" variable exists, click it
-        await expect(alterVariable).toBeVisible();
-        await alterVariable.click();
+  test("should select Geschlecht variable and display analysis chart", async ({ page }) => {
+    // Setup: Login, select dataset, expand group
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/project/test-project/adhoc");
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
+    await page.getByText("SPSS Beispielumfrage").click();
 
-        // Wait for analysis to load
+    // Expand the group using the expand button
+    const expandButton = page.getByTestId("variable-group-expand-Demografische Daten");
+    await expandButton.click();
 
-        // Check if a Mean Chart or any analysis visualization appears
-        const meanChart = page.getByTestId("mean-chart");
-        const anyChart = page
-          .locator('[data-testid*="chart"], [data-testid*="analysis"], [data-testid*="visualization"]')
-          .first();
+    // Select Geschlecht variable (categorical - deterministic)
+    const geschlechtVariable = page.getByTestId("variable-item-Geschlecht");
+    await expect(geschlechtVariable).toBeVisible();
+    await geschlechtVariable.click();
 
-        if ((await meanChart.count()) > 0) {
-          await expect(meanChart).toBeVisible();
-          console.log("✓ Successfully displayed Mean Chart for Alter variable");
-        } else if ((await anyChart.count()) > 0) {
-          await expect(anyChart).toBeVisible();
-          console.log("✓ Successfully displayed analysis visualization for Alter variable");
-        } else {
-          console.log("ℹ Variable selected but analysis visualization not yet available");
-        }
-      } else {
-        console.log(`ℹ "Alter" variable not found in Demografische Daten group for dataset: SPSS Beispielumfrage`);
-      }
-    } else {
-      // If no "Demografische Daten" group, check if any variable groups are available
-      const anyVariableGroup = page.locator('[data-testid^="variable-group-"]').first();
-
-      if ((await anyVariableGroup.count()) > 0) {
-        console.log(
-          `ℹ "Demografische Daten" not found, but other variable groups available for dataset: SPSS Beispielumfrage`
-        );
-
-        // Optionally expand the first available group and select first variable
-        await anyVariableGroup.click();
-
-        const firstVariable = page.locator('[data-testid^="variable-item-"]').first();
-        if ((await firstVariable.count()) > 0) {
-          await firstVariable.click();
-          console.log("✓ Selected first available variable from first available group");
-        }
-      } else {
-        console.log(
-          `ℹ No variable groups available for dataset: SPSS Beispielumfrage (dataset may still be processing)`
-        );
-      }
-    }
-
-    // Test passes if we successfully navigated and selected a dataset
-    // The core functionality (navigation -> dataset selection) is working
-    await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
+    // Assert that a chart is displayed
+    // Use a more flexible selector that will match any visible chart
+    await expect(page.locator("canvas, svg").first()).toBeVisible({ timeout: 10000 });
   });
 });
