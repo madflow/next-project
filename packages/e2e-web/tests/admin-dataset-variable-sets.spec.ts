@@ -379,71 +379,75 @@ test.describe("Admin Dataset Variable Sets", () => {
     // Assign a few variables to the set first
     const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
     await addButtons.first().click();
-    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove").first()).toBeVisible();
+
+    // Wait for the first variable to be assigned
+    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove")).toHaveCount(1);
+
     await addButtons.first().click(); // Add another variable
+
+    // Wait for both variables to be assigned
+    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove")).toHaveCount(2);
 
     // Test search in assigned variables section
     const assignedSearchInput = page.getByPlaceholder(/search/i).last(); // Second search input (assigned section)
 
     // Wait for assigned variables to load
     const initialAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
+    expect(initialAssignedCount).toBe(2);
 
-    if (initialAssignedCount > 0) {
-      // Test search in assigned section
-      const searchResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes("/variablesets/") &&
-          response.url().includes("/variables") &&
-          response.request().url().includes("search=nonexistent") &&
-          response.status() === 200
-      );
-      await assignedSearchInput.fill("nonexistent");
-      await searchResponsePromise;
-      const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
-      expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
+    // Test search in assigned section
+    const searchResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes("/variablesets/") &&
+        response.url().includes("/variables") &&
+        response.request().url().includes("search=nonexistent") &&
+        response.status() === 200
+    );
+    await assignedSearchInput.fill("nonexistent");
+    await searchResponsePromise;
+    const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
+    expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
 
-      // Clear search in assigned section
-      const clearSearchResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes("/variablesets/") &&
-          response.url().includes("/variables") &&
-          !response.request().url().includes("search") &&
-          response.status() === 200
-      );
-      await assignedSearchInput.clear();
-      await clearSearchResponsePromise;
-      const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
-      expect(restoredAssignedCount).toBe(initialAssignedCount);
-    }
+    // Clear search in assigned section
+    const clearSearchResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes("/variablesets/") &&
+        response.url().includes("/variables") &&
+        !response.request().url().includes("search") &&
+        response.status() === 200
+    );
+    await assignedSearchInput.clear();
+    await clearSearchResponsePromise;
+    const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
+    expect(restoredAssignedCount).toBe(initialAssignedCount);
 
     // Test search in available variables section
     const availableSearchInput = page.getByPlaceholder(/search/i).first(); // First search input (available section)
     const initialAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    expect(initialAvailableCount).toBeGreaterThan(0);
 
-    if (initialAvailableCount > 0) {
-      const searchAvailableResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes("/variables/unassigned") &&
-          response.request().url().includes("search=age") &&
-          response.status() === 200
-      );
-      await availableSearchInput.fill("age");
-      await searchAvailableResponsePromise;
-      const filteredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
-      expect(filteredAvailableCount).toBeLessThanOrEqual(initialAvailableCount);
+    const searchAvailableResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes("/variables/unassigned") &&
+        response.request().url().includes("search=age") &&
+        response.status() === 200
+    );
+    await availableSearchInput.fill("age");
+    await searchAvailableResponsePromise;
+    const filteredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    expect(filteredAvailableCount).toBeLessThanOrEqual(initialAvailableCount);
 
-      // Clear search in available section
-      const clearAvailableResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes("/variables/unassigned") &&
-          !response.request().url().includes("search") &&
-          response.status() === 200
-      );
-      await availableSearchInput.clear();
-      await clearAvailableResponsePromise;
-      const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
-      expect(restoredAvailableCount).toBe(initialAvailableCount);
-    }
+    // Clear search in available section
+    const clearAvailableResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes("/variables/unassigned") &&
+        !response.request().url().includes("search") &&
+        response.status() === 200
+    );
+    await availableSearchInput.clear();
+    await clearAvailableResponsePromise;
+    const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
+    expect(restoredAvailableCount).toBe(initialAvailableCount);
   });
 
   test("should preserve variable set state during navigation", async ({ page }) => {
