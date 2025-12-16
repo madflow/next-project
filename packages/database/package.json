@@ -11,7 +11,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "check-types": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint --max-warnings=0 ."
   },
   "exports": {
     "./clients": {
