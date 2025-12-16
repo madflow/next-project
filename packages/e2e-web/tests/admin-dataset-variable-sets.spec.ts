@@ -20,7 +20,7 @@ test.describe("Admin Dataset Variable Sets", () => {
     await page.getByTestId("admin.datasets.create.upload").click();
     const uploadFile = page.getByTestId("file-upload-input");
     await uploadFile.setInputFiles("testdata/spss/demo.sav");
-    await page.waitForSelector("data-testid=app.admin.dataset.selected-file");
+    await page.getByTestId("app.admin.dataset.selected-file").waitFor();
     await page.getByTestId("app.admin.dataset.name-input").fill(datasetName);
     await page.getByTestId("app.admin.dataset.organization-trigger").click();
     await page.getByTestId("org-option-test-organization").click();
