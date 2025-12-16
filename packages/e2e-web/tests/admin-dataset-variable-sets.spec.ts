@@ -390,12 +390,28 @@ test.describe("Admin Dataset Variable Sets", () => {
 
     if (initialAssignedCount > 0) {
       // Test search in assigned section
+      const searchResponsePromise = page.waitForResponse(
+        (response) =>
+          response.url().includes("/variablesets/") &&
+          response.url().includes("/variables") &&
+          response.request().url().includes("search=nonexistent") &&
+          response.status() === 200
+      );
       await assignedSearchInput.fill("nonexistent");
+      await searchResponsePromise;
       const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
 
       // Clear search in assigned section
+      const clearSearchResponsePromise = page.waitForResponse(
+        (response) =>
+          response.url().includes("/variablesets/") &&
+          response.url().includes("/variables") &&
+          response.request().url().includes("search") === false &&
+          response.status() === 200
+      );
       await assignedSearchInput.clear();
+      await clearSearchResponsePromise;
       const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
       expect(restoredAssignedCount).toBe(initialAssignedCount);
     }
@@ -405,12 +421,26 @@ test.describe("Admin Dataset Variable Sets", () => {
     const initialAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
 
     if (initialAvailableCount > 0) {
+      const searchAvailableResponsePromise = page.waitForResponse(
+        (response) =>
+          response.url().includes("/variables/unassigned") &&
+          response.request().url().includes("search=age") &&
+          response.status() === 200
+      );
       await availableSearchInput.fill("age");
+      await searchAvailableResponsePromise;
       const filteredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(filteredAvailableCount).toBeLessThanOrEqual(initialAvailableCount);
 
       // Clear search in available section
+      const clearAvailableResponsePromise = page.waitForResponse(
+        (response) =>
+          response.url().includes("/variables/unassigned") &&
+          response.request().url().includes("search") === false &&
+          response.status() === 200
+      );
       await availableSearchInput.clear();
+      await clearAvailableResponsePromise;
       const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
       expect(restoredAvailableCount).toBe(initialAvailableCount);
     }
