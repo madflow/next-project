@@ -75,7 +75,7 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
   });
 
-  test("should select Alter variable for split analysis", async ({ page }) => {
+  test("should select Alter variable from SPSS Beispielumfrage dataset", async ({ page }) => {
     // Login as admin
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
