@@ -42,27 +42,34 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
     // Click dataset dropdown
     await page.getByTestId("app.dropdown.dataset.trigger").click();
 
-    // Check if any datasets are available and select the first one
+    // Locate all available datasets in the dropdown
     const datasetItems = page.locator('[data-testid^="dataset-dropdown-item-"]');
     const count = await datasetItems.count();
 
-    // Use test.skip if no datasets are available, effectively avoiding conditionals for logic branching
+    // Skip test if no datasets exist - this avoids conditional branching in test logic
+    // which is flagged by playwright/no-conditional-in-test ESLint rule
     test.skip(count === 0, "No datasets available to test persistence");
 
+    // At this point, at least one dataset exists - select the first one
     const firstDataset = datasetItems.first();
     const datasetName = await firstDataset.textContent();
+
+    // Ensure dataset name exists and is not empty
+    expect(datasetName).toBeTruthy();
+    expect(datasetName?.trim()).not.toBe("");
+
     await firstDataset.click();
 
     // Verify dataset is selected
     const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
-    await expect(datasetTrigger).toContainText(datasetName || "");
+    await expect(datasetTrigger).toContainText(datasetName!);
 
     // Test page reload - should persist selection
     await page.reload();
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
 
     const datasetTriggerAfterReload = page.getByTestId("app.dropdown.dataset.trigger");
-    // Either shows the persisted dataset name or falls back to placeholder if dataset was deleted
-    await expect(datasetTriggerAfterReload).not.toHaveText("");
+    // Verify the selected dataset persists after reload
+    await expect(datasetTriggerAfterReload).toContainText(datasetName!);
   });
 });
