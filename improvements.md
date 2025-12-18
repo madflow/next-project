@@ -120,12 +120,12 @@ A comprehensive list of improvements identified across code organization, qualit
   - Issue: Uses default pool settings
   - Fix: Configure `max`, `idleTimeoutMillis`, `connectionTimeoutMillis`
 
-- [ ] **Define Drizzle relations**
+- [x] **Define Drizzle relations**
   - File: `packages/database/src/schema/index.ts`
   - Issue: No relations defined, can't use relational query builder
   - Fix: Add `userRelations`, `sessionRelations`, etc. using `relations()`
 
-- [ ] **Pass schema to Drizzle client**
+- [x] **Pass schema to Drizzle client**
   - Files: `packages/database/src/clients/default.ts`, `admin.ts`
   - Issue: Schema not passed, can't use `db.query.*`
   - Fix: `const client = drizzle({ client: pool, schema })`
