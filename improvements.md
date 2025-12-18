@@ -22,7 +22,7 @@ A comprehensive list of improvements identified across code organization, qualit
   - Issue: Both files are 100% identical but should have different connection strings
   - Fix: Create separate admin connection using `DATABASE_ADMIN_URL`
 
-- [ ] **Create authorization wrapper for server actions**
+- [x] **Create authorization wrapper for server actions**
   - Files: `apps/web/src/actions/dataset.ts` (lines 27-37, 68-78, 90-100, 118-128)
   - Issue: Same auth+session check code is copy-pasted 4+ times
   - Fix: Create `withAdminAuth()` wrapper in `src/lib/server-action-utils.ts`
