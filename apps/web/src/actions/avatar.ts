@@ -45,9 +45,9 @@ export const uploadAvatar = withAuth(
         throw new Error("No file provided or file is empty");
       }
 
-      if (session.user.image) {
+      if (session!.user.image) {
         // Extract just the filename from the full path
-        const filename = session.user.image.split("/").pop() || "";
+        const filename = session!.user.image.split("/").pop() || "";
         if (filename) {
           await deleteAvatar(userId, filename);
         }
