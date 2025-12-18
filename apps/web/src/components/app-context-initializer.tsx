@@ -2,7 +2,8 @@
 
 import { Organization } from "better-auth/plugins";
 import { useEffect } from "react";
-import { Project, useAppContext } from "@/context/app-context";
+import { useAppContext } from "@/context/app-context";
+import { Project } from "@/types/project";
 
 type AppContextInitializerProps = {
   organization: Organization | null;

@@ -4,13 +4,6 @@ import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { useProjectsByOrg } from "./use-projects-by-org";
 
-export type Project = {
-  id: string;
-  name: string;
-  slug: string;
-  organizationId: string;
-};
-
 export function useActiveProject(activeOrganization?: Organization | null) {
   const pathname = usePathname();
 

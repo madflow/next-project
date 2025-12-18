@@ -4,18 +4,12 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import { organization as organizationTable, project as projectTable } from "@repo/database/schema";
+import { type Project } from "@/types/project";
 import { auth } from "./auth";
-
-export type InitialProject = {
-  id: string;
-  organizationId: string;
-  name: string;
-  slug: string;
-};
 
 export type InitialAppContext = {
   organization: Organization | null;
-  project: InitialProject | null;
+  project: Project | null;
 };
 
 /**
@@ -61,17 +55,12 @@ export async function getInitialAppContext(projectSlug?: string): Promise<Initia
     };
 
     // If projectSlug is provided, fetch the project
-    let project: InitialProject | null = null;
+    let project: Project | null = null;
     if (projectSlug) {
       const [proj] = await db.select().from(projectTable).where(eq(projectTable.slug, projectSlug)).limit(1);
 
       if (proj && proj.organizationId === activeOrganizationId) {
-        project = {
-          id: proj.id,
-          organizationId: proj.organizationId,
-          name: proj.name,
-          slug: proj.slug,
-        };
+        project = proj;
       }
     }
 

@@ -11,10 +11,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { type Project } from "@/context/app-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useProjectsByOrg } from "@/hooks/use-projects-by-org";
 import { cn } from "@/lib/utils";
+import { type Project } from "@/types/project";
 import { SidebarMenu, SidebarMenuItem } from "./ui/sidebar";
 
 type ProjectSwitcherProps = {

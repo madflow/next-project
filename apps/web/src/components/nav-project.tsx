@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Project } from "@/context/app-context";
+import { type Project } from "@/types/project";
 
 type NavProjectProps = {
   activeOrganization: Organization | null;
