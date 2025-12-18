@@ -30,5 +30,12 @@ COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
 RUN pnpm run build
 
+# Don't run production as root
+RUN addgroup --system --gid 1001 appuser
+RUN adduser --system --uid 1001 --ingroup appuser appuser
+RUN chown -R appuser:appuser /app
+RUN chmod +x /entrypoint.sh
+USER appuser
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/bash"]
