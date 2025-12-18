@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { env } from "@/env";
 import { auth } from "@/lib/auth";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
+import { withAuth } from "@/lib/server-action-utils";
 import { getS3Client } from "@/lib/storage";
 
 type UploadAvatarParams = {
@@ -26,102 +27,107 @@ export type UploadAvatarResult = {
   };
 };
 
-export async function uploadAvatar({ file, userId, contentType }: UploadAvatarParams): Promise<UploadAvatarResult> {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (session?.user?.id !== userId) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
-  const s3Client = getS3Client();
+export const uploadAvatar = withAuth(
+  async ({ file, userId, contentType }: UploadAvatarParams): Promise<UploadAvatarResult> => {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-  try {
-    if (!file || !file.size) {
-      throw new Error("No file provided or file is empty");
+    // Ensure user can only upload their own avatar
+    if (session!.user.id !== userId) {
+      throw new ServerActionNotAuthorizedException("User ID mismatch");
     }
 
-    if (session.user.image) {
-      // Extract just the filename from the full path
-      const filename = session.user.image.split("/").pop() || "";
-      if (filename) {
-        await deleteAvatar(userId, filename);
+    const s3Client = getS3Client();
+
+    try {
+      if (!file || !file.size) {
+        throw new Error("No file provided or file is empty");
       }
-    }
 
-    const fileExtension = file.name.split(".").pop() || "bin";
-    const key = `avatars/${userId}/${randomUUID()}.${fileExtension}`;
+      if (session.user.image) {
+        // Extract just the filename from the full path
+        const filename = session.user.image.split("/").pop() || "";
+        if (filename) {
+          await deleteAvatar(userId, filename);
+        }
+      }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+      const fileExtension = file.name.split(".").pop() || "bin";
+      const key = `avatars/${userId}/${randomUUID()}.${fileExtension}`;
 
-    const params = {
-      Bucket: env.S3_BUCKET_NAME,
-      Key: key,
-      Body: buffer,
-      ContentType: contentType,
-      ACL: "public-read" as ObjectCannedACL,
-      Metadata: {
-        "original-filename": file.name,
-        "uploaded-by": userId,
-        "uploaded-at": new Date().toISOString(),
-      },
-    };
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
-    const command = new PutObjectCommand(params);
-    const response = await s3Client.send(command);
-
-    // Extract just the filename from the key
-    const filename = key.split("/").pop() || key;
-
-    const result = {
-      success: true,
-      url: filename,
-      key: filename,
-      s3Response: {
-        etag: response.ETag,
-        versionId: response.VersionId,
-      },
-    };
-    return result;
-  } catch (error: unknown) {
-    console.error("Error uploading avatar to S3:", error);
-    const errorDetails = {
-      success: false as const,
-      error: "Failed to upload avatar",
-      details: undefined as Record<string, unknown> | undefined,
-    };
-
-    if (env.NODE_ENV === "development" && error instanceof Error) {
-      const s3Error = error as S3ServiceException;
-      errorDetails.details = {
-        name: error.name,
-        message: error.message,
-        code: s3Error.$metadata?.httpStatusCode,
-        requestId: s3Error.$metadata?.requestId,
-        bucket: env.S3_BUCKET_NAME,
-        region: env.S3_REGION,
-        endpoint: env.S3_ENDPOINT,
-        hasCredentials: !!(env.S3_ACCESS_KEY_ID && env.S3_SECRET_ACCESS_KEY),
+      const params = {
+        Bucket: env.S3_BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType,
+        ACL: "public-read" as ObjectCannedACL,
+        Metadata: {
+          "original-filename": file.name,
+          "uploaded-by": userId,
+          "uploaded-at": new Date().toISOString(),
+        },
       };
-    }
 
-    if (error && typeof error === "object" && "name" in error) {
-      const errorName = String(error.name);
+      const command = new PutObjectCommand(params);
+      const response = await s3Client.send(command);
 
-      if (errorName === "NoSuchBucket") {
-        throw new Error("The specified bucket does not exist");
-      } else if (errorName === "AccessDenied") {
-        throw new Error("Access denied to S3 bucket");
-      } else if (errorName === "InvalidAccessKeyId") {
-        throw new Error("Invalid AWS access key ID");
-      } else if (errorName === "SignatureDoesNotMatch") {
-        throw new Error("Invalid AWS secret access key");
+      // Extract just the filename from the key
+      const filename = key.split("/").pop() || key;
+
+      const result = {
+        success: true,
+        url: filename,
+        key: filename,
+        s3Response: {
+          etag: response.ETag,
+          versionId: response.VersionId,
+        },
+      };
+      return result;
+    } catch (error: unknown) {
+      console.error("Error uploading avatar to S3:", error);
+      const errorDetails = {
+        success: false as const,
+        error: "Failed to upload avatar",
+        details: undefined as Record<string, unknown> | undefined,
+      };
+
+      if (env.NODE_ENV === "development" && error instanceof Error) {
+        const s3Error = error as S3ServiceException;
+        errorDetails.details = {
+          name: error.name,
+          message: error.message,
+          code: s3Error.$metadata?.httpStatusCode,
+          requestId: s3Error.$metadata?.requestId,
+          bucket: env.S3_BUCKET_NAME,
+          region: env.S3_REGION,
+          endpoint: env.S3_ENDPOINT,
+          hasCredentials: !!(env.S3_ACCESS_KEY_ID && env.S3_SECRET_ACCESS_KEY),
+        };
       }
-    }
 
-    return errorDetails;
+      if (error && typeof error === "object" && "name" in error) {
+        const errorName = String(error.name);
+
+        if (errorName === "NoSuchBucket") {
+          throw new Error("The specified bucket does not exist");
+        } else if (errorName === "AccessDenied") {
+          throw new Error("Access denied to S3 bucket");
+        } else if (errorName === "InvalidAccessKeyId") {
+          throw new Error("Invalid AWS access key ID");
+        } else if (errorName === "SignatureDoesNotMatch") {
+          throw new Error("Invalid AWS secret access key");
+        }
+      }
+
+      return errorDetails;
+    }
   }
-}
+);
 
 export async function deleteAvatar(userId: string, filename: string) {
   const s3Client = getS3Client();
