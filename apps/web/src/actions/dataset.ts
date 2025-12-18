@@ -5,9 +5,9 @@ import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import { UpdateDatasetData, dataset, datasetProject } from "@repo/database/schema";
 import { deleteDataset } from "@/dal/dataset";
-import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { CreateDatasetResult, createDataset } from "@/lib/dataset-service";
-import { ServerActionNotAuthorizedException } from "@/lib/exception";
+import { withAdminAuth } from "@/lib/server-action-utils";
 
 export type UploadDatasetResult = CreateDatasetResult;
 
@@ -23,18 +23,10 @@ type UploadDatasetParams = {
 /**
  * Upload dataset using FormData to properly handle file uploads
  */
-export async function uploadDatasetWithFormData(formData: FormData): Promise<UploadDatasetResult> {
+export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData): Promise<UploadDatasetResult> => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
-  if (!session?.user) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
-
-  if (session.user.role !== USER_ADMIN_ROLE) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
 
   // Extract data from FormData
   const file = formData.get("file") as File | null;
@@ -60,72 +52,43 @@ export async function uploadDatasetWithFormData(formData: FormData): Promise<Upl
     description,
     contentType,
     missingValues,
-    userId: session.user.id,
+    userId: session!.user.id,
   });
-}
+});
 
-export async function addToProject(datasetId: string, projectId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
-
-  if (session.user.role !== USER_ADMIN_ROLE) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
+export const addToProject = withAdminAuth(async (datasetId: string, projectId: string) => {
   await db.insert(datasetProject).values({ projectId, datasetId });
-}
+});
 
-export async function uploadDataset({
-  file,
-  name,
-  organizationId,
-  description,
-  contentType,
-  missingValues,
-}: UploadDatasetParams): Promise<UploadDatasetResult> {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
-
-  if (session.user.role !== USER_ADMIN_ROLE) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
-
-  return await createDataset({
+export const uploadDataset = withAdminAuth(
+  async ({
     file,
     name,
     organizationId,
     description,
     contentType,
     missingValues,
-    userId: session.user.id,
-  });
-}
+  }: UploadDatasetParams): Promise<UploadDatasetResult> => {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    return await createDataset({
+      file,
+      name,
+      organizationId,
+      description,
+      contentType,
+      missingValues,
+      userId: session!.user.id,
+    });
+  }
+);
 
 export async function remove(datasetId: string) {
   await deleteDataset(datasetId);
 }
 
-export async function update(datasetId: string, values: UpdateDatasetData) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
-
-  if (session.user.role !== USER_ADMIN_ROLE) {
-    throw new ServerActionNotAuthorizedException("Unauthorized");
-  }
-
+export const update = withAdminAuth(async (datasetId: string, values: UpdateDatasetData) => {
   await db.update(dataset).set(values).where(eq(dataset.id, datasetId));
-}
+});
