@@ -5,13 +5,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 import { useActiveProject } from "@/hooks/use-active-project";
 import { useDebugMode } from "@/hooks/use-debug-mode";
 import { useActiveOrganization } from "@/lib/auth-client";
-
-export type Project = {
-  id: string;
-  organizationId: string;
-  name: string;
-  slug: string;
-};
+import { type Project } from "@/types/project";
 
 type AppContextType = {
   activeOrganization: Organization | null;

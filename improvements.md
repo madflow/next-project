@@ -52,7 +52,7 @@ A comprehensive list of improvements identified across code organization, qualit
   - Files: `apps/web/src/components/admin/project/create-project-form.tsx`, `edit-project-form.tsx`, etc.
   - Fix: Create `src/schemas/project.ts`, `src/schemas/organization.ts`
 
-- [ ] **Fix Project type duplication**
+- [x] **Fix Project type duplication**
   - Files: `apps/web/src/context/app-context.tsx` (lines 9-14), `src/hooks/use-active-project.ts` (lines 7-12)
   - Fix: Import from `src/types/project.ts` which re-exports from database package
 
