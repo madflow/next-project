@@ -7,7 +7,7 @@ services:
       - ANALYSIS_API_KEY=secret
       - ANALYSIS_API_URL=http://analysis:3003/api
       - AUTH_DISABLE_SIGNUP=false
-      - AUTH_SECRET=super-secret-key
+      - AUTH_SECRET=KgVRZ3/tFzxMCDiBLAR9hSZVFmEPtoK1ZIB3BH/RLsk=
       - AUTH_URL=http://localhost:3001
       - BASE_URL=http://localhost:3001
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
