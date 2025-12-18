@@ -17,8 +17,18 @@ RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
 # Copying actuall application
 COPY . /app/src/
 RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
+
+# Don't run production as root
+RUN groupadd --system --gid 1001 appuser
+RUN useradd --system --uid 1001 --gid appuser --create-home appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
 CMD ["/usr/local/bin/python", "-m", "analysis"]
 
 FROM prod AS dev
 
+USER root
 RUN --mount=type=cache,target=/tmp/poetry_cache poetry install
+RUN chown -R appuser:appuser /app
+USER appuser
