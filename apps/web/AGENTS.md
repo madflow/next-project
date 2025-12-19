@@ -73,8 +73,37 @@
 
 ## Authentication Patterns
 
-- Keep auth logic in `lib/auth.ts`
-- Use `useSession` hook in Client Components
+This app uses Better Auth with two separate instances:
+
+### Server Components & Server Actions
+
+**Always use** `auth.api.getSession()` with headers:
+
+```typescript
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+
+const session = await auth.api.getSession({
+  headers: await headers(),
+});
+```
+
+### Client Components
+
+**Always use** the auth client instance:
+
+```typescript
+"use client";
+import { useSession } from "@/lib/auth-client";
+
+const { data: session } = useSession();
+```
+
+### Critical Rules
+
+- ❌ **NEVER** use `getSession()` from `@/lib/auth-client` in Server Components (causes Docker networking issues)
+- ✅ **ALWAYS** pass `headers` to `auth.api.getSession()` in Server Components
+- ✅ **ALWAYS** mark Client Components with `"use client"` when using auth client methods
 
 ## Performance Patterns
 
