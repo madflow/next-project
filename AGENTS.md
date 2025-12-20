@@ -1,12 +1,5 @@
 # Agents rules
 
-## General rules
-
-- Only make changes in the directories explicitly specified by the user.
-- Never commit changes unless explicitly requested by the user.
-- Never delete node_modules or pnpm-lock.yaml in order to solve conflicts.
-- Never run `pnpm run build` or `make build` unless explicitly requested by the user.
-
 ## Tech Stack
 
 This project uses the following technologies:
@@ -30,7 +23,7 @@ This project uses the following technologies:
 
 ### Apps directory
 
-- `apps/analysis/` - Python-based analysis and data processing application.
+- `apps/analysis/` - Python-based analysis and data processing api.
 - `apps/web/` - Main Next.js web application.
 
 ### Key directories in `apps/analysis/`
@@ -70,5 +63,4 @@ This project uses the following technologies:
 
 ## Rules for confirming changes
 
-- **IMPORTANT:** Use `make check` (not `pnpm run build`) to test the project and regenerate types.
 - Always run `make check` after making significant changes to ensure code quality.
