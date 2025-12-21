@@ -1,4 +1,3 @@
-// @ts-nocheck
 import playwright from "eslint-plugin-playwright";
 import { config } from "@repo/eslint-config/base";
 

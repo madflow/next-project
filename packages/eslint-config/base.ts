@@ -1,4 +1,3 @@
-// @ts-nocheck
 import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import onlyWarn from "eslint-plugin-only-warn";
