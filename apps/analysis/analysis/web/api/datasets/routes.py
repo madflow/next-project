@@ -1,3 +1,4 @@
+import os
 import tempfile
 from contextlib import contextmanager
 from typing import Any, ClassVar, Dict, Iterator, List, Optional, Tuple
@@ -114,19 +115,29 @@ def _download_sav_from_s3(s3_key: str) -> Iterator[str]:
     s3_client = S3Client.get_client()
 
     with tempfile.NamedTemporaryFile(suffix=".sav", delete=False) as temp_file:
-        try:
-            # Download file from S3 to a temporary file
-            s3_client.download_file(
-                Bucket=settings.s3_bucket_name,
-                Key=s3_key,
-                Filename=temp_file.name,
-            )
-            yield temp_file.name
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Error downloading SAV file from S3: {e!s}",
-            ) from e
+        temp_file_path = temp_file.name
+
+    try:
+        # Download file from S3 to a temporary file
+        s3_client.download_file(
+            Bucket=settings.s3_bucket_name,
+            Key=s3_key,
+            Filename=temp_file_path,
+        )
+        yield temp_file_path
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error downloading SAV file from S3: {e!s}",
+        ) from e
+    finally:
+        # Clean up the temporary file
+        if os.path.exists(temp_file_path):
+            try:
+                os.unlink(temp_file_path)
+            except Exception:
+                # Swallow removal errors to avoid masking original exceptions
+                pass
 
 
 def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
