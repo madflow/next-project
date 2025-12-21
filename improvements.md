@@ -60,7 +60,7 @@ A comprehensive list of improvements identified across code organization, qualit
   - Current: Flat structure with prefix naming (`admin-*`, `api-*`, `auth-*`)
   - Fix: Create `tests/admin/`, `tests/api/`, `tests/auth/`, `tests/adhoc/`
 
-- [ ] **Extract S3 download logic in Python**
+- [x] **Extract S3 download logic in Python**
   - File: `apps/analysis/analysis/web/api/datasets/routes.py` (lines 99-171)
   - Issue: `_read_sav_from_s3` and `_read_dataframe_from_s3` share identical S3 download code
   - Fix: Create `@contextmanager _download_sav_from_s3()` helper

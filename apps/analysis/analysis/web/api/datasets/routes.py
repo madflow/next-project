@@ -1,5 +1,6 @@
 import tempfile
-from typing import Any, ClassVar, Dict, List, Optional, Tuple
+from contextlib import contextmanager
+from typing import Any, ClassVar, Dict, Iterator, List, Optional, Tuple
 
 import pandas as pd
 import pyreadstat
@@ -96,6 +97,38 @@ class MetadataResponse(BaseModel):
         }
 
 
+@contextmanager
+def _download_sav_from_s3(s3_key: str) -> Iterator[str]:
+    """
+    Context manager that downloads an SAV file from S3 to a temporary file.
+
+    Args:
+        s3_key: The S3 object key/path
+
+    Yields:
+        Path to the temporary file containing the downloaded SAV data
+
+    Raises:
+        HTTPException: If the file cannot be downloaded from S3
+    """
+    s3_client = S3Client.get_client()
+
+    with tempfile.NamedTemporaryFile(suffix=".sav", delete=False) as temp_file:
+        try:
+            # Download file from S3 to a temporary file
+            s3_client.download_file(
+                Bucket=settings.s3_bucket_name,
+                Key=s3_key,
+                Filename=temp_file.name,
+            )
+            yield temp_file.name
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Error downloading SAV file from S3: {e!s}",
+            ) from e
+
+
 def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Read SAV file from S3 and return data and metadata.
@@ -106,20 +139,11 @@ def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     Returns:
         Tuple containing (data, metadata) from the SAV file
     """
-    s3_client = S3Client.get_client()
-
-    with tempfile.NamedTemporaryFile(suffix=".sav") as temp_file:
+    with _download_sav_from_s3(s3_key) as temp_file_path:
         try:
-            # Download file from S3 to a temporary file
-            s3_client.download_file(
-                Bucket=settings.s3_bucket_name,
-                Key=s3_key,
-                Filename=temp_file.name,
-            )
-
             # Read the SAV file
             df, meta = pyreadstat.read_sav(
-                temp_file.name,
+                temp_file_path,
                 metadataonly=True,
                 user_missing=True,
             )
@@ -146,19 +170,10 @@ def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
 def _read_dataframe_from_s3(s3_key: str) -> pd.DataFrame:
     """Read SAV file from S3 and return a pandas DataFrame."""
-    s3_client = S3Client.get_client()
-
-    with tempfile.NamedTemporaryFile(suffix=".sav") as temp_file:
+    with _download_sav_from_s3(s3_key) as temp_file_path:
         try:
-            # Download file from S3 to a temporary file
-            s3_client.download_file(
-                Bucket=settings.s3_bucket_name,
-                Key=s3_key,
-                Filename=temp_file.name,
-            )
-
             # Read the SAV file
-            df, _ = pyreadstat.read_sav(temp_file.name)
+            df, _ = pyreadstat.read_sav(temp_file_path)
             if df is None:
                 raise ValueError("No data found in SAV file.")
             return df
