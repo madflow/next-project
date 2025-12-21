@@ -24,11 +24,12 @@
 ## Creating new translations
 
 - Use the `next-intl` package to manage translations.
-- The translations files are located in the `messages` directory.
-- Use `next-intl`'''s `useTranslation` hook to access translations in client components.
-- Use `getTranslations` in server components.
-- When adding new translation files, add them to the messages array in apps/web/src/i18n/request.ts.
-- The translation keys must be added to apps/web/src/global.d.ts in order to have them available in the `useTranslation` hook.
+- The translations files are located in the `messages` directory as JSON files (e.g., `en.json`, `de.json`).
+- Use `next-intl`'s `useTranslations` hook to access translations in client components.
+- Use `getTranslations` from `next-intl/server` in server components.
+- Translation files are automatically loaded via dynamic import in `apps/web/src/i18n/request.ts` - no manual registration needed.
+- Add new translation keys directly to the JSON files in the `messages` directory.
+- The supported locales are defined in `apps/web/src/i18n/config.ts`.
 
 ## Naming conventions
 
