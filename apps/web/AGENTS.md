@@ -25,10 +25,10 @@
 
 - Use the `next-intl` package to manage translations.
 - The translations files are located in the `messages` directory.
-- Use `next-intl`'''s `useTranslation` hook to access translations in client components.
+- Use `next-intl`'s `useTranslations` hook to access translations in client components.
 - Use `getTranslations` in server components.
 - When adding new translation files, add them to the messages array in apps/web/src/i18n/request.ts.
-- The translation keys must be added to apps/web/src/global.d.ts in order to have them available in the `useTranslation` hook.
+- The translation keys must be added to apps/web/src/global.ts in order to have them available in the `useTranslations` hook.
 
 ## Naming conventions
 
@@ -66,7 +66,7 @@
 - Next.Js is used in the apps/web directory
 - Use the App Router
 - Use Server Components by default
-- Mark client components with `'''use client'''` directive
+- Mark client components with `'use client'` directive
 - Implement proper loading and error states
 - Use route groups `(folder)` for logical organization
 - Do not use hooks in server components. Use hooks in client components. A hook starts with `use` like `useSession`.
