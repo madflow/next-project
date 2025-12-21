@@ -1,7 +1,6 @@
 import playwright from "eslint-plugin-playwright";
 import { config } from "@repo/eslint-config/base";
 
-/** @type {import("eslint").Linter.Config} */
 export default [
   ...config,
   {
