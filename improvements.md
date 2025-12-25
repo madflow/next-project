@@ -170,7 +170,7 @@ A comprehensive list of improvements identified across code organization, qualit
 
 ### Critical (Fix Immediately)
 
-- [ ] **Enable rate limiting**
+- [x] **Enable rate limiting**
   - File: `apps/web/src/lib/auth.ts` (lines 125-127)
   - Issue: `rateLimit: { enabled: false }` - vulnerable to brute-force attacks
   - Fix: Enable and configure rate limiting
