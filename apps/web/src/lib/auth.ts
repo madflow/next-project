@@ -125,20 +125,20 @@ export const auth = betterAuth({
     storage: "database",
     enabled: true,
     window: 60,
-    max: 1000,
+    max: 2000,
     modelName: "rateLimit",
     customRules: {
       "/sign-in/email": async () => ({
         window: 60,
-        max: 200,
+        max: 400,
       }),
       "/sign-up/email": async () => ({
         window: 60,
-        max: 5,
+        max: 10,
       }),
       "/reset-password/email": async () => ({
         window: 60,
-        max: 5,
+        max: 10,
       }),
     },
   },
