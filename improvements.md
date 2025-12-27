@@ -170,10 +170,12 @@ A comprehensive list of improvements identified across code organization, qualit
 
 ### Critical (Fix Immediately)
 
-- [ ] **Enable rate limiting**
-  - File: `apps/web/src/lib/auth.ts` (lines 125-127)
-  - Issue: `rateLimit: { enabled: false }` - vulnerable to brute-force attacks
-  - Fix: Enable and configure rate limiting
+- [x] **Enable rate limiting**
+  - File: `apps/web/src/lib/auth.ts` (lines 124-144)
+  - Implementation: Global config (2000 req/min, 60s window, DB-backed) with custom route rules
+    - `/sign-in/email`: 400 req/min (e2e test compatibility)
+    - `/sign-up/email`: 10 req/min (prevent account automation)
+    - `/reset-password/email`: 10 req/min (prevent email spam)
 
 - [ ] **Require secrets in production**
   - File: `apps/web/src/env.ts` (lines 11-26)
