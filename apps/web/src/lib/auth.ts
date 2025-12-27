@@ -128,18 +128,18 @@ export const auth = betterAuth({
     max: 2000,
     modelName: "rateLimit",
     customRules: {
-      "/sign-in/email": async () => ({
+      "/sign-in/email": {
         window: 60,
         max: 400,
-      }),
-      "/sign-up/email": async () => ({
+      },
+      "/sign-up/email": {
         window: 60,
         max: 10,
-      }),
-      "/reset-password/email": async () => ({
+      },
+      "/reset-password/email": {
         window: 60,
         max: 10,
-      }),
+      },
     },
   },
   emailVerification: {
