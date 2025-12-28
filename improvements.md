@@ -203,7 +203,7 @@ A comprehensive list of improvements identified across code organization, qualit
   - File: `apps/web/src/lib/storage.ts` (line 18)
   - Issue: `tls: false` - unencrypted S3 communication
 
-- [ ] **Add non-root users to Docker containers**
+- [x] **Add non-root users to Docker containers**
   - Files: `apps/analysis/Dockerfile`, `packages/cli/Dockerfile`, `packages/database/Dockerfile`
   - Issue: Containers run as root
   - Fix: Add `RUN addgroup/adduser` and `USER` directive
@@ -268,7 +268,7 @@ A comprehensive list of improvements identified across code organization, qualit
   - Files: All test files repeat login boilerplate
   - Fix: Create `fixtures/auth.fixture.ts` with `adminPage` and `userPage` fixtures
 
-- [ ] **Replace hardcoded waits with explicit waits**
+- [x] **Replace hardcoded waits with explicit waits**
   - Files:
     - `user-account.spec.ts` (line 40): `waitForTimeout(1000)`
     - `adhoc-analysis-basic.spec.ts` (lines 30, 50, 81): various timeouts
