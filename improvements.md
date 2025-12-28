@@ -108,10 +108,10 @@ A comprehensive list of improvements identified across code organization, qualit
   - Issue: `DATABASE_URL` could be undefined, causing cryptic runtime errors
   - Fix: Add validation with descriptive error message
 
-- [ ] **Fix orphaned migration file**
+- [x] **Fix orphaned migration file**
   - File: `packages/database/migrations/0008_update_allowed_statistics_to_boolean_map.sql`
   - Issue: Not tracked in `_journal.json`, won't be run by Drizzle migrator
-  - Fix: Either add to journal with proper index or document manual execution
+  - Resolution: Deleted file - migration logic superseded by tracked migration `0010_clumsy_bushwacker.sql`
 
 ### Medium Priority
 
