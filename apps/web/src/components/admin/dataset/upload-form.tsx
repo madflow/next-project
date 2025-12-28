@@ -5,7 +5,7 @@ import { Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, type FieldErrors, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { uploadDatasetWithFormData } from "@/actions/dataset";
@@ -107,8 +107,7 @@ export function DatasetUploadForm() {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onErrors = (errors: any) => {
+  const onErrors = (errors: FieldErrors<FormData>) => {
     console.log(errors);
   };
 

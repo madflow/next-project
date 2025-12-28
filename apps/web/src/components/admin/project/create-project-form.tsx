@@ -16,8 +16,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Organization } from "@/types/organization";
 import { insertProjectSchema } from "@/types/project";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const createFormSchema = (t: any) =>
+type CreateProjectTranslations = {
+  (key: `form.${"name" | "slug" | "organization"}.errors.${"required" | "invalid" | "maxLength"}`): string;
+};
+
+const createFormSchema = (t: CreateProjectTranslations) =>
   z.object({
     name: z.string().min(1, {
       error: t("form.name.errors.required"),
@@ -65,7 +68,7 @@ export function CreateProjectForm() {
   }, [t]);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(createFormSchema(t)),
+    resolver: zodResolver(createFormSchema(t as unknown as CreateProjectTranslations)),
     defaultValues: {
       name: "",
       slug: "",
