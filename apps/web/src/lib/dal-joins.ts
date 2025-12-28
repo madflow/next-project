@@ -188,9 +188,9 @@ export function createListWithJoins<TSchema extends ZodSchema>(
 
       // Add joined data to the result
       for (const [joinKey, joinValue] of Object.entries(joinedData)) {
-        // Get the table name safely, defaulting to 'member' if not available
+        // Get the table name safely, defaulting to '' if not available
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tableName = (table as any)._?.name || "member";
+        const tableName = (table as any)._?.name || "";
         // If the join key is the same as the main table name, merge the properties
         if (joinKey === tableName) {
           Object.assign(result, joinValue);

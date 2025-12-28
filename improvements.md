@@ -85,7 +85,7 @@ A comprehensive list of improvements identified across code organization, qualit
 
 ### High Priority
 
-- [ ] **Replace explicit `any` types with proper types**
+- [x] **Replace explicit `any` types with proper types**
   - Files affected:
     - `apps/web/src/components/admin/project/create-project-form.tsx` (line 19-20)
     - `apps/web/src/components/admin/dataset/upload-form.tsx` (line 110-111)
