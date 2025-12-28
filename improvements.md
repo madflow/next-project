@@ -75,7 +75,7 @@ A comprehensive list of improvements identified across code organization, qualit
   - Files: `organization-select.tsx` (`onValueChangeAction`), `project-select.tsx` (`onValueChange`)
   - Fix: Use consistent naming across all select components
 
-- [ ] **Add docstrings to empty Python **init** files**
+- [x] **Add docstrings to empty Python **init** files**
   - File: `apps/analysis/analysis/web/api/datasets/__init__.py`
   - Fix: Add `"""Dataset API routes and endpoints."""`
 
