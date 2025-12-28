@@ -1,13 +1,13 @@
 import os
 import tempfile
 from contextlib import contextmanager
-from typing import Any, ClassVar, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import pandas as pd
 import pyreadstat
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.routing import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -84,18 +84,19 @@ async def get_dataset(
 class MetadataResponse(BaseModel):
     """Response model for dataset metadata."""
 
+    model_config = ConfigDict(
+        json_encoders={
+            # Handle numpy types that might be in the metadata
+            "int64": int,
+            "float64": float,
+        },
+    )
+
     status: str
     message: str
     dataset_id: str
     data: Optional[Dict[str, Any]] = {}
     metadata: Optional[Dict[str, Any]] = {}
-
-    class Config:
-        json_encoders: ClassVar[Dict[str, Any]] = {
-            # Handle numpy types that might be in the metadata
-            "int64": int,
-            "float64": float,
-        }
 
 
 @contextmanager

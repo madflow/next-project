@@ -38,9 +38,6 @@ class DatasetInDB(DatasetBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
-
 
 # For responses that include related data
 class DatasetResponse(DatasetInDB):
