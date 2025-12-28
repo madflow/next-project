@@ -15,8 +15,11 @@ import { NavProject } from "./nav-project";
 import { OrganizationMenu } from "./organization-menu";
 import { ProjectSwitcher } from "./project-switcher";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getNavData = (t: (t: any) => string) => ({
+type AppSidebarTranslations = {
+  (key: `navItems.${"admin" | "adhoc" | "dashboard" | "project"}` | "sections"): string;
+};
+
+const getNavData = (t: AppSidebarTranslations) => ({
   navSecondary: [
     {
       title: t("navItems.admin"),
@@ -30,7 +33,7 @@ const getNavData = (t: (t: any) => string) => ({
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const t = useTranslations("appSidebar");
   const isAdmin = useIsAdmin();
-  const data = getNavData(t);
+  const data = getNavData(t as unknown as AppSidebarTranslations);
   const router = useRouter();
   const { activeOrganization, activeProject, setActiveProject } = useAppContext();
 
