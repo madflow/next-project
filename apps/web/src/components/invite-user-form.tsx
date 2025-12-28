@@ -147,7 +147,7 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
                 const watchedOrgId = form.watch("organizationId");
                 return (
                   <OrganizationSelect
-                    onValueChangeAction={(value) => form.setValue("organizationId", value)}
+                    onValueChange={(value) => form.setValue("organizationId", value)}
                     defaultValue={watchedOrgId}
                   />
                 );

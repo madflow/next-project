@@ -15,12 +15,12 @@ import {
 import { useOrganizations } from "@/hooks/use-organizations";
 
 type OrganizationSelectProps = {
-  onValueChangeAction: (value: string) => void;
+  onValueChange: (value: string) => void;
   defaultValue?: string;
   triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
 };
 
-export function OrganizationSelect({ onValueChangeAction, defaultValue, triggerProps }: OrganizationSelectProps) {
+export function OrganizationSelect({ onValueChange, defaultValue, triggerProps }: OrganizationSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data: organizations, isLoading, isError } = useOrganizations();
   const t = useTranslations();
@@ -59,7 +59,7 @@ export function OrganizationSelect({ onValueChangeAction, defaultValue, triggerP
     <Select
       onValueChange={(value) => {
         setSelectedValue(value);
-        onValueChangeAction(value);
+        onValueChange(value);
       }}
       value={selectedValue}>
       <SelectTrigger {...triggerProps} className="w-[180px]" data-testid="organization-dropdown">
