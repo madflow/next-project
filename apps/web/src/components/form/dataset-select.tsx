@@ -16,12 +16,12 @@ import { useDatasetsByProject } from "@/hooks/use-datasets-by-project";
 
 type DatasetSelectProps = {
   projectId: string;
-  onValueChangeAction: (value: string) => void;
+  onValueChange: (value: string) => void;
   defaultValue?: string;
   triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
 };
 
-export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, triggerProps }: DatasetSelectProps) {
+export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerProps }: DatasetSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data, isLoading, isError } = useDatasetsByProject(projectId);
   const t = useTranslations("formDatasetSelect");
@@ -41,13 +41,13 @@ export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, tr
       } else {
         // Dataset no longer exists, clear the selection and notify parent
         setSelectedValue("");
-        onValueChangeAction("");
+        onValueChange("");
       }
     } else {
       // Data not loaded yet, set the value optimistically
       setSelectedValue(defaultValue);
     }
-  }, [defaultValue, data?.rows, onValueChangeAction]);
+  }, [defaultValue, data?.rows, onValueChange]);
 
   if (isLoading) {
     return (
@@ -83,7 +83,7 @@ export function DatasetSelect({ projectId, onValueChangeAction, defaultValue, tr
     <Select
       onValueChange={(value) => {
         setSelectedValue(value);
-        onValueChangeAction(value);
+        onValueChange(value);
       }}
       value={selectedValue}>
       <SelectTrigger data-testid="app.dropdown.dataset.trigger" className="w-full">

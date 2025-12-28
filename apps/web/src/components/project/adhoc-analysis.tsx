@@ -124,7 +124,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         <DatasetSelect
           projectId={project.id}
           defaultValue={selectedDataset || undefined}
-          onValueChangeAction={(value) => {
+          onValueChange={(value) => {
             setSelectedDataset(value || null);
             setCurrentSelection(null);
             setBaseStatsData({});
