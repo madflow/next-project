@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { SelectionItem } from "@/components/project/adhoc-variableset-selector";
-import { AdhocSelectionState, useProjectStorage } from "@/lib/project-storage";
+import { AdhocSelectionState, useProjectStorage } from "@/hooks/use-project-storage";
 
 export function useAdhocPersistence(projectId: string) {
   const { getState, setState } = useProjectStorage(projectId);
