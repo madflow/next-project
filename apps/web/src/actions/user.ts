@@ -9,6 +9,7 @@ import {
   invitation,
 } from "@repo/database/schema";
 import { auth } from "@/lib/auth";
+import { assertUserIsAdmin } from "@/lib/dal";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { withAdminAuth } from "@/lib/server-action-utils";
 

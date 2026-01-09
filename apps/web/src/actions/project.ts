@@ -7,7 +7,7 @@ import {
   type UpdateProjectData as UpdateData,
   project as entity,
 } from "@repo/database/schema";
-import { withAdminAuth } from "@/lib/server-action-utils";
+import { withAdminAuth } from "@/dal/server-action-utils";
 
 export const create = withAdminAuth(async (data: CreateData) => {
   await db.insert(entity).values(data).returning();

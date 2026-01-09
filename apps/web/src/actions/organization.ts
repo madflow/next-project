@@ -8,7 +8,7 @@ import {
   organization as entity,
   member,
 } from "@repo/database/schema";
-import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
+import { getSessionOrThrow, withAdminAuth } from "@/dal/server-action-utils";
 
 export const create = withAdminAuth(async (data: CreateData) => {
   const session = await getSessionOrThrow();

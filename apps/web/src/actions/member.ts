@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { defaultClient as db } from "@repo/database/clients";
 import { type CreateMemberData, member as memberTable, organization as organizationTable } from "@repo/database/schema";
-import { withAdminAuth } from "@/lib/server-action-utils";
+import { withAdminAuth } from "@/dal/server-action-utils";
 
 type AddMemberData = {
   userId: string;

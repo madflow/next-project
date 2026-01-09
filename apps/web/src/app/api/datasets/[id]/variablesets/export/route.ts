@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { assertAccess, find } from "@/dal/dataset";
 import { exportVariableSets } from "@/dal/dataset-variableset-export";
-import { assertUserIsAdmin } from "@/lib/dal";
+import { assertUserIsAdmin } from "@/dal/dal";
 import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
