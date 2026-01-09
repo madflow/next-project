@@ -9,8 +9,6 @@ export function createAnalysisClient() {
     "X-API-KEY": apiKey,
   };
   const analysisFetch = async (input: RequestInfo, init?: RequestInit) => {
-    const fullEndpoint = `${baseUrl}${input}`;
-    console.log(fullEndpoint);
     const response = await fetch(baseUrl + input, {
       ...init,
       headers: {
