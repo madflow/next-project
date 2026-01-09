@@ -4,16 +4,14 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { defaultClient as db } from "@repo/database/clients";
 import { type CreateMemberData, member as memberTable, organization as organizationTable } from "@repo/database/schema";
-import { assertUserIsAdmin } from "@/lib/dal";
+import { withAdminAuth } from "@/lib/server-action-utils";
 
 type AddMemberData = {
   userId: string;
   role: "admin" | "owner" | "member";
 };
 
-export async function addMember(organizationId: string, data: AddMemberData) {
-  await assertUserIsAdmin();
-
+export const addMember = withAdminAuth(async (organizationId: string, data: AddMemberData) => {
   // Check if the organization exists
   const [org] = await db.select().from(organizationTable).where(eq(organizationTable.id, organizationId)).limit(1);
 
@@ -47,11 +45,9 @@ export async function addMember(organizationId: string, data: AddMemberData) {
   revalidatePath(`/admin/organizations/${organizationId}/members`);
 
   return { success: true };
-}
+});
 
-export async function updateMemberRole(organizationId: string, userId: string, role: "admin" | "owner" | "member") {
-  await assertUserIsAdmin();
-
+export const updateMemberRole = withAdminAuth(async (organizationId: string, userId: string, role: "admin" | "owner" | "member") => {
   await db
     .update(memberTable)
     .set({ role })
@@ -61,11 +57,9 @@ export async function updateMemberRole(organizationId: string, userId: string, r
   revalidatePath(`/admin/organizations/${organizationId}/members`);
 
   return { success: true };
-}
+});
 
-export async function removeMember(memberId: string) {
-  await assertUserIsAdmin();
-
+export const removeMember = withAdminAuth(async (memberId: string) => {
   // Get the member to find the organizationId for revalidation
   const [member] = await db.select().from(memberTable).where(eq(memberTable.id, memberId)).limit(1);
 
@@ -75,4 +69,4 @@ export async function removeMember(memberId: string) {
   if (member) {
     revalidatePath(`/admin/organizations/${member.organizationId}/members`);
   }
-}
+});

@@ -1,7 +1,6 @@
 "use server";
 
 import { eq, sql } from "drizzle-orm";
-import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   type CreateOrganizationData as CreateData,
@@ -9,18 +8,12 @@ import {
   organization as entity,
   member,
 } from "@repo/database/schema";
-import { auth } from "@/lib/auth";
-import { assertUserIsAdmin } from "@/lib/dal";
+import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
 
-export async function create(data: CreateData) {
-  await assertUserIsAdmin();
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
+export const create = withAdminAuth(async (data: CreateData) => {
+  const session = await getSessionOrThrow();
+  const userId = session.user.id;
+
   const cte = db.$with("createdOrg").as(db.insert(entity).values(data).returning());
   await db
     .with(cte)
@@ -31,14 +24,12 @@ export async function create(data: CreateData) {
       role: "owner",
       createdAt: new Date(),
     });
-}
+});
 
-export async function update(id: string, data: UpdateData) {
-  await assertUserIsAdmin();
+export const update = withAdminAuth(async (id: string, data: UpdateData) => {
   await db.update(entity).set(data).where(eq(entity.id, id));
-}
+});
 
-export async function remove(id: string) {
-  await assertUserIsAdmin();
+export const remove = withAdminAuth(async (id: string) => {
   await db.delete(entity).where(eq(entity.id, id));
-}
+});

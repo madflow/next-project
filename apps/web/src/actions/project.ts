@@ -7,19 +7,16 @@ import {
   type UpdateProjectData as UpdateData,
   project as entity,
 } from "@repo/database/schema";
-import { assertUserIsAdmin } from "@/lib/dal";
+import { withAdminAuth } from "@/lib/server-action-utils";
 
-export async function create(data: CreateData) {
-  await assertUserIsAdmin();
+export const create = withAdminAuth(async (data: CreateData) => {
   await db.insert(entity).values(data).returning();
-}
+});
 
-export async function update(id: string, data: UpdateData) {
-  await assertUserIsAdmin();
+export const update = withAdminAuth(async (id: string, data: UpdateData) => {
   await db.update(entity).set(data).where(eq(entity.id, id)).returning();
-}
+});
 
-export async function remove(id: string) {
-  await assertUserIsAdmin();
+export const remove = withAdminAuth(async (id: string) => {
   await db.delete(entity).where(eq(entity.id, id));
-}
+});

@@ -1,13 +1,11 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import { UpdateDatasetData, dataset, datasetProject } from "@repo/database/schema";
 import { deleteDataset } from "@/dal/dataset";
-import { auth } from "@/lib/auth";
 import { CreateDatasetResult, createDataset } from "@/lib/dataset-service";
-import { withAdminAuth } from "@/lib/server-action-utils";
+import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
 
 export type UploadDatasetResult = CreateDatasetResult;
 
@@ -24,9 +22,7 @@ type UploadDatasetParams = {
  * Upload dataset using FormData to properly handle file uploads
  */
 export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData): Promise<UploadDatasetResult> => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSessionOrThrow();
 
   // Extract data from FormData
   const file = formData.get("file") as File | null;
@@ -52,7 +48,7 @@ export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData
     description,
     contentType,
     missingValues,
-    userId: session!.user.id,
+    userId: session.user.id,
   });
 });
 
@@ -69,9 +65,7 @@ export const uploadDataset = withAdminAuth(
     contentType,
     missingValues,
   }: UploadDatasetParams): Promise<UploadDatasetResult> => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getSessionOrThrow();
 
     return await createDataset({
       file,
@@ -80,7 +74,7 @@ export const uploadDataset = withAdminAuth(
       description,
       contentType,
       missingValues,
-      userId: session!.user.id,
+      userId: session.user.id,
     });
   }
 );
