@@ -9,13 +9,12 @@ import {
   invitation,
 } from "@repo/database/schema";
 import { auth } from "@/lib/auth";
-import { assertUserIsAdmin } from "@/lib/dal";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
+import { withAdminAuth } from "@/lib/server-action-utils";
 
-export async function create(data: CreateData) {
-  await assertUserIsAdmin();
+export const create = withAdminAuth(async (data: CreateData) => {
   await db.insert(entity).values(data).returning();
-}
+});
 
 export async function createWithInvitation(invitationId: string, data: CreateData & { password: string }) {
   const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, invitationId)).limit(1);
@@ -46,12 +45,10 @@ export async function createWithInvitation(invitationId: string, data: CreateDat
   });
 }
 
-export async function update(id: string, data: UpdateData) {
-  await assertUserIsAdmin();
+export const update = withAdminAuth(async (id: string, data: UpdateData) => {
   await db.update(entity).set(data).where(eq(entity.id, id)).returning();
-}
+});
 
-export async function remove(id: string) {
-  await assertUserIsAdmin();
+export const remove = withAdminAuth(async (id: string) => {
   await db.delete(entity).where(eq(entity.id, id));
-}
+});

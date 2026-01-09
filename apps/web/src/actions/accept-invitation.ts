@@ -1,20 +1,14 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { defaultClient as db } from "@repo/database/clients";
 import { invitation, member } from "@repo/database/schema";
 import { create as createMember } from "@/dal/member";
-import { auth } from "@/lib/auth";
+import { getSessionOrThrow, withAuth } from "@/lib/server-action-utils";
 
-export async function acceptInvitationAfterSignup(invitationId: string) {
+export const acceptInvitationAfterSignup = withAuth(async (invitationId: string) => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-    if (!session?.user) {
-      throw new Error("User not authenticated");
-    }
+    const session = await getSessionOrThrow();
 
     // Verify the invitation exists and is for this user's email
     const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, invitationId)).limit(1);
@@ -53,4 +47,4 @@ export async function acceptInvitationAfterSignup(invitationId: string) {
     console.error("Error accepting invitation:", error);
     return { success: false, message: "Failed to accept invitation" };
   }
-}
+});

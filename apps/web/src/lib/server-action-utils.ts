@@ -6,7 +6,7 @@ import { ServerActionNotAuthorizedException } from "@/lib/exception";
 /**
  * Gets the current session or throws ServerActionNotAuthorizedException
  */
-async function getSessionOrThrow() {
+export async function getSessionOrThrow() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });

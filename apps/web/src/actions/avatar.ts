@@ -2,11 +2,9 @@
 
 import { DeleteObjectCommand, ObjectCannedACL, PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
-import { headers } from "next/headers";
 import { env } from "@/env";
-import { auth } from "@/lib/auth";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
-import { withAuth } from "@/lib/server-action-utils";
+import { getSessionOrThrow, withAuth } from "@/lib/server-action-utils";
 import { getS3Client } from "@/lib/storage";
 
 type UploadAvatarParams = {
@@ -29,12 +27,10 @@ export type UploadAvatarResult = {
 
 export const uploadAvatar = withAuth(
   async ({ file, userId, contentType }: UploadAvatarParams): Promise<UploadAvatarResult> => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getSessionOrThrow();
 
     // Ensure user can only upload their own avatar
-    if (session!.user.id !== userId) {
+    if (session.user.id !== userId) {
       throw new ServerActionNotAuthorizedException("User ID mismatch");
     }
 
@@ -45,9 +41,9 @@ export const uploadAvatar = withAuth(
         throw new Error("No file provided or file is empty");
       }
 
-      if (session!.user.image) {
+      if (session.user.image) {
         // Extract just the filename from the full path
-        const filename = session!.user.image.split("/").pop() || "";
+        const filename = session.user.image.split("/").pop() || "";
         if (filename) {
           await deleteAvatar(userId, filename);
         }
