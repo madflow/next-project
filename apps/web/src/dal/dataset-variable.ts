@@ -7,7 +7,7 @@ import {
   selectDatasetVariableSchema,
   updateDatasetVariableSchema,
 } from "@repo/database/schema";
-import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/lib/dal";
+import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { DalException } from "@/lib/exception";
 
 const baseList = createList(entity, selectDatasetVariableSchema);

@@ -8,7 +8,7 @@ import {
   selectOrganizationSchema,
   selectUserSchema,
 } from "@repo/database/schema";
-import { createFind, createList, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/lib/dal";
+import { createFind, createList, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/dal/dal";
 import { DalNotAuthorizedException } from "@/lib/exception";
 
 export const find = withAdminCheck(createFind(entity, selectUserSchema));
