@@ -12,7 +12,7 @@ import {
   selectDatasetVariablesetSchema,
   updateDatasetVariablesetSchema,
 } from "@repo/database/schema";
-import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/lib/dal";
+import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { DalException } from "@/lib/exception";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 

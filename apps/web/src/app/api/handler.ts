@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { filterSchema, orderBySchema } from "@/lib/dal";
+import { filterSchema, orderBySchema } from "@/dal/dal";
 
 const reservedQueryParams = ["order", "offset", "limit", "select"];
 

@@ -9,8 +9,8 @@ import {
   getSessionUser,
   withAdminCheck,
   withSessionCheck,
-} from "@/lib/dal";
-import { createListWithJoins } from "@/lib/dal-joins";
+} from "@/dal/dal";
+import { createListWithJoins } from "@/dal/dal-joins";
 import { DalNotAuthorizedException } from "@/lib/exception";
 
 export const find = withSessionCheck(createFind(entity, selectProjectSchema));

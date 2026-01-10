@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { organization as entity, member, selectOrganizationSchema } from "@repo/database/schema";
-import { createFind, createList, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/lib/dal";
+import { createFind, createList, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/dal/dal";
 
 export const find = withAdminCheck(createFind(entity, selectOrganizationSchema));
 

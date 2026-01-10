@@ -15,7 +15,7 @@ import {
   getSessionUser,
   withAdminCheck,
   withSessionCheck,
-} from "@/lib/dal";
+} from "@/dal/dal";
 import { DalException, DalNotAuthorizedException } from "@/lib/exception";
 import { deleteDataset as s3DeleteDataset } from "@/lib/storage";
 
