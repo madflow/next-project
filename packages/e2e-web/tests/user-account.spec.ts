@@ -218,7 +218,7 @@ test.describe("User Account", () => {
     await expect(errorMessage.first()).toBeVisible({ timeout: 5000 });
 
     // Verify that the Save Changes button does NOT appear (file was rejected)
-    await expect(page.getByTestId("app.user.account.avatar-save-button")).not.toBeVisible();
+    await expect(page.getByTestId("app.user.account.avatar-save-button")).toBeHidden();
   });
 
   test("should delete user account and redirect to goodbye page", async ({ page }) => {
