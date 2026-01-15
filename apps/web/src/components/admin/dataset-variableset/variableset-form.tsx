@@ -29,7 +29,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   parentId: z.string().optional(),
   category: z.enum(CATEGORY_OPTIONS),
-  countedValue: z.coerce.number().default(1),
+  countedValue: z.number(),
 });
 
 const NO_PARENT_VALUE = "__NO_PARENT__";
@@ -282,9 +282,13 @@ export function VariablesetForm({
                       type="number"
                       step="any"
                       placeholder="1"
+                      value={field.value}
                       aria-invalid={fieldState.invalid}
                       data-testid="admin.dataset.variableset.form.countedValue"
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 1)}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        field.onChange(isNaN(value) ? 1 : value);
+                      }}
                     />
                   </FieldGroup>
                   <p className="text-muted-foreground mt-1 text-xs">{t("form.countedValueHelp")}</p>
