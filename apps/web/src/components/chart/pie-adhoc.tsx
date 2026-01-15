@@ -34,7 +34,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
     const colorIndex = (index % 6) + 1; // Cycle through chart-1 to chart-6
     chartConfig[key] = {
       label: item.label,
-      color: `hsl(var(--chart-${colorIndex}))`,
+      color: `var(--chart-${colorIndex})`,
     };
   });
 
@@ -59,7 +59,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
               />
               {rechartsData.map((entry, index) => {
                 const colorIndex = (index % 6) + 1;
-                return <Cell key={`cell-${index}`} fill={`hsl(var(--chart-${colorIndex}))`} />;
+                return <Cell key={`cell-${index}`} fill={`var(--chart-${colorIndex})`} />;
               })}
             </Pie>
             <ChartLegend
