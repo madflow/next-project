@@ -24,7 +24,7 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
   const chartConfig = {
     percentage: {
       label: t("percent"),
-      color: "hsl(var(--chart-1))",
+      color: "var(--chart-1)",
     },
   } satisfies ChartConfig;
 

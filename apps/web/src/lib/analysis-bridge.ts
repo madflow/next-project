@@ -91,7 +91,7 @@ export function transformToRechartsPieData(variableConfig: DatasetVariable, stat
       value: item.value,
       count: item.counts,
       percentage: item.percentages,
-      fill: `hsl(var(--chart-${(index % 6) + 1}))`,
+      fill: `var(--chart-${(index % 6) + 1})`,
     };
   });
 
@@ -114,7 +114,7 @@ export function transformToRechartsStackedBarData(variableConfig: DatasetVariabl
       percentage: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
       // Add individual percentage for stacking
       stackValue: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
-      fill: `hsl(var(--chart-${(index % 6) + 1}))`,
+      fill: `var(--chart-${(index % 6) + 1})`,
     };
   });
 
@@ -151,7 +151,7 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
           value: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
           label: label,
           count: item.counts,
-          color: `hsl(var(--chart-${(itemIndex % 6) + 1}))`,
+          color: `var(--chart-${(itemIndex % 6) + 1})`,
         };
       });
 
@@ -298,7 +298,7 @@ export function transformToMultiResponseIndividualStackedBarData(
             value: valueItem ? valueItem.percentages : 0,
             label: "\u200B", // Zero-width space - don't show value label but avoid fallback to dataKey
             count: valueItem ? valueItem.counts : 0,
-            color: `hsl(var(--chart-1))`, // Single color
+            color: `var(--chart-1)`, // Single color
           },
         ],
       };

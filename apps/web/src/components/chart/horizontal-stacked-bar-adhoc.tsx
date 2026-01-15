@@ -181,7 +181,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
             const key = `segment${index}`;
             stackedChartConfig[key] = {
               label: item.label,
-              color: `hsl(var(--chart-${(index % 6) + 1}))`,
+              color: `var(--chart-${(index % 6) + 1})`,
             };
             const normalizedValue = Math.round(item.percentage * normalizationFactor * 100) / 100;
             acc[key] = normalizedValue;

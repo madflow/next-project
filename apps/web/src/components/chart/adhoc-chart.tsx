@@ -171,7 +171,7 @@ export function AdhocChart({
   const chartConfig = {
     percentage: {
       label: tChart("percent"),
-      color: "hsl(var(--chart-1))",
+      color: "var(--chart-1)",
     },
   } satisfies ChartConfig;
 
@@ -316,7 +316,7 @@ export function AdhocChart({
           const colorIndex = (index % 6) + 1;
           pieChartConfig[key] = {
             label: item.label,
-            color: `hsl(var(--chart-${colorIndex}))`,
+            color: `var(--chart-${colorIndex})`,
           };
         });
 
