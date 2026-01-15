@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import path from "path";
 import { testUsers } from "../config";
 import { extractLinkFromMessage, loginUser, logoutUser, smtpServerApi } from "../utils";
 
@@ -150,14 +151,8 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.avatar-upload-button").click();
 
     const fileInput = page.getByTestId("app.user.account.avatar-file-input");
-    await fileInput.setInputFiles({
-      name: "avatar.svg",
-      mimeType: "image/svg+xml",
-      buffer: Buffer.from(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#000000"><circle cx="50" cy="50" r="40" /></svg>'
-      ),
-    });
-    //             data-testid="app.user.account.avatar-save-button">
+    const avatarPath = path.join(__dirname, "../testdata/avatar.png");
+    await fileInput.setInputFiles(avatarPath);
 
     const uploadPromise = page.waitForRequest(/avatar/);
     await page.getByTestId("app.user.account.avatar-save-button").click();
@@ -166,12 +161,64 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.avatar-container").waitFor({ state: "visible" });
     await expect(page.getByTestId("app.user.account.avatar-container")).toBeVisible();
     const avatarExistsResponse = page.waitForResponse(
-      /\/api\/users\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/avatars\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.svg/i
+      /\/api\/users\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/avatars\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.png/i
     );
     await page.reload();
     await avatarExistsResponse;
     await page.getByTestId("app.user.account.avatar-container").waitFor({ state: "visible" });
     await expect(page.getByTestId("app.user.account.avatar-container")).toBeVisible();
+  });
+
+  test("should reject fake PNG file (SVG with .png extension)", async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
+
+    await page.goto("/user/account");
+
+    const avatarContainer = page.getByTestId("app.user.account.avatar-container");
+    await avatarContainer.waitFor({ state: "visible", timeout: 5000 });
+
+    await page.getByTestId("app.user.account.avatar-upload-button").waitFor({ state: "visible" });
+    await page.getByTestId("app.user.account.avatar-upload-button").click();
+
+    const fileInput = page.getByTestId("app.user.account.avatar-file-input");
+    const fakePngPath = path.join(__dirname, "../testdata/avatar-fake.png");
+    await fileInput.setInputFiles(fakePngPath);
+
+    // Click save and expect an error
+    await page.getByTestId("app.user.account.avatar-save-button").click();
+
+    // Wait for error message or toast notification
+    // The system should detect that the file content doesn't match the extension
+    const errorMessage = page.locator("text=/invalid.*file.*type|unsupported.*format|file.*type.*not.*allowed/i");
+    await expect(errorMessage.first()).toBeVisible({ timeout: 5000 });
+  });
+
+  test("should reject SVG file upload", async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
+
+    await page.goto("/user/account");
+
+    const avatarContainer = page.getByTestId("app.user.account.avatar-container");
+    await avatarContainer.waitFor({ state: "visible", timeout: 5000 });
+
+    await page.getByTestId("app.user.account.avatar-upload-button").waitFor({ state: "visible" });
+    await page.getByTestId("app.user.account.avatar-upload-button").click();
+
+    const fileInput = page.getByTestId("app.user.account.avatar-file-input");
+    const svgPath = path.join(__dirname, "../testdata/avatar.svg");
+    await fileInput.setInputFiles(svgPath);
+
+    // Frontend validation should reject the file immediately and show an error toast
+    // The error message appears immediately after file selection, no need to click save
+    const errorMessage = page.locator(
+      "text=/invalid.*file.*type|unsupported.*format|svg.*not.*allowed|file.*type.*not.*allowed/i"
+    );
+    await expect(errorMessage.first()).toBeVisible({ timeout: 5000 });
+
+    // Verify that the Save Changes button does NOT appear (file was rejected)
+    await expect(page.getByTestId("app.user.account.avatar-save-button")).not.toBeVisible();
   });
 
   test("should delete user account and redirect to goodbye page", async ({ page }) => {
