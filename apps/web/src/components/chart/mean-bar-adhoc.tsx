@@ -125,7 +125,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
             <LabelList
               dataKey="value"
               position="right"
-              formatter={(value: number) => `${formatChartValue(value, MEAN_BAR_DECIMALS)}`}
+              formatter={(value: unknown) => `${formatChartValue(Number(value), MEAN_BAR_DECIMALS)}`}
             />
           </Bar>
           <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />

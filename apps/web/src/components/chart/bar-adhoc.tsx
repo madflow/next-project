@@ -52,7 +52,7 @@ export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
               <LabelList
                 dataKey="percentage"
                 position="top"
-                formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
+                formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
               />
             </Bar>
           </BarChart>

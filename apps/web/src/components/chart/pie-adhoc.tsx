@@ -55,7 +55,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
                 position="inside"
                 fill="white"
                 fontSize={12}
-                formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
+                formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
               />
               {rechartsData.map((entry, index) => {
                 const colorIndex = (index % 6) + 1;
