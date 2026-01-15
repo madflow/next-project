@@ -116,7 +116,8 @@ export function AvatarUpload() {
             },
           });
         } else {
-          toast.error(t("error.uploadFailed"));
+          // Show the server's specific error message if available, otherwise show generic error
+          toast.error(result.error || t("error.uploadFailed"));
         }
       } catch (error) {
         console.error("Error uploading avatar:", error);
