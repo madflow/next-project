@@ -27,9 +27,10 @@ export function AvatarUpload() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      toast.error(t("error.fileType"));
+    // Validate file type - only allow specific image formats
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error(t("error.invalidFileType"));
       return;
     }
 
@@ -92,12 +93,10 @@ export function AvatarUpload() {
         const formData = new FormData();
         formData.append("file", selectedFile);
         formData.append("userId", user.id);
-        formData.append("contentType", selectedFile.type);
 
         const result = await uploadAvatar({
           file: selectedFile,
           userId: user.id,
-          contentType: selectedFile.type,
         });
 
         if (result.success && result.url) {
@@ -161,7 +160,7 @@ export function AvatarUpload() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml"
+          accept="image/png, image/jpeg, image/webp"
           className="hidden"
           onChange={handleFileChange}
           disabled={isPending}

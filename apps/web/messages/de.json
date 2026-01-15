@@ -50,6 +50,7 @@
           "deleteFailed": "Löschen des Profilbilds fehlgeschlagen. Bitte versuchen Sie es erneut.",
           "fileSize": "Datei zu groß: Bitte laden Sie ein Bild mit maximal 2 MB hoch",
           "fileType": "Ungültiger Dateityp: Bitte laden Sie eine Bilddatei hoch",
+          "invalidFileType": "Ungültiger Dateityp: Nur WebP-, PNG- und JPEG-Bilder sind erlaubt",
           "invalidUrl": "Ungültige Profilbild-URL",
           "unknown": "Beim Hochladen Ihres Profilbilds ist ein Fehler aufgetreten",
           "updateFailed": "Profilbild konnte nicht aktualisiert werden",
