@@ -85,7 +85,7 @@ export function MultiResponseChart({
                 dataKey="percentage"
                 position="right"
                 fontSize={10}
-                formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
+                formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
               />
             </Bar>
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />

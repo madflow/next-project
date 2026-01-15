@@ -147,8 +147,8 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
                     position="center"
                     fontSize={10}
                     fill="white"
-                    formatter={(value: number) =>
-                      value > 5 ? `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%` : ""
+                    formatter={(value: unknown) =>
+                      Number(value) > 5 ? `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%` : ""
                     }
                   />
                 </Bar>
@@ -227,8 +227,8 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
                 position="center"
                 fontSize={10}
                 fill="white"
-                formatter={(value: number) =>
-                  value > 5 ? `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%` : ""
+                formatter={(value: unknown) =>
+                  Number(value) > 5 ? `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%` : ""
                 }
               />
             </Bar>

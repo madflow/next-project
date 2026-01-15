@@ -239,7 +239,7 @@ export function AdhocChart({
                   dataKey="percentage"
                   position="top"
                   fontSize={10}
-                  formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
+                  formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
                 />
               </Bar>
             </BarChart>
@@ -287,7 +287,7 @@ export function AdhocChart({
                   dataKey="percentage"
                   position="right"
                   fontSize={10}
-                  formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
+                  formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
                 />
               </Bar>
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
@@ -333,7 +333,7 @@ export function AdhocChart({
                   position="inside"
                   fontSize={10}
                   fill="white"
-                  formatter={(value: number) => `${formatChartValue(value, PERCENTAGE_CHART_DECIMALS)}%`}
+                  formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
                 />
               </Pie>
               <ChartLegend

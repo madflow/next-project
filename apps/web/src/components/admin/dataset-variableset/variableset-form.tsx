@@ -57,7 +57,6 @@ export function VariablesetForm({
   const isEditing = !!variableset;
 
   const form = useForm<FormData>({
-    // @ts-expect-error - zod coerce causes type mismatch with react-hook-form
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -168,10 +167,7 @@ export function VariablesetForm({
           <DialogDescription>{isEditing ? t("form.editDescription") : t("form.createDescription")}</DialogDescription>
         </DialogHeader>
 
-        <form
-          // @ts-expect-error - FormData type from zod schema causes mismatch with react-hook-form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Controller
             name="name"
             control={form.control}
