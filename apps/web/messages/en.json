@@ -50,6 +50,7 @@
           "deleteFailed": "Failed to delete avatar. Please try again.",
           "fileSize": "File too large: Please upload an image smaller than 2MB",
           "fileType": "Invalid file type: Please upload an image file",
+          "invalidFileType": "Invalid file type: Only WebP, PNG, and JPEG images are allowed",
           "invalidUrl": "Invalid avatar URL",
           "unknown": "An error occurred while uploading your avatar",
           "updateFailed": "Failed to update profile with new avatar",
