@@ -35,9 +35,7 @@ pnpm run seed || echo "⚠️  Database seeding failed or not configured"
 
 # Install Python dependencies for analysis app
 echo "🐍 Installing Python dependencies..."
-cd /workspace/apps/analysis
-poetry install || echo "⚠️  Poetry install failed"
-cd /workspace
+(cd /workspace/apps/analysis && poetry install) || echo "⚠️  Poetry install failed"
 
 echo "✅ Post-create setup complete!"
 echo ""

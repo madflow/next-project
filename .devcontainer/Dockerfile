@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM mcr.microsoft.com/devcontainers/javascript-node:1-24-bookworm
+FROM mcr.microsoft.com/devcontainers/javascript-node:24-bookworm
 
-# Install Python and Poetry
+# Install Python and dependencies
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     python3 \
@@ -11,17 +11,13 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 - \
-    && ln -s /root/.local/bin/poetry /usr/local/bin/poetry
-
 # Install pnpm globally
 RUN npm install -g pnpm@10.27.0
 
 # Switch to node user
 USER node
 
-# Install Poetry for node user as well
+# Install Poetry for node user
 RUN curl -sSL https://install.python-poetry.org | python3 - \
     && echo 'export PATH="/home/node/.local/bin:$PATH"' >> /home/node/.bashrc
 
