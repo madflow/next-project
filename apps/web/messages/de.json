@@ -612,6 +612,15 @@
     "percent": "Prozent",
     "stdev": "Standardabweichung"
   },
+  "checkEmail": {
+    "alert": {
+      "checkInbox": "Bitte überprüfen Sie Ihr E-Mail-Postfach und klicken Sie auf den Verifizierungslink, um Ihr Konto zu aktivieren.",
+      "checkSpam": "Wenn Sie die E-Mail nicht sehen, überprüfen Sie bitte Ihren Spam- oder Junk-Ordner. Der Verifizierungslink kann nach einer bestimmten Zeit ablaufen.",
+      "title": "Verifizierungs-E-Mail gesendet"
+    },
+    "description": "Wir haben Ihnen eine Verifizierungs-E-Mail gesendet",
+    "title": "Überprüfen Sie Ihre E-Mails"
+  },
   "dataset": {
     "edit": {
       "description": "Datensatzdetails aktualisieren",
@@ -1176,5 +1185,33 @@
       "placeholder": "Benutzer suchen..."
     },
     "title": "Benutzer"
+  },
+  "verifyEmail": {
+    "actions": {
+      "backToLogin": "Zurück zur Anmeldung",
+      "signIn": "Anmelden",
+      "signUpAgain": "Erneut registrieren"
+    },
+    "description": "Verifizieren Sie Ihre E-Mail-Adresse, um fortzufahren",
+    "messages": {
+      "alreadyVerified": {
+        "description": "Diese E-Mail-Adresse wurde bereits verifiziert. Sie können sich bei Ihrem Konto anmelden.",
+        "title": "E-Mail bereits verifiziert"
+      },
+      "error": {
+        "description": "Der Verifizierungslink ist ungültig oder abgelaufen. Bitte registrieren Sie sich erneut oder fordern Sie einen neuen Verifizierungslink an.",
+        "generic": "Bei der Verifizierung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+        "title": "Verifizierung fehlgeschlagen"
+      },
+      "success": {
+        "description": "Ihre E-Mail wurde verifiziert. Sie können sich jetzt bei Ihrem Konto anmelden.",
+        "title": "E-Mail erfolgreich verifiziert"
+      },
+      "verifying": {
+        "description": "Bitte warten Sie, während wir Ihre E-Mail-Adresse verifizieren...",
+        "title": "E-Mail wird verifiziert"
+      }
+    },
+    "title": "E-Mail-Verifizierung"
   }
 }

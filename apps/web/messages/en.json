@@ -612,6 +612,15 @@
     "percent": "Percent",
     "stdev": "Stdev"
   },
+  "checkEmail": {
+    "alert": {
+      "checkInbox": "Please check your email inbox and click the verification link to activate your account.",
+      "checkSpam": "If you don't see the email, please check your spam or junk folder. The verification link may expire after a certain time.",
+      "title": "Verification email sent"
+    },
+    "description": "We've sent you a verification email",
+    "title": "Check your email"
+  },
   "dataset": {
     "edit": {
       "description": "Update dataset details",
@@ -1176,5 +1185,33 @@
       "placeholder": "Search users..."
     },
     "title": "Users"
+  },
+  "verifyEmail": {
+    "actions": {
+      "backToLogin": "Back to login",
+      "signIn": "Sign in",
+      "signUpAgain": "Sign up again"
+    },
+    "description": "Verify your email address to continue",
+    "messages": {
+      "alreadyVerified": {
+        "description": "This email address has already been verified. You can sign in to your account.",
+        "title": "Email already verified"
+      },
+      "error": {
+        "description": "The verification link is invalid or has expired. Please sign up again or request a new verification link.",
+        "generic": "An error occurred during verification. Please try again.",
+        "title": "Verification failed"
+      },
+      "success": {
+        "description": "Your email has been verified. You can now sign in to your account.",
+        "title": "Email verified successfully"
+      },
+      "verifying": {
+        "description": "Please wait while we verify your email address...",
+        "title": "Verifying your email"
+      }
+    },
+    "title": "Email Verification"
   }
 }
