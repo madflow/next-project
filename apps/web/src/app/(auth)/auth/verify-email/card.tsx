@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Locale } from "@/i18n/config";
 
-type VerificationState = "verifying" | "success" | "already-verified" | "error";
+type VerificationState = "success" | "already-verified" | "error";
 
 export function VerifyEmailCard() {
   const locale = useLocale() as Locale;
@@ -20,7 +20,6 @@ export function VerifyEmailCard() {
 
   const { state, errorMessage } = useMemo(() => {
     const error = searchParams.get("error");
-    const success = searchParams.get("success");
 
     // Determine the verification state based on query params
     let resultState: VerificationState;
@@ -34,31 +33,16 @@ export function VerifyEmailCard() {
         resultState = "error";
         resultErrorMessage = error;
       }
-    } else if (success === "true" || success === "1") {
-      resultState = "success";
-    } else if (!error && !success) {
-      // If neither error nor success param, show verifying state
-      resultState = "verifying";
     } else {
-      // Fallback to error state
-      resultState = "error";
-      resultErrorMessage = t("verifyEmail.messages.error.generic");
+      // If no error param, assume success (better-auth redirects here after successful verification)
+      resultState = "success";
     }
 
     return { state: resultState, errorMessage: resultErrorMessage };
-  }, [searchParams, t]);
+  }, [searchParams]);
 
   const renderContent = () => {
     switch (state) {
-      case "verifying":
-        return (
-          <Alert variant="default">
-            <Info className="h-4 w-4 animate-pulse" />
-            <AlertTitle>{t("verifyEmail.messages.verifying.title")}</AlertTitle>
-            <AlertDescription>{t("verifyEmail.messages.verifying.description")}</AlertDescription>
-          </Alert>
-        );
-
       case "success":
         return (
           <div className="space-y-4">
