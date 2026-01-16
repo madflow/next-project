@@ -45,7 +45,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
     if (data) {
       form.reset();
-      redirect("/auth/login");
+      redirect("/auth/check-email");
     }
   };
 

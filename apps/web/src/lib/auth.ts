@@ -168,6 +168,9 @@ export const auth = betterAuth({
         }),
       });
     },
+    sendVerificationOnSignUp: true,
+    autoSignInAfterVerification: false,
+    callbackURL: "/auth/verify-email",
   },
   emailAndPassword: {
     enabled: true,
