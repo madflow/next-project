@@ -1,0 +1,129 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - node_modules:/workspace/node_modules
+      - pnpm-store:/home/node/.local/share/pnpm/store
+    command: sleep infinity
+    environment:
+      - ANALYSIS_API_KEY=secret
+      - ANALYSIS_API_URL=http://analysis:3003/api
+      - AUTH_DISABLE_SIGNUP=false
+      - AUTH_SECRET=KgVRZ3/tFzxMCDiBLAR9hSZVFmEPtoK1ZIB3BH/RLsk=
+      - AUTH_URL=http://localhost:3000
+      - BASE_URL=http://localhost:3000
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - MAIL_DEFAULT_SENDER=no-reply@example.com
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+      - NEXT_PUBLIC_SITE_NAME=App
+      - NODE_ENV=development
+      - S3_ACCESS_KEY_ID=s3
+      - S3_BUCKET_NAME=app
+      - S3_ENDPOINT=http://s3:7070
+      - S3_REGION=us-east-1
+      - S3_SECRET_ACCESS_KEY=s3
+      - SITE_NAME=Next Project
+      - SMTP_SERVER_HOST=smtp
+      - SMTP_SERVER_PASSWORD=password
+      - SMTP_SERVER_PORT=1025
+      - SMTP_SERVER_USERNAME=user
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  analysis:
+    build:
+      context: ../apps/analysis
+    environment:
+      - ANALYSIS_DB_HOST=postgres
+      - ANALYSIS_DB_PORT=5432
+      - ANALYSIS_DB_USER=postgres
+      - ANALYSIS_DB_PASS=postgres
+      - ANALYSIS_DB_BASE=postgres
+      - ANALYSIS_DB_ECHO=false
+      - ANALYSIS_S3_REGION=us-east-1
+      - ANALYSIS_S3_BUCKET_NAME=app
+      - ANALYSIS_S3_ACCESS_KEY_ID=s3
+      - ANALYSIS_S3_SECRET_ACCESS_KEY=s3
+      - ANALYSIS_S3_ENDPOINT=http://s3:7070
+      - ANALYSIS_API_KEY=secret
+      - ANALYSIS_LOG_LEVEL=DEBUG
+      - ANALYSIS_HOST=0.0.0.0
+      - ANALYSIS_PORT=3003
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: "postgres:18"
+    command: "postgres -c log_statement=all"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+
+  rest:
+    image: postgrest/postgrest
+    ports:
+      - "3002:3000"
+    environment:
+      PGRST_DB_URI: postgres://postgres:postgres@postgres:5432/postgres
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3002
+    depends_on:
+      - postgres
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  smtp:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+  s3:
+    image: versity/versitygw:latest
+    ports:
+      - "7070:7070"
+    environment:
+      ROOT_ACCESS_KEY: s3
+      ROOT_SECRET_KEY: s3
+    command: >
+      posix /data
+    volumes:
+      - s3-data:/data
+
+volumes:
+  node_modules:
+  pnpm-store:
+  postgres-data:
+  pgadmin-data:
+  s3-data:
