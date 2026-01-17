@@ -12,9 +12,9 @@ export function CheckEmailCard() {
   const t = useTranslations();
 
   return (
-    <Card>
+    <Card className="shadow-xs">
       <CardHeader className="space-y-1">
-        <div className="align-center flex justify-between">
+        <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">{t("checkEmail.title")}</CardTitle>
           <LocaleSwitcher defaultValue={locale} />
         </div>
