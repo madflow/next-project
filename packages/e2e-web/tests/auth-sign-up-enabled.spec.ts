@@ -39,7 +39,7 @@ test("sign-up", async ({ page }) => {
   await page.getByTestId("auth.sign-up.form.name").fill(signUpUser.name);
   await page.getByTestId("auth.sign-up.form.submit").click();
 
-  await expect(page.getByTestId("auth.login.page")).toBeVisible();
+  await expect(page.getByTestId("auth.check-email.page")).toBeVisible();
   const searchMessages = await smtpServerApi.searchMessages({
     query: `to:"${signUpUser.email}"`,
   });
@@ -56,6 +56,8 @@ test("sign-up", async ({ page }) => {
   }
   expect(verifyLink).toBeTruthy();
   await page.goto(verifyLink);
+  await expect(page.getByTestId("auth.verify-email.page")).toBeVisible();
+  await page.getByTestId("verify-email.login").click();
   await expect(page.getByTestId("auth.login.page")).toBeVisible();
 
   await page.getByTestId("auth.login.form.email").fill(signUpUser.email);
