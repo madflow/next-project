@@ -16,6 +16,10 @@ import { withAdminAuth } from "@/lib/server-action-utils";
 function validateCallbackURL(callbackURL: string | undefined): void {
   if (!callbackURL) return;
 
+  if (!env.BASE_URL) {
+    throw new ServerActionNotAuthorizedException("Invalid redirect URL");
+  }
+
   const baseUrl = new URL(env.BASE_URL);
   const redirectUrl = new URL(callbackURL, env.BASE_URL);
 
