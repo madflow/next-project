@@ -63,6 +63,8 @@ test.describe("User invitations", () => {
     const verifyLink = await extractLinkFromMessage(messagesVerify, "verify-email");
 
     await page.goto(verifyLink);
+    await expect(page.getByTestId("auth.verify-email.page")).toBeVisible();
+    await page.getByTestId("verify-email.login").click();
     await loginUser(page, userEmail, "Tester12345");
   });
 

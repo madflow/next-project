@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { env } from "@/env";
 import { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +46,7 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
       email: values.email,
       name: values.name,
       password: values.password,
+      callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/auth/verify-email`,
     });
 
     form.reset();

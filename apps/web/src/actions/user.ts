@@ -18,7 +18,7 @@ export const create = withAdminAuth(async (data: CreateData) => {
 
 export async function createWithInvitation(
   invitationId: string,
-  data: { name: string; email: string; password: string }
+  data: { name: string; email: string; password: string; callbackURL?: string }
 ) {
   const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, invitationId)).limit(1);
   if (!existingInvitation) {
@@ -33,6 +33,7 @@ export async function createWithInvitation(
       name: data.name,
       email: data.email,
       password: data.password,
+      callbackURL: data.callbackURL,
     },
     params: {
       invitationId: invitationId,
