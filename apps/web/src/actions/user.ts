@@ -16,7 +16,10 @@ export const create = withAdminAuth(async (data: CreateData) => {
   await db.insert(entity).values(data).returning();
 });
 
-export async function createWithInvitation(invitationId: string, data: CreateData & { password: string }) {
+export async function createWithInvitation(
+  invitationId: string,
+  data: { name: string; email: string; password: string }
+) {
   const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, invitationId)).limit(1);
   if (!existingInvitation) {
     throw new ServerActionNotAuthorizedException("Invitation not found");

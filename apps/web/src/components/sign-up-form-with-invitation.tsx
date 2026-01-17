@@ -41,14 +41,9 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
   });
 
   const handleSubmit = async (values: z.infer<typeof signUpSchema>) => {
-    const now = new Date();
     await createWithInvitation(invitation.id, {
       email: values.email,
       name: values.name,
-      emailVerified: true,
-      role: "user",
-      createdAt: now,
-      updatedAt: now,
       password: values.password,
     });
 
