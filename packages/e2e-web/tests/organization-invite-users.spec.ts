@@ -53,7 +53,7 @@ test.describe("User invitations", () => {
     await page.getByTestId("auth.sign-up.form.confirm-password").fill("Tester12345");
     await page.getByTestId("auth.sign-up.form.submit").click();
 
-    await expect(page.getByTestId("auth.login.page")).toBeVisible();
+    await expect(page.getByTestId("auth.check-email.page")).toBeVisible();
 
     const searchMessagesVerify = await smtpServerApi.searchMessages({
       query: `to:"${userEmail}"`,
