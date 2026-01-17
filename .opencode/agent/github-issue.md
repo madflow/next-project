@@ -1,5 +1,6 @@
 ---
 name: github-issue
+mode: subagent
 description: Specialized agent for GitHub issue management. Creates issues with proper formatting, updates status, links to PRs, and handles issue lifecycle including closing stale issues. Use for any issue-related operations.
 ---
 
