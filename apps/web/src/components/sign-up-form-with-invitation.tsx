@@ -46,7 +46,7 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
       email: values.email,
       name: values.name,
       password: values.password,
-      callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/auth/verify-email`,
+      callbackURL: new URL("/auth/verify-email", env.NEXT_PUBLIC_BASE_URL).toString(),
     });
 
     form.reset();
