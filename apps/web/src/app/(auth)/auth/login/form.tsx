@@ -52,7 +52,7 @@ export function LoginForm(props: LoginFormProps) {
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card>
-        <CardHeader className="flex items-center justify-between space-y-1">
+        <CardHeader className="flex justify-between space-y-1">
           <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
           <LocaleSwitcher defaultValue={locale} />
         </CardHeader>

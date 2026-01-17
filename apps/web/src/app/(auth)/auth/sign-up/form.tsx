@@ -53,7 +53,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="space-y-1">
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between">
             <CardTitle className="text-2xl">{t("signUp.title")}</CardTitle>
             <LocaleSwitcher defaultValue={locale} />
           </div>

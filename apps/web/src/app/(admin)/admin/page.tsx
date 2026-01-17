@@ -9,7 +9,7 @@ export default async function Page() {
   return (
     <PageLayout title={t("title")} description={t("description")} data-testid="admin.page">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="flex flex-col items-center justify-between shadow-xs">
+        <Card className="flex flex-col justify-between shadow-xs">
           <CardHeader>
             <CardTitle>{t("organizations.title")}</CardTitle>
             <CardDescription>{t("organizations.description")}</CardDescription>
@@ -21,7 +21,7 @@ export default async function Page() {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col items-center justify-between shadow-xs">
+        <Card className="flex flex-col justify-between shadow-xs">
           <CardHeader>
             <CardTitle>{t("users.title")}</CardTitle>
             <CardDescription>{t("users.description")}</CardDescription>
@@ -33,7 +33,7 @@ export default async function Page() {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col items-center justify-between shadow-xs">
+        <Card className="flex flex-col justify-between shadow-xs">
           <CardHeader>
             <CardTitle>{t("projects.title")}</CardTitle>
             <CardDescription>{t("projects.description")}</CardDescription>
@@ -45,7 +45,7 @@ export default async function Page() {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col items-center justify-between shadow-xs">
+        <Card className="flex flex-col justify-between shadow-xs">
           <CardHeader>
             <CardTitle>{t("datasets.title")}</CardTitle>
             <CardDescription>{t("datasets.description")}</CardDescription>
