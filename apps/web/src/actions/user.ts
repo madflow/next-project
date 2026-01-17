@@ -8,9 +8,18 @@ import {
   user as entity,
   invitation,
 } from "@repo/database/schema";
-import { auth } from "@/lib/auth";
-import { ServerActionNotAuthorizedException } from "@/lib/exception";
-import { withAdminAuth } from "@/lib/server-action-utils";
+import { env } from "@/env";
+
+function validateCallbackURL(callbackURL: string | undefined): void {
+  if (!callbackURL) return;
+
+  const baseUrl = new URL(env.BASE_URL);
+  const redirectUrl = new URL(callbackURL, env.BASE_URL);
+
+  if (redirectUrl.origin !== baseUrl.origin) {
+    throw new ServerActionNotAuthorizedException("Invalid redirect URL");
+  }
+}
 
 export const create = withAdminAuth(async (data: CreateData) => {
   await db.insert(entity).values(data).returning();
@@ -20,6 +29,8 @@ export async function createWithInvitation(
   invitationId: string,
   data: { name: string; email: string; password: string; callbackURL?: string }
 ) {
+  validateCallbackURL(data.callbackURL);
+
   const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, invitationId)).limit(1);
   if (!existingInvitation) {
     throw new ServerActionNotAuthorizedException("Invitation not found");

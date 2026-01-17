@@ -36,7 +36,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       email: values.email,
       password: values.password,
       name: values.name,
-      callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/auth/verify-email`,
+      callbackURL: new URL("/auth/verify-email", env.NEXT_PUBLIC_BASE_URL).toString(),
     });
 
     if (error && error.message) {
