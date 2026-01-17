@@ -60,7 +60,7 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
     <div className={cn("flex flex-col gap-6")}>
       <Card>
         <CardHeader className="space-y-1">
-          <div className="align-center flex justify-between">
+          <div className="flex items-center justify-between">
             <CardTitle className="text-2xl">{t("authAcceptInvitation.title")}</CardTitle>
             <LocaleSwitcher defaultValue={locale} />
           </div>
