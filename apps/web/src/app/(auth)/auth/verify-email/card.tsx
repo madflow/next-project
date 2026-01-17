@@ -20,21 +20,28 @@ export function VerifyEmailCard() {
 
   const { state, errorMessage } = useMemo(() => {
     const error = searchParams.get("error");
+    const token = searchParams.get("token");
 
     // Determine the verification state based on query params
     let resultState: VerificationState;
     let resultErrorMessage: string | null = null;
 
     if (error) {
-      // Check for "already verified" error
-      if (error.toLowerCase().includes("already") || error.toLowerCase().includes("verified")) {
+      // Check for specific BetterAuth error codes
+      if (error === "already_verified") {
         resultState = "already-verified";
+      } else if (error === "invalid_token") {
+        resultState = "error";
+        resultErrorMessage = "Invalid or expired verification token";
       } else {
         resultState = "error";
         resultErrorMessage = error;
       }
+    } else if (token) {
+      // If token is present without error, verification was successful
+      resultState = "success";
     } else {
-      // If no error param, assume success (better-auth redirects here after successful verification)
+      // If neither error nor token, still verifying
       resultState = "success";
     }
 
@@ -97,9 +104,9 @@ export function VerifyEmailCard() {
   };
 
   return (
-    <Card>
+    <Card className="shadow-xs">
       <CardHeader className="space-y-1">
-        <div className="align-center flex justify-between">
+        <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">{t("verifyEmail.title")}</CardTitle>
           <LocaleSwitcher defaultValue={locale} />
         </div>
