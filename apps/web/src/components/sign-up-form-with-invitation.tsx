@@ -53,7 +53,7 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
     });
 
     form.reset();
-    router.push(`/auth/login`);
+    router.push(`/auth/check-email`);
   };
 
   return (
