@@ -85,19 +85,12 @@
   },
   "lsp": {
     "tailwind": {
-      "command": ["npx", "tailwindcss-language-server", "--stdio"],
-      "extensions": ["tsx"]
+      "command": ["npx", "-y", "tailwindcss-language-server", "--stdio"],
+      "extensions": [".tsx"]
     }
   },
-  "mcp": {
-    "playwright-test": {
-      "command": ["npx", "playwright", "run-test-mcp-server"],
-      "enabled": true,
-      "type": "local"
-    }
-  },
+  "mcp": {},
   "tools": {
     "playwright*": false
   }
 }
-
