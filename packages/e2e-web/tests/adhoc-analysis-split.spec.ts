@@ -97,8 +97,8 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     // Expand first group
     await firstVariableGroup.click();
 
-    // Select "Alter" variable specifically
-    const alterVariable = page.getByTestId("variable-item-Alter");
+    // Select "Age" variable specifically
+    const alterVariable = page.getByTestId("variable-item-age");
     await expect(alterVariable).toBeVisible();
     await alterVariable.click();
 
@@ -129,8 +129,8 @@ test.describe("Adhoc Analysis - Split Functionality", () => {
     // Expand first group
     await firstVariableGroup.click();
 
-    // Select "Alter" variable
-    const alterVariable = page.getByTestId("variable-item-Alter");
+    // Select "Age" variable
+    const alterVariable = page.getByTestId("variable-item-age");
     await expect(alterVariable).toBeVisible();
     await alterVariable.click();
 
