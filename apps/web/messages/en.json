@@ -273,9 +273,8 @@
           "label": "Type"
         },
         "variableLabels": {
-          "label": "Variable Labels",
           "default": "Default Label",
-          "translations": "Translations",
+          "label": "Variable Labels",
           "locale": {
             "de": "German",
             "en": "English"
@@ -284,11 +283,10 @@
             "default": "Enter default label",
             "translation": "Enter translation for {locale}"
           },
+          "translations": "Translations",
           "validation": {
             "defaultRequired": "Default label is required"
-          },
-          "addTranslation": "Add {locale} translation",
-          "removeTranslation": "Remove translation"
+          }
         }
       },
       "title": "Edit Variable"

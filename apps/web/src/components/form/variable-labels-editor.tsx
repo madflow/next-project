@@ -44,7 +44,7 @@ export function VariableLabelsEditor({ value, onChange }: VariableLabelsEditorPr
     onChange(updated);
   };
 
-  // Get all supported translation locales (excluding "en" which might be default)
+  // Get all supported translation locales
   const translationLocales = (["de", "en"] as SupportedLocale[]).sort();
 
   return (
