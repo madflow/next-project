@@ -1,4 +1,5 @@
 import { matchesCountedValue } from "@/lib/multi-response-utils";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
 
@@ -212,7 +213,7 @@ export function transformToMultiResponseData(
       const count = valueItem ? valueItem.counts : 0;
 
       return {
-        label: variable.label || variable.name,
+        label: getVariableLabel(variable),
         variableName: variable.name,
         percentage: Math.round(percentage * 100) / 100, // Round to 2 decimal places
         count: count,

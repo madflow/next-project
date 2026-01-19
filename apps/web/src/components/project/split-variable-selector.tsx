@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQueryApi } from "@/hooks/use-query-api";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import type { DatasetVariable } from "@/types/dataset-variable";
 
 type SplitVariableSelectorProps = {
@@ -52,7 +53,7 @@ export function SplitVariableSelector({
   const getSelectedLabel = () => {
     if (!selectedSplitVariable) return t("none");
     const selectedVar = splitVariables.find((v) => v.name === selectedSplitVariable);
-    return selectedVar?.label || selectedSplitVariable;
+    return selectedVar ? getVariableLabel(selectedVar) : selectedSplitVariable;
   };
 
   return (
@@ -86,7 +87,7 @@ export function SplitVariableSelector({
             )}
             {splitVariables.map((variable) => (
               <SelectItem key={variable.id} value={variable.name}>
-                {variable.label} {"("}
+                {getVariableLabel(variable)} {"("}
                 {variable.name}
                 {")"}
               </SelectItem>

@@ -2,6 +2,7 @@ import { ArrowBigDownIcon, ArrowRightCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useDatasetVariables } from "@/hooks/use-dataset-variables";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
@@ -45,7 +46,7 @@ export function AdHocVariables({ datasetId, onAddVariable }: AdHocAnalysisProps)
                   <ArrowRightCircle />
                 </Button>
                 <span className="text-sm">
-                  {variable.label} {"("}
+                  {getVariableLabel(variable)} {"("}
                   {variable.name}
                   {")"}
                 </span>

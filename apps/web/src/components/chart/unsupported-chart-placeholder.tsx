@@ -3,10 +3,13 @@
 import { AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getVariableLabel } from "@/lib/variable-helpers";
+import { type DatasetVariable } from "@/types/dataset-variable";
 
 interface UnsupportedChartPlaceholderProps {
   variableName: string;
   variableLabel?: string;
+  variable?: DatasetVariable;
   reason?: string;
   className?: string;
   "data-testid"?: string;
@@ -15,15 +18,19 @@ interface UnsupportedChartPlaceholderProps {
 export function UnsupportedChartPlaceholder({
   variableName,
   variableLabel,
+  variable,
   reason,
   className,
   "data-testid": dataTestId,
 }: UnsupportedChartPlaceholderProps) {
+  // Determine the label to use
+  const displayLabel = variable ? getVariableLabel(variable) : (variableLabel ?? variableName);
+
   return (
     <div className={className} data-testid={dataTestId}>
       <Card className="shadow-xs">
         <CardHeader>
-          <CardTitle>{variableLabel ?? variableName}</CardTitle>
+          <CardTitle>{displayLabel}</CardTitle>
           <CardDescription>{"Unsupported Chart Type"}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">

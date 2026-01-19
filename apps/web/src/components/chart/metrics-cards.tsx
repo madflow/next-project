@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useQueryApi } from "@/hooks/use-query-api";
 import { getVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { METRICS_CARD_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 
@@ -82,7 +83,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
     if (allVariables.length > 0) {
       const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
       if (splitVariable) {
-        const splitVariableLabel = splitVariable.label ?? splitVariable.name;
+        const splitVariableLabel = getVariableLabel(splitVariable);
         return tAdhoc("splitBy", { variable: splitVariableLabel });
       }
     }
@@ -151,7 +152,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
   return (
     <Card className="shadow-xs" {...props}>
       <CardHeader>
-        <CardTitle>{variable.label ?? variable.name}</CardTitle>
+        <CardTitle>{getVariableLabel(variable)}</CardTitle>
         {getSplitVariableDescription(variable, stats) && (
           <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
         )}
