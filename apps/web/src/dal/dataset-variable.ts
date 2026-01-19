@@ -2,7 +2,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import {
-  UpdateDatasetData,
+  UpdateDatasetVariableData,
   datasetVariable as entity,
   selectDatasetVariableSchema,
   updateDatasetVariableSchema,
@@ -22,7 +22,7 @@ async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
 
 export const listByDataset = withSessionCheck(listByDatasetFn);
 
-async function updateFn(id: string, data: UpdateDatasetData) {
+async function updateFn(id: string, data: UpdateDatasetVariableData) {
   const updateData = updateDatasetVariableSchema.parse(data);
 
   const [updatedVariable] = await db.update(entity).set(updateData).where(eq(entity.id, id)).returning();

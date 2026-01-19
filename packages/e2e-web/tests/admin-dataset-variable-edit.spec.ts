@@ -87,7 +87,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
-
     // Verify missing values are still there
     const missingValuesGroupRecheck = page.getByRole("group").filter({ hasText: "Missing Values" });
     await expect(missingValuesGroupRecheck.locator('input[readonly][value="9"]')).toBeVisible();
@@ -226,5 +225,107 @@ test.describe("Admin Dataset Variable Edit", () => {
     // Verify missing range was removed
     await expect(missingRangesGroup.locator('input[readonly][value="500"]')).toBeHidden();
     await expect(missingRangesGroup.locator('input[readonly][value="600"]')).toBeHidden();
+  });
+
+  test("should edit variable labels with default and translations", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    // Navigate to the datasets page
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Search for and click on the test dataset
+    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
+    await page.getByRole("link", { name: DATASET_NAME }).click();
+
+    await page.waitForURL("**/admin/datasets/**");
+
+    // Search for the "age" variable
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Wait for the edit form to appear
+
+    // Edit the default variableLabel
+    const defaultLabelInput = page.getByLabel("Default Label");
+    await defaultLabelInput.fill("Age of Respondent");
+
+    // Add German translation
+    const germanLabelInput = page.getByLabel("German");
+    await germanLabelInput.fill("Alter des Befragten");
+
+    // Add English translation
+    const englishLabelInput = page.getByLabel("English");
+    await englishLabelInput.fill("Age of Respondent");
+
+    // Save changes
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    // Wait for the save to complete and return to the dataset editor
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    // Click edit again to verify the changes were saved
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Verify default label is saved
+    await expect(page.getByLabel("Default Label")).toHaveValue("Age of Respondent");
+
+    // Verify German translation is saved
+    await expect(page.getByLabel("German")).toHaveValue("Alter des Befragten");
+
+    // Verify English translation is saved
+    await expect(page.getByLabel("English")).toHaveValue("Age of Respondent");
+
+    // Clear German translation
+    await page.getByLabel("German").clear();
+
+    // Save changes
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    // Wait for the save to complete
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    // Click edit again to verify the German translation was removed
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Verify German translation is removed
+    await expect(page.getByLabel("German")).toHaveValue("");
+
+    // Verify default and English labels are still there
+    await expect(page.getByLabel("Default Label")).toHaveValue("Age of Respondent");
+    await expect(page.getByLabel("English")).toHaveValue("Age of Respondent");
+
+    // Test validation: try to save with empty default label
+    await page.getByLabel("Default Label").clear();
+
+    // Try to save - this should trigger validation
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    // Verify validation error is displayed
+    await expect(page.getByText("Default label is required")).toBeVisible();
+
+    // Clean up: Reset to original state
+    await page.getByLabel("Default Label").fill("Alter");
+    await page.getByLabel("English").clear();
+
+    // Save cleanup changes
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    // Wait for save to complete
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
   });
 });

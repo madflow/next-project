@@ -271,6 +271,22 @@
         "success": "Variable erfolgreich aktualisiert",
         "type": {
           "label": "Typ"
+        },
+        "variableLabels": {
+          "label": "Variablenbeschriftungen",
+          "default": "Standardbeschriftung",
+          "translations": "Übersetzungen",
+          "locale": {
+            "de": "Deutsch",
+            "en": "Englisch"
+          },
+          "placeholder": {
+            "default": "Standardbeschriftung eingeben",
+            "translation": "Übersetzung für {locale} eingeben"
+          },
+          "validation": {
+            "defaultRequired": "Standardbeschriftung ist erforderlich"
+          }
         }
       },
       "title": "Variable bearbeiten"

@@ -76,11 +76,11 @@ export type CreateDatasetData = z.infer<typeof insertDatasetSchema>;
 export type Dataset = z.infer<typeof selectDatasetSchema>;
 export type UpdateDatasetData = z.infer<typeof updateDatasetSchema>;
 
-export const datasetVariableLabelSchema = z
-  .object({
-    default: z.string().optional(),
-  })
-  .catchall(z.string().optional());
+export const datasetVariableLabelSchema = z.object({
+  default: z.string().min(1), // Required, non-empty
+  de: z.string().optional(),
+  en: z.string().optional(),
+});
 
 export const datasetVariableValueLabelSchema = z
   .object({
@@ -141,6 +141,7 @@ export const datasetVariable = pgTable(
 export const insertDatasetVariableSchema = createInsertSchema(datasetVariable);
 export const selectDatasetVariableSchema = createSelectSchema(datasetVariable);
 export const updateDatasetVariableSchema = createUpdateSchema(datasetVariable, {
+  variableLabels: datasetVariableLabelSchema.optional(),
   valueLabels: z.record(z.string(), z.record(z.string(), z.string())).optional(),
   missingRanges: z
     .record(
