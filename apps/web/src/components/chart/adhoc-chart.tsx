@@ -44,6 +44,7 @@ import {
 } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { determineChartSelection } from "@/lib/chart-selection";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { SplitVariableSelector } from "../project/split-variable-selector";
@@ -106,7 +107,7 @@ export function AdhocChart({
     if (allVariables.length > 0) {
       const splitVariable = allVariables.find((v: DatasetVariableWithAttributes) => v.name === splitVariableName);
       if (splitVariable) {
-        const splitVariableLabel = splitVariable.label ?? splitVariable.name;
+        const splitVariableLabel = getVariableLabel(splitVariable);
         return t("splitBy", { variable: splitVariableLabel });
       }
     }
@@ -180,7 +181,7 @@ export function AdhocChart({
     return (
       <UnsupportedChartPlaceholder
         variableName={variable.name}
-        variableLabel={variable.label ?? undefined}
+        variableLabel={getVariableLabel(variable)}
         reason={chartSelection.unsupportedReason}
         data-testid="unsupported-chart-placeholder"
         {...props}
@@ -194,7 +195,7 @@ export function AdhocChart({
       <div {...props}>
         <Card className="shadow-xs">
           <CardHeader>
-            <CardTitle>{variable.label ?? variable.name}</CardTitle>
+            <CardTitle>{getVariableLabel(variable)}</CardTitle>
             {getSplitVariableDescription(variable, stats) && (
               <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
             )}
@@ -390,7 +391,7 @@ export function AdhocChart({
           <TabsContent value="chart">
             <Card className="shadow-xs">
               <CardHeader>
-                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                <CardTitle>{getVariableLabel(variable)}</CardTitle>
                 {getSplitVariableDescription(variable, stats) && (
                   <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
                 )}
@@ -439,7 +440,7 @@ export function AdhocChart({
             <TabsContent value="variable">
               <Card className="shadow-xs">
                 <CardHeader>
-                  <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                  <CardTitle>{getVariableLabel(variable)}</CardTitle>
                   {getSplitVariableDescription(variable, stats) && (
                     <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
                   )}
@@ -454,7 +455,7 @@ export function AdhocChart({
             <TabsContent value="stats">
               <Card className="shadow-xs">
                 <CardHeader>
-                  <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                  <CardTitle>{getVariableLabel(variable)}</CardTitle>
                   {getSplitVariableDescription(variable, stats) && (
                     <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
                   )}
@@ -483,7 +484,7 @@ export function AdhocChart({
         <TabsContent value="chart">
           <Card className="shadow-xs">
             <CardHeader>
-              <CardTitle>{variable.label ?? variable.name}</CardTitle>
+              <CardTitle>{getVariableLabel(variable)}</CardTitle>
               {getSplitVariableDescription(variable, stats) && (
                 <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
               )}
@@ -526,7 +527,7 @@ export function AdhocChart({
           <TabsContent value="variable">
             <Card className="shadow-xs">
               <CardHeader>
-                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                <CardTitle>{getVariableLabel(variable)}</CardTitle>
                 {getSplitVariableDescription(variable, stats) && (
                   <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
                 )}
@@ -541,7 +542,7 @@ export function AdhocChart({
           <TabsContent value="stats">
             <Card className="shadow-xs">
               <CardHeader>
-                <CardTitle>{variable.label ?? variable.name}</CardTitle>
+                <CardTitle>{getVariableLabel(variable)}</CardTitle>
                 {getSplitVariableDescription(variable, stats) && (
                   <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
                 )}

@@ -8,6 +8,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsBarData } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -31,7 +32,7 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
   return (
     <Card className="shadow-xs" {...props}>
       <CardHeader>
-        <CardTitle>{variable.label ?? variable.name}</CardTitle>
+        <CardTitle>{getVariableLabel(variable)}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>

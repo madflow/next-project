@@ -10,6 +10,7 @@ import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { extractVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -56,7 +57,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
       if (allVariables.length > 0) {
         const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
         if (splitVariable) {
-          const splitVariableLabel = splitVariable.label ?? splitVariable.name;
+          const splitVariableLabel = getVariableLabel(splitVariable);
           return tAdhoc("splitBy", { variable: splitVariableLabel });
         }
       }
@@ -140,7 +141,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
     return (
       <Card className="shadow-xs" data-testid="mean-chart" {...props}>
         <CardHeader>
-          <CardTitle>{variable.label ?? variable.name}</CardTitle>
+          <CardTitle>{getVariableLabel(variable)}</CardTitle>
           {getSplitVariableDescription(variable, stats) && (
             <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
           )}

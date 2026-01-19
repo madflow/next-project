@@ -14,6 +14,7 @@ import {
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -43,7 +44,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
   return (
     <Card className="shadow-xs" {...props}>
       <CardHeader>
-        <CardTitle>{variable.label ?? variable.name}</CardTitle>
+        <CardTitle>{getVariableLabel(variable)}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>

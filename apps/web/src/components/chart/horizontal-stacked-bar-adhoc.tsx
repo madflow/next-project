@@ -17,6 +17,7 @@ import {
   transformToSplitVariableStackedBarData,
 } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 
@@ -175,7 +176,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
     // Create one horizontal bar with multiple segments
     const singleBarData = [
       {
-        label: variable.label ?? variable.name,
+        label: getVariableLabel(variable),
         ...stackedData.reduce(
           (acc, item, index) => {
             const key = `segment${index}`;

@@ -8,6 +8,7 @@ import { useThemeConfig } from "@/components/active-theme";
 import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
 import { useVariablesetVariables } from "@/hooks/use-variableset-variables";
+import { getVariableLabel } from "@/lib/variable-helpers";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import { Button } from "../ui/button";
@@ -56,7 +57,7 @@ function VariablesetNode({
   const filteredVariables = variables.filter(
     (variable) =>
       variable.name.toLowerCase().includes(search.toLowerCase()) ||
-      variable.label?.toLowerCase().includes(search.toLowerCase())
+      getVariableLabel(variable).toLowerCase().includes(search.toLowerCase())
   );
 
   const hasMatchingVariables = search ? filteredVariables.length > 0 : true;
@@ -113,8 +114,8 @@ function VariablesetNode({
               <button
                 className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
                 onClick={() => onSelectVariable(variable, node)}
-                data-testid={`variable-item-${variable.label}`}>
-                {variable.label}
+                data-testid={`variable-item-${getVariableLabel(variable)}`}>
+                {getVariableLabel(variable)}
               </button>
             </div>
           ))}
