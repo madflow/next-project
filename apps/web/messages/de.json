@@ -286,7 +286,9 @@
           },
           "validation": {
             "defaultRequired": "Standardbeschriftung ist erforderlich"
-          }
+          },
+          "addTranslation": "{locale}-Übersetzung hinzufügen",
+          "removeTranslation": "Übersetzung entfernen"
         }
       },
       "title": "Variable bearbeiten"

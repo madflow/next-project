@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { locales } from "@/i18n/config";
 
 export type DatasetVariableLabel = {
   default: string;
@@ -16,6 +15,8 @@ type VariableLabelsEditorProps = {
   value: DatasetVariableLabel | null;
   onChange: (value: DatasetVariableLabel | null) => void;
 };
+
+type SupportedLocale = "de" | "en";
 
 export function VariableLabelsEditor({ value, onChange }: VariableLabelsEditorProps) {
   const t = useTranslations("adminDatasetEditor");
@@ -33,7 +34,7 @@ export function VariableLabelsEditor({ value, onChange }: VariableLabelsEditorPr
     onChange({ ...currentValue, default: newDefault });
   };
 
-  const handleTranslationChange = (locale: "de" | "en", newValue: string) => {
+  const handleTranslationChange = (locale: SupportedLocale, newValue: string) => {
     const updated = { ...currentValue };
     if (newValue.trim()) {
       updated[locale] = newValue;
@@ -43,8 +44,11 @@ export function VariableLabelsEditor({ value, onChange }: VariableLabelsEditorPr
     onChange(updated);
   };
 
+  // Get all supported translation locales (excluding "en" which might be default)
+  const translationLocales = (["de", "en"] as SupportedLocale[]).sort();
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 rounded-lg border p-4">
       <Field>
         <FieldLabel htmlFor="variableLabel-default">{t("editVariable.form.variableLabels.default")}</FieldLabel>
         <FieldGroup>
@@ -61,25 +65,25 @@ export function VariableLabelsEditor({ value, onChange }: VariableLabelsEditorPr
 
       <div className="space-y-3">
         <p className="text-sm font-medium">{t("editVariable.form.variableLabels.translations")}</p>
-        {locales
-          .filter((locale) => locale !== "en") // Filter out default locale or adjust as needed
-          .map((locale) => (
-            <Field key={locale}>
-              <FieldLabel htmlFor={`variableLabel-${locale}`}>
-                {t(`editVariable.form.variableLabels.locale.${locale}`)}
-              </FieldLabel>
-              <FieldGroup>
-                <Input
-                  id={`variableLabel-${locale}`}
-                  value={currentValue[locale as "de" | "en"] ?? ""}
-                  onChange={(e) => handleTranslationChange(locale as "de" | "en", e.target.value)}
-                  placeholder={t("editVariable.form.variableLabels.placeholder.translation", {
-                    locale: t(`editVariable.form.variableLabels.locale.${locale}`),
-                  })}
-                />
-              </FieldGroup>
-            </Field>
-          ))}
+
+        {/* Always show all translation fields */}
+        {translationLocales.map((locale) => (
+          <Field key={locale}>
+            <FieldLabel htmlFor={`variableLabel-${locale}`}>
+              {t(`editVariable.form.variableLabels.locale.${locale}`)}
+            </FieldLabel>
+            <FieldGroup>
+              <Input
+                id={`variableLabel-${locale}`}
+                value={currentValue[locale] ?? ""}
+                onChange={(e) => handleTranslationChange(locale, e.target.value)}
+                placeholder={t("editVariable.form.variableLabels.placeholder.translation", {
+                  locale: t(`editVariable.form.variableLabels.locale.${locale}`),
+                })}
+              />
+            </FieldGroup>
+          </Field>
+        ))}
       </div>
     </div>
   );
