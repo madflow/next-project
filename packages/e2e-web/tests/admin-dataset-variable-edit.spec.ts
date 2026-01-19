@@ -87,7 +87,6 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
 
-
     // Verify missing values are still there
     const missingValuesGroupRecheck = page.getByRole("group").filter({ hasText: "Missing Values" });
     await expect(missingValuesGroupRecheck.locator('input[readonly][value="9"]')).toBeVisible();
@@ -226,5 +225,289 @@ test.describe("Admin Dataset Variable Edit", () => {
     // Verify missing range was removed
     await expect(missingRangesGroup.locator('input[readonly][value="500"]')).toBeHidden();
     await expect(missingRangesGroup.locator('input[readonly][value="600"]')).toBeHidden();
+  });
+
+  test("should add and edit variable labels with translations", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    // Navigate to the datasets page
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Search for and click on the test dataset
+    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
+    await page.getByRole("link", { name: DATASET_NAME }).click();
+    await page.waitForURL("**/admin/datasets/**");
+
+    // Search for the "age" variable
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Locate the Variable Labels group
+    const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
+
+    // Store original values for cleanup
+    const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
+    const germanInput = variableLabelsGroup.getByRole("textbox", { name: /German/i });
+    const englishInput = variableLabelsGroup.getByRole("textbox", { name: /English/i });
+
+    const originalDefault = await defaultLabelInput.inputValue();
+    const originalGerman = await germanInput.inputValue();
+    const originalEnglish = await englishInput.inputValue();
+
+    // Set new variable labels
+    await defaultLabelInput.fill("Age of participant");
+    await germanInput.fill("Alter des Teilnehmers");
+    await englishInput.fill("Participant Age");
+
+    // Save changes
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    // Wait for return to dataset editor page
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    // Re-open the edit form
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Verify all labels are persisted
+    const variableLabelsGroupRecheck = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const defaultLabelInputRecheck = variableLabelsGroupRecheck.getByRole("textbox", { name: /Default Label/i });
+    const germanInputRecheck = variableLabelsGroupRecheck.getByRole("textbox", { name: /German/i });
+    const englishInputRecheck = variableLabelsGroupRecheck.getByRole("textbox", { name: /English/i });
+
+    await expect(defaultLabelInputRecheck).toHaveValue("Age of participant");
+    await expect(germanInputRecheck).toHaveValue("Alter des Teilnehmers");
+    await expect(englishInputRecheck).toHaveValue("Participant Age");
+
+    // Cleanup: Restore original values
+    await defaultLabelInputRecheck.fill(originalDefault);
+    await germanInputRecheck.fill(originalGerman);
+    await englishInputRecheck.fill(originalEnglish);
+    await page.getByRole("button", { name: "Save changes" }).click();
+  });
+
+  test("should validate default label is required", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    // Navigate to the datasets page
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Search for and click on the test dataset
+    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
+    await page.getByRole("link", { name: DATASET_NAME }).click();
+    await page.waitForURL("**/admin/datasets/**");
+
+    // Search for the "age" variable
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Locate the Variable Labels group
+    const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
+
+    // Clear the default label
+    await defaultLabelInput.clear();
+
+    // Attempt to save
+    await page.getByRole("button", { name: "Save changes" }).click();
+
+    // Verify validation error is displayed
+    await expect(variableLabelsGroup.getByText("Default label is required")).toBeVisible();
+
+    // Verify we're still on the edit page (form submission was blocked)
+    await expect(page.getByRole("button", { name: "Save changes" })).toBeVisible();
+  });
+
+  test("should remove optional translations", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    // Navigate to the datasets page
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Search for and click on the test dataset
+    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
+    await page.getByRole("link", { name: DATASET_NAME }).click();
+    await page.waitForURL("**/admin/datasets/**");
+
+    // Search for the "age" variable
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Locate the Variable Labels group
+    const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
+    const germanInput = variableLabelsGroup.getByRole("textbox", { name: /German/i });
+    const englishInput = variableLabelsGroup.getByRole("textbox", { name: /English/i });
+
+    // Store original values for cleanup
+    const originalDefault = await defaultLabelInput.inputValue();
+    const originalGerman = await germanInput.inputValue();
+    const originalEnglish = await englishInput.inputValue();
+
+    // Set labels with translations
+    await defaultLabelInput.fill("Test Label");
+    await germanInput.fill("Deutsches Label");
+    await englishInput.fill("English Label");
+
+    // Save and reopen
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Verify translations are present
+    const variableLabelsGroup2 = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const germanInput2 = variableLabelsGroup2.getByRole("textbox", { name: /German/i });
+    const englishInput2 = variableLabelsGroup2.getByRole("textbox", { name: /English/i });
+
+    await expect(germanInput2).toHaveValue("Deutsches Label");
+    await expect(englishInput2).toHaveValue("English Label");
+
+    // Clear the translation fields
+    await germanInput2.clear();
+    await englishInput2.clear();
+
+    // Save and reopen
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Verify translations are now empty
+    const variableLabelsGroup3 = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const defaultLabelInput3 = variableLabelsGroup3.getByRole("textbox", { name: /Default Label/i });
+    const germanInput3 = variableLabelsGroup3.getByRole("textbox", { name: /German/i });
+    const englishInput3 = variableLabelsGroup3.getByRole("textbox", { name: /English/i });
+
+    await expect(defaultLabelInput3).toHaveValue("Test Label");
+    await expect(germanInput3).toHaveValue("");
+    await expect(englishInput3).toHaveValue("");
+
+    // Cleanup: Restore original values
+    await defaultLabelInput3.fill(originalDefault);
+    await germanInput3.fill(originalGerman);
+    await englishInput3.fill(originalEnglish);
+    await page.getByRole("button", { name: "Save changes" }).click();
+  });
+
+  test("should edit existing variable labels", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    // Navigate to the datasets page
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Search for and click on the test dataset
+    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
+    await page.getByRole("link", { name: DATASET_NAME }).click();
+    await page.waitForURL("**/admin/datasets/**");
+
+    // Search for the "age" variable
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Locate the Variable Labels group
+    const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
+    const germanInput = variableLabelsGroup.getByRole("textbox", { name: /German/i });
+
+    // Store original values for cleanup
+    const originalDefault = await defaultLabelInput.inputValue();
+    const originalGerman = await germanInput.inputValue();
+    const originalEnglish = await variableLabelsGroup.getByRole("textbox", { name: /English/i }).inputValue();
+
+    // Set initial label
+    await defaultLabelInput.fill("Original Label");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    // Reopen and verify
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    const variableLabelsGroup2 = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const defaultLabelInput2 = variableLabelsGroup2.getByRole("textbox", { name: /Default Label/i });
+    await expect(defaultLabelInput2).toHaveValue("Original Label");
+
+    // Update label and add translation
+    await defaultLabelInput2.fill("Updated Label");
+    const germanInput2 = variableLabelsGroup2.getByRole("textbox", { name: /German/i });
+    await germanInput2.fill("Aktualisiertes Label");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    // Reopen and verify updates
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    const variableLabelsGroup3 = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const defaultLabelInput3 = variableLabelsGroup3.getByRole("textbox", { name: /Default Label/i });
+    const germanInput3 = variableLabelsGroup3.getByRole("textbox", { name: /German/i });
+
+    await expect(defaultLabelInput3).toHaveValue("Updated Label");
+    await expect(germanInput3).toHaveValue("Aktualisiertes Label");
+
+    // Modify German translation
+    await germanInput3.fill("Geändertes Label");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
+
+    // Reopen and verify final modification
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    const variableLabelsGroup4 = page.getByRole("group").filter({ hasText: "Variable Labels" });
+    const germanInput4 = variableLabelsGroup4.getByRole("textbox", { name: /German/i });
+    await expect(germanInput4).toHaveValue("Geändertes Label");
+
+    // Cleanup: Restore original values
+    const defaultLabelInput4 = variableLabelsGroup4.getByRole("textbox", { name: /Default Label/i });
+    const englishInput4 = variableLabelsGroup4.getByRole("textbox", { name: /English/i });
+
+    await defaultLabelInput4.fill(originalDefault);
+    await germanInput4.fill(originalGerman);
+    await englishInput4.fill(originalEnglish);
+    await page.getByRole("button", { name: "Save changes" }).click();
   });
 });
