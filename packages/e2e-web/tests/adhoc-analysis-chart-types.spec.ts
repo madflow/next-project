@@ -27,8 +27,8 @@ test.describe("Adhoc Analysis - Chart Type Switching", () => {
     const expandButton = page.getByTestId("variable-group-expand-Demografische Daten");
     await expandButton.click();
 
-    // Select Geschlecht variable (categorical - good for chart testing)
-    const geschlechtVariable = page.getByTestId("variable-item-Geschlecht");
+    // Select Gender variable (categorical - good for chart testing)
+    const geschlechtVariable = page.getByTestId("variable-item-gender");
     await expect(geschlechtVariable).toBeVisible();
     await geschlechtVariable.click();
 

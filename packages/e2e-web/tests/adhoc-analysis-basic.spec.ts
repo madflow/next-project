@@ -39,10 +39,10 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
     const expandButton = page.getByTestId("variable-group-expand-Demografische Daten");
     await expandButton.click();
 
-    // Assert specific variables are visible (using labels from SPSS metadata)
-    await expect(page.getByTestId("variable-item-Alter")).toBeVisible();
-    await expect(page.getByTestId("variable-item-Geschlecht")).toBeVisible();
-    await expect(page.getByTestId("variable-item-Familienstand")).toBeVisible();
+    // Assert specific variables are visible (using variable names from SPSS file)
+    await expect(page.getByTestId("variable-item-age")).toBeVisible();
+    await expect(page.getByTestId("variable-item-gender")).toBeVisible();
+    await expect(page.getByTestId("variable-item-marital")).toBeVisible();
   });
 
   test("should select Geschlecht variable and display analysis chart", async ({ page }) => {
@@ -57,8 +57,8 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
     const expandButton = page.getByTestId("variable-group-expand-Demografische Daten");
     await expandButton.click();
 
-    // Select Geschlecht variable (categorical - deterministic)
-    const geschlechtVariable = page.getByTestId("variable-item-Geschlecht");
+    // Select Gender variable (categorical - deterministic)
+    const geschlechtVariable = page.getByTestId("variable-item-gender");
     await expect(geschlechtVariable).toBeVisible();
     await geschlechtVariable.click();
 
