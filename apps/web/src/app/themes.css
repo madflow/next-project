@@ -4,6 +4,7 @@
   --chart-3: var(--color-blue-600);
   --chart-4: var(--color-blue-700);
   --chart-5: var(--color-blue-800);
+  --chart-6: var(--color-blue-900);
 }
 
 .theme-blue .theme-container {
@@ -18,6 +19,7 @@
   --chart-3: var(--color-blue-600);
   --chart-4: var(--color-blue-700);
   --chart-5: var(--color-blue-800);
+  --chart-6: var(--color-blue-900);
 
   @variant dark {
     --primary: var(--color-blue-500);
@@ -38,6 +40,7 @@
   --chart-3: var(--color-green-600);
   --chart-4: var(--color-green-700);
   --chart-5: var(--color-green-800);
+  --chart-6: var(--color-green-900);
   --sidebar-primary: var(--color-lime-600);
   --sidebar-primary-foreground: var(--color-lime-50);
   --sidebar-ring: var(--color-lime-400);
@@ -61,6 +64,7 @@
   --chart-3: var(--color-amber-600);
   --chart-4: var(--color-amber-700);
   --chart-5: var(--color-amber-800);
+  --chart-6: var(--color-amber-900);
   --sidebar-primary: var(--color-amber-600);
   --sidebar-primary-foreground: var(--color-amber-50);
   --sidebar-ring: var(--color-amber-400);
@@ -84,6 +88,7 @@
   --chart-3: var(--color-rose-600);
   --chart-4: var(--color-rose-700);
   --chart-5: var(--color-rose-800);
+  --chart-6: var(--color-rose-900);
   --sidebar-primary: var(--color-rose-600);
   --sidebar-primary-foreground: var(--color-rose-50);
   --sidebar-ring: var(--color-rose-400);
@@ -107,6 +112,7 @@
   --chart-3: var(--color-purple-600);
   --chart-4: var(--color-purple-700);
   --chart-5: var(--color-purple-800);
+  --chart-6: var(--color-purple-900);
   --sidebar-primary: var(--color-purple-600);
   --sidebar-primary-foreground: var(--color-purple-50);
   --sidebar-ring: var(--color-purple-400);
@@ -130,6 +136,7 @@
   --chart-3: var(--color-orange-600);
   --chart-4: var(--color-orange-700);
   --chart-5: var(--color-orange-800);
+  --chart-6: var(--color-orange-900);
   --sidebar-primary: var(--color-orange-600);
   --sidebar-primary-foreground: var(--color-orange-50);
   --sidebar-ring: var(--color-orange-400);
@@ -152,6 +159,7 @@
   --chart-3: var(--color-teal-600);
   --chart-4: var(--color-teal-700);
   --chart-5: var(--color-teal-800);
+  --chart-6: var(--color-teal-900);
   --sidebar-primary: var(--color-teal-600);
   --sidebar-primary-foreground: var(--color-teal-50);
   --sidebar-ring: var(--color-teal-400);
@@ -174,6 +182,7 @@
   --chart-3: var(--color-stone-600);
   --chart-4: var(--color-stone-700);
   --chart-5: var(--color-stone-800);
+  --chart-6: var(--color-stone-900);
   --sidebar-primary: var(--color-stone-600);
   --sidebar-primary-foreground: var(--color-stone-50);
   --sidebar-ring: var(--color-stone-400);
@@ -231,6 +240,7 @@
   --chart-3: var(--color-blue-600);
   --chart-4: var(--color-blue-700);
   --chart-5: var(--color-blue-800);
+  --chart-6: var(--color-blue-900);
 
   @media (min-width: 1024px) {
     --radius: 0.45em;
@@ -273,6 +283,7 @@
   --chart-3: var(--color-red-600);
   --chart-4: var(--color-red-700);
   --chart-5: var(--color-red-800);
+  --chart-6: var(--color-red-900);
   --sidebar-primary: var(--color-red-600);
   --sidebar-primary-foreground: var(--color-red-50);
   --sidebar-ring: var(--color-red-400);
@@ -296,6 +307,7 @@
   --chart-3: var(--color-yellow-600);
   --chart-4: var(--color-yellow-700);
   --chart-5: var(--color-yellow-800);
+  --chart-6: var(--color-yellow-900);
   --sidebar-primary: var(--color-yellow-600);
   --sidebar-primary-foreground: var(--color-yellow-50);
   --sidebar-ring: var(--color-yellow-400);
@@ -319,6 +331,7 @@
   --chart-3: var(--color-violet-600);
   --chart-4: var(--color-violet-700);
   --chart-5: var(--color-violet-800);
+  --chart-6: var(--color-violet-900);
   --sidebar-primary: var(--color-violet-600);
   --sidebar-primary-foreground: var(--color-violet-50);
   --sidebar-ring: var(--color-violet-400);
