@@ -157,6 +157,7 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
       variableLabels: datasetVariable.variableLabels,
       valueLabels: datasetVariable.valueLabels,
       missingValues: datasetVariable.missingValues,
+      missingRanges: datasetVariable.missingRanges,
       orderIndex: datasetVariablesetItem.orderIndex,
       attributes: datasetVariablesetItem.attributes,
     })
@@ -204,6 +205,7 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
       variableLabels: datasetVariable.variableLabels,
       valueLabels: datasetVariable.valueLabels,
       missingValues: datasetVariable.missingValues,
+      missingRanges: datasetVariable.missingRanges,
     })
     .from(datasetVariable)
     .leftJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
