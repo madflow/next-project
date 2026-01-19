@@ -23,8 +23,8 @@ test.describe("Admin Datasets", () => {
     await page.getByTestId("app.datatable.search-input").click();
     await page.getByTestId("app.datatable.search-input").fill("age");
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
-    await page.getByRole("textbox", { name: "Label" }).click();
-    await page.getByRole("textbox", { name: "Label" }).fill("Age in years edited");
+    await page.getByTestId("app.admin.dataset-variable.label-input").click();
+    await page.getByTestId("app.admin.dataset-variable.label-input").fill("Age in years edited");
     await page.getByRole("button", { name: "Save changes" }).click();
     await page.getByTestId("app.admin.editor.projects.tab").click();
     await page.getByTestId("project-dropdown").click();

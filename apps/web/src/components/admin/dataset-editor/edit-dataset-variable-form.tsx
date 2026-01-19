@@ -112,6 +112,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                 <FieldGroup>
                   <Input
                     id="label"
+                    data-testid="app.admin.dataset-variable.label-input"
                     placeholder={t("editVariable.form.label.placeholder")}
                     aria-invalid={fieldState.invalid}
                     {...field}
