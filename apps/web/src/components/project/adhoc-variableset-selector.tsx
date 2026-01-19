@@ -106,19 +106,26 @@ function VariablesetNode({
 
       {isExpanded && (
         <div>
-          {filteredVariables.map((variable) => (
-            <div
-              key={variable.id}
-              className="flex items-center py-1"
-              style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
-              <button
-                className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
-                onClick={() => onSelectVariable(variable, node)}
-                data-testid={`variable-item-${getVariableLabel(variable)}`}>
-                {getVariableLabel(variable)}
-              </button>
-            </div>
-          ))}
+          {filteredVariables.map((variable) => {
+            // Use stable identifier for data-testid: prefer sanitized name, fallback to id
+            const testId = variable.name
+              ? `variable-item-${variable.name.replace(/[^a-zA-Z0-9-_]/g, "-")}`
+              : `variable-item-${variable.id}`;
+
+            return (
+              <div
+                key={variable.id}
+                className="flex items-center py-1"
+                style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
+                <button
+                  className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
+                  onClick={() => onSelectVariable(variable, node)}
+                  data-testid={testId}>
+                  {getVariableLabel(variable)}
+                </button>
+              </div>
+            );
+          })}
 
           {node.children.map((child) => (
             <VariablesetNode
