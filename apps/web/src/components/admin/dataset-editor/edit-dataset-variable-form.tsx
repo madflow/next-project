@@ -59,7 +59,9 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
       measure: datasetVariable.measure,
       missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
       missingRanges: datasetVariable.missingRanges?.[datasetVariable.name] ?? null,
-      variableLabels: (datasetVariable.variableLabels as DatasetVariableLabel) ?? null,
+      variableLabels:
+        (datasetVariable.variableLabels as DatasetVariableLabel) ??
+        (datasetVariable.label ? { default: datasetVariable.label } : { default: "" }),
     },
   });
 

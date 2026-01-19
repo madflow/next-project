@@ -286,7 +286,9 @@
           },
           "validation": {
             "defaultRequired": "Default label is required"
-          }
+          },
+          "addTranslation": "Add {locale} translation",
+          "removeTranslation": "Remove translation"
         }
       },
       "title": "Edit Variable"
