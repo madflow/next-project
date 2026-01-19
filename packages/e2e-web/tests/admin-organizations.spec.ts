@@ -4,12 +4,14 @@ import { loginUser } from "../utils";
 
 test.describe("Admin organizations", () => {
   test.describe.configure({ mode: "parallel" });
+
   test("list", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/organizations");
     await expect(page.getByTestId("admin.organizations.page")).toBeVisible();
   });
+
   test("create and edit", async ({ page }) => {
     const newOrganization = {
       name: "E2E Organization",

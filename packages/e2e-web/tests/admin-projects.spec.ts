@@ -4,6 +4,7 @@ import { loginUser } from "../utils";
 
 test.describe("Admin Projects", () => {
   test.describe.configure({ mode: "parallel" });
+
   test("list projects", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);

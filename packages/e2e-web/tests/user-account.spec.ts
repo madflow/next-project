@@ -9,6 +9,7 @@ test.afterAll(async () => {
 
 test.describe("User Account", () => {
   test.describe.configure({ mode: "serial" });
+
   test("should log in and navigate to account settings", async ({ page }) => {
     // Navigate to the login page
     await page.goto("/");

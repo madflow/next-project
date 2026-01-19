@@ -7,12 +7,14 @@ test.describe("Admin organization members", () => {
     name: string;
     slug: string;
   };
+
   test.beforeAll(async () => {
     newOrganization = {
       name: "E2E Organization with Members",
       slug: "e2e-organization-members",
     };
   });
+
   test("create and add members", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.adminInNoOrg.email, testUsers.adminInNoOrg.password);

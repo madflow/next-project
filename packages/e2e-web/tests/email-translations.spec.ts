@@ -26,6 +26,7 @@ async function getLatestEmail(email: string) {
 }
 
 test.describe.configure({ mode: "parallel" });
+
 test.describe("Email Translations", () => {
   test.afterAll(async () => {
     await smtpServerApi.deleteMessages();
