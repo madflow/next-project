@@ -10,6 +10,7 @@ import { z } from "zod";
 import { update } from "@/actions/dataset-variable";
 import { MissingRangesEditor } from "@/components/form/missing-ranges-editor";
 import { TextArrayEditor } from "@/components/form/text-array-editor";
+import { DatasetVariableLabel, VariableLabelsEditor } from "@/components/form/variable-labels-editor";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,14 @@ const formSchema = z.object({
   missingValues: z.array(z.string()).nullable().optional(),
   missingRanges: z
     .array(z.object({ lo: z.number(), hi: z.number() }))
+    .nullable()
+    .optional(),
+  variableLabels: z
+    .object({
+      default: z.string().min(1),
+      de: z.string().optional(),
+      en: z.string().optional(),
+    })
     .nullable()
     .optional(),
 });
@@ -50,6 +59,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
       measure: datasetVariable.measure,
       missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
       missingRanges: datasetVariable.missingRanges?.[datasetVariable.name] ?? null,
+      variableLabels: (datasetVariable.variableLabels as DatasetVariableLabel) ?? null,
     },
   });
 
@@ -105,6 +115,20 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                     {...field}
                     value={field.value ?? ""}
                   />
+                </FieldGroup>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="variableLabels"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>{t("editVariable.form.variableLabels.label")}</FieldLabel>
+                <FieldGroup>
+                  <VariableLabelsEditor value={field.value ?? null} onChange={field.onChange} />
                 </FieldGroup>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>

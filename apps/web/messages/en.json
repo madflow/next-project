@@ -271,6 +271,22 @@
         "success": "Variable updated successfully",
         "type": {
           "label": "Type"
+        },
+        "variableLabels": {
+          "label": "Variable Labels",
+          "default": "Default Label",
+          "translations": "Translations",
+          "locale": {
+            "de": "German",
+            "en": "English"
+          },
+          "placeholder": {
+            "default": "Enter default label",
+            "translation": "Enter translation for {locale}"
+          },
+          "validation": {
+            "defaultRequired": "Default label is required"
+          }
         }
       },
       "title": "Edit Variable"
