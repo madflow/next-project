@@ -529,6 +529,7 @@
   },
   "adminUserEditForm": {
     "buttons": {
+      "cancel": "Cancel",
       "update": "Update",
       "updating": "Updating..."
     },
@@ -643,6 +644,7 @@
       "title": "Edit dataset"
     },
     "form": {
+      "cancel": "Cancel",
       "description": {
         "label": "Description",
         "placeholder": "Enter dataset description"

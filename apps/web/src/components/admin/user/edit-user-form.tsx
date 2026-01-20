@@ -136,13 +136,23 @@ export function EditUserForm({ user }: FormEditProps) {
           </Field>
         )}
       />
-      <Button
-        type="submit"
-        className="cursor-pointer"
-        data-testid="admin.users.edit.form.submit"
-        disabled={form.formState.isSubmitting}>
-        {form.formState.isSubmitting ? t("buttons.updating") : t("buttons.update")}
-      </Button>
+      <div className="flex gap-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push("/admin/users")}
+          disabled={form.formState.isSubmitting}
+          className="cursor-pointer">
+          {t("buttons.cancel")}
+        </Button>
+        <Button
+          type="submit"
+          className="cursor-pointer"
+          data-testid="admin.users.edit.form.submit"
+          disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? t("buttons.updating") : t("buttons.update")}
+        </Button>
+      </div>
     </form>
   );
 }

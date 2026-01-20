@@ -529,6 +529,7 @@
   },
   "adminUserEditForm": {
     "buttons": {
+      "cancel": "Abbrechen",
       "update": "Aktualisieren",
       "updating": "Wird aktualisiert..."
     },
@@ -643,6 +644,7 @@
       "title": "Datensatz bearbeiten"
     },
     "form": {
+      "cancel": "Abbrechen",
       "description": {
         "label": "Beschreibung",
         "placeholder": "Beschreibung des Datensatzes eingeben"

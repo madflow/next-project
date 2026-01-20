@@ -176,7 +176,15 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
         )}
       />
 
-      <div className="pt-2">
+      <div className="flex gap-4 pt-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push("/admin/projects")}
+          disabled={form.formState.isSubmitting || isLoading}
+          className="cursor-pointer">
+          {t("form.cancel")}
+        </Button>
         <Button
           type="submit"
           disabled={form.formState.isSubmitting || isLoading || organizations.length === 0}
