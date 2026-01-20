@@ -104,7 +104,7 @@ export function EditOrganizationForm({ organization }: FormEditProps) {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.back()}
+          onClick={() => router.push("/admin/organizations")}
           disabled={form.formState.isSubmitting}
           className="cursor-pointer">
           {t("organization.form.cancel")}
