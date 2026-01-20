@@ -7,14 +7,14 @@ import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { PaginationState, SortingState } from "@/types";
-import type { Dataset } from "@/types/dataset";
+import type { DatasetWithOrganization } from "@/types/dataset";
 
 interface Props {
-  columns: ColumnDef<Dataset, unknown>[];
+  columns: ColumnDef<DatasetWithOrganization, unknown>[];
 }
 
 interface ApiResponse {
-  rows: Dataset[];
+  rows: DatasetWithOrganization[];
   count: number;
   limit: number;
   offset: number;
@@ -44,7 +44,7 @@ export function DatasetsDataTable({ columns }: Props) {
   const error = queryError ? queryError.message : null;
 
   return (
-    <DataTable<Dataset>
+    <DataTable<DatasetWithOrganization>
       columns={columns}
       data={apiResponse?.rows ?? []}
       count={apiResponse?.count ?? 0}

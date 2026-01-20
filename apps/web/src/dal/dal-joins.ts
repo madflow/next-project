@@ -82,29 +82,33 @@ export function createListWithJoins<TSchema extends ZodSchema>(
     const searchConditions: SQL<unknown>[] = [];
     if (search && searchColumns) {
       for (const searchColumn of searchColumns) {
-        let column: PgColumn | undefined;
+        const columns: PgColumn[] = [];
 
-        // First check main table
+        // Check main table
         const mainTableColumns = getTableColumns(table);
         if (searchColumn in mainTableColumns) {
-          column = mainTableColumns[searchColumn as keyof typeof mainTableColumns];
-        } else {
-          // Check joined tables
-          for (const join of joins) {
-            const joinTableColumns = getTableColumns(join.table);
-            if (searchColumn in joinTableColumns) {
-              column = joinTableColumns[searchColumn as keyof typeof joinTableColumns];
-              break;
+          const column = mainTableColumns[searchColumn as keyof typeof mainTableColumns];
+          if (column) {
+            columns.push(column);
+          }
+        }
+
+        // Check joined tables
+        for (const join of joins) {
+          const joinTableColumns = getTableColumns(join.table);
+          if (searchColumn in joinTableColumns) {
+            const column = joinTableColumns[searchColumn as keyof typeof joinTableColumns];
+            if (column) {
+              columns.push(column);
             }
           }
         }
 
-        if (!column) {
-          continue;
+        // Add search condition for each matching column
+        for (const column of columns) {
+          const searchCondition = ilike(column, `%${search}%`);
+          searchConditions.push(searchCondition);
         }
-
-        const searchCondition = ilike(column, `%${search}%`);
-        searchConditions.push(searchCondition);
       }
     }
 
@@ -175,6 +179,9 @@ export function createListWithJoins<TSchema extends ZodSchema>(
       const result: Record<string, unknown> = {};
       const joinedData: Record<string, Record<string, unknown>> = {};
 
+      // Get the main table name
+      const mainTableName = getTableName(table);
+
       // Process each property in the row
       for (const [key, value] of Object.entries(row)) {
         if (value && typeof value === "object" && value !== null) {
@@ -188,13 +195,11 @@ export function createListWithJoins<TSchema extends ZodSchema>(
 
       // Add joined data to the result
       for (const [joinKey, joinValue] of Object.entries(joinedData)) {
-        // Get the table name safely, defaulting to '' if not available
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tableName = (table as any)._?.name || "";
         // If the join key is the same as the main table name, merge the properties
-        if (joinKey === tableName) {
+        if (joinKey === mainTableName) {
           Object.assign(result, joinValue);
         } else {
+          // Use the original plural table name
           result[joinKey] = joinValue;
         }
       }

@@ -654,6 +654,10 @@
         "label": "Name",
         "placeholder": "Namen des Datensatzes eingeben"
       },
+      "organization": {
+        "helpText": "Die Organisation, zu der dieser Datensatz gehört. Dies kann nach der Erstellung nicht mehr geändert werden.",
+        "label": "Organisation"
+      },
       "submit": {
         "update": "Aktualisieren",
         "updating": "Wird aktualisiert..."

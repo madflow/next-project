@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { InfoIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -11,7 +12,8 @@ import { update } from "@/actions/dataset";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { type Dataset, updateDatasetSchema } from "@/types/dataset";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { type DatasetWithOrganization, updateDatasetSchema } from "@/types/dataset";
 
 // Function to create schema with translations
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,7 +34,7 @@ type FormValues = {
 };
 
 type EditDatasetFormProps = {
-  dataset: Dataset;
+  dataset: DatasetWithOrganization;
 };
 
 export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
@@ -106,6 +108,29 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
           </Field>
         )}
       />
+
+      <Field>
+        <FieldLabel htmlFor="organization" className="flex items-center gap-2">
+          {t("form.organization.label")}
+          <Tooltip>
+            <TooltipTrigger type="button" className="cursor-help">
+              <InfoIcon className="text-muted-foreground h-4 w-4" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t("form.organization.helpText")}</p>
+            </TooltipContent>
+          </Tooltip>
+        </FieldLabel>
+        <FieldGroup>
+          <Input
+            id="organization"
+            value={dataset.organizations.name}
+            disabled
+            className="bg-muted cursor-not-allowed"
+            data-testid="admin.datasets.edit.form.organization"
+          />
+        </FieldGroup>
+      </Field>
 
       <div className="pt-2">
         <Button

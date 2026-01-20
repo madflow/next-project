@@ -11,8 +11,7 @@ import { type Organization } from "@/types/organization";
 import { type Project } from "@/types/project";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 
-interface ProjectWithOrganization {
-  projects: Project;
+interface ProjectWithOrganization extends Project {
   organizations: Organization;
 }
 
@@ -21,7 +20,7 @@ export const columns: ColumnDef<ProjectWithOrganization>[] = [
     accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.name" />,
     cell: function Cell({ row }) {
-      return row.original.projects.name;
+      return row.original.name;
     },
   },
   {
@@ -35,22 +34,22 @@ export const columns: ColumnDef<ProjectWithOrganization>[] = [
     accessorKey: "slug",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.slug" />,
     cell: function Cell({ row }) {
-      return row.original.projects.slug;
+      return row.original.slug;
     },
   },
   {
     accessorKey: "createdAt",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.createdAt" />,
     cell: function Cell({ row }) {
-      const date = row.original.projects.createdAt;
+      const date = row.original.createdAt;
       return <div>{new Date(date).toLocaleString()}</div>;
     },
   },
   {
     id: "actions",
     cell: function Cell({ row }) {
-      const id = row.original.projects.id;
-      const slug = row.original.projects.slug;
+      const id = row.original.id;
+      const slug = row.original.slug;
       const t = useTranslations();
 
       return (
@@ -67,7 +66,7 @@ export const columns: ColumnDef<ProjectWithOrganization>[] = [
               <span className="sr-only">{t("project.actions.edit")}</span>
             </Link>
           </Button>
-          <DeleteProjectDialog projectId={id} projectName={row.original.projects.name} onDelete={remove} />
+          <DeleteProjectDialog projectId={id} projectName={row.original.name} onDelete={remove} />
         </div>
       );
     },
