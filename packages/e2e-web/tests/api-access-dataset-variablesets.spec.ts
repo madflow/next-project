@@ -18,7 +18,7 @@ test.describe("API Dataset Variable Sets", () => {
     const data = await response.json();
 
     if (data.rows && data.rows.length > 0) {
-      testDatasetId = data.rows[0].id;
+      testDatasetId = data.rows[0].datasets.id;
     } else {
       throw new Error("No datasets found in test environment");
     }

@@ -78,7 +78,7 @@ test.describe("API Datasets", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].name.toLowerCase()).toContain("test");
+      expect(data.rows[0].datasets.name.toLowerCase()).toContain("test");
     });
   });
 
@@ -92,7 +92,7 @@ test.describe("API Datasets", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].name <= data.rows[1].name).toBe(true);
+      expect(data.rows[0].datasets.name <= data.rows[1].datasets.name).toBe(true);
     });
 
     test("orders by dataset name descending", async ({ page }) => {
@@ -104,7 +104,7 @@ test.describe("API Datasets", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].name >= data.rows[1].name).toBe(true);
+      expect(data.rows[0].datasets.name >= data.rows[1].datasets.name).toBe(true);
     });
 
     test("orders by dataset filename", async ({ page }) => {
@@ -116,7 +116,7 @@ test.describe("API Datasets", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].filename <= data.rows[1].filename).toBe(true);
+      expect(data.rows[0].datasets.filename <= data.rows[1].datasets.filename).toBe(true);
     });
 
     test("orders by creation date", async ({ page }) => {
@@ -128,8 +128,8 @@ test.describe("API Datasets", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      const firstDate = new Date(data.rows[0].createdAt);
-      const secondDate = new Date(data.rows[1].createdAt);
+      const firstDate = new Date(data.rows[0].datasets.createdAt);
+      const secondDate = new Date(data.rows[1].datasets.createdAt);
       expect(firstDate >= secondDate).toBe(true);
     });
 
@@ -165,7 +165,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].name).toContain("Test Dataset");
+      expect(data.rows[0].datasets.name).toContain("Test Dataset");
     });
 
     test("filters by dataset filename", async ({ page }) => {
@@ -177,7 +177,7 @@ test.describe("API Datasets", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].filename).toBe("demo.sav");
+      expect(data.rows[0].datasets.filename).toBe("demo.sav");
     });
 
     test("applies multiple filters with AND logic", async ({ page }) => {
@@ -188,7 +188,7 @@ test.describe("API Datasets", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].filename).toBe("demo.sav");
+      expect(data.rows[0].datasets.filename).toBe("demo.sav");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
@@ -239,7 +239,7 @@ test.describe("API Datasets", () => {
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].filename).toBe("demo.sav");
+      expect(data.rows[0].datasets.filename).toBe("demo.sav");
     });
   });
 
@@ -272,11 +272,13 @@ test.describe("API Datasets", () => {
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
       const dataset = data.rows[0];
-      expect(dataset).toHaveProperty("id");
-      expect(dataset).toHaveProperty("name");
-      expect(dataset).toHaveProperty("filename");
-      expect(dataset).toHaveProperty("createdAt");
-      expect(dataset).toHaveProperty("updatedAt");
+      expect(dataset).toHaveProperty("datasets");
+      expect(dataset).toHaveProperty("organizations");
+      expect(dataset.datasets).toHaveProperty("id");
+      expect(dataset.datasets).toHaveProperty("name");
+      expect(dataset.datasets).toHaveProperty("filename");
+      expect(dataset.datasets).toHaveProperty("createdAt");
+      expect(dataset.datasets).toHaveProperty("updatedAt");
     });
 
     test("count accuracy with filters", async ({ page }) => {
