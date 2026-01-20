@@ -11,16 +11,17 @@ import { type Organization } from "@/types/organization";
 import { type Project } from "@/types/project";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 
-interface ProjectWithOrganization extends Project {
+interface ProjectWithOrganization {
+  projects: Project;
   organizations: Organization;
 }
 
 export const columns: ColumnDef<ProjectWithOrganization>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "projects.name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.name" />,
     cell: function Cell({ row }) {
-      return row.original.name;
+      return row.original.projects.name;
     },
   },
   {
@@ -31,25 +32,25 @@ export const columns: ColumnDef<ProjectWithOrganization>[] = [
     },
   },
   {
-    accessorKey: "slug",
+    accessorKey: "projects.slug",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.slug" />,
     cell: function Cell({ row }) {
-      return row.original.slug;
+      return row.original.projects.slug;
     },
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "projects.createdAt",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.createdAt" />,
     cell: function Cell({ row }) {
-      const date = row.original.createdAt;
+      const date = row.original.projects.createdAt;
       return <div>{new Date(date).toLocaleString()}</div>;
     },
   },
   {
     id: "actions",
     cell: function Cell({ row }) {
-      const id = row.original.id;
-      const slug = row.original.slug;
+      const id = row.original.projects.id;
+      const slug = row.original.projects.slug;
       const t = useTranslations();
 
       return (
@@ -66,7 +67,7 @@ export const columns: ColumnDef<ProjectWithOrganization>[] = [
               <span className="sr-only">{t("project.actions.edit")}</span>
             </Link>
           </Button>
-          <DeleteProjectDialog projectId={id} projectName={row.original.name} onDelete={remove} />
+          <DeleteProjectDialog projectId={id} projectName={row.original.projects.name} onDelete={remove} />
         </div>
       );
     },

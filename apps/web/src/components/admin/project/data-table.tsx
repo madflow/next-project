@@ -10,7 +10,8 @@ import type { PaginationState, SortingState } from "@/types/index";
 import { type Organization } from "@/types/organization";
 import type { Project } from "@/types/project";
 
-interface ProjectWithOrganization extends Project {
+interface ProjectWithOrganization {
+  projects: Project;
   organizations: Organization;
 }
 

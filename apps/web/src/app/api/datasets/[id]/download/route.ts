@@ -30,7 +30,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       return new NextResponse("File not found", { status: 404 });
     }
 
-    const { storageKey, filename, fileType } = dataFile;
+    const { storageKey, filename, fileType } = dataFile.datasets;
     const bucket = env.S3_BUCKET_NAME;
 
     try {
