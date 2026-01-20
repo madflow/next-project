@@ -47,11 +47,11 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
     // Find a dataset that has variable sets by checking each one
     let foundDatasetId: string | null = null;
     for (const dataset of data.rows) {
-      const vsResponse = await page.request.get(`/api/datasets/${dataset.id}/variablesets/export`);
+      const vsResponse = await page.request.get(`/api/datasets/${dataset.datasets.id}/variablesets/export`);
       if (vsResponse.status() === 200) {
         const exportData = await vsResponse.json();
         if (exportData.variableSets && exportData.variableSets.length > 0) {
-          foundDatasetId = dataset.id;
+          foundDatasetId = dataset.datasets.id;
           break;
         }
       }
