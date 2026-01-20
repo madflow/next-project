@@ -24,14 +24,14 @@ export default async function Page({ params }: PageProps) {
     return notFound();
   }
 
-  const organization = await findOrganization(dataset.organizationId);
+  const organization = await findOrganization(dataset.datasets.organizationId);
 
   if (!organization) {
     return notFound();
   }
 
   return (
-    <PageLayout title={t("editor.title", { name: dataset?.name || "" })}>
+    <PageLayout title={t("editor.title", { name: dataset?.datasets.name || "" })}>
       <Tabs defaultValue="variables">
         <TabsList>
           <TabsTrigger value="variables" data-testid="app.admin.editor.variables.tab">

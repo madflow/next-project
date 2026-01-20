@@ -47,9 +47,9 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      id: dataset.id,
-      name: dataset.name,
-      description: dataset.description ?? "",
+      id: dataset.datasets.id,
+      name: dataset.datasets.name,
+      description: dataset.datasets.description ?? "",
       updatedAt: new Date(),
     },
   });
@@ -57,7 +57,7 @@ export function EditDatasetForm({ dataset }: EditDatasetFormProps) {
   const onSubmit = async (formData: FormValues) => {
     const updateData = updateDatasetSchema.parse(formData);
     try {
-      await update(dataset.id, updateData);
+      await update(dataset.datasets.id, updateData);
       toast.success(t("messages.updateSuccess"));
       router.push("/admin/datasets");
     } catch (error: unknown) {

@@ -24,9 +24,9 @@ const findFn = async (id: string) => {
 
   if (!result) return null;
 
-  // Transform the result to include organization data
+  // Transform the result to include organization data in nested structure
   return {
-    ...result.datasets,
+    datasets: result.datasets,
     organizations: result.organizations,
   };
 };

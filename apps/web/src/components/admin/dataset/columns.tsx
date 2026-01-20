@@ -15,14 +15,14 @@ import { InfoDatasetModal } from "./info-dataset-modal";
 
 export const columns: ColumnDef<DatasetWithOrganization>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "datasets.name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.name" />,
     cell: function Cell({ row }) {
       return (
         <Link
-          href={`/admin/datasets/${row.original.id}/editor`}
+          href={`/admin/datasets/${row.original.datasets.id}/editor`}
           className="text-primary flex cursor-pointer items-center gap-1 font-medium hover:underline">
-          {row.original.name}
+          {row.original.datasets.name}
           <Pencil className="h-3 w-3" />
         </Link>
       );
@@ -34,29 +34,29 @@ export const columns: ColumnDef<DatasetWithOrganization>[] = [
     cell: ({ row }) => row.original.organizations.name,
   },
   {
-    accessorKey: "filename",
+    accessorKey: "datasets.filename",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.filename" />,
   },
   {
-    accessorKey: "fileType",
+    accessorKey: "datasets.fileType",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.type" />,
-    cell: ({ row }) => row.original.fileType.toUpperCase(),
+    cell: ({ row }) => row.original.datasets.fileType.toUpperCase(),
   },
   {
-    accessorKey: "fileSize",
+    accessorKey: "datasets.fileSize",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.size" />,
-    cell: ({ row }) => formatFileSize(row.original.fileSize),
+    cell: ({ row }) => formatFileSize(row.original.datasets.fileSize),
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "datasets.createdAt",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.uploaded" />,
-    cell: ({ row }) => formatDate(row.original.createdAt),
+    cell: ({ row }) => formatDate(row.original.datasets.createdAt),
   },
   {
     id: "actions",
     cell: function Cell({ row }) {
       const t = useTranslations("adminDataset");
-      const dataset = row.original;
+      const dataset = row.original.datasets;
 
       const handleDelete = async (id: string) => {
         try {

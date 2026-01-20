@@ -179,9 +179,6 @@ export function createListWithJoins<TSchema extends ZodSchema>(
       const result: Record<string, unknown> = {};
       const joinedData: Record<string, Record<string, unknown>> = {};
 
-      // Get the main table name
-      const mainTableName = getTableName(table);
-
       // Process each property in the row
       for (const [key, value] of Object.entries(row)) {
         if (value && typeof value === "object" && value !== null) {
@@ -193,15 +190,9 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         }
       }
 
-      // Add joined data to the result
+      // Add joined data to the result - keep all as nested objects
       for (const [joinKey, joinValue] of Object.entries(joinedData)) {
-        // If the join key is the same as the main table name, merge the properties
-        if (joinKey === mainTableName) {
-          Object.assign(result, joinValue);
-        } else {
-          // Use the original plural table name
-          result[joinKey] = joinValue;
-        }
+        result[joinKey] = joinValue;
       }
 
       return result;
