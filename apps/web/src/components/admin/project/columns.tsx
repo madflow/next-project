@@ -18,7 +18,7 @@ interface ProjectWithOrganization {
 
 export const columns: ColumnDef<ProjectWithOrganization>[] = [
   {
-    accessorKey: "projects.name",
+    accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.name" />,
     cell: function Cell({ row }) {
       return row.original.projects.name;
@@ -32,14 +32,14 @@ export const columns: ColumnDef<ProjectWithOrganization>[] = [
     },
   },
   {
-    accessorKey: "projects.slug",
+    accessorKey: "slug",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.slug" />,
     cell: function Cell({ row }) {
       return row.original.projects.slug;
     },
   },
   {
-    accessorKey: "projects.createdAt",
+    accessorKey: "createdAt",
     header: ({ column }) => <DataTableColumnHeader column={column} title="project.columns.createdAt" />,
     cell: function Cell({ row }) {
       const date = row.original.projects.createdAt;
