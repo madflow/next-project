@@ -9,11 +9,11 @@ import { remove } from "@/actions/dataset";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatFileSize } from "@/lib/utils";
-import type { Dataset } from "@/types/dataset";
+import type { DatasetWithOrganization } from "@/types/dataset";
 import { DeleteDatasetDialog } from "./delete-dataset-dialog";
 import { InfoDatasetModal } from "./info-dataset-modal";
 
-export const columns: ColumnDef<Dataset>[] = [
+export const columns: ColumnDef<DatasetWithOrganization>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.name" />,
@@ -29,6 +29,11 @@ export const columns: ColumnDef<Dataset>[] = [
     },
   },
   {
+    accessorKey: "organizations:name",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.organization" />,
+    cell: ({ row }) => row.original.organizations.name,
+  },
+  {
     accessorKey: "filename",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.filename" />,
   },
@@ -41,20 +46,6 @@ export const columns: ColumnDef<Dataset>[] = [
     accessorKey: "fileSize",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.size" />,
     cell: ({ row }) => formatFileSize(row.original.fileSize),
-  },
-  {
-    accessorKey: "fileHash",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.hash" />,
-    cell: function Cell({ row }) {
-      const hash = row.original.fileHash;
-      const shortHash = hash ? `${hash.substring(0, 8)}...${hash.substring(hash.length - 4)}` : "";
-
-      return (
-        <div className="flex items-center">
-          <span className="bg-muted rounded px-2 py-1 font-mono text-xs">{shortHash}</span>
-        </div>
-      );
-    },
   },
   {
     accessorKey: "createdAt",

@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   type CreateDatasetData,
   type Dataset,
+  type Organization,
   type UpdateDatasetData,
   insertDatasetSchema,
   selectDatasetSchema,
@@ -15,6 +16,10 @@ export {
   type Dataset,
   type CreateDatasetData,
   type UpdateDatasetData,
+};
+
+export type DatasetWithOrganization = Dataset & {
+  organizations: Organization;
 };
 
 export const datasetReadMetadataSchema = z.object({

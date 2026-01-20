@@ -8,20 +8,39 @@ import {
   project,
   selectDatasetSchema,
 } from "@repo/database/schema";
-import {
-  createFind,
-  createList,
-  getAuthenticatedClient,
-  getSessionUser,
-  withAdminCheck,
-  withSessionCheck,
-} from "@/dal/dal";
+import { createList, getAuthenticatedClient, getSessionUser, withAdminCheck, withSessionCheck } from "@/dal/dal";
+import { createListWithJoins } from "@/dal/dal-joins";
 import { DalException, DalNotAuthorizedException } from "@/lib/exception";
 import { deleteDataset as s3DeleteDataset } from "@/lib/storage";
 
-export const find = withSessionCheck(createFind(entity, selectDatasetSchema));
+const findFn = async (id: string) => {
+  const db = await getAuthenticatedClient();
+  const [result] = await db
+    .select()
+    .from(entity)
+    .innerJoin(organization, eq(entity.organizationId, organization.id))
+    .where(eq(entity.id, id))
+    .limit(1);
 
-export const list = withAdminCheck(createList(entity, selectDatasetSchema));
+  if (!result) return null;
+
+  // Transform the result to include organization data
+  return {
+    ...result.datasets,
+    organizations: result.organizations,
+  };
+};
+
+export const find = withSessionCheck(findFn);
+
+export const list = withAdminCheck(
+  createListWithJoins(entity, selectDatasetSchema, [
+    {
+      table: organization,
+      condition: eq(entity.organizationId, organization.id),
+    },
+  ])
+);
 
 export const listAuthenticated = withSessionCheck(createList(entity, selectDatasetSchema));
 

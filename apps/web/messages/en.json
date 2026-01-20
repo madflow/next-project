@@ -654,6 +654,10 @@
         "label": "Name",
         "placeholder": "Enter dataset name"
       },
+      "organization": {
+        "helpText": "The organization this dataset belongs to. This cannot be changed after creation.",
+        "label": "Organization"
+      },
       "submit": {
         "update": "Update",
         "updating": "Updating..."

@@ -31,4 +31,52 @@ test.describe("Admin Datasets", () => {
     await page.getByTestId("project-dropdown-item-test-project").getByText("Test Project").click();
     await page.getByRole("button", { name: "Add to project" }).click();
   });
+
+  test("should display organization column in datasets grid", async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Verify organization column header is present
+    await expect(page.getByRole("columnheader", { name: /organization/i })).toBeVisible();
+
+    // Verify file hash column is not present
+    await expect(page.getByRole("columnheader", { name: /file hash/i })).toBeHidden();
+  });
+
+  test("should search datasets by organization name", async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Search by organization name
+    await page.getByTestId("app.datatable.search-input").fill("Test Organization");
+
+    // Verify that at least one row is visible after search
+    await expect(page.locator("tbody tr").first()).toBeVisible();
+  });
+
+  test("should show readonly organization field in edit form", async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Click the first dataset's edit button
+    const firstEditButton = page.locator('[title="Edit"]').first();
+    await firstEditButton.click();
+
+    // Verify we're on the edit page
+    await expect(page.getByTestId("admin.datasets.edit.page")).toBeVisible();
+
+    // Verify organization field is present and disabled
+    const organizationField = page.getByTestId("admin.datasets.edit.form.organization");
+    await expect(organizationField).toBeVisible();
+    await expect(organizationField).toBeDisabled();
+
+    // Verify organization field has a value
+    await expect(organizationField).not.toHaveValue("");
+  });
 });
