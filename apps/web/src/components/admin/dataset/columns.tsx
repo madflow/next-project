@@ -15,7 +15,7 @@ import { InfoDatasetModal } from "./info-dataset-modal";
 
 export const columns: ColumnDef<DatasetWithOrganization>[] = [
   {
-    accessorKey: "datasets.name",
+    accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.name" />,
     cell: function Cell({ row }) {
       return (
@@ -34,21 +34,22 @@ export const columns: ColumnDef<DatasetWithOrganization>[] = [
     cell: ({ row }) => row.original.organizations.name,
   },
   {
-    accessorKey: "datasets.filename",
+    accessorKey: "filename",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.filename" />,
+    cell: ({ row }) => row.original.datasets.filename,
   },
   {
-    accessorKey: "datasets.fileType",
+    accessorKey: "fileType",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.type" />,
     cell: ({ row }) => row.original.datasets.fileType.toUpperCase(),
   },
   {
-    accessorKey: "datasets.fileSize",
+    accessorKey: "fileSize",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.size" />,
     cell: ({ row }) => formatFileSize(row.original.datasets.fileSize),
   },
   {
-    accessorKey: "datasets.createdAt",
+    accessorKey: "createdAt",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.uploaded" />,
     cell: ({ row }) => formatDate(row.original.datasets.createdAt),
   },
