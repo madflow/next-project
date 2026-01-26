@@ -34,7 +34,7 @@ export const create = withAdminAuth(async (data: CreateData) => {
 
 export async function createWithInvitation(
   invitationId: string,
-  data: { name: string; email: string; password: string; callbackURL?: string }
+  data: { name: string; email: string; password: string; callbackURL?: string; locale?: string }
 ) {
   validateCallbackURL(data.callbackURL);
 
@@ -52,6 +52,7 @@ export async function createWithInvitation(
       email: data.email,
       password: data.password,
       callbackURL: data.callbackURL,
+      locale: data.locale,
     },
     params: {
       invitationId: invitationId,

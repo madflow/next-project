@@ -1100,6 +1100,7 @@
     "form": {
       "confirmPassword": "Passwort bestätigen",
       "email": "E-Mail",
+      "language": "Sprache",
       "name": "Name",
       "password": "Passwort",
       "submit": "Registrieren"

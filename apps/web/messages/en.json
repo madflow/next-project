@@ -1100,6 +1100,7 @@
     "form": {
       "confirmPassword": "Confirm Password",
       "email": "Email",
+      "language": "Language",
       "name": "Name",
       "password": "Password",
       "submit": "Sign Up"
