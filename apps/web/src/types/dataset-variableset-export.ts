@@ -20,7 +20,7 @@ export const VariableSetExportSchema = z.object({
   description: z.string().nullable(),
   parentName: z.string().nullable(),
   orderIndex: z.number(),
-  category: z.enum(["general", "multi_response", "matrix"]).default("general"),
+  category: z.enum(["general", "multi_response", "matrix"]).optional().default("general"),
   attributes: z
     .object({
       multiResponse: z
