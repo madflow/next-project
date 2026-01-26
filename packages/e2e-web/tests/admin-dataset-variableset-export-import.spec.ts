@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
@@ -351,6 +351,62 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
   });
 
   test.describe("Category and Attributes Export/Import", () => {
+    // Array to track created variablesets for cleanup
+    let createdSets: string[] = [];
+
+    // Cleanup function to delete created variablesets
+    async function cleanupVariablesets(page: Page) {
+      if (createdSets.length === 0) return;
+
+      try {
+        // Get the hierarchical list which includes IDs
+        const hierarchyResponse = await page.request.get(
+          `/api/datasets/${testDatasetId}/variablesets?hierarchical=true`
+        );
+        if (hierarchyResponse.status() === 200) {
+          const hierarchyData = await hierarchyResponse.json();
+
+          // Helper to find variableset ID by name in the hierarchy
+          const findVariablesetId = (
+            nodes: Array<{ name: string; id: string; children?: unknown[] }>,
+            name: string
+          ): string | null => {
+            for (const node of nodes) {
+              if (node.name === name) return node.id;
+              if (node.children && node.children.length > 0) {
+                const found = findVariablesetId(
+                  node.children as Array<{ name: string; id: string; children?: unknown[] }>,
+                  name
+                );
+                if (found) return found;
+              }
+            }
+            return null;
+          };
+
+          // Delete each created variableset using the API
+          for (const setName of createdSets) {
+            const variablesetId = findVariablesetId(hierarchyData.hierarchy, setName);
+            if (variablesetId) {
+              // Delete via the DELETE API endpoint
+              await page.request.delete(`/api/variablesets/${variablesetId}`);
+            }
+          }
+        }
+      } catch (error) {
+        // Log but don't fail the test if cleanup fails
+        console.error("Failed to cleanup variablesets:", error);
+      } finally {
+        // Clear the array even if cleanup failed
+        createdSets = [];
+      }
+    }
+
+    // Run cleanup after each test, even if the test fails
+    test.afterEach(async ({ page }) => {
+      await cleanupVariablesets(page);
+    });
+
     test("export includes category field", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
@@ -371,7 +427,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       }
     });
 
-    test("import preserves category field", async ({ page }) => {
+    test("import preserves category field", async ({ page }, testInfo) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
@@ -387,8 +443,14 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       // Take the first variable
       const variables = setWithVars!.variables.slice(0, 1);
 
-      // Use timestamp to create unique names
-      const timestamp = Date.now();
+      // Use timestamp and worker index to create unique names
+      const uniqueSuffix = `${Date.now()}_w${testInfo.workerIndex}`;
+
+      // Generate unique names and collect them
+      const generalName = `Test_Category_General_${uniqueSuffix}`;
+      const multiResponseName = `Test_Category_MultiResponse_${uniqueSuffix}`;
+      const matrixName = `Test_Category_Matrix_${uniqueSuffix}`;
+      createdSets.push(generalName, multiResponseName, matrixName);
 
       // Create test data with different categories
       const testExport: ExportData = {
@@ -400,7 +462,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
         },
         variableSets: [
           {
-            name: `Test_Category_General_${timestamp}`,
+            name: generalName,
             description: "Testing general category",
             parentName: null,
             orderIndex: 200,
@@ -408,7 +470,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
             variables: [{ name: variables[0].name, orderIndex: 0 }],
           },
           {
-            name: `Test_Category_MultiResponse_${timestamp}`,
+            name: multiResponseName,
             description: "Testing multi_response category",
             parentName: null,
             orderIndex: 201,
@@ -422,7 +484,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
             variables: [{ name: variables[0].name, orderIndex: 0 }],
           },
           {
-            name: `Test_Category_Matrix_${timestamp}`,
+            name: matrixName,
             description: "Testing matrix category",
             parentName: null,
             orderIndex: 202,
@@ -452,13 +514,11 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
       const verifyExportData = (await verifyExportResponse.json()) as ExportData;
 
-      const generalSet = verifyExportData.variableSets.find((vs) => vs.name === `Test_Category_General_${timestamp}`);
+      const generalSet = verifyExportData.variableSets.find((vs) => vs.name === generalName);
       expect(generalSet).toBeDefined();
       expect(generalSet!.category).toBe("general");
 
-      const multiResponseSet = verifyExportData.variableSets.find(
-        (vs) => vs.name === `Test_Category_MultiResponse_${timestamp}`
-      );
+      const multiResponseSet = verifyExportData.variableSets.find((vs) => vs.name === multiResponseName);
       expect(multiResponseSet).toBeDefined();
       expect(multiResponseSet!.category).toBe("multi_response");
       expect(multiResponseSet!.attributes).toBeDefined();
@@ -466,12 +526,12 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       expect(multiResponseSet!.attributes?.multiResponse?.type).toBe("dichotomies");
       expect(multiResponseSet!.attributes?.multiResponse?.countedValue).toBe(1);
 
-      const matrixSet = verifyExportData.variableSets.find((vs) => vs.name === `Test_Category_Matrix_${timestamp}`);
+      const matrixSet = verifyExportData.variableSets.find((vs) => vs.name === matrixName);
       expect(matrixSet).toBeDefined();
       expect(matrixSet!.category).toBe("matrix");
     });
 
-    test("import handles missing category field (backward compatibility)", async ({ page }) => {
+    test("import handles missing category field (backward compatibility)", async ({ page }, testInfo) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
@@ -486,8 +546,10 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
 
       const variables = setWithVars!.variables.slice(0, 1);
 
-      // Use timestamp to create unique name
-      const timestamp = Date.now();
+      // Use timestamp and worker index to create unique name
+      const uniqueSuffix = `${Date.now()}_w${testInfo.workerIndex}`;
+      const noCategoryName = `Test_No_Category_${uniqueSuffix}`;
+      createdSets.push(noCategoryName);
 
       // Create an old-format export without category field
       const oldFormatExport = {
@@ -499,7 +561,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
         },
         variableSets: [
           {
-            name: `Test_No_Category_${timestamp}`,
+            name: noCategoryName,
             description: "Testing backward compatibility",
             parentName: null,
             orderIndex: 300,
@@ -529,7 +591,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
       const verifyExportData = (await verifyExportResponse.json()) as ExportData;
 
-      const importedSet = verifyExportData.variableSets.find((vs) => vs.name === `Test_No_Category_${timestamp}`);
+      const importedSet = verifyExportData.variableSets.find((vs) => vs.name === noCategoryName);
       expect(importedSet).toBeDefined();
       expect(importedSet!.category).toBe("general");
     });
