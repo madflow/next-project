@@ -13,6 +13,13 @@ interface VariableSet {
   description: string | null;
   parentName: string | null;
   orderIndex: number;
+  category?: "general" | "multi_response" | "matrix";
+  attributes?: {
+    multiResponse?: {
+      type: "dichotomies" | "categories";
+      countedValue: number;
+    };
+  } | null;
   variables: VariableItem[];
 }
 
@@ -340,6 +347,183 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       expect(variableNames[0]).toBe(variables[1].name); // orderIndex 0
       expect(variableNames[1]).toBe(variables[2].name); // orderIndex 1
       expect(variableNames[2]).toBe(variables[0].name); // orderIndex 2
+    });
+  });
+
+  test.describe("Category and Attributes Export/Import", () => {
+    test("export includes category field", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+      const response = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      expect(response.status()).toBe(200);
+
+      const exportData = (await response.json()) as ExportData;
+
+      // Verify variableSets exist and have at least one item
+      expect(exportData.variableSets).toBeDefined();
+      expect(exportData.variableSets.length).toBeGreaterThan(0);
+
+      // Verify each variableset has category field
+      for (const variableSet of exportData.variableSets) {
+        expect(variableSet.category).toBeDefined();
+        expect(["general", "multi_response", "matrix"]).toContain(variableSet.category);
+      }
+    });
+
+    test("import preserves category field", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+      // First get existing variables from the dataset to use in the test
+      const existingExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      expect(existingExportResponse.status()).toBe(200);
+      const existingExportData = (await existingExportResponse.json()) as ExportData;
+
+      // Find a variableset with at least 1 variable to use in our test
+      const setWithVars = existingExportData.variableSets.find((vs) => vs.variables && vs.variables.length >= 1);
+      expect(setWithVars).toBeDefined();
+
+      // Take the first variable
+      const variables = setWithVars!.variables.slice(0, 1);
+
+      // Create test data with different categories
+      const testExport: ExportData = {
+        metadata: {
+          datasetId: testDatasetId,
+          datasetName: "Test Dataset",
+          exportedAt: new Date().toISOString(),
+          version: "2.0",
+        },
+        variableSets: [
+          {
+            name: "Test_Category_General",
+            description: "Testing general category",
+            parentName: null,
+            orderIndex: 200,
+            category: "general",
+            variables: [{ name: variables[0].name, orderIndex: 0 }],
+          },
+          {
+            name: "Test_Category_MultiResponse",
+            description: "Testing multi_response category",
+            parentName: null,
+            orderIndex: 201,
+            category: "multi_response",
+            attributes: {
+              multiResponse: {
+                type: "dichotomies",
+                countedValue: 1,
+              },
+            },
+            variables: [{ name: variables[0].name, orderIndex: 0 }],
+          },
+          {
+            name: "Test_Category_Matrix",
+            description: "Testing matrix category",
+            parentName: null,
+            orderIndex: 202,
+            category: "matrix",
+            variables: [{ name: variables[0].name, orderIndex: 0 }],
+          },
+        ],
+      };
+
+      const importResponse = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
+        multipart: {
+          file: {
+            name: "category-test.json",
+            mimeType: "application/json",
+            buffer: Buffer.from(JSON.stringify(testExport)),
+          },
+        },
+      });
+
+      expect(importResponse.status()).toBe(200);
+      const importResult = await importResponse.json();
+
+      expect(importResult.success).toBe(true);
+      expect(importResult.summary.createdSets).toBe(3);
+
+      // Verify the imported data has correct categories
+      const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      const verifyExportData = (await verifyExportResponse.json()) as ExportData;
+
+      const generalSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_Category_General");
+      expect(generalSet).toBeDefined();
+      expect(generalSet!.category).toBe("general");
+
+      const multiResponseSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_Category_MultiResponse");
+      expect(multiResponseSet).toBeDefined();
+      expect(multiResponseSet!.category).toBe("multi_response");
+      expect(multiResponseSet!.attributes).toBeDefined();
+      expect(multiResponseSet!.attributes?.multiResponse).toBeDefined();
+      expect(multiResponseSet!.attributes?.multiResponse?.type).toBe("dichotomies");
+      expect(multiResponseSet!.attributes?.multiResponse?.countedValue).toBe(1);
+
+      const matrixSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_Category_Matrix");
+      expect(matrixSet).toBeDefined();
+      expect(matrixSet!.category).toBe("matrix");
+    });
+
+    test("import handles missing category field (backward compatibility)", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+      // First get existing variables from the dataset to use in the test
+      const existingExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      expect(existingExportResponse.status()).toBe(200);
+      const existingExportData = (await existingExportResponse.json()) as ExportData;
+
+      // Find a variableset with at least 1 variable
+      const setWithVars = existingExportData.variableSets.find((vs) => vs.variables && vs.variables.length >= 1);
+      expect(setWithVars).toBeDefined();
+
+      const variables = setWithVars!.variables.slice(0, 1);
+
+      // Create an old-format export without category field
+      const oldFormatExport = {
+        metadata: {
+          datasetId: testDatasetId,
+          datasetName: "Test Dataset",
+          exportedAt: new Date().toISOString(),
+          version: "2.0",
+        },
+        variableSets: [
+          {
+            name: "Test_No_Category",
+            description: "Testing backward compatibility",
+            parentName: null,
+            orderIndex: 300,
+            // category field intentionally missing
+            variables: [{ name: variables[0].name, orderIndex: 0 }],
+          },
+        ],
+      };
+
+      const importResponse = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
+        multipart: {
+          file: {
+            name: "backward-compat.json",
+            mimeType: "application/json",
+            buffer: Buffer.from(JSON.stringify(oldFormatExport)),
+          },
+        },
+      });
+
+      expect(importResponse.status()).toBe(200);
+      const importResult = await importResponse.json();
+
+      expect(importResult.success).toBe(true);
+      expect(importResult.summary.createdSets).toBe(1);
+
+      // Verify the imported data defaults to "general" category
+      const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      const verifyExportData = (await verifyExportResponse.json()) as ExportData;
+
+      const importedSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_No_Category");
+      expect(importedSet).toBeDefined();
+      expect(importedSet!.category).toBe("general");
     });
   });
 });

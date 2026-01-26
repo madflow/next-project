@@ -2,7 +2,11 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { dataset, datasetVariable, datasetVariableset, datasetVariablesetItem } from "@repo/database/schema";
-import type { DatasetVariablesetItemAttributes } from "@repo/database/schema";
+import type {
+  DatasetVariablesetAttributes,
+  DatasetVariablesetCategory,
+  DatasetVariablesetItemAttributes,
+} from "@repo/database/schema";
 import type {
   VariableItemExport,
   VariableSetExport,
@@ -34,6 +38,8 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
       setDescription: datasetVariableset.description,
       setParentId: datasetVariableset.parentId,
       setOrderIndex: datasetVariableset.orderIndex,
+      setCategory: datasetVariableset.category,
+      setAttributes: datasetVariableset.attributes,
       variableName: datasetVariable.name,
       variableOrderIndex: datasetVariablesetItem.orderIndex,
       variableAttributes: datasetVariablesetItem.attributes,
@@ -66,6 +72,8 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
       description: string | null;
       parentId: string | null;
       orderIndex: number;
+      category: DatasetVariablesetCategory;
+      attributes: DatasetVariablesetAttributes | null;
       variables: VariableItemExport[];
     }
   >();
@@ -77,6 +85,8 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
         description: row.setDescription,
         parentId: row.setParentId,
         orderIndex: row.setOrderIndex,
+        category: row.setCategory,
+        attributes: row.setAttributes,
         variables: [],
       });
     }
@@ -100,6 +110,8 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
     description: set.description,
     parentName: set.parentId ? parentMap.get(set.parentId) || null : null,
     orderIndex: set.orderIndex,
+    category: set.category,
+    attributes: set.attributes,
     variables: set.variables.sort((a, b) => a.orderIndex - b.orderIndex), // Sort variables by orderIndex
   }));
 
@@ -223,6 +235,8 @@ export async function importVariableSets(
             description: importSet.description,
             datasetId,
             orderIndex: importSet.orderIndex,
+            category: importSet.category || "general",
+            attributes: importSet.attributes || null,
             // parentId will be set in second pass
           })
           .returning({ id: datasetVariableset.id });

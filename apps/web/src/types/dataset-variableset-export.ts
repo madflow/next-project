@@ -20,6 +20,18 @@ export const VariableSetExportSchema = z.object({
   description: z.string().nullable(),
   parentName: z.string().nullable(),
   orderIndex: z.number(),
+  category: z.enum(["general", "multi_response", "matrix"]).default("general"),
+  attributes: z
+    .object({
+      multiResponse: z
+        .object({
+          type: z.enum(["dichotomies", "categories"]),
+          countedValue: z.number(),
+        })
+        .optional(),
+    })
+    .nullable()
+    .optional(),
   variables: z.array(VariableItemExportSchema),
 });
 
