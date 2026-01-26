@@ -423,7 +423,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       // Verify each variableset has category field
       for (const variableSet of exportData.variableSets) {
         expect(variableSet.category).toBeDefined();
-        expect(["general", "multi_response", "matrix"]).toContain(variableSet.category);
+        expect(["general", "multi_response"]).toContain(variableSet.category);
       }
     });
 
@@ -449,8 +449,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       // Generate unique names and collect them
       const generalName = `Test_Category_General_${uniqueSuffix}`;
       const multiResponseName = `Test_Category_MultiResponse_${uniqueSuffix}`;
-      const matrixName = `Test_Category_Matrix_${uniqueSuffix}`;
-      createdSets.push(generalName, multiResponseName, matrixName);
+      createdSets.push(generalName, multiResponseName);
 
       // Create test data with different categories
       const testExport: ExportData = {
@@ -483,14 +482,6 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
             },
             variables: [{ name: variables[0].name, orderIndex: 0 }],
           },
-          {
-            name: matrixName,
-            description: "Testing matrix category",
-            parentName: null,
-            orderIndex: 202,
-            category: "matrix",
-            variables: [{ name: variables[0].name, orderIndex: 0 }],
-          },
         ],
       };
 
@@ -508,7 +499,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       const importResult = await importResponse.json();
 
       expect(importResult.success).toBe(true);
-      expect(importResult.summary.createdSets).toBe(3);
+      expect(importResult.summary.createdSets).toBe(2);
 
       // Verify the imported data has correct categories
       const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
@@ -525,10 +516,6 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       expect(multiResponseSet!.attributes?.multiResponse).toBeDefined();
       expect(multiResponseSet!.attributes?.multiResponse?.type).toBe("dichotomies");
       expect(multiResponseSet!.attributes?.multiResponse?.countedValue).toBe(1);
-
-      const matrixSet = verifyExportData.variableSets.find((vs) => vs.name === matrixName);
-      expect(matrixSet).toBeDefined();
-      expect(matrixSet!.category).toBe("matrix");
     });
 
     test("import handles missing category field (backward compatibility)", async ({ page }, testInfo) => {

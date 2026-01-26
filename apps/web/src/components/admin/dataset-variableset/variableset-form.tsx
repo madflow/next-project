@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 
-const CATEGORY_OPTIONS = ["general", "multi_response", "matrix"] as const;
+const CATEGORY_OPTIONS = ["general", "multi_response"] as const;
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
