@@ -387,6 +387,9 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       // Take the first variable
       const variables = setWithVars!.variables.slice(0, 1);
 
+      // Use timestamp to create unique names
+      const timestamp = Date.now();
+
       // Create test data with different categories
       const testExport: ExportData = {
         metadata: {
@@ -397,7 +400,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
         },
         variableSets: [
           {
-            name: "Test_Category_General",
+            name: `Test_Category_General_${timestamp}`,
             description: "Testing general category",
             parentName: null,
             orderIndex: 200,
@@ -405,7 +408,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
             variables: [{ name: variables[0].name, orderIndex: 0 }],
           },
           {
-            name: "Test_Category_MultiResponse",
+            name: `Test_Category_MultiResponse_${timestamp}`,
             description: "Testing multi_response category",
             parentName: null,
             orderIndex: 201,
@@ -419,7 +422,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
             variables: [{ name: variables[0].name, orderIndex: 0 }],
           },
           {
-            name: "Test_Category_Matrix",
+            name: `Test_Category_Matrix_${timestamp}`,
             description: "Testing matrix category",
             parentName: null,
             orderIndex: 202,
@@ -449,11 +452,13 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
       const verifyExportData = (await verifyExportResponse.json()) as ExportData;
 
-      const generalSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_Category_General");
+      const generalSet = verifyExportData.variableSets.find((vs) => vs.name === `Test_Category_General_${timestamp}`);
       expect(generalSet).toBeDefined();
       expect(generalSet!.category).toBe("general");
 
-      const multiResponseSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_Category_MultiResponse");
+      const multiResponseSet = verifyExportData.variableSets.find(
+        (vs) => vs.name === `Test_Category_MultiResponse_${timestamp}`
+      );
       expect(multiResponseSet).toBeDefined();
       expect(multiResponseSet!.category).toBe("multi_response");
       expect(multiResponseSet!.attributes).toBeDefined();
@@ -461,7 +466,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       expect(multiResponseSet!.attributes?.multiResponse?.type).toBe("dichotomies");
       expect(multiResponseSet!.attributes?.multiResponse?.countedValue).toBe(1);
 
-      const matrixSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_Category_Matrix");
+      const matrixSet = verifyExportData.variableSets.find((vs) => vs.name === `Test_Category_Matrix_${timestamp}`);
       expect(matrixSet).toBeDefined();
       expect(matrixSet!.category).toBe("matrix");
     });
@@ -481,6 +486,9 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
 
       const variables = setWithVars!.variables.slice(0, 1);
 
+      // Use timestamp to create unique name
+      const timestamp = Date.now();
+
       // Create an old-format export without category field
       const oldFormatExport = {
         metadata: {
@@ -491,7 +499,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
         },
         variableSets: [
           {
-            name: "Test_No_Category",
+            name: `Test_No_Category_${timestamp}`,
             description: "Testing backward compatibility",
             parentName: null,
             orderIndex: 300,
@@ -521,7 +529,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       const verifyExportResponse = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
       const verifyExportData = (await verifyExportResponse.json()) as ExportData;
 
-      const importedSet = verifyExportData.variableSets.find((vs) => vs.name === "Test_No_Category");
+      const importedSet = verifyExportData.variableSets.find((vs) => vs.name === `Test_No_Category_${timestamp}`);
       expect(importedSet).toBeDefined();
       expect(importedSet!.category).toBe("general");
     });
