@@ -17,11 +17,6 @@ A comprehensive list of improvements identified across code organization, qualit
 
 ### High Priority
 
-- [ ] **Consolidate duplicate client files in database package**
-  - Files: `packages/database/src/clients/default.ts`, `packages/database/src/clients/admin.ts`
-  - Issue: Both files are 100% identical but should have different connection strings
-  - Fix: Create separate admin connection using `DATABASE_ADMIN_URL`
-
 - [x] **Create authorization wrapper for server actions**
   - Files: `apps/web/src/actions/dataset.ts` (lines 27-37, 68-78, 90-100, 118-128)
   - Issue: Same auth+session check code is copy-pasted 4+ times
@@ -48,26 +43,14 @@ A comprehensive list of improvements identified across code organization, qualit
 
 ### Medium Priority
 
-- [ ] **Move form schemas to shared location**
-  - Files: `apps/web/src/components/admin/project/create-project-form.tsx`, `edit-project-form.tsx`, etc.
-  - Fix: Create `src/schemas/project.ts`, `src/schemas/organization.ts`
-
 - [x] **Fix Project type duplication**
   - Files: `apps/web/src/context/app-context.tsx` (lines 9-14), `src/hooks/use-active-project.ts` (lines 7-12)
   - Fix: Import from `src/types/project.ts` which re-exports from database package
-
-- [ ] **Organize e2e tests into subdirectories**
-  - Current: Flat structure with prefix naming (`admin-*`, `api-*`, `auth-*`)
-  - Fix: Create `tests/admin/`, `tests/api/`, `tests/auth/`, `tests/adhoc/`
 
 - [x] **Extract S3 download logic in Python**
   - File: `apps/analysis/analysis/web/api/datasets/routes.py` (lines 99-171)
   - Issue: `_read_sav_from_s3` and `_read_dataframe_from_s3` share identical S3 download code
   - Fix: Create `@contextmanager _download_sav_from_s3()` helper
-
-- [ ] **Split large schema files**
-  - Files: `packages/database/src/schema/auth.ts` (211 lines), `app.ts` (298 lines)
-  - Fix: Split into domain-specific files: `schema/auth/user.ts`, `schema/auth/session.ts`, etc.
 
 ### Low Priority
 
@@ -146,12 +129,6 @@ A comprehensive list of improvements identified across code organization, qualit
 
 ### Low Priority
 
-- [ ] **Remove unused imports in tests**
-  - File: `apps/analysis/analysis/tests/web/test_routes.py` (line 1: `import json`)
-
-- [ ] **Fix unused `isPending` variable**
-  - File: `apps/web/src/components/admin/dataset/upload-form.tsx` (line 64)
-
 - [ ] **Replace console.error with logging utility**
   - Files: Multiple (upload-form.tsx, create-project-form.tsx, dal/dataset.ts)
   - Fix: Create `src/lib/logger.ts` with structured logging
@@ -220,28 +197,19 @@ A comprehensive list of improvements identified across code organization, qualit
 
 ### Medium Priority
 
-- [ ] **Sanitize LIKE query inputs**
+- [x] **Sanitize LIKE query inputs**
   - File: `apps/web/src/dal/dataset-variableset.ts` (line 126)
   - Issue: `%${search}%` could cause issues with special LIKE characters
   - Fix: Escape special characters (`%`, `_`, `\`)
 
-- [ ] **Secure file extension extraction**
+- [x] **Secure file extension extraction**
   - Files: `apps/web/src/lib/storage.ts` (line 41), `src/actions/avatar.ts` (line 51)
   - Issue: Uses `.split(".").pop()` on user-provided filename
   - Fix: Validate against whitelist of allowed extensions
 
-- [ ] **Fix health check HTTP status codes**
-  - File: `apps/analysis/analysis/web/api/health.py` (lines 87-119)
-  - Issue: Status code calculated but always returns 200 OK
-  - Fix: Use `response.status_code = status_code`
-
 - [ ] **Review Sentry PII settings**
   - File: `apps/analysis/analysis/web/application.py` (line 19)
   - Issue: `send_default_pii=True` may expose sensitive user data
-
-- [ ] **Disable insecure SMTP auth**
-  - File: `docker-compose.yml` (lines 127-128)
-  - Issue: `MP_SMTP_AUTH_ALLOW_INSECURE: 1`
 
 ### Low Priority
 
@@ -318,44 +286,3 @@ A comprehensive list of improvements identified across code organization, qualit
   - Form validation (required fields, email format)
   - Session expiry handling
   - Pagination edge cases (last page, empty results)
-
----
-
-## Summary by Priority
-
-| Priority  | Count  | Categories                                   |
-| --------- | ------ | -------------------------------------------- |
-| Critical  | 4      | Security                                     |
-| High      | 22     | Organization, Quality, Security, Testability |
-| Medium    | 18     | Organization, Quality, Security, Testability |
-| Low       | 11     | Organization, Quality, Security, Testability |
-| **Total** | **55** |                                              |
-
----
-
-## Suggested Implementation Order
-
-1. **Week 1: Security Critical**
-   - Enable rate limiting
-   - Require secrets in production
-   - Fix assertUserIsAdmin await
-   - Add authorization to actions
-
-2. **Week 2: Code Quality Critical**
-   - Fix session management in Python
-   - Add environment validation
-   - Replace `any` types with proper types
-
-3. **Week 3: Organization**
-   - Create authorization wrapper
-   - Extract common hooks and components
-   - Consolidate database clients
-
-4. **Week 4: Testing**
-   - Create API test factory
-   - Create auth fixtures
-   - Replace hardcoded waits
-
-5. **Ongoing**
-   - Address medium and low priority items
-   - Add missing tests as features change

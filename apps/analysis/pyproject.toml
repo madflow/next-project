@@ -45,8 +45,6 @@ src_paths = ["analysis"]
 [tool.mypy]
 strict = true
 ignore_missing_imports = true
-allow_subclassing_any = true
-allow_untyped_calls = true
 pretty = true
 show_error_codes = true
 implicit_reexport = true
@@ -64,9 +62,13 @@ filterwarnings = [
 env = ["ANALYSIS_ENVIRONMENT=pytest", "ANALYSIS_DB_BASE=analysis_test"]
 
 [tool.ruff]
+line-length = 88
+exclude = ["analysis/db/migrations", ".venv/"]
+
 # List of enabled rulsets.
 # See https://docs.astral.sh/ruff/rules/ for more information.
-lint.select = [
+[tool.ruff.lint]
+select = [
   "E",   # Error
   "F",   # Pyflakes
   "W",   # Pycodestyle
@@ -93,7 +95,7 @@ lint.select = [
   "PL",  # PyLint checks
   "RUF", # Specific to Ruff checks
 ]
-lint.ignore = [
+ignore = [
   "D101",
   "D105",    # Missing docstring in magic method
   "D107",    # Missing docstring in __init__
@@ -111,12 +113,12 @@ lint.ignore = [
   "PLR0913", # Too many arguments for function call
   "D106",    # Missing docstring in public nested class
 ]
-exclude = ["analysis/db/migrations", ".venv/"]
-lint.mccabe = { max-complexity = 10 }
-line-length = 88
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = [
+"**/tests/**" = [
   "S101", # Use of assert detected
 ]
 
@@ -126,32 +128,6 @@ ignore-decorators = ["typing.overload"]
 
 [tool.ruff.lint.pylint]
 allow-magic-value-types = ["int", "str", "float", "bytes"]
-
-
-[fastapi-template.options]
-project_name = "analysis"
-api_type = "rest"
-enable_redis = "None"
-enable_rmq = "None"
-ci_type = "github"
-enable_migrations = "None"
-enable_taskiq = "None"
-enable_kube = "None"
-kube_name = "analysis"
-enable_routers = "None"
-enable_kafka = "None"
-enable_loguru = "None"
-traefik_labels = "None"
-add_dummy = "None"
-orm = "sqlalchemy"
-self_hosted_swagger = "None"
-prometheus_enabled = "None"
-sentry_enabled = "None"
-otlp_enabled = "None"
-gunicorn = "True"
-add_users = "None"
-cookie_auth = "None"
-jwt_auth = "None"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
