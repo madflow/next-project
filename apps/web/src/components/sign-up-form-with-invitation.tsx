@@ -13,8 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { env } from "@/env";
-import { Locale } from "@/i18n/config";
+import { Locale, locales } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
 interface SignUpFormWithInvitationProps {
@@ -31,6 +32,25 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
   const t = useTranslations();
   const router = useRouter();
 
+  // Auto-detect browser language
+  const getBrowserLocale = (): Locale => {
+    if (typeof window === "undefined") return locale;
+
+    const browserLanguages = window.navigator.languages || [window.navigator.language];
+    const availableLocales = locales;
+
+    for (const lang of browserLanguages) {
+      const baseLang = lang.split("-")[0];
+      if (availableLocales.includes(baseLang as Locale)) {
+        return baseLang as Locale;
+      }
+    }
+
+    return locale;
+  };
+
+  const browserLocale = getBrowserLocale();
+
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -38,6 +58,7 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
       name: "",
       password: "",
       confirmPassword: "",
+      locale: browserLocale,
     },
   });
 
@@ -47,6 +68,7 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
       name: values.name,
       password: values.password,
       callbackURL: new URL("/auth/verify-email", env.NEXT_PUBLIC_BASE_URL).toString(),
+      locale: values.locale,
     });
 
     form.reset();
@@ -148,6 +170,31 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
                         />
                       </FieldGroup>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Controller
+                  name="locale"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel htmlFor="locale">{t("signUp.form.language")}</FieldLabel>
+                      <FieldGroup>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <SelectTrigger id="locale" data-testid="auth.sign-up.form.language">
+                            <SelectValue placeholder={t("localeSwitcher.selectLanguage")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {locales.map((lang) => (
+                              <SelectItem key={lang} value={lang}>
+                                {t(`localeSwitcher.languages.${lang}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldGroup>
                     </Field>
                   )}
                 />
