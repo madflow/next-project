@@ -5,3 +5,5 @@ packages:
 minimumReleaseAgeExclude:
   # Renovate security update: next@16.1.5
   - next@16.1.5
+  # Renovate security update: pnpm@10.28.2
+  - pnpm@10.28.2
