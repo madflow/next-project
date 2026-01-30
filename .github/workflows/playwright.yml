@@ -108,6 +108,10 @@ jobs:
         run: cp ./apps/web/.env.dist ./apps/web/.env && cp ./packages/database/.env.dist ./packages/database/.env && cp ./apps/analysis/.env.dist ./apps/analysis/.env
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
       - name: Install Python deps
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
