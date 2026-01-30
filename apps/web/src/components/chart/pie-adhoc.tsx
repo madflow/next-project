@@ -3,14 +3,7 @@
 import { DownloadIcon } from "lucide-react";
 import { Cell, LabelList, Pie, PieChart } from "recharts";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
@@ -39,7 +32,20 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
     };
   });
 
-  console.log(rechartsData);
+  // Render custom legend that preserves the data order (sorted by numeric value)
+  const renderOrderedLegend = () => (
+    <div className="flex -translate-y-2 flex-wrap items-center justify-center gap-4 pt-3 *:basis-1/4 *:justify-center">
+      {rechartsData.map((item, index) => {
+        const colorIndex = (index % 6) + 1;
+        return (
+          <div key={item.label} className="flex items-center gap-1.5">
+            <div className="h-2 w-2 shrink-0 rounded-[2px]" style={{ backgroundColor: `var(--chart-${colorIndex})` }} />
+            <span className="text-xs">{item.label}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
 
   return (
     <Card className="shadow-xs" {...props}>
@@ -63,11 +69,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
                 return <Cell key={`cell-${index}`} fill={`var(--chart-${colorIndex})`} />;
               })}
             </Pie>
-            <ChartLegend
-              fontSize={10}
-              content={<ChartLegendContent nameKey="label" />}
-              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-            />
+            <ChartLegend fontSize={10} content={renderOrderedLegend} />
           </PieChart>
         </ChartContainer>
       </CardContent>
