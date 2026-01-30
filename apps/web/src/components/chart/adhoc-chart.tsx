@@ -23,14 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAppContext } from "@/context/app-context";
@@ -321,6 +314,18 @@ export function AdhocChart({
           };
         });
 
+        // Render custom legend that preserves the data order (sorted by numeric value)
+        const renderOrderedLegend = () => (
+          <div className="flex -translate-y-2 flex-wrap items-center justify-center gap-4 pt-3 *:basis-1/4 *:justify-center">
+            {pieData.map((item) => (
+              <div key={item.label} className="flex items-center gap-1.5">
+                <div className="h-2 w-2 shrink-0 rounded-[2px]" style={{ backgroundColor: item.fill }} />
+                <span className="text-xs">{item.label}</span>
+              </div>
+            ))}
+          </div>
+        );
+
         return (
           <ChartContainer config={pieChartConfig} ref={ref} data-export-filename={variable.name}>
             <PieChart>
@@ -337,11 +342,7 @@ export function AdhocChart({
                   formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
                 />
               </Pie>
-              <ChartLegend
-                fontSize={10}
-                content={<ChartLegendContent nameKey="label" />}
-                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-              />
+              <ChartLegend fontSize={10} content={renderOrderedLegend} />
             </PieChart>
           </ChartContainer>
         );
