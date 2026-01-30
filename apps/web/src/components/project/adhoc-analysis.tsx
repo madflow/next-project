@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Suspense, useEffect, useState } from "react";
 import { useThemeConfig } from "@/components/active-theme";
 import { DatasetSelect } from "@/components/form/dataset-select";
+import { OrganizationThemeStyleInjector } from "@/context/organization-theme-context";
 import { useAdhocPersistence } from "@/hooks/use-adhoc-persistence";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
 import { type Project } from "@/types/project";
@@ -20,7 +21,7 @@ type AdHocAnalysisProps = {
 
 export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const t = useTranslations("projectAdhocAnalysis");
-  const { setActiveTheme } = useThemeConfig();
+  const { activeTheme, setActiveTheme } = useThemeConfig();
   const { restoreState, saveDataset, saveCurrentSelection } = useAdhocPersistence(project.id);
 
   // Initialize state from localStorage
@@ -120,6 +121,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
 
   return (
     <div className="theme-container flex gap-4">
+      <OrganizationThemeStyleInjector activeTheme={activeTheme} />
       <div className="flex w-64 max-w-64 min-w-64 flex-col gap-4">
         <DatasetSelect
           projectId={project.id}
