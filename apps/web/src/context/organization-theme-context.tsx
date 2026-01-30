@@ -225,3 +225,49 @@ export function useOrganizationTheme() {
   }
   return context;
 }
+
+/**
+ * Component that injects organization theme chart colors as CSS custom properties.
+ *
+ * When an organization custom theme is active, this component renders a <style> tag
+ * that sets --chart-1 through --chart-6 CSS variables on the .theme-container element.
+ *
+ * This is necessary because organization themes are dynamically defined (stored in the database),
+ * unlike predefined themes which have static CSS in themes.css.
+ *
+ * Usage: Place this component inside the .theme-container element in adhoc analysis views.
+ */
+export function OrganizationThemeStyleInjector({ activeTheme }: { activeTheme: string }) {
+  const { resolveTheme } = useOrganizationTheme();
+
+  const { theme, isOrganizationTheme } = resolveTheme(activeTheme);
+
+  // Only inject styles for organization themes
+  // Predefined themes (default, blue, green, etc.) are handled by themes.css
+  if (!isOrganizationTheme || !theme.chartColors) {
+    return null;
+  }
+
+  // Generate CSS that sets chart color variables on .theme-container
+  const cssVariables = Object.entries(theme.chartColors)
+    .map(([key, value]) => `  --${key}: ${value};`)
+    .join("\n");
+
+  // Sanitize theme name for CSS class selector
+  const sanitizedThemeName = activeTheme
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-_]/g, "");
+
+  const cssContent = `.theme-${sanitizedThemeName} .theme-container {
+${cssVariables}
+}`;
+
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: cssContent,
+      }}
+    />
+  );
+}
