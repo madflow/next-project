@@ -1,4 +1,6 @@
 ---
+name: deslopify
+mode: subagent
 description: Remove AI code slop
 ---
 
