@@ -31,7 +31,6 @@ async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
 }
 
 async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]> {
-  // Get all variablesets for the dataset with variable counts
   const variablesets = await db
     .select({
       id: entity.id,
@@ -57,11 +56,9 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
     )
     .orderBy(entity.orderIndex, entity.id);
 
-  // Build hierarchy tree
   const nodeMap = new Map<string, VariablesetTreeNode>();
   const rootNodes: VariablesetTreeNode[] = [];
 
-  // First pass: create all nodes
   for (const set of variablesets) {
     const node: VariablesetTreeNode = {
       category: set.category,
@@ -78,7 +75,6 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
     nodeMap.set(set.id, node);
   }
 
-  // Second pass: build hierarchy and calculate levels
   for (const node of nodeMap.values()) {
     if (node.parentId) {
       const parent = nodeMap.get(node.parentId);
@@ -86,7 +82,6 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
         node.level = parent.level + 1;
         parent.children.push(node);
       } else {
-        // Parent not found, treat as root
         rootNodes.push(node);
       }
     } else {
@@ -131,10 +126,8 @@ async function removeFn(id: string) {
 async function getVariablesInSetFn(variablesetId: string, options: ListOptions = {}) {
   const { search } = options;
 
-  // Build where conditions
   const whereConditions = [eq(datasetVariablesetItem.variablesetId, variablesetId)];
 
-  // Add search if provided
   if (search) {
     const searchConditions = [ilike(datasetVariable.name, `%${search}%`), ilike(datasetVariable.label, `%${search}%`)];
     const searchOr = or(...searchConditions);
@@ -178,10 +171,8 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
 async function getUnassignedVariablesFn(datasetId: string, options: ListOptions = {}) {
   const { search } = options;
 
-  // Build where conditions
   const whereConditions = [eq(datasetVariable.datasetId, datasetId), isNull(datasetVariablesetItem.variableId)];
 
-  // Add search if provided
   if (search) {
     const searchConditions = [ilike(datasetVariable.name, `%${search}%`), ilike(datasetVariable.label, `%${search}%`)];
     const searchOr = or(...searchConditions);
@@ -192,7 +183,6 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
 
   const whereCondition = whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions);
 
-  // Get variables that are not assigned to any variableset
   const query = db
     .select({
       id: datasetVariable.id,
@@ -223,7 +213,6 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
 }
 
 async function addVariableToSetFn(variablesetId: string, variableId: string, orderIndex?: number) {
-  // Check if variable is already in the set
   const existing = await db
     .select()
     .from(datasetVariablesetItem)
@@ -236,7 +225,6 @@ async function addVariableToSetFn(variablesetId: string, variableId: string, ord
     throw new DalException("Variable is already assigned to this set");
   }
 
-  // If no order index provided, append to end
   if (orderIndex === undefined) {
     const maxOrder = await db
       .select({ maxOrder: sql<number>`COALESCE(MAX(${datasetVariablesetItem.orderIndex}), -1)` })
@@ -290,7 +278,6 @@ async function updateVariablesetItemAttributesFn(
 }
 
 async function reorderVariablesetsFn(datasetId: string, parentId: string | null, reorderedIds: string[]) {
-  // Verify all IDs belong to the dataset and have the same parent
   const variablesets = await db
     .select()
     .from(entity)
@@ -303,7 +290,6 @@ async function reorderVariablesetsFn(datasetId: string, parentId: string | null,
     throw new DalException("Some variablesets do not belong to the specified parent");
   }
 
-  // Update order indexes in a transaction
   await db.transaction(async (tx) => {
     for (let i = 0; i < reorderedIds.length; i++) {
       const id = reorderedIds[i];
@@ -322,7 +308,6 @@ async function reorderVariablesetsFn(datasetId: string, parentId: string | null,
 }
 
 async function reorderVariablesetItemsFn(variablesetId: string, reorderedVariableIds: string[]) {
-  // Verify all variable IDs are in the variableset
   const items = await db
     .select()
     .from(datasetVariablesetItem)
@@ -335,7 +320,6 @@ async function reorderVariablesetItemsFn(variablesetId: string, reorderedVariabl
     throw new DalException("Some variables do not belong to the specified variableset");
   }
 
-  // Update order indexes in a transaction
   await db.transaction(async (tx) => {
     for (let i = 0; i < reorderedVariableIds.length; i++) {
       const variableId = reorderedVariableIds[i];
@@ -355,7 +339,6 @@ async function reorderVariablesetItemsFn(variablesetId: string, reorderedVariabl
   return { success: true };
 }
 
-// Exported functions with appropriate auth checks
 export const listByDataset = withSessionCheck(listByDatasetFn);
 export const getHierarchy = withSessionCheck(getHierarchyFn);
 export const find = withSessionCheck(findFn);

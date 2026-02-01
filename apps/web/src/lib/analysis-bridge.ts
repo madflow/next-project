@@ -3,23 +3,17 @@ import { getVariableLabel } from "@/lib/variable-helpers";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
 
-// Helper function to sort categories in ascending order (numeric if possible, otherwise alphabetic)
 function sortCategoriesAscending(categories: string[]): string[] {
   return [...categories].sort((a, b) => {
-    try {
-      const numA = parseFloat(a);
-      const numB = parseFloat(b);
-      if (!isNaN(numA) && !isNaN(numB)) {
-        return numA - numB; // Numeric sort
-      }
-    } catch {
-      // Fall back to string sort
+    const numA = parseFloat(a);
+    const numB = parseFloat(b);
+    if (!isNaN(numA) && !isNaN(numB)) {
+      return numA - numB;
     }
-    return a.localeCompare(b); // String sort
+    return a.localeCompare(b);
   });
 }
 
-// Helper function to check if stats data is split variable format
 export function isSplitVariableStats(stats: unknown): stats is {
   split_variable: string;
   categories: Record<string, VariableStats>;
@@ -28,12 +22,10 @@ export function isSplitVariableStats(stats: unknown): stats is {
   return Boolean(stats && typeof stats === "object" && "split_variable" in stats && "categories" in stats);
 }
 
-// Helper function to get stats for single variable (handles both normal and split variable formats)
 export function extractVariableStats(variableConfig: DatasetVariable, statsData: StatsResponse): VariableStats | null {
   const targetVariable = statsData.find((item) => item.variable === variableConfig.name);
   if (!targetVariable) return null;
 
-  // If it's split variable data, return the first category for now (could be enhanced later)
   if (isSplitVariableStats(targetVariable.stats)) {
     const categories = Object.keys(targetVariable.stats.categories);
     if (categories.length > 0) {
@@ -65,8 +57,8 @@ export function transformToRechartsBarData(variableConfig: DatasetVariable, stat
   const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
 
   const rechartsData = sortedFrequencyTable.map((item) => {
-    const valueKey = item.value.toString() as keyof typeof valueLabels; // Convert to string to match valueLabels keys
-    const label = valueLabels[valueKey] || item.value; // Fallback if label not found
+    const valueKey = item.value.toString() as keyof typeof valueLabels;
+    const label = valueLabels[valueKey] || item.value;
 
     return {
       label: label,
@@ -84,8 +76,8 @@ export function transformToRechartsPieData(variableConfig: DatasetVariable, stat
 
   const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
   const rechartsData = sortedFrequencyTable.map((item, index) => {
-    const valueKey = item.value.toString() as keyof typeof valueLabels; // Convert to string to match valueLabels keys
-    const label = valueLabels[valueKey] || item.value; // Fallback if label not found
+    const valueKey = item.value.toString() as keyof typeof valueLabels;
+    const label = valueLabels[valueKey] || item.value;
 
     return {
       label: label,
@@ -112,9 +104,8 @@ export function transformToRechartsStackedBarData(variableConfig: DatasetVariabl
       label: label,
       value: item.value,
       count: item.counts,
-      percentage: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
-      // Add individual percentage for stacking
-      stackValue: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
+      percentage: Math.round(item.percentages * 100) / 100,
+      stackValue: Math.round(item.percentages * 100) / 100,
       fill: `var(--chart-${(index % 6) + 1})`,
     };
   });
@@ -122,22 +113,19 @@ export function transformToRechartsStackedBarData(variableConfig: DatasetVariabl
   return rechartsData;
 }
 
-// New function for split variable stacked bar data
 export function transformToSplitVariableStackedBarData(variableConfig: DatasetVariable, statsData: StatsResponse) {
   const targetVariable = statsData.find((item) => item.variable === variableConfig.name);
   if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
-    return []; // Return empty if not split variable data
+    return [];
   }
 
   const valueLabels = variableConfig.valueLabels ?? {};
   const splitStats = targetVariable.stats;
   const splitVariableLabels = splitStats.split_variable_labels || {};
 
-  // Get categories and sort them in ascending order
   const categories = Object.keys(splitStats.categories);
   const sortedCategories = sortCategoriesAscending(categories);
 
-  // Create a separate bar for each split category
   const rechartsData = sortedCategories
     .map((category, categoryIndex) => {
       const categoryStats = splitStats.categories[category];
@@ -149,14 +137,13 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
 
         return {
           segment: `segment${itemIndex}`,
-          value: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
+          value: Math.round(item.percentages * 100) / 100,
           label: label,
           count: item.counts,
           color: `var(--chart-${(itemIndex % 6) + 1})`,
         };
       });
 
-      // Use split variable label if available, otherwise use category key
       const categoryLabel = splitVariableLabels[category] || category;
 
       return {
@@ -171,9 +158,6 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
   return rechartsData;
 }
 
-// Transform multiple variables into multi-response chart data
-// Extracts only value={countedValue} percentages from each variable
-// This function expects simple (non-split) stats data only
 export function transformToMultiResponseData(
   variables: Array<DatasetVariable & { orderIndex?: number | null }>,
   statsData: Record<string, StatsResponse>,
@@ -191,8 +175,6 @@ export function transformToMultiResponseData(
         return null;
       }
 
-      // This function should only receive simple stats (no splits)
-      // If split stats are detected, throw an error as this indicates incorrect usage
       if (isSplitVariableStats(targetVariable.stats)) {
         throw new Error(
           `transformToMultiResponseData received split stats for variable ${variable.name}. ` +
@@ -205,8 +187,6 @@ export function transformToMultiResponseData(
         return null;
       }
 
-      // Find the frequency item where value equals the configured counted value
-      // Handle both integer and float formats (e.g., 1 matches both "1" and "1.0")
       const valueItem = variableStats.frequency_table.find((item) => matchesCountedValue(item.value, countedValue));
 
       const percentage = valueItem ? valueItem.percentages : 0;
@@ -215,13 +195,12 @@ export function transformToMultiResponseData(
       return {
         label: getVariableLabel(variable),
         variableName: variable.name,
-        percentage: Math.round(percentage * 100) / 100, // Round to 2 decimal places
+        percentage: Math.round(percentage * 100) / 100,
         count: count,
         orderIndex: variable.orderIndex ?? 0,
       };
     })
     .filter((item): item is NonNullable<typeof item> => item !== null)
-    // Sort by orderIndex ascending (lowest first)
     .sort((a, b) => a.orderIndex - b.orderIndex);
 
   return rechartsData;
@@ -241,7 +220,6 @@ function findCountedValueInFrequencyTable(
   return stats.frequency_table.find((item) => matchesCountedValue(item.value, countedValue));
 }
 
-// Transform single multi-response variable to show only countedValue
 export function transformToMultiResponseIndividualBarData(
   variableConfig: DatasetVariable,
   statsData: StatsResponse,
@@ -249,10 +227,9 @@ export function transformToMultiResponseIndividualBarData(
 ) {
   const valueItem = findCountedValueInFrequencyTable(variableConfig, statsData, countedValue);
 
-  // Return 0% bar if value not found
   return [
     {
-      label: "", // Empty label - we don't show the value label
+      label: "",
       value: countedValue,
       count: valueItem ? valueItem.counts : 0,
       percentage: valueItem ? valueItem.percentages : 0,
@@ -260,7 +237,6 @@ export function transformToMultiResponseIndividualBarData(
   ];
 }
 
-// Transform multi-response variable with split variable (stacked bars)
 export function transformToMultiResponseIndividualStackedBarData(
   variableConfig: DatasetVariable,
   statsData: StatsResponse,
@@ -274,17 +250,14 @@ export function transformToMultiResponseIndividualStackedBarData(
   const splitStats = targetVariable.stats;
   const splitVariableLabels = splitStats.split_variable_labels || {};
 
-  // Get categories and sort them in ascending order
   const categories = Object.keys(splitStats.categories);
   const sortedCategories = sortCategoriesAscending(categories);
 
-  // For each split category, extract only the countedValue
   const rechartsData = sortedCategories
     .map((category, categoryIndex) => {
       const categoryStats = splitStats.categories[category];
       if (!categoryStats?.frequency_table) return null;
 
-      // Find the counted value in this category's frequency table
       const valueItem = categoryStats.frequency_table.find((item) => matchesCountedValue(item.value, countedValue));
 
       const categoryLabel = splitVariableLabels[category] || category;
@@ -297,9 +270,9 @@ export function transformToMultiResponseIndividualStackedBarData(
           {
             segment: "counted",
             value: valueItem ? valueItem.percentages : 0,
-            label: "\u200B", // Zero-width space - don't show value label but avoid fallback to dataKey
+            label: "\u200B",
             count: valueItem ? valueItem.counts : 0,
-            color: `var(--chart-1)`, // Single color
+            color: `var(--chart-1)`,
           },
         ],
       };

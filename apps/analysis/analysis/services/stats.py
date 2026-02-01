@@ -126,11 +126,9 @@ class StatisticsService:
         if missing_ranges is None:
             return data
 
-        # Make a copy to avoid modifying the original data
         data = data.copy()
         variable = data[variable_name]
 
-        # Apply each range for this variable
         for range_obj in missing_ranges:
             if (
                 not isinstance(range_obj, dict)
@@ -142,10 +140,8 @@ class StatisticsService:
             lo = range_obj["lo"]
             hi = range_obj["hi"]
 
-            # Create mask for values within the range (inclusive)
             mask = (variable >= lo) & (variable <= hi)
 
-            # Replace values within range with pd.NA
             data.loc[mask, variable_name] = pd.NA
 
         return data
@@ -166,33 +162,26 @@ class StatisticsService:
         converted_values = []
 
         for i, value in enumerate(missing_values):
-            # If already numeric, keep as is
             if isinstance(value, (int, float)):
                 converted_values.append(value)
                 continue
 
-            # Try to convert string to numeric
             if isinstance(value, str):
-                # Remove whitespace
                 value = value.strip()
 
-                # Try to convert to int first (for whole numbers)
                 try:
-                    # Check if it's a whole number (no decimal point or .0)
                     if "." not in value or value.endswith(".0"):
                         int_val = int(
                             float(value),
-                        )  # Convert via float to handle "123.0"
+                        )
                         converted_values.append(int_val)
                     else:
-                        # Convert to float for decimal numbers
                         float_val = float(value)
                         converted_values.append(float_val)
                     continue
                 except ValueError:
-                    pass  # Will raise error below
+                    pass
 
-            # If we get here, conversion failed
             raise ValueError(
                 f"Cannot convert missing_values[{i}] = '{value}' (type: {type(value).__name__}) "
                 f"to a numeric value. All missing_values must be numeric or convertible to numeric.",
@@ -200,20 +189,22 @@ class StatisticsService:
 
         return converted_values
 
-    def _get_missing_ranges_values(self, missing_ranges: Optional[List[Dict[str, float]]]) -> set:
+    def _get_missing_ranges_values(
+        self, missing_ranges: Optional[List[Dict[str, float]]]
+    ) -> set:
         """
         Get all values that fall within the missing ranges.
-        
+
         Args:
             missing_ranges: List of range objects with 'lo' and 'hi' keys
-            
+
         Returns:
             Set of values (as strings) that fall within the missing ranges
         """
         missing_set = set()
         if missing_ranges is None:
             return missing_set
-            
+
         for range_obj in missing_ranges:
             if (
                 not isinstance(range_obj, dict)
@@ -221,10 +212,10 @@ class StatisticsService:
                 or "hi" not in range_obj
             ):
                 continue
-                
+
             lo = range_obj["lo"]
             hi = range_obj["hi"]
-            
+
             # For each value in the range (assuming integer ranges like 97-97, 98-98, 99-99)
             # Generate all possible values in the range
             if isinstance(lo, (int, float)) and isinstance(hi, (int, float)):
@@ -239,7 +230,7 @@ class StatisticsService:
                         missing_set.add(f"{int(current)}.0")
                         missing_set.add(str(int(current)))
                     current += 1
-                    
+
         return missing_set
 
     def _describe_var_with_split(
@@ -297,7 +288,9 @@ class StatisticsService:
 
         # Apply missing ranges to split variable
         if split_variable_missing_ranges is not None:
-            data = self._apply_missing_ranges(data, split_variable, split_variable_missing_ranges)
+            data = self._apply_missing_ranges(
+                data, split_variable, split_variable_missing_ranges
+            )
 
         # Get unique categories from split variable (excluding NA and missing values)
         split_categories = data[split_variable].dropna().unique()

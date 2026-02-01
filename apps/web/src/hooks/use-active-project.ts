@@ -7,7 +7,6 @@ import { useProjectsByOrg } from "./use-projects-by-org";
 export function useActiveProject(activeOrganization?: Organization | null) {
   const pathname = usePathname();
 
-  // Derive project slug directly from pathname
   const activeProjectSlug = useMemo(() => {
     const segments = pathname.split("/").filter(Boolean);
     const projectIndex = segments.findIndex((segment: string) => segment === "project");

@@ -24,7 +24,6 @@ const findFn = async (id: string) => {
 
   if (!result) return null;
 
-  // Transform the result to include organization data in nested structure
   return {
     datasets: result.datasets,
     organizations: result.organizations,
@@ -47,7 +46,6 @@ export const listAuthenticated = withSessionCheck(createList(entity, selectDatas
 export const deleteDataset = withAdminCheck(async (datasetId: string) => {
   const db = await getAuthenticatedClient();
 
-  // Get the dataset first to get the S3 key
   const [dataset] = await db.select().from(entity).where(eq(entity.id, datasetId)).limit(1);
 
   if (!dataset) {
@@ -55,12 +53,10 @@ export const deleteDataset = withAdminCheck(async (datasetId: string) => {
   }
 
   try {
-    // Delete the file from S3 if it exists
     if (dataset.storageKey) {
       await s3DeleteDataset(dataset.storageKey);
     }
 
-    // Delete from database
     await db.delete(entity).where(eq(entity.id, datasetId));
 
     return { success: true };

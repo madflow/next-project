@@ -36,7 +36,6 @@ export function UpdateProfileForm() {
     },
   });
 
-  // Update form default values when session is available
   useEffect(() => {
     if (session) {
       const values: ProfileFormValues = {

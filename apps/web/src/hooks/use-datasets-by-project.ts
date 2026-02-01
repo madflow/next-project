@@ -10,20 +10,14 @@ type ApiResponseRow = {
 export function useDatasetsByProject(projectId: string, options?: UseQueryApiOptions) {
   const endpoint = `/api/projects/${projectId}/datasets`;
 
-  let finalOptions: UseQueryApiOptions;
-  if (!options) {
-    finalOptions = {
-      enabled: !!projectId,
-      offset: 0,
-      limit: 250,
-      order: [{ column: "datasets:name", direction: "asc" }],
-    };
-  } else {
-    finalOptions = {
-      ...options,
-      enabled: !!projectId && options.enabled,
-    };
-  }
+  const finalOptions: UseQueryApiOptions = {
+    enabled: !!projectId,
+    offset: 0,
+    limit: 250,
+    order: [{ column: "datasets:name", direction: "asc" }],
+    ...(options || {}),
+    enabled: !!projectId && (options?.enabled ?? true),
+  };
 
   finalOptions.queryKey = ["datasets", "by-project", projectId];
 

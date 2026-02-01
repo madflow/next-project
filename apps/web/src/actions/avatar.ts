@@ -88,7 +88,6 @@ export const uploadAvatar = withAuth(async ({ file, userId }: UploadAvatarParams
       }
     }
 
-    // Use the detected file extension from the actual file content
     const key = `avatars/${userId}/${randomUUID()}.${detectedType.ext}`;
 
     const params = {
@@ -163,7 +162,6 @@ export const uploadAvatar = withAuth(async ({ file, userId }: UploadAvatarParams
 export async function deleteAvatar(userId: string, filename: string) {
   const s3Client = getS3Client();
   try {
-    // Construct the full S3 key with the correct path
     const key = `avatars/${userId}/${filename}`;
 
     const command = new DeleteObjectCommand({

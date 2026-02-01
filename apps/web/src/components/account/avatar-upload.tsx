@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { updateUser, useSession } from "@/lib/auth-client";
 
 export function AvatarUpload() {
-  // Use the correct namespace for translations
   const t = useTranslations("account.profile.avatar");
   const { data: session } = useSession();
   const user = session?.user;
@@ -19,7 +18,6 @@ export function AvatarUpload() {
   const [selectedFilePreview, setSelectedFilePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Derive preview URL from user data or selected file preview
   const previewUrl =
     selectedFilePreview || (user?.image ? `/api/users/${user.id}/avatars/${encodeURIComponent(user.image)}` : null);
 
@@ -27,20 +25,17 @@ export function AvatarUpload() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type - only allow specific image formats
     const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
       toast.error(t("error.invalidFileType"));
       return;
     }
 
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       toast.error(t("error.fileSize"));
       return;
     }
 
-    // Create a preview URL for the selected image
     const imageUrl = URL.createObjectURL(file);
     setSelectedFilePreview(imageUrl);
     setSelectedFile(file);
@@ -51,17 +46,14 @@ export function AvatarUpload() {
 
     try {
       startTransition(async () => {
-        // Extract the filename from the image URL
         const filename = user.image?.split("/").pop();
         if (!filename) throw new Error(t("error.invalidUrl"));
 
-        // Delete the avatar from S3
         const deleteResult = await deleteAvatar(user.id, filename);
         if (!deleteResult.success) {
           throw new Error(deleteResult.error || "Failed to delete avatar");
         }
 
-        // Update the user's profile to remove the avatar reference
         await updateUser({
           image: null,
           fetchOptions: {
@@ -90,17 +82,12 @@ export function AvatarUpload() {
 
     startTransition(async () => {
       try {
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-        formData.append("userId", user.id);
-
         const result = await uploadAvatar({
           file: selectedFile,
           userId: user.id,
         });
 
         if (result.success && result.url) {
-          // Update the user's profile with the image key (not the full URL)
           await updateUser({
             image: result.url,
             fetchOptions: {
@@ -109,14 +96,12 @@ export function AvatarUpload() {
               },
               onSuccess: () => {
                 toast.success(t("success"));
-                // Clear the selected file after successful update
                 setSelectedFile(null);
                 setSelectedFilePreview(null);
               },
             },
           });
         } else {
-          // Show the server's specific error message if available, otherwise show generic error
           toast.error(result.error || t("error.uploadFailed"));
         }
       } catch (error) {
@@ -126,12 +111,10 @@ export function AvatarUpload() {
     });
   };
 
-  // Get the user's initials for the avatar fallback
   const getInitials = () => {
     return user?.name?.charAt(0)?.toUpperCase() || t("initial");
   };
 
-  // Show loading state while uploading
   if (isPending) {
     return (
       <div
