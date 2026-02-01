@@ -10,15 +10,6 @@ from analysis.web.lifespan import lifespan_setup
 
 
 def get_app() -> FastAPI:
-
-    if settings.sentry_dsn:
-        sentry_sdk.init(
-            dsn=settings.sentry_dsn,
-            # Add data like request headers and IP for users,
-            # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
-            send_default_pii=True,
-        )
-
     """
     Get FastAPI application.
 
@@ -26,6 +17,13 @@ def get_app() -> FastAPI:
 
     :return: application.
     """
+    if settings.sentry_dsn:
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            # Add data like request headers and IP for users,
+            # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+            send_default_pii=True,
+        )
     app = FastAPI(
         title="analysis",
         version=metadata.version("analysis"),
