@@ -23,7 +23,6 @@ const MEASURE_OPTIONS = ["nominal", "ordinal", "scale", "unknown"] as const;
 // Define the form schema
 const formSchema = z.object({
   id: z.uuid(),
-  label: z.string().nullable(),
   measure: z.enum(MEASURE_OPTIONS),
   missingValues: z.array(z.string()).nullable().optional(),
   missingRanges: z
@@ -55,7 +54,6 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: datasetVariable.id,
-      label: datasetVariable.label,
       measure: datasetVariable.measure,
       missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
       missingRanges: datasetVariable.missingRanges?.[datasetVariable.name] ?? null,
@@ -103,26 +101,16 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
             </FieldGroup>
           </Field>
 
-          <Controller
-            name="label"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="label">{t("editVariable.form.label.label")}</FieldLabel>
-                <FieldGroup>
-                  <Input
-                    id="label"
-                    data-testid="app.admin.dataset-variable.label-input"
-                    placeholder={t("editVariable.form.label.placeholder")}
-                    aria-invalid={fieldState.invalid}
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FieldGroup>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
+          <Field>
+            <FieldLabel>{t("editVariable.form.label.label")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                data-testid="app.admin.dataset-variable.label-input"
+                value={getFieldValue(datasetVariable.label)}
+                disabled
+              />
+            </FieldGroup>
+          </Field>
 
           <Controller
             name="variableLabels"
