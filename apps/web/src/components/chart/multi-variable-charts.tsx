@@ -63,6 +63,10 @@ export function MultiVariableCharts({
     onStatsRequestAction(variableName, splitVariable || undefined);
   };
 
+  // Extract conditions for clarity - moved before single/multiple variable branching
+  const isMultiResponse = variableset?.category === "multi_response";
+  const countedValue = parseCountedValue(variableset?.attributes);
+
   if (variables.length === 1) {
     const variable = variables[0];
     if (!variable) return <div className="text-muted-foreground">{"No variable selected"}</div>;
@@ -85,15 +89,13 @@ export function MultiVariableCharts({
           onSplitVariableChangeAction={(splitVariable: string | null) =>
             handleSplitVariableChange(variable.name, splitVariable)
           }
-          isMultiResponseIndividual={false}
+          isMultiResponseIndividual={isMultiResponse}
+          countedValue={countedValue}
         />
       </div>
     );
   }
 
-  // Extract conditions for clarity
-  const isMultiResponse = variableset?.category === "multi_response";
-  const countedValue = parseCountedValue(variableset?.attributes);
   const showVariablesetHeader = variableset && !isMultiResponse;
   const showMultiResponseAggregate = isMultiResponse;
 
