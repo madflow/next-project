@@ -11,12 +11,12 @@ import { useQueryApi } from "@/hooks/use-query-api";
 import { extractVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getVariableLabel } from "@/lib/variable-helpers";
-import { type DatasetVariable } from "@/types/dataset-variable";
+import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
 
 type MeanBarAdhocProps = {
-  variable: DatasetVariable;
+  variable: DatasetVariableWithAttributes;
   stats: StatsResponse;
   datasetId?: string;
   renderAsContent?: boolean;
@@ -28,11 +28,9 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
     const tAdhoc = useTranslations("projectAdhocAnalysis");
     const { ref: internalRef, exportPNG } = useChartExport();
 
-    // Use forwarded ref if provided (when renderAsContent is true), otherwise use internal ref
     const ref = forwardedRef || internalRef;
 
-    // Fetch split variables when datasetId is provided
-    const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariable[] }>({
+    const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariableWithAttributes[] }>({
       endpoint: `/api/datasets/${datasetId}/splitvariables`,
       pagination: { pageIndex: 0, pageSize: 100 },
       sorting: [],
@@ -43,9 +41,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
 
     const allVariables = splitVariablesResponse?.rows || [];
 
-    // Helper function to get split variable description
-    function getSplitVariableDescription(variable: DatasetVariable, stats: StatsResponse): string | null {
-      // Find the stats for this variable
+    function getSplitVariableDescription(variable: DatasetVariableWithAttributes, stats: StatsResponse): string | null {
       const targetVariable = stats.find((item) => item.variable === variable.name);
       if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
         return null;
@@ -53,24 +49,20 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
 
       const splitVariableName = targetVariable.stats.split_variable;
 
-      // Try to find the split variable in allVariables to get its label
       if (allVariables.length > 0) {
-        const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
+        const splitVariable = allVariables.find((v: DatasetVariableWithAttributes) => v.name === splitVariableName);
         if (splitVariable) {
           const splitVariableLabel = getVariableLabel(splitVariable);
           return tAdhoc("splitBy", { variable: splitVariableLabel });
         }
       }
 
-      // Fallback to variable name if no label found
       return tAdhoc("splitBy", { variable: splitVariableName });
     }
 
-    // Find the stats for this variable using the helper function
     const variableStats = extractVariableStats(variable, stats);
     if (!variableStats) return null;
 
-    // Create data for mean and median bars
     const chartData = [
       {
         label: t("mean"),
@@ -82,9 +74,9 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
       },
     ];
 
-    // Use the max value from stats for the domain
-    const maxValue = variableStats.max;
-    const minValue = variableStats.min;
+    const valueRange = variable.attributes?.valueRange;
+    const maxValue = valueRange?.max ?? variableStats.max;
+    const minValue = valueRange?.min ?? variableStats.min;
 
     const chartConfig = {
       value: {

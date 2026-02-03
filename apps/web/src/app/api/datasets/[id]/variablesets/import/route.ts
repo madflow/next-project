@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { assertUserIsAdmin } from "@/dal/dal";
 import { assertAccess } from "@/dal/dataset";
 import { importVariableSets } from "@/dal/dataset-variableset-export";
-import { assertUserIsAdmin } from "@/dal/dal";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { VariableSetExportFileSchema, VariableSetImportOptionsSchema } from "@/types/dataset-variableset-export";
 

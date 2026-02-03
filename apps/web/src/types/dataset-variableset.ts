@@ -5,6 +5,7 @@ import {
   type DatasetVariablesetCategory,
   type DatasetVariablesetItem,
   type UpdateDatasetVariablesetData,
+  type ValueRange,
   insertDatasetVariablesetItemSchema,
   insertDatasetVariablesetSchema,
   selectDatasetVariablesetItemSchema,
@@ -28,6 +29,8 @@ export {
   // Variable set item types
   type DatasetVariablesetItem,
   type CreateDatasetVariablesetItemData,
+  // Value range type
+  type ValueRange,
 };
 
 // Extended types for UI components

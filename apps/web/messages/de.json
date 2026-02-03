@@ -381,7 +381,16 @@
       "success": "Erlaubte Statistiken erfolgreich aktualisiert",
       "title": "Erlaubte Statistiken konfigurieren",
       "validation": {
-        "atLeastOne": "Mindestens eine Statistik muss ausgewählt sein"
+        "atLeastOne": "Mindestens eine Statistik muss ausgewählt sein",
+        "minMax": "Minimalwert muss kleiner oder gleich dem Maximalwert sein"
+      },
+      "valueRange": {
+        "description": "Definieren Sie die gültigen Minimal- und Maximalwerte für diese Skalenvariable (optional)",
+        "max": "Max",
+        "maxPlaceholder": "Maximalwert",
+        "min": "Min",
+        "minPlaceholder": "Minimalwert",
+        "title": "Wertebereich Anzeige"
       }
     },
     "assignVariables": "Variablen zuweisen",
