@@ -31,7 +31,7 @@
     },
     "e2e": {
       "cache": false,
-      "passThroughEnv": ["AUTH_DISABLE_SIGNUP"]
+      "passThroughEnv": ["AUTH_DISABLE_SIGNUP", "NEXT_PUBLIC_AUTH_DISABLE_SIGNUP"]
     },
     "e2e:deps": {
       "cache": false
