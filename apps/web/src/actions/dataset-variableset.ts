@@ -54,6 +54,14 @@ export async function updateVariablesetItemAttributes(
   variableId: string,
   attributes: CreateDatasetVariablesetItemData["attributes"]
 ) {
+  // Server-side validation for valueRange
+  if (attributes?.valueRange) {
+    const { min, max } = attributes.valueRange;
+    if (min > max) {
+      throw new ServerActionFailureException("Min value must be less than or equal to max value");
+    }
+  }
+
   const updated = await updateVariablesetItemAttributesDal(variablesetId, variableId, attributes);
 
   if (!updated) {

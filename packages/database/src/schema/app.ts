@@ -242,6 +242,22 @@ export type CreateDatasetVariablesetData = z.infer<typeof insertDatasetVariables
 export type DatasetVariableset = z.infer<typeof selectDatasetVariablesetSchema>;
 export type UpdateDatasetVariablesetData = z.infer<typeof updateDatasetVariablesetSchema>;
 
+export const valueRangeSchema = z
+  .object({
+    min: z.number(),
+    max: z.number(),
+  })
+  .optional()
+  .refine(
+    (range) => {
+      if (!range) return true;
+      return range.min <= range.max;
+    },
+    {
+      message: "Min value must be less than or equal to max value",
+    }
+  );
+
 export const datasetVariablesetItemAttributes = z.object({
   allowedStatistics: z
     .object({
@@ -249,8 +265,10 @@ export const datasetVariablesetItemAttributes = z.object({
       mean: z.boolean(),
     })
     .default({ distribution: true, mean: false }),
+  valueRange: valueRangeSchema,
 });
 
+export type ValueRange = z.infer<typeof valueRangeSchema>;
 export type DatasetVariablesetItemAttributes = z.infer<typeof datasetVariablesetItemAttributes>;
 
 export const datasetVariablesetItem = pgTable(
