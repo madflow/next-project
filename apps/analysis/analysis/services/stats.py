@@ -1,6 +1,79 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
+
+
+class RawDataService:
+    """Service for fetching raw data values from variables."""
+
+    def get_raw_values(
+        self,
+        data: pd.DataFrame,
+        variable_names: List[str],
+        exclude_empty: bool = True,
+        max_values: int = 1000,
+    ) -> Dict[str, Dict[str, Any]]:
+        """
+        Get raw values for specified variables from a DataFrame.
+
+        Args:
+            data: The input DataFrame.
+            variable_names: List of variable (column) names to fetch values for.
+            exclude_empty: Whether to filter out empty/null values.
+            max_values: Maximum number of values to return per variable.
+
+        Returns:
+            A dictionary mapping variable names to their raw data:
+            {
+                "variable_name": {
+                    "values": ["value1", "value2", ...],
+                    "totalCount": 10,
+                    "nonEmptyCount": 8
+                }
+            }
+        """
+        result = {}
+
+        for variable_name in variable_names:
+            if variable_name not in data.columns:
+                result[variable_name] = {
+                    "values": [],
+                    "totalCount": 0,
+                    "nonEmptyCount": 0,
+                    "error": f"Variable '{variable_name}' not found in the DataFrame.",
+                }
+                continue
+
+            variable = data[variable_name]
+            total_count = len(variable)
+
+            # Get all values
+            values = variable.tolist()
+
+            # Filter out empty/null values if requested
+            if exclude_empty:
+                values = [
+                    v
+                    for v in values
+                    if v is not None and not pd.isna(v) and str(v).strip() != ""
+                ]
+
+            # Convert all values to strings for consistent serialization
+            values = [str(v) for v in values]
+
+            # Limit to max_values
+            if len(values) > max_values:
+                values = values[:max_values]
+
+            non_empty_count = len(values)
+
+            result[variable_name] = {
+                "values": values,
+                "totalCount": total_count,
+                "nonEmptyCount": non_empty_count,
+            }
+
+        return result
 
 
 class StatisticsService:
@@ -200,20 +273,22 @@ class StatisticsService:
 
         return converted_values
 
-    def _get_missing_ranges_values(self, missing_ranges: Optional[List[Dict[str, float]]]) -> set:
+    def _get_missing_ranges_values(
+        self, missing_ranges: Optional[List[Dict[str, float]]]
+    ) -> set:
         """
         Get all values that fall within the missing ranges.
-        
+
         Args:
             missing_ranges: List of range objects with 'lo' and 'hi' keys
-            
+
         Returns:
             Set of values (as strings) that fall within the missing ranges
         """
         missing_set = set()
         if missing_ranges is None:
             return missing_set
-            
+
         for range_obj in missing_ranges:
             if (
                 not isinstance(range_obj, dict)
@@ -221,10 +296,10 @@ class StatisticsService:
                 or "hi" not in range_obj
             ):
                 continue
-                
+
             lo = range_obj["lo"]
             hi = range_obj["hi"]
-            
+
             # For each value in the range (assuming integer ranges like 97-97, 98-98, 99-99)
             # Generate all possible values in the range
             if isinstance(lo, (int, float)) and isinstance(hi, (int, float)):
@@ -239,7 +314,7 @@ class StatisticsService:
                         missing_set.add(f"{int(current)}.0")
                         missing_set.add(str(int(current)))
                     current += 1
-                    
+
         return missing_set
 
     def _describe_var_with_split(
@@ -297,7 +372,9 @@ class StatisticsService:
 
         # Apply missing ranges to split variable
         if split_variable_missing_ranges is not None:
-            data = self._apply_missing_ranges(data, split_variable, split_variable_missing_ranges)
+            data = self._apply_missing_ranges(
+                data, split_variable, split_variable_missing_ranges
+            )
 
         # Get unique categories from split variable (excluding NA and missing values)
         split_categories = data[split_variable].dropna().unique()
