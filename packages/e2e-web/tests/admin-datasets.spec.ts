@@ -23,9 +23,10 @@ test.describe("Admin Datasets", () => {
     await page.getByTestId("app.datatable.search-input").click();
     await page.getByTestId("app.datatable.search-input").fill("age");
     await page.getByTestId("app.admin.dataset-variable.edit-age").click();
-    await page.getByTestId("app.admin.dataset-variable.label-input").click();
-    await page.getByTestId("app.admin.dataset-variable.label-input").fill("Age in years edited");
-    await page.getByRole("button", { name: "Save changes" }).click();
+    // Note: Label field is now read-only (see admin-dataset-variable-edit.spec.ts for verification)
+    // Just save the variable to proceed with the test
+    // Using regex to match both English "Save changes" and German "Änderungen speichern"
+    await page.getByRole("button", { name: /save changes|änderungen speichern/i }).click();
     await page.getByTestId("app.admin.editor.projects.tab").click();
     await page.getByTestId("project-dropdown").click();
     await page.getByTestId("project-dropdown-item-test-project").getByText("Test Project").click();
