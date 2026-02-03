@@ -141,6 +141,7 @@ export const datasetVariable = pgTable(
 export const insertDatasetVariableSchema = createInsertSchema(datasetVariable);
 export const selectDatasetVariableSchema = createSelectSchema(datasetVariable);
 export const updateDatasetVariableSchema = createUpdateSchema(datasetVariable, {
+  label: z.never().optional(), // Explicitly disallow label updates - label is set during import from SPSS file
   variableLabels: datasetVariableLabelSchema.optional(),
   valueLabels: z.record(z.string(), z.record(z.string(), z.string())).optional(),
   missingRanges: z
