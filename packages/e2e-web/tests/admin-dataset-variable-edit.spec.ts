@@ -510,4 +510,37 @@ test.describe("Admin Dataset Variable Edit", () => {
     await englishInput4.fill(originalEnglish);
     await page.getByRole("button", { name: "Save changes" }).click();
   });
+
+  test("should display label field as readonly/disabled", async ({ page }) => {
+    // Login as admin
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    // Navigate to the datasets page
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    // Search for and click on the test dataset
+    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
+    await page.getByRole("link", { name: DATASET_NAME }).click();
+    await page.waitForURL("**/admin/datasets/**");
+
+    // Search for the "age" variable
+    await page.getByTestId("app.datatable.search-input").click();
+    await page.getByTestId("app.datatable.search-input").fill("age");
+
+    // Click the edit button for the age variable
+    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
+    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+
+    // Locate the label field using the test ID
+    const labelInput = page.getByTestId("app.admin.dataset-variable.label-input");
+
+    // Verify the label field is disabled/readonly
+    await expect(labelInput).toBeDisabled();
+
+    // Verify the label field displays the current value (from SPSS import)
+    // The label should not be empty since it comes from the SPSS file metadata
+    await expect(labelInput).not.toHaveValue("");
+  });
 });
