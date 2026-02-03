@@ -72,7 +72,11 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
     });
 
     form.reset();
-    router.push(`/auth/check-email`);
+    if (env.NEXT_PUBLIC_AUTH_DISABLE_SIGNUP) {
+      router.push("/auth/login");
+    } else {
+      router.push("/auth/check-email");
+    }
   };
 
   return (

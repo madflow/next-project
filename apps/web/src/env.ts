@@ -33,9 +33,11 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_BASE_URL: z.string().default(""),
     NEXT_PUBLIC_SITE_NAME: z.string().default(""),
+    NEXT_PUBLIC_AUTH_DISABLE_SIGNUP: booleanString.default(true),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME,
+    NEXT_PUBLIC_AUTH_DISABLE_SIGNUP: process.env.NEXT_PUBLIC_AUTH_DISABLE_SIGNUP,
   },
 });
