@@ -63,6 +63,9 @@ export function MultiVariableCharts({
     onStatsRequestAction(variableName, splitVariable || undefined);
   };
 
+  const isMultiResponse = variableset?.category === "multi_response";
+  const countedValue = parseCountedValue(variableset?.attributes);
+
   if (variables.length === 1) {
     const variable = variables[0];
     if (!variable) return <div className="text-muted-foreground">{"No variable selected"}</div>;
@@ -85,21 +88,18 @@ export function MultiVariableCharts({
           onSplitVariableChangeAction={(splitVariable: string | null) =>
             handleSplitVariableChange(variable.name, splitVariable)
           }
-          isMultiResponseIndividual={false}
+          isMultiResponseIndividual={isMultiResponse}
+          countedValue={countedValue}
         />
       </div>
     );
   }
 
-  // Extract conditions for clarity
-  const isMultiResponse = variableset?.category === "multi_response";
-  const countedValue = parseCountedValue(variableset?.attributes);
   const showVariablesetHeader = variableset && !isMultiResponse;
   const showMultiResponseAggregate = isMultiResponse;
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Multi-response aggregate chart FIRST */}
       {showMultiResponseAggregate && (
         <MultiResponseChart
           variables={variables}
@@ -111,7 +111,6 @@ export function MultiVariableCharts({
         />
       )}
 
-      {/* Variableset header for non-multi-response sets */}
       {showVariablesetHeader && (
         <div className="mb-4">
           <h2 className="text-xl font-semibold">{variableset.name}</h2>
