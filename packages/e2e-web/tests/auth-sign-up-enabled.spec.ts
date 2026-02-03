@@ -58,6 +58,13 @@ async function performLogin(page: typeof signUpUser, email: string, password: st
   await expect(page.getByTestId("app.sign-out")).toBeVisible();
 }
 
+// Skip this test when email verification is disabled (NEXT_PUBLIC_AUTH_DISABLE_SIGNUP defaults to true)
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
+  process.env.NEXT_PUBLIC_AUTH_DISABLE_SIGNUP === "true" || process.env.NEXT_PUBLIC_AUTH_DISABLE_SIGNUP === undefined,
+  "Skipping test: email verification is disabled"
+);
+
 test("sign-up with email verification enabled redirects to check-email page", async ({ page }) => {
   await page.goto("/auth/sign-up");
   const expectedVisibleTestIds = [
@@ -84,6 +91,12 @@ test("sign-up with email verification enabled redirects to check-email page", as
   await performLogin(page, signUpUser.email, signUpUser.password);
 });
 
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip(
+  process.env.NEXT_PUBLIC_AUTH_DISABLE_SIGNUP !== "true" && process.env.NEXT_PUBLIC_AUTH_DISABLE_SIGNUP !== undefined,
+  "Skipping test: email verification is enabled"
+);
+
 test("sign-up with email verification disabled redirects to login page", async ({ page }) => {
   const testUser = {
     email: `e2e-sign-up-disabled-${crypto.randomUUID()}@example.com`,
@@ -101,8 +114,7 @@ test("sign-up with email verification disabled redirects to login page", async (
   // When email verification is disabled, user is redirected to login page
   await expect(page.getByTestId("auth.login.page")).toBeVisible();
 
-  // Check if email was sent - if so, verify it
-  await completeEmailVerificationFlow(page, testUser.email);
+  // Complete login flow (no email verification needed)
   await performLogin(page, testUser.email, testUser.password);
 
   // Cleanup
