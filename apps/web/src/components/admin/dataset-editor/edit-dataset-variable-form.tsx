@@ -17,13 +17,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatasetVariable, updateDatasetVariableSchema } from "@/types/dataset-variable";
 
-// Define the allowed measure values
 const MEASURE_OPTIONS = ["nominal", "ordinal", "scale", "unknown"] as const;
 
-// Define the form schema
 const formSchema = z.object({
   id: z.uuid(),
-  label: z.string().nullable(),
   measure: z.enum(MEASURE_OPTIONS),
   missingValues: z.array(z.string()).nullable().optional(),
   missingRanges: z
@@ -55,7 +52,6 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: datasetVariable.id,
-      label: datasetVariable.label,
       measure: datasetVariable.measure,
       missingValues: Array.isArray(datasetVariable.missingValues) ? (datasetVariable.missingValues as string[]) : null,
       missingRanges: datasetVariable.missingRanges?.[datasetVariable.name] ?? null,
@@ -65,13 +61,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
     },
   });
 
-  // Helper function to safely get field value
-  const getFieldValue = (value: string | null | undefined): string => {
-    return value ?? "";
-  };
-
   const onSubmit = async (values: FormValues) => {
-    // Transform missingRanges from array to record keyed by variable name
     const updateData = updateDatasetVariableSchema.parse({
       ...values,
       missingRanges: values.missingRanges ? { [datasetVariable.name]: values.missingRanges } : null,
@@ -84,8 +74,7 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
       toast.success(t("editVariable.form.success"));
       router.refresh();
       router.push(`/admin/datasets/${datasetVariable.datasetId}/editor`);
-    } catch (error) {
-      console.error("Error updating dataset variable:", error);
+    } catch {
       toast.error(t("editVariable.form.errors.updateFailed"));
     } finally {
       setIsLoading(false);
@@ -99,30 +88,20 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
           <Field>
             <FieldLabel>{t("editVariable.form.name.label")}</FieldLabel>
             <FieldGroup>
-              <Input value={getFieldValue(datasetVariable.name)} disabled />
+              <Input value={datasetVariable.name ?? ""} disabled />
             </FieldGroup>
           </Field>
 
-          <Controller
-            name="label"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="label">{t("editVariable.form.label.label")}</FieldLabel>
-                <FieldGroup>
-                  <Input
-                    id="label"
-                    data-testid="app.admin.dataset-variable.label-input"
-                    placeholder={t("editVariable.form.label.placeholder")}
-                    aria-invalid={fieldState.invalid}
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                </FieldGroup>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
+          <Field>
+            <FieldLabel>{t("editVariable.form.label.label")}</FieldLabel>
+            <FieldGroup>
+              <Input
+                data-testid="app.admin.dataset-variable.label-input"
+                value={datasetVariable.label ?? ""}
+                disabled
+              />
+            </FieldGroup>
+          </Field>
 
           <Controller
             name="variableLabels"
