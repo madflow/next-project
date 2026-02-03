@@ -223,7 +223,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
         <Input type="text" placeholder={t("search")} onChange={(e) => setSearch(e.target.value)} value={search} />
       </CardHeader>
       <CardContent className="px-3">
-        <ScrollArea className="flex max-h-[500px] min-h-[300px] flex-col gap-2">
+        <ScrollArea className="flex max-h-[300px] min-h-[200px] flex-col gap-2 md:max-h-[500px] md:min-h-[300px]">
           {isLoading && (
             <div className="text-muted-foreground text-sm">
               <Spinner />
