@@ -26,6 +26,7 @@ interface AllowedStatisticsSelectorProps {
   variableMeasure: DatasetVariableMeasure;
   currentAttributes: DatasetVariablesetItemAttributes;
   onUpdate: () => void;
+  variableType?: string;
 }
 
 export function AllowedStatisticsSelector({
@@ -34,6 +35,7 @@ export function AllowedStatisticsSelector({
   variableMeasure,
   currentAttributes,
   onUpdate,
+  variableType,
 }: AllowedStatisticsSelectorProps) {
   const t = useTranslations("adminDatasetVariableset.allowedStatistics");
   const [isOpen, setIsOpen] = useState(false);
@@ -48,8 +50,12 @@ export function AllowedStatisticsSelector({
   const isScaleVariable = variableMeasure === "scale";
   const showValueRange = isScaleVariable && mean;
 
+  // String variables don't support mean/distribution
+  const isStringVariable = variableType === "string";
+
   const handleSave = async () => {
-    if (!distribution && !mean) {
+    // Validation: at least one must be selected (only for non-string variables)
+    if (!isStringVariable && !distribution && !mean) {
       toast.error(t("validation.atLeastOne"));
       return;
     }
@@ -129,6 +135,36 @@ export function AllowedStatisticsSelector({
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
+          {isStringVariable ? (
+            <div className="text-muted-foreground text-sm">
+              <p>{t("stringVariableMessage")}</p>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="distribution"
+                  checked={distribution}
+                  onCheckedChange={(checked) => setDistribution(checked === true)}
+                  data-testid="admin.dataset.variableset.allowed-statistics.distribution"
+                />
+                <Label htmlFor="distribution" className="cursor-pointer text-sm font-normal">
+                  {t("distribution")}
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="mean"
+                  checked={mean}
+                  onCheckedChange={(checked) => setMean(checked === true)}
+                  data-testid="admin.dataset.variableset.allowed-statistics.mean"
+                />
+                <Label htmlFor="mean" className="cursor-pointer text-sm font-normal">
+                  {t("mean")}
+                </Label>
+              </div>
+            </>
+          )}
           <div className="flex items-center space-x-2">
             <Checkbox
               id="distribution"
@@ -196,13 +232,15 @@ export function AllowedStatisticsSelector({
             data-testid="admin.dataset.variableset.allowed-statistics.cancel">
             {t("cancel")}
           </Button>
-          <Button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving || (!distribution && !mean)}
-            data-testid="admin.dataset.variableset.allowed-statistics.save">
-            {isSaving ? t("saving") : t("save")}
-          </Button>
+          {!isStringVariable && (
+            <Button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving || (!distribution && !mean)}
+              data-testid="admin.dataset.variableset.allowed-statistics.save">
+              {isSaving ? t("saving") : t("save")}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

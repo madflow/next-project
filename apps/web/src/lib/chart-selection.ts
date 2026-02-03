@@ -227,8 +227,17 @@ export function determineChartSelection(criteria: ChartSelectionCriteria): Chart
     };
   }
 
-  // Check if variable type is supported (numeric types only)
+  // Check if variable type is supported
   if (!isNumericVariableType(variable.type)) {
+    // String variables show raw values in text explorer
+    if (variable.type === "string") {
+      return {
+        availableChartTypes: ["textExplorer"],
+        defaultChartType: "textExplorer",
+        canUseSplitVariable: false,
+        showUnsupportedPlaceholder: false,
+      };
+    }
     return {
       availableChartTypes: [],
       defaultChartType: "horizontalBar", // fallback

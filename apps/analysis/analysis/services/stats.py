@@ -3,6 +3,79 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 
 
+class RawDataService:
+    """Service for fetching raw data values from variables."""
+
+    def get_raw_values(
+        self,
+        data: pd.DataFrame,
+        variable_names: List[str],
+        exclude_empty: bool = True,
+        max_values: int = 1000,
+    ) -> Dict[str, Dict[str, Any]]:
+        """
+        Get raw values for specified variables from a DataFrame.
+
+        Args:
+            data: The input DataFrame.
+            variable_names: List of variable (column) names to fetch values for.
+            exclude_empty: Whether to filter out empty/null values.
+            max_values: Maximum number of values to return per variable.
+
+        Returns:
+            A dictionary mapping variable names to their raw data:
+            {
+                "variable_name": {
+                    "values": ["value1", "value2", ...],
+                    "totalCount": 10,
+                    "nonEmptyCount": 8
+                }
+            }
+        """
+        result = {}
+
+        for variable_name in variable_names:
+            if variable_name not in data.columns:
+                result[variable_name] = {
+                    "values": [],
+                    "totalCount": 0,
+                    "nonEmptyCount": 0,
+                    "error": f"Variable '{variable_name}' not found in the DataFrame.",
+                }
+                continue
+
+            variable = data[variable_name]
+            total_count = len(variable)
+
+            # Get all values
+            values = variable.tolist()
+
+            # Filter out empty/null values if requested
+            if exclude_empty:
+                values = [
+                    v
+                    for v in values
+                    if v is not None and not pd.isna(v) and str(v).strip() != ""
+                ]
+
+            # Convert all values to strings for consistent serialization
+            values = [str(v) for v in values]
+
+            # Limit to max_values
+            if len(values) > max_values:
+                values = values[:max_values]
+
+            non_empty_count = len(values)
+
+            result[variable_name] = {
+                "values": values,
+                "totalCount": total_count,
+                "nonEmptyCount": non_empty_count,
+            }
+
+        return result
+
+
 class StatisticsService:
     """Service for calculating descriptive statistics for variables."""
 
@@ -203,9 +276,8 @@ class StatisticsService:
 
         return converted_values
 
-    def get_missing_ranges_values(
-        self,
-        missing_ranges: Optional[List[Dict[str, float]]],
+    def _get_missing_ranges_values(
+        self, missing_ranges: Optional[List[Dict[str, float]]]
     ) -> set:
         """
         Get all values that fall within the missing ranges.
@@ -231,8 +303,7 @@ class StatisticsService:
             lo = range_obj["lo"]
             hi = range_obj["hi"]
 
-            # For each value in the range (assuming integer ranges like
-            # 97-97, 98-98, 99-99)
+            # For each value in the range (assuming integer ranges like 97-97, 98-98, 99-99)
             # Generate all possible values in the range
             if isinstance(lo, (int, float)) and isinstance(hi, (int, float)):
                 # For ranges like 97-97, 98-98, this will add just that single value
@@ -305,9 +376,7 @@ class StatisticsService:
         # Apply missing ranges to split variable
         if split_variable_missing_ranges is not None:
             data = self._apply_missing_ranges(
-                data,
-                split_variable,
-                split_variable_missing_ranges,
+                data, split_variable, split_variable_missing_ranges
             )
 
         # Get unique categories from split variable (excluding NA and missing values)
@@ -477,7 +546,7 @@ class StatisticsService:
 
                 # Add missing ranges values to the missing set
                 if missing_ranges is not None:
-                    missing_ranges_set = self.get_missing_ranges_values(missing_ranges)
+                    missing_ranges_set = self._get_missing_ranges_values(missing_ranges)
                     missing_set.update(missing_ranges_set)
 
                 # Create a set of all valid label keys
