@@ -173,7 +173,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: !env.AUTH_DISABLE_SIGNUP,
     disableSignUp: false, // this needs to stay false, when private signup via invitation should work
     sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }, request) => {
       const { user, url } = data;
