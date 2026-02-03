@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 import { smtpServerApi } from "../utils";
 
@@ -19,13 +20,13 @@ test.afterAll(async () => {
   await smtpServerApi.deleteMessagesBySearch({ query: `to:"${signUpUser.email}"` });
 });
 
-async function completeEmailVerificationFlow(page: typeof signUpUser, email: string) {
+async function completeEmailVerificationFlow(page: Page, email: string) {
   const searchMessages = await smtpServerApi.searchMessages({
     query: `to:"${email}"`,
   });
 
   if (searchMessages.messages.length === 0) {
-    return;
+    throw new Error(`No verification email found for ${email}`);
   }
 
   const message = searchMessages.messages[0];
@@ -44,7 +45,7 @@ async function completeEmailVerificationFlow(page: typeof signUpUser, email: str
   await expect(page.getByTestId("auth.login.page")).toBeVisible();
 }
 
-async function performLogin(page: typeof signUpUser, email: string, password: string) {
+async function performLogin(page: Page, email: string, password: string) {
   await page.getByTestId("auth.login.form.email").fill(email);
   await page.getByTestId("auth.login.form.password").fill(password);
 
