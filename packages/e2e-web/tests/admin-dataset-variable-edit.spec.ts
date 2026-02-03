@@ -541,7 +541,6 @@ test.describe("Admin Dataset Variable Edit", () => {
 
     // Verify the label field displays the current value (from SPSS import)
     // The label should not be empty since it comes from the SPSS file metadata
-    const labelValue = await labelInput.inputValue();
-    expect(labelValue).toBeTruthy();
+    await expect(labelInput).not.toHaveValue("");
   });
 });
