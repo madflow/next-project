@@ -14,7 +14,7 @@ from sqlalchemy.future import select
 from analysis.db.dependencies import get_db_session
 from analysis.db.models.models import Dataset, DatasetVariable
 from analysis.services.s3_client import S3Client
-from analysis.services.stats import StatisticsService
+from analysis.services.stats import RawDataService, StatisticsService
 from analysis.settings import settings
 from analysis.web.api.schemas.datasets import DatasetResponse
 from analysis.web.api.security import get_api_key
@@ -37,6 +37,46 @@ class StatsRequest(BaseModel):
     split_variable: Optional[str] = None
     # Number of decimal places for numeric statistics (mean, std, percentages, etc.)
     decimal_places: Optional[int] = 2
+
+
+class RawDataRequestOptions(BaseModel):
+    """Options for raw data request."""
+
+    exclude_empty: bool = True
+    max_values: int = 1000
+
+
+class RawDataRequest(BaseModel):
+    """Request model for raw data endpoint."""
+
+    variables: List[str]
+    options: RawDataRequestOptions = RawDataRequestOptions()
+
+
+class RawDataVariableResponse(BaseModel):
+    """Response model for a single variable's raw data."""
+
+    values: List[str]
+    total_count: int
+    non_empty_count: int
+    error: Optional[str] = None
+
+
+class RawDataResponse(BaseModel):
+    """Response model for raw data endpoint."""
+
+    model_config = ConfigDict(
+        json_encoders={
+            # Handle numpy types that might be in the metadata
+            "int64": int,
+            "float64": float,
+        },
+    )
+
+    status: str
+    message: str
+    dataset_id: str
+    data: Dict[str, RawDataVariableResponse]
 
 
 async def _get_dataset_by_id(db: AsyncSession, dataset_id: str) -> Optional[Dataset]:
@@ -339,4 +379,64 @@ async def get_dataset_stats(  # noqa: C901
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing dataset statistics: {e!s}",
+        ) from e
+
+
+@router.post("/datasets/{dataset_id}/raw-data", response_model=RawDataResponse)
+async def get_dataset_raw_data(
+    dataset_id: str,
+    raw_data_request: RawDataRequest,
+    db: AsyncSession = Depends(get_db_session),
+    api_key: str = Security(get_api_key),
+) -> RawDataResponse:
+    """
+    Get raw data values for specified variables in a dataset.
+
+    Returns non-empty raw values for string variables and can also be used
+    for numeric variables if needed.
+    """
+    dataset = await _get_dataset_by_id(db, dataset_id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    if dataset.s3_key is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Dataset has no associated S3 key",
+        )
+
+    try:
+        df = _read_dataframe_from_s3(str(dataset.s3_key))
+        raw_data_service = RawDataService()
+
+        raw_data = raw_data_service.get_raw_values(
+            df,
+            raw_data_request.variables,
+            exclude_empty=raw_data_request.options.exclude_empty,
+            max_values=raw_data_request.options.max_values,
+        )
+
+        # Convert to response model format
+        response_data = {}
+        for var_name, var_data in raw_data.items():
+            response_data[var_name] = RawDataVariableResponse(
+                values=var_data["values"],
+                total_count=var_data["totalCount"],
+                non_empty_count=var_data["nonEmptyCount"],
+                error=var_data.get("error"),
+            )
+
+        return RawDataResponse(
+            status="success",
+            message=f"Successfully retrieved raw data for {len(raw_data)} variable(s)",
+            dataset_id=dataset_id,
+            data=response_data,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving raw data: {e!s}",
         ) from e

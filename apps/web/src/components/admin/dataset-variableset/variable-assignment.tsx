@@ -105,6 +105,7 @@ function SortableVariableItem({ variable, selectedSetId, onRemove, onRefresh, is
               variableId={variable.id}
               currentAttributes={variable.attributes}
               onUpdate={onRefresh}
+              variableType={variable.type}
             />
           </div>
         )}

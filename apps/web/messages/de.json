@@ -378,6 +378,7 @@
       "mean": "Mittelwert",
       "save": "Speichern",
       "saving": "Wird gespeichert...",
+      "stringVariableMessage": "String-Variablen zeigen Rohwerte ohne Leerwerte an. Statistische Diagramme sind für Textdaten nicht verfügbar.",
       "success": "Erlaubte Statistiken erfolgreich aktualisiert",
       "title": "Erlaubte Statistiken konfigurieren",
       "validation": {

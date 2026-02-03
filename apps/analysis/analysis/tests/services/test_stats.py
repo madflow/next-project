@@ -1,7 +1,108 @@
 import pandas as pd
 import pytest
 
-from analysis.services.stats import StatisticsService
+from analysis.services.stats import RawDataService, StatisticsService
+
+
+@pytest.fixture
+def raw_data_service():
+    """Fixture to provide a RawDataService instance for testing."""
+    return RawDataService()
+
+
+# Test cases for raw data service
+raw_data_test_cases = [
+    # Standard case with string data
+    (
+        pd.DataFrame(
+            {"feedback": ["Great service!", "Could be better", "Excellent!", None, ""]}
+        ),
+        ["feedback"],
+        {
+            "feedback": {
+                "values": ["Great service!", "Could be better", "Excellent!"],
+                "nonEmptyCount": 3,
+                "totalCount": 5,
+            }
+        },
+    ),
+    # Case with numeric data (should convert to strings)
+    (
+        pd.DataFrame({"scores": [1, 2, 3, None, 5]}),
+        ["scores"],
+        {
+            "scores": {
+                "values": ["1.0", "2.0", "3.0", "5.0"],
+                "nonEmptyCount": 4,
+                "totalCount": 5,
+            }
+        },
+    ),
+    # Case with multiple variables
+    (
+        pd.DataFrame(
+            {
+                "var1": ["a", "b", None],
+                "var2": [1, 2, 3],
+            }
+        ),
+        ["var1", "var2"],
+        {
+            "var1": {"values": ["a", "b"], "nonEmptyCount": 2, "totalCount": 3},
+            "var2": {"values": ["1", "2", "3"], "nonEmptyCount": 3, "totalCount": 3},
+        },
+    ),
+    # Case with max_values limit
+    (
+        pd.DataFrame({"items": ["a", "b", "c", "d", "e"]}),
+        ["items"],
+        {"items": {"values": ["a", "b", "c"], "nonEmptyCount": 3, "totalCount": 5}},
+        {"max_values": 3},
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "df, variables, expected, options",
+    [(*case, {}) if len(case) == 3 else case for case in raw_data_test_cases],
+)
+def test_get_raw_values(raw_data_service, df, variables, expected, options):
+    """Test raw data service with various scenarios."""
+    exclude_empty = options.get("exclude_empty", True)
+    max_values = options.get("max_values", 1000)
+
+    result = raw_data_service.get_raw_values(
+        df, variables, exclude_empty=exclude_empty, max_values=max_values
+    )
+
+    for var_name in expected:
+        assert var_name in result
+        assert result[var_name]["values"] == expected[var_name]["values"]
+        assert result[var_name]["nonEmptyCount"] == expected[var_name]["nonEmptyCount"]
+        assert result[var_name]["totalCount"] == expected[var_name]["totalCount"]
+
+
+def test_get_raw_values_variable_not_found(raw_data_service):
+    """Test error handling when variable doesn't exist."""
+    df = pd.DataFrame({"existing": ["a", "b", "c"]})
+
+    result = raw_data_service.get_raw_values(df, ["nonexistent"])
+
+    assert "nonexistent" in result
+    assert "error" in result["nonexistent"]
+    assert "values" in result["nonexistent"]
+    assert result["nonexistent"]["nonEmptyCount"] == 0
+
+
+def test_get_raw_values_include_empty(raw_data_service):
+    """Test including empty values when exclude_empty is False."""
+    df = pd.DataFrame({"feedback": ["Great!", None, "", "Good"]})
+
+    result = raw_data_service.get_raw_values(df, ["feedback"], exclude_empty=False)
+
+    # Should include all values including None and empty strings
+    assert result["feedback"]["nonEmptyCount"] == 4  # All 4 values are kept
+    assert result["feedback"]["totalCount"] == 4
 
 
 @pytest.fixture
@@ -238,8 +339,8 @@ def test_frequency_table_with_value_labels_includes_all_valid_labels(
     # Create test data with only some of the labeled values present
     df = pd.DataFrame(
         {
-            "rating": [1.0, 2.0, 2.0, 3.0, -998.0, -999.0],  # Missing 4.0 and 5.0
-        },
+            "rating": [1.0, 2.0, 2.0, 3.0, -998.0, -999.0]  # Missing 4.0 and 5.0
+        }
     )
 
     value_labels = {
@@ -308,8 +409,8 @@ def test_frequency_table_includes_values_not_in_labels(stats_service) -> None:
     # Create test data with a value not in labels
     df = pd.DataFrame(
         {
-            "rating": [1.0, 2.0, 6.0],  # 6.0 is not in value_labels
-        },
+            "rating": [1.0, 2.0, 6.0]  # 6.0 is not in value_labels
+        }
     )
 
     value_labels = {
@@ -319,10 +420,7 @@ def test_frequency_table_includes_values_not_in_labels(stats_service) -> None:
     }
 
     result = stats_service.describe_var(
-        df,
-        "rating",
-        include=["frequencies"],
-        value_labels=value_labels,
+        df, "rating", include=["frequencies"], value_labels=value_labels
     )
 
     frequency_table = result["frequency_table"]
@@ -342,17 +440,9 @@ def test_frequency_table_includes_values_not_in_labels(stats_service) -> None:
 
 def test_frequency_table_without_value_labels_unchanged(stats_service) -> None:
     """Test that frequency table behavior is unchanged when value_labels is None."""
-    df = pd.DataFrame(
-        {
-            "rating": [1.0, 2.0, 2.0, 3.0],
-        },
-    )
+    df = pd.DataFrame({"rating": [1.0, 2.0, 2.0, 3.0]})
 
-    result = stats_service.describe_var(
-        df,
-        "rating",
-        include=["frequencies"],
-    )
+    result = stats_service.describe_var(df, "rating", include=["frequencies"])
 
     frequency_table = result["frequency_table"]
     frequency_values = {item["value"] for item in frequency_table}
@@ -370,8 +460,8 @@ def test_frequency_table_is_sorted_by_value_ascending(stats_service) -> None:
     """Test that frequency table is sorted by value in ascending order."""
     df = pd.DataFrame(
         {
-            "rating": [5.0, 1.0, 3.0, 2.0, 1.0],  # Unsorted data
-        },
+            "rating": [5.0, 1.0, 3.0, 2.0, 1.0]  # Unsorted data
+        }
     )
 
     value_labels = {
@@ -383,10 +473,7 @@ def test_frequency_table_is_sorted_by_value_ascending(stats_service) -> None:
     }
 
     result = stats_service.describe_var(
-        df,
-        "rating",
-        include=["frequencies"],
-        value_labels=value_labels,
+        df, "rating", include=["frequencies"], value_labels=value_labels
     )
 
     frequency_table = result["frequency_table"]
@@ -401,15 +488,11 @@ def test_frequency_table_sorted_without_value_labels(stats_service) -> None:
     """Test that frequency table is sorted even without value_labels."""
     df = pd.DataFrame(
         {
-            "rating": [5.0, 1.0, 3.0, 2.0],  # Unsorted data
-        },
+            "rating": [5.0, 1.0, 3.0, 2.0]  # Unsorted data
+        }
     )
 
-    result = stats_service.describe_var(
-        df,
-        "rating",
-        include=["frequencies"],
-    )
+    result = stats_service.describe_var(df, "rating", include=["frequencies"])
 
     frequency_table = result["frequency_table"]
     values = [item["value"] for item in frequency_table]
@@ -423,17 +506,11 @@ def test_frequency_table_sorted_without_value_labels(stats_service) -> None:
 def test_describe_var_with_split_variable_numeric(stats_service) -> None:
     """Test descriptive statistics with split variable for numeric data."""
     df = pd.DataFrame(
-        {
-            "score": [10, 20, 30, 40, 50, 60],
-            "group": ["A", "A", "B", "B", "C", "C"],
-        },
+        {"score": [10, 20, 30, 40, 50, 60], "group": ["A", "A", "B", "B", "C", "C"]}
     )
 
     result = stats_service.describe_var(
-        df,
-        "score",
-        split_variable="group",
-        include=["count", "mean", "min", "max"],
+        df, "score", split_variable="group", include=["count", "mean", "min", "max"]
     )
 
     # Check structure
@@ -469,14 +546,11 @@ def test_describe_var_with_split_variable_categorical(stats_service) -> None:
         {
             "color": ["red", "blue", "red", "green", "blue", "red"],
             "size": ["S", "S", "M", "M", "L", "L"],
-        },
+        }
     )
 
     result = stats_service.describe_var(
-        df,
-        "color",
-        split_variable="size",
-        include=["count", "mode", "frequencies"],
+        df, "color", split_variable="size", include=["count", "mode", "frequencies"]
     )
 
     # Check structure
@@ -501,7 +575,7 @@ def test_describe_var_with_split_variable_missing_values(stats_service) -> None:
         {
             "score": [10, 20, 30, 40, 50],
             "group": ["A", "B", -999, "A", "B"],  # -999 is missing
-        },
+        }
     )
 
     result = stats_service.describe_var(
@@ -519,35 +593,24 @@ def test_describe_var_with_split_variable_missing_values(stats_service) -> None:
     # Check that only valid groups are included
     assert categories["A"]["count"] == 2  # positions 0 and 3
     assert categories["A"]["mean"] == pytest.approx(
-        25.0,
+        25.0
     )  # (10 + 40) / 2  - positions 0 and 3
 
     assert categories["B"]["count"] == 2  # positions 1 and 4
     assert categories["B"]["mean"] == pytest.approx(
-        35.0,
+        35.0
     )  # (20 + 50) / 2 - positions 1 and 4
 
 
 def test_describe_var_with_split_variable_value_labels(stats_service) -> None:
     """Test split variable functionality with value labels for both variables."""
     df = pd.DataFrame(
-        {
-            "satisfaction": [1, 2, 1, 3, 2, 3],
-            "department": [1, 1, 2, 2, 3, 3],
-        },
+        {"satisfaction": [1, 2, 1, 3, 2, 3], "department": [1, 1, 2, 2, 3, 3]}
     )
 
-    satisfaction_labels = {
-        "1": "Low",
-        "2": "Medium",
-        "3": "High",
-    }
+    satisfaction_labels = {"1": "Low", "2": "Medium", "3": "High"}
 
-    department_labels = {
-        "1": "Sales",
-        "2": "Marketing",
-        "3": "Engineering",
-    }
+    department_labels = {"1": "Sales", "2": "Marketing", "3": "Engineering"}
 
     result = stats_service.describe_var(
         df,
@@ -572,14 +635,11 @@ def test_describe_var_with_split_variable_single_category(stats_service) -> None
         {
             "score": [10, 20, 30],
             "group": ["A", "A", "A"],  # All same group
-        },
+        }
     )
 
     result = stats_service.describe_var(
-        df,
-        "score",
-        split_variable="group",
-        include=["count", "mean"],
+        df, "score", split_variable="group", include=["count", "mean"]
     )
 
     categories = result["categories"]
@@ -594,7 +654,7 @@ def test_describe_var_with_split_variable_empty_after_filtering(stats_service) -
         {
             "score": [10, 20, 30],
             "group": [-999, -998, -999],  # All missing
-        },
+        }
     )
 
     result = stats_service.describe_var(
@@ -612,20 +672,12 @@ def test_describe_var_with_split_variable_empty_after_filtering(stats_service) -
 
 def test_describe_var_with_split_variable_mixed_numeric_string_categories(
     stats_service,
-) -> None:
+):
     """Test split variable with mixed numeric and string categories."""
-    df = pd.DataFrame(
-        {
-            "score": [10, 20, 30, 40, 50],
-            "group": [1, "A", 2, "A", 1],
-        },
-    )
+    df = pd.DataFrame({"score": [10, 20, 30, 40, 50], "group": [1, "A", 2, "A", 1]})
 
     result = stats_service.describe_var(
-        df,
-        "score",
-        split_variable="group",
-        include=["count", "mean"],
+        df, "score", split_variable="group", include=["count", "mean"]
     )
 
     categories = result["categories"]
@@ -646,37 +698,22 @@ def test_describe_var_with_split_variable_mixed_numeric_string_categories(
 
 def test_split_variable_not_found_error(stats_service) -> None:
     """Test that ValueError is raised when split variable doesn't exist."""
-    df = pd.DataFrame(
-        {
-            "score": [10, 20, 30],
-            "group": ["A", "B", "C"],
-        },
-    )
+    df = pd.DataFrame({"score": [10, 20, 30], "group": ["A", "B", "C"]})
 
     with pytest.raises(
-        ValueError, match=r"Split variable 'nonexistent' not found in the DataFrame\.",
+        ValueError, match="Split variable 'nonexistent' not found in the DataFrame."
     ):
-        stats_service.describe_var(
-            df,
-            "score",
-            split_variable="nonexistent",
-        )
+        stats_service.describe_var(df, "score", split_variable="nonexistent")
 
 
 def test_describe_var_with_split_variable_frequency_table_sorted(stats_service) -> None:
     """Test that frequency tables within split categories are properly sorted."""
     df = pd.DataFrame(
-        {
-            "rating": [5, 1, 3, 2, 4, 1],
-            "group": ["A", "A", "A", "B", "B", "B"],
-        },
+        {"rating": [5, 1, 3, 2, 4, 1], "group": ["A", "A", "A", "B", "B", "B"]}
     )
 
     result = stats_service.describe_var(
-        df,
-        "rating",
-        split_variable="group",
-        include=["frequencies"],
+        df, "rating", split_variable="group", include=["frequencies"]
     )
 
     categories = result["categories"]
@@ -694,10 +731,7 @@ def test_describe_var_with_split_variable_main_var_missing_values(
 ) -> None:
     """Test split variable functionality with missing values in main variable."""
     df = pd.DataFrame(
-        {
-            "score": [10, -999, 30, 40, -999],
-            "group": ["A", "A", "B", "B", "B"],
-        },
+        {"score": [10, -999, 30, 40, -999], "group": ["A", "A", "B", "B", "B"]}
     )
 
     result = stats_service.describe_var(
@@ -728,8 +762,8 @@ def test_decimal_places_rounding(stats_service) -> None:
     # Create test data with values that will produce many decimal places
     df = pd.DataFrame(
         {
-            "test_var": [1, 2, 2, 3, 4, 4, 4],  # Mean: 2.857..., Std: 1.214...
-        },
+            "test_var": [1, 2, 2, 3, 4, 4, 4]  # Mean: 2.857..., Std: 1.214...
+        }
     )
 
     # Test with default decimal_places (should return 2 decimal places)
@@ -744,7 +778,7 @@ def test_decimal_places_rounding(stats_service) -> None:
 
     # Test with decimal_places=None (should return full precision)
     stats_full_precision = stats_service.describe_var(
-        df, "test_var", decimal_places=None,
+        df, "test_var", decimal_places=None
     )
     assert len(str(stats_full_precision["mean"]).split(".")[-1]) > 2
     assert len(str(stats_full_precision["std"]).split(".")[-1]) > 2
@@ -761,7 +795,7 @@ def test_decimal_places_rounding(stats_service) -> None:
     for item in freq_table:
         percentage_str = str(item["percentages"])
         if "." in percentage_str:
-            decimal_places_count = len(percentage_str.rsplit(".", maxsplit=1)[-1])
+            decimal_places_count = len(percentage_str.split(".")[-1])
             assert decimal_places_count <= 2, (
                 f"Percentage {item['percentages']} has more than 2 decimal places"
             )
@@ -783,15 +817,12 @@ def test_decimal_places_with_split_variable(stats_service) -> None:
         {
             "values": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             "groups": ["A", "A", "A", "B", "B", "B"],
-        },
+        }
     )
 
     # Test with decimal_places=1
     stats = stats_service.describe_var(
-        df,
-        "values",
-        split_variable="groups",
-        decimal_places=1,
+        df, "values", split_variable="groups", decimal_places=1
     )
 
     assert "categories" in stats
@@ -819,11 +850,7 @@ def test_decimal_places_with_split_variable(stats_service) -> None:
 
 def test_missing_ranges_basic(stats_service) -> None:
     """Test that missing ranges are applied correctly to exclude values from statistics."""
-    df = pd.DataFrame(
-        {
-            "test_var": [1, 2, 3, 97, 98, 99, 100],
-        },
-    )
+    df = pd.DataFrame({"test_var": [1, 2, 3, 97, 98, 99, 100]})
 
     missing_ranges = [
         {"lo": 97, "hi": 99},  # Should exclude 97, 98, 99
@@ -840,17 +867,9 @@ def test_missing_ranges_basic(stats_service) -> None:
 
 def test_missing_ranges_frequency_table(stats_service) -> None:
     """Test that missing ranges are excluded from frequency tables."""
-    df = pd.DataFrame(
-        {
-            "test_var": [1, 2, 97, 98, 99, 100],
-        },
-    )
+    df = pd.DataFrame({"test_var": [1, 2, 97, 98, 99, 100]})
 
-    missing_ranges = [
-        {"lo": 97, "hi": 97},
-        {"lo": 98, "hi": 98},
-        {"lo": 99, "hi": 99},
-    ]
+    missing_ranges = [{"lo": 97, "hi": 97}, {"lo": 98, "hi": 98}, {"lo": 99, "hi": 99}]
 
     stats = stats_service.describe_var(df, "test_var", missing_ranges=missing_ranges)
 
@@ -868,11 +887,7 @@ def test_missing_ranges_frequency_table(stats_service) -> None:
 
 def test_missing_ranges_with_value_labels(stats_service) -> None:
     """Test that missing ranges work correctly with value labels."""
-    df = pd.DataFrame(
-        {
-            "test_var": [1, 2, 97, 98, 99, 100],
-        },
-    )
+    df = pd.DataFrame({"test_var": [1, 2, 97, 98, 99, 100]})
 
     value_labels = {
         "1": "One",
@@ -883,15 +898,10 @@ def test_missing_ranges_with_value_labels(stats_service) -> None:
         "100": "One hundred",
     }
 
-    missing_ranges = [
-        {"lo": 97, "hi": 99},
-    ]
+    missing_ranges = [{"lo": 97, "hi": 99}]
 
     stats = stats_service.describe_var(
-        df,
-        "test_var",
-        missing_ranges=missing_ranges,
-        value_labels=value_labels,
+        df, "test_var", missing_ranges=missing_ranges, value_labels=value_labels
     )
 
     # Check frequency table excludes missing range values even when they have labels
@@ -912,18 +922,13 @@ def test_missing_ranges_with_split_variable(stats_service) -> None:
         {
             "main_var": [1, 2, 97, 98, 1, 2, 99],
             "split_var": ["A", "A", "A", "B", "B", "B", "B"],
-        },
+        }
     )
 
-    missing_ranges = [
-        {"lo": 97, "hi": 99},
-    ]
+    missing_ranges = [{"lo": 97, "hi": 99}]
 
     stats = stats_service.describe_var(
-        df,
-        "main_var",
-        missing_ranges=missing_ranges,
-        split_variable="split_var",
+        df, "main_var", missing_ranges=missing_ranges, split_variable="split_var"
     )
 
     # Check that missing range values are excluded from each split category
@@ -958,12 +963,10 @@ def test_split_variable_missing_ranges(stats_service) -> None:
                 99,
                 3,
             ],  # 97, 98, 99 should be excluded from split
-        },
+        }
     )
 
-    split_variable_missing_ranges = [
-        {"lo": 97, "hi": 99},
-    ]
+    split_variable_missing_ranges = [{"lo": 97, "hi": 99}]
 
     stats = stats_service.describe_var(
         df,
@@ -984,11 +987,7 @@ def test_split_variable_missing_ranges(stats_service) -> None:
 
 def test_missing_ranges_combined_with_missing_values(stats_service) -> None:
     """Test that missing ranges work together with missing values."""
-    df = pd.DataFrame(
-        {
-            "test_var": [1, 2, 96, 97, 98, 99, 100],
-        },
-    )
+    df = pd.DataFrame({"test_var": [1, 2, 96, 97, 98, 99, 100]})
 
     missing_values = [96]  # Explicit missing value
     missing_ranges = [
@@ -996,10 +995,7 @@ def test_missing_ranges_combined_with_missing_values(stats_service) -> None:
     ]
 
     stats = stats_service.describe_var(
-        df,
-        "test_var",
-        missing_values=missing_values,
-        missing_ranges=missing_ranges,
+        df, "test_var", missing_values=missing_values, missing_ranges=missing_ranges
     )
 
     # Should only count: 1, 2, 100 (96, 97, 98, 99 excluded)
@@ -1020,13 +1016,9 @@ def test_missing_ranges_combined_with_missing_values(stats_service) -> None:
 
 def test_get_missing_ranges_values_helper(stats_service) -> None:
     """Test the helper method that converts missing ranges to excluded values."""
-    missing_ranges = [
-        {"lo": 97, "hi": 97},
-        {"lo": 98, "hi": 98},
-        {"lo": 99, "hi": 99},
-    ]
+    missing_ranges = [{"lo": 97, "hi": 97}, {"lo": 98, "hi": 98}, {"lo": 99, "hi": 99}]
 
-    excluded_values = stats_service.get_missing_ranges_values(missing_ranges)
+    excluded_values = stats_service._get_missing_ranges_values(missing_ranges)
 
     # Should include various string representations of 97, 98, 99
     assert "97" in excluded_values
@@ -1039,11 +1031,7 @@ def test_get_missing_ranges_values_helper(stats_service) -> None:
 
 def test_missing_ranges_empty_or_none(stats_service) -> None:
     """Test that empty or None missing ranges don't affect results."""
-    df = pd.DataFrame(
-        {
-            "test_var": [1, 2, 97, 98, 99],
-        },
-    )
+    df = pd.DataFrame({"test_var": [1, 2, 97, 98, 99]})
 
     # Test with None
     stats_none = stats_service.describe_var(df, "test_var", missing_ranges=None)
