@@ -103,6 +103,7 @@ function SortableVariableItem({ variable, selectedSetId, onRemove, onRefresh, is
             <AllowedStatisticsSelector
               variablesetId={selectedSetId}
               variableId={variable.id}
+              variableMeasure={variable.measure}
               currentAttributes={variable.attributes}
               onUpdate={onRefresh}
             />

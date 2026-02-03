@@ -242,6 +242,11 @@ export type CreateDatasetVariablesetData = z.infer<typeof insertDatasetVariables
 export type DatasetVariableset = z.infer<typeof selectDatasetVariablesetSchema>;
 export type UpdateDatasetVariablesetData = z.infer<typeof updateDatasetVariablesetSchema>;
 
+export const valueRangeSchema = z.object({
+  min: z.number(),
+  max: z.number(),
+});
+
 export const datasetVariablesetItemAttributes = z.object({
   allowedStatistics: z
     .object({
@@ -249,8 +254,10 @@ export const datasetVariablesetItemAttributes = z.object({
       mean: z.boolean(),
     })
     .default({ distribution: true, mean: false }),
+  valueRange: valueRangeSchema.optional(),
 });
 
+export type ValueRange = z.infer<typeof valueRangeSchema>;
 export type DatasetVariablesetItemAttributes = z.infer<typeof datasetVariablesetItemAttributes>;
 
 export const datasetVariablesetItem = pgTable(

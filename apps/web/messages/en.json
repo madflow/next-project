@@ -381,7 +381,16 @@
       "success": "Allowed statistics updated successfully",
       "title": "Configure Allowed Statistics",
       "validation": {
-        "atLeastOne": "At least one statistic must be selected"
+        "atLeastOne": "At least one statistic must be selected",
+        "minMax": "Min value must be less than or equal to max value"
+      },
+      "valueRange": {
+        "description": "Define the valid min and max values for this scale variable (optional)",
+        "max": "Max",
+        "maxPlaceholder": "Max value",
+        "min": "Min",
+        "minPlaceholder": "Min value",
+        "title": "Value Range Display"
       }
     },
     "assignVariables": "Assign Variables",
