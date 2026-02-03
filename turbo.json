@@ -30,7 +30,8 @@
       "persistent": true
     },
     "e2e": {
-      "cache": false
+      "cache": false,
+      "passThroughEnv": ["AUTH_DISABLE_SIGNUP"]
     },
     "e2e:deps": {
       "cache": false
