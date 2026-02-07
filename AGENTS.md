@@ -25,6 +25,7 @@ This project uses the following technologies:
 - **Linting:** ESLint
 - **Code Formatting:** Prettier
 - **End-to-End Testing:** Playwright
+- **Browser Automation:** Playwright CLI (for coding agents)
 - **Build Automation:** Make
 
 ## Monorepo structure
@@ -72,3 +73,47 @@ This project uses the following technologies:
 ## Rules for confirming changes
 
 - Always run `make check` after making significant changes to ensure code quality.
+
+## Playwright CLI
+
+Playwright CLI is installed for browser automation via coding agents. It provides a token-efficient CLI interface for browser automation tasks.
+
+### Installation
+
+The CLI is already installed as a dev dependency. To install skills for coding agents:
+
+```bash
+pnpm playwright-cli install --skills
+```
+
+This installs skills to `.claude/skills/playwright-cli` for use with coding agents.
+
+### Basic Usage
+
+```bash
+# Open a browser
+pnpm playwright-cli open https://example.com
+
+# Take a screenshot
+pnpm playwright-cli snapshot
+
+# List running browsers
+pnpm playwright-cli list
+
+# Close all browsers
+pnpm playwright-cli close-all
+```
+
+### Session Management
+
+By default, Playwright CLI uses persistent profiles that preserve cookies and storage state. You can use different sessions for different projects:
+
+```bash
+# Use a specific session
+pnpm playwright-cli -s=project-name open https://example.com
+
+# List all sessions
+pnpm playwright-cli list
+```
+
+For more details, see: https://github.com/microsoft/playwright-cli
