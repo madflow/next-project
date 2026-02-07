@@ -3,10 +3,11 @@
 ## General rules
 
 - **Always use context7** when I need code generation, setup or
-configuration steps, or library/API documentation. This means
-you should automatically use the Context7 MCP tools to resolve
-library id and get library docs without me having to
-explicitly ask.
+  configuration steps, or library/API documentation. This means
+  you should automatically use the Context7 MCP tools to resolve
+  library id and get library docs without me having to
+  explicitly ask.
+- Always run `make check` after making significant changes to ensure code quality.
 
 ## Tech Stack
 
@@ -26,6 +27,7 @@ This project uses the following technologies:
 - **Code Formatting:** Prettier
 - **End-to-End Testing:** Playwright
 - **Build Automation:** Make
+- **CI/CD:** GitHub Actions
 
 ## Monorepo structure
 
@@ -33,31 +35,6 @@ This project uses the following technologies:
 
 - `apps/analysis/` - Python-based analysis and data processing api.
 - `apps/web/` - Main Next.js web application.
-
-### Key directories in `apps/analysis/`
-
-- `analysis/` - Core analysis module.
-  - `db/` - Database models and ORM configurations.
-  - `services/` - Business logic and data processing services.
-  - `tests/` - Unit and integration tests.
-  - `web/` - Web utilities and API integrations.
-- `sandbox/` - Experimental code and prototyping.
-- `scripts/` - Utility scripts for maintenance and administration.
-
-### Key directories in `apps/web/`
-
-- `messages/` - Contains translation files for `next-intl`, organized by locale (e.g., `de`, `en`).
-- `public/` - Stores static assets like images, fonts, and other files served directly by Next.js.
-- `scripts/` - Houses utility scripts, such as database seeding scripts.
-- `src/` - Core application source code.
-  - `actions/` - Server actions for handling form submissions and data mutations.
-  - `app/` - Next.js App Router root, containing route segments, layouts, and pages.
-  - `components/` - Reusable UI components.
-  - `context/` - React context providers for global state management.
-  - `dal/` - Data Access Layer for interacting with the database.
-  - `hooks/` - Custom React hooks for encapsulating reusable logic.
-  - `i18n/` - Internationalization configuration and utilities.
-  - `lib/` - General utility functions and helper modules.
 
 ### Key directories in `packages/`
 
@@ -68,7 +45,3 @@ This project uses the following technologies:
 - `eslint-config/` - Shared ESLint configuration.
 - `prettier-config/` - Shared Prettier configuration.
 - `typescript-config/` - Shared TypeScript configuration.
-
-## Rules for confirming changes
-
-- Always run `make check` after making significant changes to ensure code quality.
