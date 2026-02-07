@@ -41,7 +41,7 @@ export const user = pgTable(
     locale: varchar("locale", { length: 2 }),
     banned: boolean("banned"),
     banReason: text("ban_reason"),
-    banExpires: timestamp("ban_expires"),
+    banExpires: timestamp("ban_expires", { withTimezone: true }),
   },
   (table) => [uniqueIndex("emailUniqueIndex").on(sql`lower(${table.email})`)]
 );
@@ -50,7 +50,7 @@ export const session = pgTable("sessions", {
   id: uuid("id")
     .primaryKey()
     .default(sql`uuidv7()`),
-  expiresAt: timestamp("expires_at").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   token: text("token").notNull().unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
@@ -75,8 +75,8 @@ export const account = pgTable("accounts", {
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
-  accessTokenExpiresAt: timestamp("access_token_expires_at"),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
   scope: text("scope"),
   password: text("password"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
