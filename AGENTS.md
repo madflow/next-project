@@ -45,3 +45,15 @@ This project uses the following technologies:
 - `eslint-config/` - Shared ESLint configuration.
 - `prettier-config/` - Shared Prettier configuration.
 - `typescript-config/` - Shared TypeScript configuration.
+
+## Available Skills
+
+The following skills are available in `.opencode/skills/`:
+
+### playwright-cli
+
+**Use when:** Automating browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information from web pages.
+
+**Tools available:** `Bash(playwright-cli:*)`
+
+**Location:** `.opencode/skills/playwright-cli/`
