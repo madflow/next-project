@@ -41,5 +41,6 @@ pnpm-debug.log*
 .vscode
 .idea
 
-# SQL dumps 
+# SQL dumps (but not migrations)
 *.sql
+!packages/database/migrations/*.sql
