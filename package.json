@@ -23,6 +23,7 @@
     "check-translations": "turbo run check-translations"
   },
   "devDependencies": {
+    "@playwright/cli": "^0.0.65",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "prettier": "3.8.1",
     "prettier-plugin-sort-json": "4.2.0",

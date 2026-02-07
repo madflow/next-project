@@ -12,6 +12,9 @@ importers:
 
   .:
     devDependencies:
+      '@playwright/cli':
+        specifier: ^0.0.65
+        version: 0.0.65
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.0
         version: 6.0.2(prettier@3.8.1)
@@ -1853,6 +1856,11 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
+
+  '@playwright/cli@0.0.65':
+    resolution: {integrity: sha512-JzW0NDuuJAitbOVJCouZJEtrS8s3iZxKeu9OgoCkqemR0zmYGgWIglPib3VNcQFROc3fjhCuxgjLqlFtyUYnjA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@playwright/test@1.58.1':
     resolution: {integrity: sha512-6LdVIUERWxQMmUSSQi0I53GgCBYgM2RpGngCPY7hSeju+VrKjq3lvs7HpJoPbDiY5QM5EYRtRX5fvrinnMAz3w==}
@@ -4588,11 +4596,13 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@11.1.0:
     resolution: {integrity: sha512-vuNwKSaKiqm7g0THUBu2x7ckSs3XJLXE+2ssL7/MfTGPLLcrJQ/4Uq1CjPTtO5cCIiRxqvN6Twy1qOwhL0Xjcw==}
     engines: {node: 20 || >=22}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   globals@14.0.0:
@@ -5433,8 +5443,18 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  playwright-core@1.59.0-alpha-1770338664000:
+    resolution: {integrity: sha512-Qlaafyf5T1GN/ynNJVVdJyD26HjzqvgRC62jNdfaFoMkTvqSlV4of9O6BV7c1x5ZJpplKXHecAPWKSWNdea7Dw==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   playwright@1.58.1:
     resolution: {integrity: sha512-+2uTZHxSCcxjvGc5C891LrS1/NlxglGxzrC4seZiVjcYVQfUa87wBL6rTDqzGjuoWNjnBzRqKmF6zRYGMvQUaQ==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.59.0-alpha-1770338664000:
+    resolution: {integrity: sha512-YKR5ko/eQFtcvlZPTJN3BmVFRrIxuzKw8sqZgP9XY+JvQEDlAsGDNsBd7/TxWLZYzCC8HHETB7cW6Ru2DEkTWA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -8032,6 +8052,12 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@playwright/cli@0.0.65':
+    dependencies:
+      minimist: 1.2.8
+      playwright: 1.59.0-alpha-1770338664000
+      playwright-core: 1.59.0-alpha-1770338664000
 
   '@playwright/test@1.58.1':
     dependencies:
@@ -11758,9 +11784,17 @@ snapshots:
 
   playwright-core@1.58.1: {}
 
+  playwright-core@1.59.0-alpha-1770338664000: {}
+
   playwright@1.58.1:
     dependencies:
       playwright-core: 1.58.1
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  playwright@1.59.0-alpha-1770338664000:
+    dependencies:
+      playwright-core: 1.59.0-alpha-1770338664000
     optionalDependencies:
       fsevents: 2.3.2
 
