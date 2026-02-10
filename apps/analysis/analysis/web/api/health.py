@@ -23,7 +23,7 @@ async def check_database_health(db: AsyncSession) -> Tuple[bool, str]:
         await db.execute(text("SELECT 1"))
         return True, "Successfully connected to database"
     except Exception as e:
-        return False, f"Database connection error: {str(e)}"
+        return False, f"Database connection error: {e!s}"
 
 
 def get_health_status() -> Tuple[Dict[str, Any], int]:
@@ -43,9 +43,6 @@ def get_health_status() -> Tuple[Dict[str, Any], int]:
         services["s3"] = {
             "connected": s3_connected,
             "message": s3_message,
-            # "endpoint": settings.s3_endpoint,
-            # "bucket": settings.s3_bucket_name,
-            # "region": settings.s3_region,
         }
 
         if not s3_connected:
@@ -70,14 +67,14 @@ def get_health_status() -> Tuple[Dict[str, Any], int]:
             "services": {
                 "s3": {
                     "connected": False,
-                    "message": f"Error: {str(e)}",
+                    "message": f"Error: {e!s}",
                     "endpoint": settings.s3_endpoint,
                     "bucket": settings.s3_bucket_name,
                     "region": settings.s3_region,
                 },
                 "database": {
                     "connected": False,
-                    "message": f"Error during health check: {str(e)}",
+                    "message": f"Error during health check: {e!s}",
                 },
             },
         }
@@ -103,9 +100,6 @@ async def health_check(
     health_status["services"]["database"] = {
         "connected": db_connected,
         "message": db_message,
-        # "host": settings.db_host,
-        # "port": settings.db_port,
-        # "name": settings.db_base,
     }
 
     # Update overall status if database is not connected
