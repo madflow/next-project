@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -118,7 +118,8 @@ class StatisticsService:
         Args:
             data: The input DataFrame to modify
             variable_name: The name of the variable to apply missing ranges to
-            missing_ranges: List of range objects with 'lo' and 'hi' keys defining inclusive ranges
+            missing_ranges: List of range objects with 'lo' and 'hi' keys
+                defining inclusive ranges
 
         Returns:
             Modified DataFrame with values in specified ranges replaced with pd.NA
@@ -174,19 +175,19 @@ class StatisticsService:
             # Try to convert string to numeric
             if isinstance(value, str):
                 # Remove whitespace
-                value = value.strip()
+                stripped_value = value.strip()
 
                 # Try to convert to int first (for whole numbers)
                 try:
                     # Check if it's a whole number (no decimal point or .0)
-                    if "." not in value or value.endswith(".0"):
+                    if "." not in stripped_value or stripped_value.endswith(".0"):
                         int_val = int(
-                            float(value),
+                            float(stripped_value),
                         )  # Convert via float to handle "123.0"
                         converted_values.append(int_val)
                     else:
                         # Convert to float for decimal numbers
-                        float_val = float(value)
+                        float_val = float(stripped_value)
                         converted_values.append(float_val)
                     continue
                 except ValueError:
@@ -194,26 +195,31 @@ class StatisticsService:
 
             # If we get here, conversion failed
             raise ValueError(
-                f"Cannot convert missing_values[{i}] = '{value}' (type: {type(value).__name__}) "
-                f"to a numeric value. All missing_values must be numeric or convertible to numeric.",
+                f"Cannot convert missing_values[{i}] = '{stripped_value if isinstance(value, str) else value}' "
+                f"(type: {type(value).__name__}) "
+                f"to a numeric value. All missing_values must be numeric "
+                f"or convertible to numeric.",
             )
 
         return converted_values
 
-    def _get_missing_ranges_values(self, missing_ranges: Optional[List[Dict[str, float]]]) -> set:
+    def get_missing_ranges_values(
+        self,
+        missing_ranges: Optional[List[Dict[str, float]]],
+    ) -> set:
         """
         Get all values that fall within the missing ranges.
-        
+
         Args:
             missing_ranges: List of range objects with 'lo' and 'hi' keys
-            
+
         Returns:
             Set of values (as strings) that fall within the missing ranges
         """
         missing_set = set()
         if missing_ranges is None:
             return missing_set
-            
+
         for range_obj in missing_ranges:
             if (
                 not isinstance(range_obj, dict)
@@ -221,11 +227,12 @@ class StatisticsService:
                 or "hi" not in range_obj
             ):
                 continue
-                
+
             lo = range_obj["lo"]
             hi = range_obj["hi"]
-            
-            # For each value in the range (assuming integer ranges like 97-97, 98-98, 99-99)
+
+            # For each value in the range (assuming integer ranges like
+            # 97-97, 98-98, 99-99)
             # Generate all possible values in the range
             if isinstance(lo, (int, float)) and isinstance(hi, (int, float)):
                 # For ranges like 97-97, 98-98, this will add just that single value
@@ -239,7 +246,7 @@ class StatisticsService:
                         missing_set.add(f"{int(current)}.0")
                         missing_set.add(str(int(current)))
                     current += 1
-                    
+
         return missing_set
 
     def _describe_var_with_split(
@@ -297,13 +304,17 @@ class StatisticsService:
 
         # Apply missing ranges to split variable
         if split_variable_missing_ranges is not None:
-            data = self._apply_missing_ranges(data, split_variable, split_variable_missing_ranges)
+            data = self._apply_missing_ranges(
+                data,
+                split_variable,
+                split_variable_missing_ranges,
+            )
 
         # Get unique categories from split variable (excluding NA and missing values)
         split_categories = data[split_variable].dropna().unique()
 
         # Sort categories in ascending order
-        def sort_key(item) -> tuple[int, float | str]:
+        def sort_key(item: Any) -> tuple[int, float | str]:
             try:
                 return (0, float(item))  # Numeric values get priority
             except (ValueError, TypeError):
@@ -338,7 +349,7 @@ class StatisticsService:
 
         return result
 
-    def _calculate_single_var_stats(
+    def _calculate_single_var_stats(  # noqa: C901, PLR0912, PLR0915
         self,
         data: pd.DataFrame,
         variable_name: str,
@@ -450,7 +461,8 @@ class StatisticsService:
                 # Get the missing values for filtering
                 missing_set = set()
                 if missing_values is not None:
-                    # Convert missing values to their various string representations for comparison
+                    # Convert missing values to their various string
+                    # representations for comparison
                     numeric_missing_values = self._convert_to_numeric_missing_values(
                         missing_values,
                     )
@@ -465,12 +477,13 @@ class StatisticsService:
 
                 # Add missing ranges values to the missing set
                 if missing_ranges is not None:
-                    missing_ranges_set = self._get_missing_ranges_values(missing_ranges)
+                    missing_ranges_set = self.get_missing_ranges_values(missing_ranges)
                     missing_set.update(missing_ranges_set)
 
-                # Create a set of all valid label keys (excluding missing values and ranges)
+                # Create a set of all valid label keys
+                # (excluding missing values and ranges)
                 valid_label_keys = set()
-                for key in value_labels.keys():
+                for key in value_labels:
                     if key not in missing_set:
                         valid_label_keys.add(key)
 
@@ -502,19 +515,20 @@ class StatisticsService:
                         }
 
                 # Convert to frequency records
-                for value_str, data in value_to_data.items():
+                for value_str, freq_data in value_to_data.items():
                     frequency_records.append(
                         {
                             "value": value_str,
-                            "counts": data["counts"],
-                            "percentages": data["percentages"],
+                            "counts": freq_data["counts"],
+                            "percentages": freq_data["percentages"],
                         },
                     )
             else:
                 # Original behavior when no value_labels are provided
                 for _, row in frequency_table_df.iterrows():
                     value = row["value"]
-                    # Always preserve as string to maintain exact format (e.g., "1.0" stays "1.0")
+                    # Always preserve as string to maintain exact format
+                    # (e.g., "1.0" stays "1.0")
                     try:
                         value = str(value) if pd.notna(value).item() else value
                     except (AttributeError, ValueError):
@@ -532,7 +546,7 @@ class StatisticsService:
                     )
 
             # Sort frequency records by value (numeric first, then string)
-            def sort_key(item) -> tuple[int, float | str]:
+            def sort_key(item: dict[str, Any]) -> tuple[int, float | str]:
                 try:
                     return (0, float(item["value"]))  # Numeric values get priority
                 except (ValueError, TypeError):

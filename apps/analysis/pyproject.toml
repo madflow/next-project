@@ -106,19 +106,19 @@ lint.ignore = [
   "D100",    # Missing docstring in public module
   "D202",    # No blank lines allowed after function docstring
   "D205",
-  "ANN102",  # Missing type annotation for self in method
-  "ANN101",  # Missing type annotation for argument
   "ANN401",  # typing.Any are disallowed in `**kwargs
   "PLR0913", # Too many arguments for function call
   "D106",    # Missing docstring in public nested class
+  "E501",    # Line too long - ignore line length checks
 ]
 exclude = ["analysis/db/migrations", ".venv/"]
 lint.mccabe = { max-complexity = 10 }
 line-length = 88
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = [
+"analysis/tests/*" = [
   "S101", # Use of assert detected
+  "ANN001", # Missing type annotation for function argument (pytest fixtures)
 ]
 
 [tool.ruff.lint.pydocstyle]

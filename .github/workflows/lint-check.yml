@@ -38,12 +38,34 @@ jobs:
           ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
           ${{ runner.os }}-nextjs-
     
+    - name: Cache Python dependencies
+      uses: actions/cache@v5
+      with:
+        path: |
+          ~/.cache/pip
+          apps/analysis/.venv
+        key: ${{ runner.os }}-python-${{ hashFiles('apps/analysis/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-python-
+    
     - uses: actions/setup-node@v6
       with:
         node-version: 24
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.14"
+    - name: Install Python deps
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        cd apps/analysis 
+        python3 -m venv .venv
+        source .venv/bin/activate
+        poetry install
+      shell: bash
     - name: Build 
       run: pnpm run build
     - name: Lint

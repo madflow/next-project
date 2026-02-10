@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     s3_region: str = "us-east-1"
     s3_bucket_name: str = "app"
     s3_access_key_id: str = "s3"
-    s3_secret_access_key: str = "s3"
+    s3_secret_access_key: str = "s3"  # noqa: S105
     s3_endpoint: str = "http://localhost:7070"
 
     api_key: str = "your-super-secret-api-key"
