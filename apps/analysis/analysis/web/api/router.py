@@ -11,6 +11,7 @@ api_router = APIRouter()
 
 @api_router.get("/", response_class=JSONResponse)
 async def root(api_key: str = Security(get_api_key)) -> dict[str, str]:
+    """Root endpoint returning API information."""
     return {"__self": "root"}
 
 

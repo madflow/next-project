@@ -1,6 +1,6 @@
-import os
 import tempfile
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
+from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import pandas as pd
@@ -133,12 +133,11 @@ def _download_sav_from_s3(s3_key: str) -> Iterator[str]:
         ) from e
     finally:
         # Clean up the temporary file
-        if os.path.exists(temp_file_path):
-            try:
-                os.unlink(temp_file_path)
-            except Exception:
+        temp_path = Path(temp_file_path)
+        if temp_path.exists():
+            with suppress(OSError):
                 # Swallow removal errors to avoid masking original exceptions
-                pass
+                temp_path.unlink()
 
 
 def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
