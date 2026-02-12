@@ -155,12 +155,21 @@ test.describe("User Account", () => {
     const avatarPath = path.join(__dirname, "../testdata/avatar.png");
     await fileInput.setInputFiles(avatarPath);
 
-    const uploadPromise = page.waitForRequest(/avatar/);
-    await page.getByTestId("app.user.account.avatar-save-button").click();
+    // Wait for save button to be visible and enabled before clicking
+    const saveButton = page.getByTestId("app.user.account.avatar-save-button");
+    await saveButton.waitFor({ state: "visible", timeout: 5000 });
+    await expect(saveButton).toBeEnabled();
+
+    // Wait for the user update response after clicking save
+    // The avatar upload is handled by a Server Action that calls /api/auth/update-user
+    const uploadPromise = page.waitForResponse(/api\/auth\/update-user/);
+    await saveButton.click();
     await uploadPromise;
 
     await page.getByTestId("app.user.account.avatar-container").waitFor({ state: "visible" });
     await expect(page.getByTestId("app.user.account.avatar-container")).toBeVisible();
+
+    // After reload, verify the avatar image is loaded from the API
     const avatarExistsResponse = page.waitForResponse(
       /\/api\/users\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/avatars\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.png/i
     );
