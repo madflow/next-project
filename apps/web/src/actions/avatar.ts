@@ -1,6 +1,6 @@
 "use server";
 
-import { DeleteObjectCommand, ObjectCannedACL, PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
 import { env } from "@/env";
@@ -96,7 +96,6 @@ export const uploadAvatar = withAuth(async ({ file, userId }: UploadAvatarParams
       Key: key,
       Body: buffer,
       ContentType: detectedType.mime,
-      ACL: "public-read" as ObjectCannedACL,
       Metadata: {
         "original-filename": file.name,
         "uploaded-by": userId,
