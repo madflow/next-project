@@ -5,6 +5,9 @@ env:
   DO_NOT_TRACK: 1
   NEXT_PUBLIC_BASE_URL: http://localhost:3000
   NEXT_PUBLIC_SITE_NAME: app
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  ANALYSIS_SENTRY_DSN: ${{ secrets.ANALYSIS_SENTRY_DSN }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 on:
   push:
     branches: [main]
