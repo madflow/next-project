@@ -378,6 +378,7 @@
       "mean": "Mean",
       "save": "Save",
       "saving": "Saving...",
+      "stringVariableMessage": "String variables display raw non-empty values. Statistical charts are not available for text data.",
       "success": "Allowed statistics updated successfully",
       "title": "Configure Allowed Statistics",
       "validation": {

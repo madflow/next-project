@@ -55,4 +55,11 @@ export type VariableStats = z.infer<typeof VariableStatsSchema>;
 export type StatsResponseItem = z.infer<typeof StatsResponseItemSchema>;
 export type StatsResponse = z.infer<typeof StatsResponseSchema>;
 
-export type AnalysisChartType = "bar" | "horizontalBar" | "horizontalStackedBar" | "pie" | "metrics" | "meanBar";
+export type AnalysisChartType =
+  | "bar"
+  | "horizontalBar"
+  | "horizontalStackedBar"
+  | "pie"
+  | "metrics"
+  | "meanBar"
+  | "textExplorer";
