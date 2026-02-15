@@ -62,16 +62,6 @@
 
 - Use TanStack Query (react-query) for frontend data fetching.
 
-## Next.js 15 specifics
-
-- Next.Js is used in the apps/web directory
-- Use the App Router
-- Use Server Components by default
-- Mark client components with `'''use client'''` directive
-- Implement proper loading and error states
-- Use route groups `(folder)` for logical organization
-- Do not use hooks in server components. Use hooks in client components. A hook starts with `use` like `useSession`.
-
 ## Authentication Patterns
 
 This app uses Better Auth with two separate instances:
