@@ -47,8 +47,6 @@
 
 - Always use type hints for function signatures
 - Use Pydantic models for data validation
-- Enable MyPy strict mode for type checking
-- Avoid using `Any` type unless absolutely necessary
 
 ## Database Patterns
 
