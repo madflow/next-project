@@ -58,4 +58,4 @@ The following skills are available in `.opencode/skills/`:
 
 **Location:** `.opencode/skills/playwright-cli/`
 
-**Important:** Run `make seeed` before running a test to ensure that the database is seeded with the necessary test data.
+**Important:** Run `make seed` before running a test to ensure that the database is seeded with the necessary test data.
