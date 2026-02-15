@@ -34,6 +34,20 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+      s3:
+        image: versity/versitygw:latest
+        env:
+          ROOT_ACCESS_KEY: s3
+          ROOT_SECRET_KEY: s3
+          VGW_BACKEND: posix
+          VGW_BACKEND_ARG: /tmp
+        ports:
+          - 7070:7070
+        options: >-
+          --health-cmd="curl -s -o /dev/null http://localhost:7070 || true"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -85,16 +99,6 @@ jobs:
         with:
           node-version: lts/*
           cache: "pnpm"
-      - name: Start S3 service
-        run: |
-          docker compose -f docker-compose.actions.yml up -d
-          sleep 5
-          docker compose -f docker-compose.actions.yml logs
-      - name: Wait for S3 service to be ready
-        run: |
-          echo "Waiting for S3 service..."
-          timeout 10 bash -c 'until http_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:7070) && [ "$http_code" -ge 200 ] && [ "$http_code" -lt 500 ]; do sleep 2; done'
-          echo "S3 service is ready!"
       - name: Configure AWS CLI for local S3
         run: |
           pip install awscli
