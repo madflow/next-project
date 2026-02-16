@@ -41,6 +41,4 @@ pnpm-debug.log*
 .vscode
 .idea
 
-# SQL dumps 
-*.sql
 .playwright-cli
