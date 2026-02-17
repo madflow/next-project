@@ -1069,6 +1069,8 @@
       "description": "No chart types are enabled for this variable. Please contact an administrator to configure allowed statistics.",
       "title": "No Charts Available"
     },
+    "sidebarDescription": "Choose a dataset and select variables to analyze",
+    "sidebarTitle": "Dataset and Variables",
     "splitBy": "Split by {variable}",
     "splitVariable": {
       "label": "Split Variable:",
@@ -1080,7 +1082,8 @@
       "chart": "Chart",
       "stats": "Statistics",
       "variable": "Variable"
-    }
+    },
+    "title": "Ad-hoc Analysis"
   },
   "projectAdhocVariables": {
     "loadMore": "Load more variables",

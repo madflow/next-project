@@ -1069,6 +1069,8 @@
       "description": "Für diese Variable sind keine Diagrammtypen aktiviert. Bitte kontaktieren Sie einen Administrator, um die erlaubten Statistiken zu konfigurieren.",
       "title": "Keine Diagramme verfügbar"
     },
+    "sidebarDescription": "Wählen Sie einen Datensatz und Variablen zur Analyse aus",
+    "sidebarTitle": "Datensatz und Variablen",
     "splitBy": "aufgeteilt nach: {variable}",
     "splitVariable": {
       "label": "Teilungsvariable:",
@@ -1080,7 +1082,8 @@
       "chart": "Diagramm",
       "stats": "Statistiken",
       "variable": "Variable"
-    }
+    },
+    "title": "Ad-hoc-Analyse"
   },
   "projectAdhocVariables": {
     "loadMore": "Weitere Variablen laden",

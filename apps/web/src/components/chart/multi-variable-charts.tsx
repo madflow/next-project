@@ -83,7 +83,7 @@ export function MultiVariableCharts({
           variable={variable}
           stats={stats}
           datasetId={datasetId}
-          className="w-[600px]"
+          className="min-h-[300px] w-full max-w-[768px]"
           selectedSplitVariable={splitVariables[variable.name] || null}
           onSplitVariableChangeAction={(splitVariable: string | null) =>
             handleSplitVariableChange(variable.name, splitVariable)
@@ -107,7 +107,7 @@ export function MultiVariableCharts({
           variablesetName={variableset.name}
           variablesetDescription={variableset.description}
           countedValue={countedValue}
-          className="w-[600px]"
+          className="min-h-[300px] w-full max-w-[768px]"
         />
       )}
 
@@ -125,7 +125,7 @@ export function MultiVariableCharts({
             variable={variable}
             stats={stats}
             datasetId={datasetId}
-            className="w-[600px]"
+            className="min-h-[300px] w-full max-w-[768px]"
             selectedSplitVariable={splitVariables[variable.name] || null}
             onSplitVariableChangeAction={(splitVariable: string | null) =>
               handleSplitVariableChange(variable.name, splitVariable)
