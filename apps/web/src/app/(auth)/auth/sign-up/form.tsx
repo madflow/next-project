@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -20,6 +20,7 @@ import { type SignUpSchema, signUpSchema } from "./schema";
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   const locale = useLocale() as Locale;
   const t = useTranslations();
+  const router = useRouter();
 
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
@@ -45,7 +46,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
     if (data) {
       form.reset();
-      redirect("/auth/check-email");
+      if (env.NEXT_PUBLIC_AUTH_DISABLE_SIGNUP) {
+        router.push("/auth/login");
+      } else {
+        router.push("/auth/check-email");
+      }
     }
   };
 
