@@ -51,7 +51,7 @@ jobs:
       - name: Install Python deps
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-          cd apps/analysis 
+          cd apps/analysis
           python3 -m venv .venv
           source .venv/bin/activate
           poetry install
