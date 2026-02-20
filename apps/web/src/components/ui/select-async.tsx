@@ -29,6 +29,7 @@ function SelectAsync<T, TResponse>({
   itemToKey,
   responseToItems,
 }: SelectAsyncProps<T, TResponse>) {
+  const listboxId = React.useId();
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const [items, setItems] = React.useState<T[]>([]);
@@ -55,7 +56,12 @@ function SelectAsync<T, TResponse>({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="justify-between">
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={listboxId}
+          className="justify-between">
           {selectedItem ? itemToLabel(selectedItem) : (placeholder ?? "Select")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -63,7 +69,7 @@ function SelectAsync<T, TResponse>({
       <PopoverContent className="p-0">
         <Command filter={() => 1}>
           <CommandInput placeholder="Search..." value={query} onValueChange={setQuery} />
-          <CommandList>
+          <CommandList id={listboxId}>
             {isLoading && (
               <div className="flex justify-center p-2">
                 <Loader2 className="h-6 w-6 animate-spin" />

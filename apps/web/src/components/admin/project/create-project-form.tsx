@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -13,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Organization } from "@/types/organization";
+import { useOrganizations } from "@/hooks/use-organizations";
 import { insertProjectSchema } from "@/types/project";
 
 type CreateProjectTranslations = {
@@ -49,23 +48,7 @@ type FormValues = z.infer<ReturnType<typeof createFormSchema>> & {
 export function CreateProjectForm() {
   const router = useRouter();
   const t = useTranslations("project");
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadOrganizations() {
-      try {
-        const result = await fetch("/api/organizations").then((res) => res.json());
-        setOrganizations(result.rows);
-      } catch (error) {
-        console.error("Failed to load organizations", error);
-        toast.error(t("messages.error.generic"));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadOrganizations();
-  }, [t]);
+  const { data: organizations = [], isLoading } = useOrganizations();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(createFormSchema(t as unknown as CreateProjectTranslations)),

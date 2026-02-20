@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -12,13 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useOrganizations } from "@/hooks/use-organizations";
 import { updateProjectSchema } from "@/types/project";
-
-type Organization = {
-  id: string;
-  name: string;
-  slug: string;
-};
 
 // Function to create schema with translations
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,26 +52,10 @@ type EditProjectFormProps = {
 export function EditProjectForm({ project }: EditProjectFormProps) {
   const router = useRouter();
   const t = useTranslations("project");
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: organizations = [], isLoading } = useOrganizations();
 
   // Create schema with translations once when the component mounts
   const schema = useMemo(() => createFormSchema(t), [t]);
-
-  useEffect(() => {
-    async function loadOrganizations() {
-      try {
-        const result = await fetch("/api/organizations").then((res) => res.json());
-        setOrganizations(result.rows);
-      } catch (error) {
-        console.error("Failed to load organizations", error);
-        toast.error(t("messages.error.generic"));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadOrganizations();
-  }, [t]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
