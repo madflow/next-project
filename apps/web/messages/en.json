@@ -1018,6 +1018,7 @@
         "placeholder": "Enter project name"
       },
       "organization": {
+        "error": "Failed to load organizations",
         "errors": {
           "required": "Organization is required"
         },

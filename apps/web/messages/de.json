@@ -1018,6 +1018,7 @@
         "placeholder": "Namen des Projekts eingeben"
       },
       "organization": {
+        "error": "Organisationen konnten nicht geladen werden",
         "errors": {
           "required": "Bitte wählen Sie eine Organisation aus"
         },

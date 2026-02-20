@@ -48,7 +48,7 @@ type FormValues = z.infer<ReturnType<typeof createFormSchema>> & {
 export function CreateProjectForm() {
   const router = useRouter();
   const t = useTranslations("project");
-  const { data: organizations = [], isLoading } = useOrganizations();
+  const { data: organizations = [], isLoading, isError } = useOrganizations();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(createFormSchema(t as unknown as CreateProjectTranslations)),
@@ -130,6 +130,8 @@ export function CreateProjectForm() {
                 <SelectContent>
                   {isLoading ? (
                     <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.loading")}</div>
+                  ) : isError ? (
+                    <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.error")}</div>
                   ) : organizations.length === 0 ? (
                     <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.notFound")}</div>
                   ) : (

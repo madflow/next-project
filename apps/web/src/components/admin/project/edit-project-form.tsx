@@ -16,8 +16,11 @@ import { useOrganizations } from "@/hooks/use-organizations";
 import { updateProjectSchema } from "@/types/project";
 
 // Function to create schema with translations
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const createFormSchema = (t: any) => {
+type EditProjectTranslations = (
+  key: `form.${"name" | "slug" | "organization"}.errors.${"required" | "invalid" | "maxLength"}`
+) => string;
+
+const createFormSchema = (t: EditProjectTranslations) => {
   return z.object({
     id: z.string().min(1),
     name: z.string().min(1, { message: t("form.name.errors.required") }),
@@ -52,10 +55,10 @@ type EditProjectFormProps = {
 export function EditProjectForm({ project }: EditProjectFormProps) {
   const router = useRouter();
   const t = useTranslations("project");
-  const { data: organizations = [], isLoading } = useOrganizations();
+  const { data: organizations = [], isLoading, isError } = useOrganizations();
 
   // Create schema with translations once when the component mounts
-  const schema = useMemo(() => createFormSchema(t), [t]);
+  const schema = useMemo(() => createFormSchema(t as unknown as EditProjectTranslations), [t]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -138,6 +141,8 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
                 <SelectContent>
                   {isLoading ? (
                     <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.loading")}</div>
+                  ) : isError ? (
+                    <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.error")}</div>
                   ) : organizations.length === 0 ? (
                     <div className="text-muted-foreground px-2 py-1.5 text-sm">{t("form.organization.notFound")}</div>
                   ) : (

@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { Controller, type FieldErrors, useForm } from "react-hook-form";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { uploadDatasetWithFormData } from "@/actions/dataset";
@@ -61,7 +61,6 @@ type FormData = {
 export function DatasetUploadForm() {
   const router = useRouter();
   const t = useTranslations("adminDatasetUploadForm");
-  const [isPending] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
 
   const { data: organizations = [], isLoading } = useOrganizations();
@@ -90,10 +89,6 @@ export function DatasetUploadForm() {
       description: "",
     },
   });
-
-  const onErrors = (errors: FieldErrors<FormData>) => {
-    console.log(errors);
-  };
 
   const onSubmit = async (data: FormData) => {
     const selectedFile = data.files[0];
@@ -140,7 +135,7 @@ export function DatasetUploadForm() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <form onSubmit={form.handleSubmit(onSubmit, onErrors)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Controller
           name="files"
           control={form.control}
@@ -283,7 +278,7 @@ export function DatasetUploadForm() {
                   {...field}
                   id={field.name}
                   placeholder={t("formLabels.description")}
-                  disabled={isPending || isUploading}
+                  disabled={isUploading}
                   rows={3}
                   aria-invalid={fieldState.invalid}
                 />
@@ -294,10 +289,10 @@ export function DatasetUploadForm() {
         />
 
         <div className="flex justify-start space-x-4 pt-4">
-          <Button type="button" variant="outline" onClick={() => router.back()} disabled={isPending || isUploading}>
+          <Button type="button" variant="outline" onClick={() => router.back()} disabled={isUploading}>
             {t("buttons.cancel")}
           </Button>
-          <Button type="submit" data-testid="app.admin.dataset.upload-button" disabled={isPending || isUploading}>
+          <Button type="submit" data-testid="app.admin.dataset.upload-button" disabled={isUploading}>
             {isUploading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
