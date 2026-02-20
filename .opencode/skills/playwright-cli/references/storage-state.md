@@ -34,23 +34,23 @@ The saved file contains:
 {
   "cookies": [
     {
-      "name": "session_id",
-      "value": "abc123",
       "domain": "example.com",
-      "path": "/",
       "expires": 1735689600,
       "httpOnly": true,
+      "name": "session_id",
+      "path": "/",
+      "sameSite": "Lax",
       "secure": true,
-      "sameSite": "Lax"
+      "value": "abc123"
     }
   ],
   "origins": [
     {
-      "origin": "https://example.com",
       "localStorage": [
         { "name": "theme", "value": "dark" },
         { "name": "user_id", "value": "12345" }
-      ]
+      ],
+      "origin": "https://example.com"
     }
   ]
 }
