@@ -12,7 +12,7 @@ import {
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Folder } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 import { SortableVariablesetNode } from "./sortable-variableset-node";
 
@@ -62,12 +62,14 @@ function SortableList({
   onReorder,
 }: SortableListProps) {
   const [localNodes, setLocalNodes] = useState(nodes);
+  const [prevNodes, setPrevNodes] = useState(nodes);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Update local nodes when props change
-  useEffect(() => {
+  // Sync local nodes when the prop changes (getDerivedStateFromProps pattern)
+  if (prevNodes !== nodes) {
+    setPrevNodes(nodes);
     setLocalNodes(nodes);
-  }, [nodes]);
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

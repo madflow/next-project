@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Controller, type FieldErrors, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Organization } from "@/types/organization";
+import { useOrganizations } from "@/hooks/use-organizations";
 
 function generateDatasetName(filename: string): string {
   // Return empty string if filename is empty or null
@@ -64,23 +64,7 @@ export function DatasetUploadForm() {
   const [isPending] = useTransition();
   const [isUploading, setIsUploading] = useState(false);
 
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadOrganizations() {
-      try {
-        const result = await fetch("/api/organizations").then((res) => res.json());
-        setOrganizations(result.rows);
-      } catch (error) {
-        console.error("Failed to load organizations", error);
-        toast.error(t("errors.unknownError"));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadOrganizations();
-  }, [t]);
+  const { data: organizations = [], isLoading } = useOrganizations();
 
   const form = useForm<FormData>({
     resolver: zodResolver(
