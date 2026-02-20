@@ -85,16 +85,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v5
-        with:
-          path: |
-            ~/.cache/pip
-            apps/analysis/.venv
-          key: ${{ runner.os }}-python-${{ hashFiles('apps/analysis/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-python-
-
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
