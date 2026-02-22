@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "dev": "email dev --dir ./src/templates -p 3333",
-    "clean": "rm -rf .turbo node_modules"
+    "clean": "git clean -xdf .cache dist .turbo node_modules"
   },
   "dependencies": {
     "@react-email/components": "^1.0.6",

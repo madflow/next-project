@@ -2,6 +2,8 @@
     "name": "@app/analysis",
     "version": "0.1.0",
     "scripts": {
+        "clean": "git clean -xdf .cache dist .turbo node_modules",
+        "env:copy": "cp -n .env.dist .env || true",
         "start": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'",
         "dev": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'",
         "test": "bash -c 'source .venv/bin/activate && poetry run pytest'",

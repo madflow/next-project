@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "E2E tests",
   "scripts": {
+    "clean": "git clean -xdf .cache dist .turbo node_modules",
     "e2e": "playwright test --project=chromium",
     "e2e:single": "playwright test --project=chromium",
     "e2e:prod": "BASE_URL=http://localhost:3001 playwright test --project=chromium --workers=1",

@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "description": "Database package",
   "scripts": {
+    "clean": "git clean -xdf .cache dist .turbo node_modules",
+    "env:copy": "cp -n .env.dist .env || true",
     "build": "unbuild --clean",
     "stub": "unbuild --stub",
     "db:generate": "drizzle-kit generate",

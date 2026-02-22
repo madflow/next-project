@@ -13,6 +13,9 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "clean": {
+      "cache": false
+    },
     "db:generate": {
       "cache": false
     },
@@ -36,6 +39,9 @@
       "cache": false
     },
     "e2e:single": {
+      "cache": false
+    },
+    "env:copy": {
       "cache": false
     },
     "lint": {

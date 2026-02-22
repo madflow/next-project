@@ -4,6 +4,7 @@
   "private": true,
   "main": "./dist/index.mjs",
   "scripts": {
+    "clean": "git clean -xdf .cache dist .turbo node_modules",
     "build": "unbuild",
     "stub": "unbuild --stub",
     "check-types": "tsc --noEmit",
