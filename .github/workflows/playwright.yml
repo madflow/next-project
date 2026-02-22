@@ -102,7 +102,7 @@ jobs:
           aws s3 mb s3://app --endpoint-url $AWS_ENDPOINT_URL
           echo "Bucket 'app' created successfully"
       - name: Copy .env.dist
-        run: cp ./apps/web/.env.dist ./apps/web/.env && cp ./packages/database/.env.dist ./packages/database/.env && cp ./apps/analysis/.env.dist ./apps/analysis/.env
+        run: pnpm run env:copy
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Set up Python
