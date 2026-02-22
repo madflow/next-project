@@ -45,10 +45,10 @@ jobs:
         with:
           node-version: lts/*
           cache: "pnpm"
-      - name: Copy .env.dist
-        run: pnpm run env:copy
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Copy .env.dist
+        run: pnpm run env:copy
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
