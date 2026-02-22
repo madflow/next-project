@@ -20,7 +20,8 @@
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "check-translations": "turbo run check-translations"
+    "check-translations": "turbo run check-translations",
+    "clean": "turbo run clean"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",

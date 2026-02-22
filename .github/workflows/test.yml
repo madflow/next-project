@@ -46,7 +46,7 @@ jobs:
           node-version: lts/*
           cache: "pnpm"
       - name: Copy .env.dist
-        run: cp ./apps/web/.env.dist ./apps/web/.env && cp ./packages/database/.env.dist ./packages/database/.env && cp ./apps/analysis/.env.dist ./apps/analysis/.env
+        run: pnpm run env:copy
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Set up Python

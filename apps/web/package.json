@@ -4,6 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "clean": "git clean -xdf .cache dist .turbo node_modules",
+    "env:copy": "cp -n .env.dist .env || true",
     "dev": "next dev --turbopack --port 3000",
     "build": "next build",
     "start": "next start",
