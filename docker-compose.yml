@@ -27,7 +27,7 @@ services:
       - SMTP_SERVER_USERNAME=password
       - SENTRY_DSN=${APP_SENTRY_DSN:-""}
     ports:
-      - "3001:3000"
+      - "${APP_PORT:-3001}:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,17 +90,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_DB=${POSTGRES_DB:-postgres}
     ports:
-      - "5432:5432"
-
-  rest:
-    image: postgrest/postgrest
-    ports:
-      - "3002:3000"
-    environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3002
-    depends_on:
-      - postgres
+      - "${POSTGRES_PORT:-5432}:5432"
 
   # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
   pgadmin:
@@ -111,7 +101,7 @@ services:
     volumes:
       - pg-admin-data:/var/lib/pgadmin
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT:-5050}:80"
     depends_on:
       - postgres
 
@@ -120,8 +110,8 @@ services:
     image: axllent/mailpit
     platform: linux/arm64
     ports:
-      - 8025:8025
-      - 1025:1025
+      - "${SMTP_WEB_PORT:-8025}:8025"
+      - "${SMTP_PORT:-1025}:1025"
     environment:
       MP_MAX_MESSAGES: 5000
       MP_SMTP_AUTH_ACCEPT_ANY: 1
@@ -130,7 +120,7 @@ services:
   s3:
     image: versity/versitygw:latest
     ports:
-      - "7070:7070"
+      - "${S3_PORT:-7070}:7070"
     environment:
       ROOT_ACCESS_KEY: ${VGW_ROOT_ACCESS_KEY:-s3}
       ROOT_SECRET_KEY: ${VGW_ROOT_SECRET_KEY:-s3}
