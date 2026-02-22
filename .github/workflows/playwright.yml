@@ -101,10 +101,10 @@ jobs:
           export AWS_ENDPOINT_URL=http://localhost:7070
           aws s3 mb s3://app --endpoint-url $AWS_ENDPOINT_URL
           echo "Bucket 'app' created successfully"
-      - name: Copy .env.dist
-        run: pnpm run env:copy
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Copy .env.dist
+        run: pnpm run env:copy
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
