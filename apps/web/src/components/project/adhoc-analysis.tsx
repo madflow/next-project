@@ -210,7 +210,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
               size="icon"
               className="h-8 w-8"
               onClick={variablePanel.toggle}
-              data-testid="variable-panel-toggle">
+              data-testid="variable-panel-toggle"
+              aria-label={variablePanel.isOpen ? t("variablePanel.hidePanel") : t("variablePanel.showPanel")}>
               {variablePanel.isOpen ? (
                 <PanelLeftCloseIcon className="h-4 w-4" />
               ) : (
