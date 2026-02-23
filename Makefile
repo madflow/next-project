@@ -144,7 +144,9 @@ check:
 ## Initialize development environment
 .PHONY: dev-init
 dev-init:
-	s3cmd --no-check-certificate -c .config/s3cfg.local mb s3://app
+	pnpm install
+	make venv
+	s3cmd --no-check-certificate -c docker/s3cfg.local mb s3://app || true
 	make migrate
 	make seed
 
@@ -156,3 +158,8 @@ e2e-single:
 		exit 1; \
 	fi
 	pnpm run e2e:single -- $(TEST)
+
+## Create python virtual environment
+.PHONY: venv
+venv:
+				python3 -m venv ./apps/analysis/.venv
