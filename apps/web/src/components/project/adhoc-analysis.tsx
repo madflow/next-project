@@ -121,10 +121,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       setBaseStatsData({});
       setSplitStatsData({});
       saveDataset(value);
-
-      if (!value) {
-        saveCurrentSelection(null);
-      }
+      saveCurrentSelection(null);
     },
     [saveDataset, saveCurrentSelection]
   );
