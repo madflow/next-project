@@ -144,7 +144,10 @@ check:
 ## Initialize development environment
 .PHONY: dev-init
 dev-init:
+	pnpm run clean
 	pnpm install
+	pnpm run env:copy
+	make build
 	make venv
 	s3cmd --no-check-certificate -c docker/s3cfg.local mb s3://app || true
 	make migrate
