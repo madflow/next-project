@@ -1081,6 +1081,11 @@
       "chart": "Diagramm",
       "stats": "Statistiken",
       "variable": "Variable"
+    },
+    "variablePanel": {
+      "hidePanel": "Variablen ausblenden",
+      "showPanel": "Variablen anzeigen",
+      "title": "Variablen"
     }
   },
   "projectAdhocVariables": {
