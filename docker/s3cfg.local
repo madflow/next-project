@@ -1,0 +1,8 @@
+[default]
+access_key = s3
+secret_key = s3
+host_base = localhost:7070
+host_bucket = localhost:7070
+use_https = False
+signature_v2 = False
+bucket_location = us-east-1
