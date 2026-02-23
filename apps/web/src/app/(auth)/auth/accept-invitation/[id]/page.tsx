@@ -5,6 +5,7 @@ import { defaultClient as db } from "@repo/database/clients";
 import { invitation, member, user } from "@repo/database/schema";
 import { AuthAcceptInvitationCard } from "@/components/auth-accept-invitation-card";
 import { SignUpFormWithInvitation } from "@/components/sign-up-form-with-invitation";
+import { env } from "@/env";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   // Await params before accessing properties
@@ -37,8 +38,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   // Store this information to determine if the user needs to sign up or can directly accept the invitation
   const needsToSignUp = !existingUser;
   const canDirectlyAccept = !needsToSignUp && !isAlreadyMember;
-
-  console.log("canDirectlyAccept", canDirectlyAccept);
+  const signUpDisabled = !!env.AUTH_DISABLE_SIGNUP;
 
   return (
     <main
@@ -49,6 +49,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <AuthAcceptInvitationCard invitationId={id} userId={existingUser?.id} />
         ) : needsToSignUp ? (
           <SignUpFormWithInvitation
+            signUpDisabled={signUpDisabled}
             invitation={{
               id: existingInvitation.id,
               email: existingInvitation.email,

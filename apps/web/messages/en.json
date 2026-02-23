@@ -1092,6 +1092,17 @@
     "loadMore": "Load more variables",
     "search": "Search..."
   },
+  "registrationSuccess": {
+    "actions": {
+      "signIn": "Sign in"
+    },
+    "alert": {
+      "description": "Your account is ready. You can now sign in to access the application.",
+      "title": "Account created"
+    },
+    "description": "Your account has been created successfully",
+    "title": "Registration Successful"
+  },
   "resetPassword": {
     "description": "Enter your new password below.",
     "form": {

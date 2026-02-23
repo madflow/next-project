@@ -19,6 +19,7 @@ import { Locale, locales } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
 interface SignUpFormWithInvitationProps {
+  signUpDisabled: boolean;
   invitation: {
     id: string;
     email: string;
@@ -27,7 +28,7 @@ interface SignUpFormWithInvitationProps {
   };
 }
 
-export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitationProps) {
+export function SignUpFormWithInvitation({ signUpDisabled, invitation }: SignUpFormWithInvitationProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations();
   const router = useRouter();
@@ -67,12 +68,14 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
       email: values.email,
       name: values.name,
       password: values.password,
-      callbackURL: new URL("/auth/verify-email", env.NEXT_PUBLIC_BASE_URL).toString(),
+      callbackURL: signUpDisabled
+        ? new URL("/auth/login", env.NEXT_PUBLIC_BASE_URL).toString()
+        : new URL("/auth/verify-email", env.NEXT_PUBLIC_BASE_URL).toString(),
       locale: values.locale,
     });
 
     form.reset();
-    router.push(`/auth/check-email`);
+    router.push(signUpDisabled ? "/auth/registration-success" : "/auth/check-email");
   };
 
   return (

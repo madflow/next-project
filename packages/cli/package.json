@@ -21,6 +21,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "eslint": "^9.29.0",
+    "typescript": "^5.8.3",
     "unbuild": "^3.6.0"
   },
   "files": [

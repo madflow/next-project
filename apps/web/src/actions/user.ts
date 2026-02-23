@@ -66,6 +66,11 @@ export async function createWithInvitation(
       organizationId: existingInvitation.organizationId,
     },
   });
+
+  // In invite-only mode, the invite itself serves as implicit email verification.
+  if (env.AUTH_DISABLE_SIGNUP) {
+    await db.update(entity).set({ emailVerified: true }).where(eq(entity.id, signUpResponse.user.id));
+  }
 }
 
 export const update = withAdminAuth(async (id: string, data: UpdateData) => {

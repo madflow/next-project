@@ -1092,6 +1092,17 @@
     "loadMore": "Weitere Variablen laden",
     "search": "Durchsuchen..."
   },
+  "registrationSuccess": {
+    "actions": {
+      "signIn": "Anmelden"
+    },
+    "alert": {
+      "description": "Ihr Konto ist bereit. Sie können sich jetzt anmelden, um auf die Anwendung zuzugreifen.",
+      "title": "Konto erstellt"
+    },
+    "description": "Ihr Konto wurde erfolgreich erstellt",
+    "title": "Registrierung erfolgreich"
+  },
   "resetPassword": {
     "description": "Geben Sie unten Ihr neues Passwort ein.",
     "form": {

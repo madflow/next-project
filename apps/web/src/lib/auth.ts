@@ -145,6 +145,8 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async (data: { user: { email: string; locale?: string }; url: string }, request) => {
+      if (env.AUTH_DISABLE_SIGNUP) return;
+
       const { user, url } = data;
       const cookieHeader = request?.headers.get("cookie");
       const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
