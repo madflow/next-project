@@ -1128,6 +1128,19 @@
     },
     "title": "Registrieren"
   },
+  "signUpSuccessful": {
+    "actions": {
+      "signIn": "Anmelden"
+    },
+    "description": "Ihr Konto wurde erstellt",
+    "messages": {
+      "success": {
+        "description": "Ihre Registrierung war erfolgreich. Sie können sich jetzt in Ihrem Konto anmelden.",
+        "title": "Willkommen!"
+      }
+    },
+    "title": "Registrierung erfolgreich"
+  },
   "themeSelector": {
     "changeTheme": "Design ändern",
     "colorThemes": "Farben",
