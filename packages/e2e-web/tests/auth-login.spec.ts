@@ -10,7 +10,6 @@ test("login", async ({ page }) => {
     "auth.login.form.email",
     "auth.login.form.password",
     "auth.login.form.submit",
-    "auth.login.form.sign-up",
     "auth.login.form.forgot-password",
   ];
   for (const testId of expectedVisibleTestIds) {

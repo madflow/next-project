@@ -1,7 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
-import { testUsers } from "../config";
-import { extractLinkFromMessage, loginUser, logoutUser } from "../utils";
-import { smtpServerApi } from "../utils";
+import { testUsers } from "../../config";
+import { extractLinkFromMessage, loginUser, logoutUser } from "../../utils";
+import { smtpServerApi } from "../../utils";
 
 const orgWithPermission = "Test Organization 3";
 
@@ -40,21 +40,32 @@ async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
 test.describe.configure({ mode: "parallel" });
 
 test.describe("User invitations", () => {
-  test("an owner can invite an existing user", async ({ page }) => {
+  test("an owner can invite a not existing user", { tag: ["@sign-up-enabled"] }, async ({ page }) => {
+    const userEmail = `e2e-test-user-not-registered-${Date.now()}@example.com`;
     await page.goto("/");
     await loginUser(page, testUsers.accountMultipleOrgs.email, testUsers.accountMultipleOrgs.password);
     await selectOrganization(page, orgWithPermission);
-    await inviteUser(page, testUsers.accountInNoOrg.email);
+    await inviteUser(page, userEmail);
     await logoutUser(page);
+    await visitAcceptPageFromEmail(page, userEmail);
 
-    await visitAcceptPageFromEmail(page, testUsers.accountInNoOrg.email);
-    await expect(page.getByTestId("auth-accept-invitation-card-not-signed-in")).toBeVisible();
-    const acceptUrl = "" + page.url();
-    await page.goto("/auth/login");
-    await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);
-    await page.goto(acceptUrl);
-    await page.getByTestId("auth-accept-invitation-card.accept").click();
-    await page.goto("/");
-    await selectOrganization(page, orgWithPermission);
+    await page.getByTestId("auth.sign-up.form.name").fill("E2E Tester");
+    await page.getByTestId("auth.sign-up.form.password").fill("Tester12345");
+    await page.getByTestId("auth.sign-up.form.confirm-password").fill("Tester12345");
+    await page.getByTestId("auth.sign-up.form.submit").click();
+
+    await expect(page.getByTestId("auth.check-email.page")).toBeVisible();
+
+    const searchMessagesVerify = await smtpServerApi.searchMessages({
+      query: `to:"${userEmail}"`,
+    });
+
+    const messagesVerify = searchMessagesVerify.messages[0];
+    const verifyLink = await extractLinkFromMessage(messagesVerify, "verify-email");
+
+    await page.goto(verifyLink);
+    await expect(page.getByTestId("auth.verify-email.page")).toBeVisible();
+    await page.getByTestId("verify-email.login").click();
+    await loginUser(page, userEmail, "Tester12345");
   });
 });

@@ -1,0 +1,96 @@
+name: Playwright Setup
+description: Sets up the full environment required to run Playwright e2e tests
+
+inputs:
+  signup-enabled:
+    description: "Write apps/web/.env.local with AUTH_DISABLE_SIGNUP=0"
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.29.3
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version: lts/*
+
+    - name: Configure AWS CLI for local S3
+      shell: bash
+      run: |
+        pip install awscli
+        aws configure set aws_access_key_id s3
+        aws configure set aws_secret_access_key s3
+        aws configure set default.region us-east-1
+
+    - name: Create app bucket
+      shell: bash
+      run: |
+        export AWS_ENDPOINT_URL=http://localhost:7070
+        aws s3 mb s3://app --endpoint-url $AWS_ENDPOINT_URL
+        echo "Bucket 'app' created successfully"
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Copy .env.dist
+      shell: bash
+      run: pnpm run env:copy
+
+    - name: Enable signup (write .env.local)
+      if: inputs.signup-enabled == 'true'
+      shell: bash
+      run: echo "AUTH_DISABLE_SIGNUP=0" > apps/web/.env.local
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.14"
+
+    - name: Install Python deps
+      shell: bash
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        cd apps/analysis
+        python3 -m venv .venv
+        source .venv/bin/activate
+        poetry install
+
+    - name: Install e2e dependencies
+      shell: bash
+      run: pnpm run e2e:deps
+
+    - name: Build
+      shell: bash
+      run: pnpm run build
+
+    - name: Migrate
+      shell: bash
+      run: pnpm run db:migrate
+
+    - name: Run App
+      shell: bash
+      run: |
+        pnpm run start | tee app.log 2>&1 &
+        sleep 10
+        for attempt in {1..10}; do
+          if [ $(curl -o /dev/null -s -w "%{http_code}" http://localhost:3000/api/health) -eq 200 ]; then
+            echo "Application is ready."
+            break
+          fi
+          if [ $attempt -eq 10 ]; then
+            echo "Application failed to start in time."
+            exit 1
+          fi
+          echo "Still waiting for the application to be ready..."
+          sleep 10
+        done
+
+    - name: Seed
+      shell: bash
+      run: pnpm run seed

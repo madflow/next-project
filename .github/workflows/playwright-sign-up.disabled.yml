@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright Tests (sign-up-disabled)
 env:
   TURBO_TELEMETRY_DISABLED: 1
   NEXT_TELEMETRY_DISABLED: 1
@@ -8,13 +8,14 @@ env:
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   ANALYSIS_SENTRY_DSN: ${{ secrets.ANALYSIS_SENTRY_DSN }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  AUTH_DISABLE_SIGNUP: 1
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 jobs:
-  build-run-test:
+  build-run-test-sign-up-disabled:
     services:
       mailpit:
         image: axllent/mailpit
@@ -53,12 +54,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/playwright-setup
+        with:
+          signup-enabled: "false"
 
-      - name: Run Playwright tests
-        run: pnpm run e2e
+      - name: Run Playwright tests (sign-up-disabled)
+        run: pnpm run e2e:sign-up-disabled
       - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
-          name: playwright-test-results
+          name: playwright-sign-up-disabled-test-results
           path: ./packages/e2e-web/test-results
           retention-days: 30
