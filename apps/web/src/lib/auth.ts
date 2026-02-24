@@ -143,7 +143,8 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: true,
+    sendOnSignUp: !env.AUTH_DISABLE_SIGNUP,
+    sendOnSignIn: false,
     sendVerificationEmail: async (data: { user: { email: string; locale?: string }; url: string }, request) => {
       const { user, url } = data;
       const cookieHeader = request?.headers.get("cookie");
@@ -168,13 +169,13 @@ export const auth = betterAuth({
         }),
       });
     },
-    sendVerificationOnSignUp: true,
     autoSignInAfterVerification: false,
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: !env.AUTH_DISABLE_SIGNUP,
     disableSignUp: false, // this needs to stay false, when private signup via invitation should work
+    autoSignIn: false,
     sendResetPassword: async (data: { user: { email: string; locale?: string }; url: string }, request) => {
       const { user, url } = data;
       const cookieHeader = request?.headers.get("cookie");
