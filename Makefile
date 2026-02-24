@@ -144,7 +144,6 @@ check:
 ## Initialize development environment
 .PHONY: dev-init
 dev-init:
-	pnpm run clean
 	pnpm install
 	pnpm run env:copy
 	make build
