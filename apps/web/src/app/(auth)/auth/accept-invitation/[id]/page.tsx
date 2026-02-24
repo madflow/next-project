@@ -5,19 +5,19 @@ import { defaultClient as db } from "@repo/database/clients";
 import { invitation, member, user } from "@repo/database/schema";
 import { AuthAcceptInvitationCard } from "@/components/auth-accept-invitation-card";
 import { SignUpFormWithInvitation } from "@/components/sign-up-form-with-invitation";
+import { env } from "@/env";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  // Await params before accessing properties
   const { id } = await params;
   const t = await getTranslations("authAcceptInvitation");
 
-  // Check if the invitation exists in the database
   const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, id)).limit(1);
 
-  // If the invitation doesn't exist, return 404
   if (!existingInvitation) {
     notFound();
   }
+
+  const hasVerifyEmail = !env.AUTH_DISABLE_SIGNUP;
 
   // Check if the invitation email corresponds to an existing user
   const [existingUser] = await db.select().from(user).where(ilike(user.email, existingInvitation.email)).limit(1);
@@ -34,11 +34,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     isAlreadyMember = !!existingMember;
   }
 
-  // Store this information to determine if the user needs to sign up or can directly accept the invitation
   const needsToSignUp = !existingUser;
   const canDirectlyAccept = !needsToSignUp && !isAlreadyMember;
-
-  console.log("canDirectlyAccept", canDirectlyAccept);
 
   return (
     <main
@@ -55,6 +52,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               organizationId: existingInvitation.organizationId,
               role: existingInvitation.role ?? "member",
             }}
+            hasVerifyEmail={hasVerifyEmail}
           />
         ) : (
           <div className="text-center">
