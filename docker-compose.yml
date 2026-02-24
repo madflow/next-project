@@ -6,7 +6,7 @@ services:
   #   environment:
   #     - ANALYSIS_API_KEY=secret
   #     - ANALYSIS_API_URL=http://analysis:3003/api
-  #     - AUTH_DISABLE_SIGNUP=false
+  #     - AUTH_DISABLE_SIGNUP=1
   #     - AUTH_SECRET=KgVRZ3/tFzxMCDiBLAR9hSZVFmEPtoK1ZIB3BH/RLsk=
   #     - AUTH_URL=http://localhost:3001
   #     - BASE_URL=http://localhost:3001

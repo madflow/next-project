@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { smtpServerApi } from "../utils";
+import { smtpServerApi } from "../../utils";
 
 let signUpUser: {
   email: string;
@@ -19,7 +19,7 @@ test.afterAll(async () => {
   await smtpServerApi.deleteMessagesBySearch({ query: `to:"${signUpUser.email}"` });
 });
 
-test("sign-up", async ({ page }) => {
+test("sign-up", { tag: ["@sign-up-enabled"] }, async ({ page }) => {
   await page.goto("/auth/sign-up");
   const expectedVisibleTestIds = [
     "auth.sign-up.page",
