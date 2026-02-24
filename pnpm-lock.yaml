@@ -153,8 +153,8 @@ importers:
         specifier: ^1.5.11
         version: 1.6.7
       lucide-react:
-        specifier: ^0.564.0
-        version: 0.564.0(react@19.2.4)
+        specifier: ^0.566.0
+        version: 0.566.0(react@19.2.4)
       next:
         specifier: ^16.0.0
         version: 16.1.6(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -5188,8 +5188,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@0.564.0:
-    resolution: {integrity: sha512-JJ8GVTQqFwuliifD48U6+h7DXEHdkhJ/E87kksGByII3qHxtPciVb8T8woQONHBQgHVOl7rSMrrip3SeVNy7Fg==}
+  lucide-react@0.566.0:
+    resolution: {integrity: sha512-b18qC/JAh1X9rVKlF5EtSIyumdIYuh78b0JShynZnHbcaWR4AW4oZyi8Ms/aQYVSnLPlAnMhug2hSr19BgVZAw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -11584,7 +11584,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@0.564.0(react@19.2.4):
+  lucide-react@0.566.0(react@19.2.4):
     dependencies:
       react: 19.2.4
 
