@@ -25,14 +25,14 @@ interface SignUpFormWithInvitationProps {
     organizationId: string;
     role: string | null;
   };
+  hasVerifyEmail: boolean;
 }
 
-export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitationProps) {
+export function SignUpFormWithInvitation({ hasVerifyEmail, invitation }: SignUpFormWithInvitationProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations();
   const router = useRouter();
 
-  // Auto-detect browser language
   const getBrowserLocale = (): Locale => {
     if (typeof window === "undefined") return locale;
 
@@ -72,7 +72,11 @@ export function SignUpFormWithInvitation({ invitation }: SignUpFormWithInvitatio
     });
 
     form.reset();
-    router.push(`/auth/check-email`);
+    if (hasVerifyEmail === true) {
+      router.push("/auth/check-email");
+    } else {
+      router.push("/auth/sign-up-successful");
+    }
   };
 
   return (
