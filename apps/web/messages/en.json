@@ -1128,6 +1128,19 @@
     },
     "title": "Sign Up"
   },
+  "signUpSuccessful": {
+    "actions": {
+      "signIn": "Sign in"
+    },
+    "description": "Your account has been created",
+    "messages": {
+      "success": {
+        "description": "Your registration was successful. You can now log in to your account.",
+        "title": "Welcome aboard!"
+      }
+    },
+    "title": "Registration Successful"
+  },
   "themeSelector": {
     "changeTheme": "Change theme",
     "colorThemes": "Colors",
