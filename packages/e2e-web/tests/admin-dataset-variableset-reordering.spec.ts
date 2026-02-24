@@ -249,16 +249,14 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     await page.locator('[data-testid*="admin.dataset.variableset.tree.item"]').filter({ hasText: setName }).click();
     await expect(page.getByTestId("admin.dataset.variableset.available.variables.list")).toBeVisible();
 
-    // Assign 4 variables
+    // Assign 4 variables, waiting for each one to appear before clicking the next
+    const assignedList = page.getByTestId("admin.dataset.variableset.assigned.variables.list");
+    const assignedItems = assignedList.locator('[data-testid*="admin.dataset.variableset.assigned.variable"]');
     const addButtons = page.getByTestId("admin.dataset.variableset.assignment.add");
     for (let i = 0; i < 4; i++) {
       await addButtons.nth(0).click();
+      await expect(assignedItems).toHaveCount(i + 1);
     }
-
-    // Verify we have 4 assigned variables
-    const assignedList = page.getByTestId("admin.dataset.variableset.assigned.variables.list");
-    const assignedItems = assignedList.locator('[data-testid*="admin.dataset.variableset.assigned.variable"]');
-    await expect(assignedItems).toHaveCount(4);
 
     // Get initial order (by variable names)
     const initialOrder = await assignedItems.allTextContents();
@@ -344,10 +342,9 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     const items = page.locator('[data-testid*="admin.dataset.variableset.tree.item"]');
     await dragVariablesetFromHandle(page, 1, 0);
 
-    // Verify order
-    let texts = await items.allTextContents();
-    expect(texts[0]).toContain(set2Name);
-    expect(texts[1]).toContain(set1Name);
+    // Verify order using expect() with retries to ensure UI has updated
+    await expect(items.nth(0)).toContainText(set2Name);
+    await expect(items.nth(1)).toContainText(set1Name);
 
     // Navigate to variables tab
     await page.getByTestId("app.admin.editor.variables.tab").click();
@@ -355,10 +352,10 @@ test.describe("Admin Dataset Variableset Reordering", () => {
     // Navigate back to variablesets tab
     await page.getByTestId("app.admin.editor.variablesets.tab").click();
 
-    // Verify order is still preserved
-    texts = await items.allTextContents();
-    expect(texts[0]).toContain(set2Name);
-    expect(texts[1]).toContain(set1Name);
+    // Wait for the variableset list to be visible and order to be preserved
+    await expect(items).toHaveCount(2);
+    await expect(items.nth(0)).toContainText(set2Name);
+    await expect(items.nth(1)).toContainText(set1Name);
   });
 
   test("should reorder multiple times in succession", async ({ page }) => {
