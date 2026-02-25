@@ -127,7 +127,7 @@ export const uploadAvatar = withAuth(async ({ file, userId }: UploadAvatarParams
       details: undefined as Record<string, unknown> | undefined,
     };
 
-    if (error instanceof Error) {
+    if (error instanceof Error && env.NODE_ENV === "development") {
       const s3Error = error as S3ServiceException;
       errorDetails.details = {
         name: error.name,
