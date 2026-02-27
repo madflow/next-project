@@ -48,8 +48,10 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.profile.locale").click();
     await page.getByRole("option", { name: "German" }).click();
 
-    // Submit the form
+    // Submit the form and wait for the server action to complete
+    const updateProfilePromise = page.waitForResponse(/api\/auth\/update-user/);
     await page.getByTestId("app.user.account.profile.update").click();
+    await updateProfilePromise;
 
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
 
