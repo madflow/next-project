@@ -35,9 +35,9 @@ For tasks like `lint` and `check-types` that can run in parallel but need depend
 ```json
 {
   "tasks": {
-    "transit": { "dependsOn": ["^transit"] },
+    "check-types": { "dependsOn": ["transit"] },
     "lint": { "dependsOn": ["transit"] },
-    "check-types": { "dependsOn": ["transit"] }
+    "transit": { "dependsOn": ["^transit"] }
   }
 }
 ```
@@ -104,11 +104,7 @@ Files considered when calculating task hash. Defaults to all tracked files in pa
 {
   "tasks": {
     "build": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "!README.md",
-        "$TURBO_ROOT$/tsconfig.base.json"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", "!README.md", "$TURBO_ROOT$/tsconfig.base.json"]
     }
   }
 }
@@ -141,8 +137,8 @@ Enable/disable caching for a task. Default: `true`.
 ```json
 {
   "tasks": {
-    "dev": { "cache": false },
-    "deploy": { "cache": false }
+    "deploy": { "cache": false },
+    "dev": { "cache": false }
   }
 }
 ```
@@ -203,9 +199,9 @@ Run tasks alongside this task. For long-running tasks that need runtime dependen
 {
   "tasks": {
     "dev": {
-      "with": ["api#dev"],
+      "cache": false,
       "persistent": true,
-      "cache": false
+      "with": ["api#dev"]
     }
   }
 }
@@ -221,9 +217,9 @@ Allow `turbo watch` to restart the task on changes. Default: `false`.
 {
   "tasks": {
     "dev": {
-      "persistent": true,
+      "cache": false,
       "interruptible": true,
-      "cache": false
+      "persistent": true
     }
   }
 }

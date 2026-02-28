@@ -79,7 +79,11 @@ numeric_test_data = [
 
 @pytest.mark.parametrize("series, var_name, include, expected", numeric_test_data)
 def test_describe_var_numeric(
-    stats_service, series, var_name, include, expected,
+    stats_service,
+    series,
+    var_name,
+    include,
+    expected,
 ) -> None:
     """Test descriptive statistics for numeric variables with various scenarios."""
     df = pd.DataFrame({var_name: series})
@@ -144,7 +148,11 @@ categorical_test_data = [
 
 @pytest.mark.parametrize("series, var_name, include, expected", categorical_test_data)
 def test_describe_var_categorical(
-    stats_service, series, var_name, include, expected,
+    stats_service,
+    series,
+    var_name,
+    include,
+    expected,
 ) -> None:
     """Test descriptive statistics for categorical variables."""
     df = pd.DataFrame({var_name: series})
@@ -211,7 +219,11 @@ edge_case_data = [
 
 @pytest.mark.parametrize("series, var_name, include, expected", edge_case_data)
 def test_describe_var_edge_cases(
-    stats_service, series, var_name, include, expected,
+    stats_service,
+    series,
+    var_name,
+    include,
+    expected,
 ) -> None:
     """Test edge cases like NaN values and empty series."""
     df = pd.DataFrame({var_name: series})
@@ -654,7 +666,8 @@ def test_split_variable_not_found_error(stats_service) -> None:
     )
 
     with pytest.raises(
-        ValueError, match=r"Split variable 'nonexistent' not found in the DataFrame\.",
+        ValueError,
+        match=r"Split variable 'nonexistent' not found in the DataFrame\.",
     ):
         stats_service.describe_var(
             df,
@@ -744,7 +757,9 @@ def test_decimal_places_rounding(stats_service) -> None:
 
     # Test with decimal_places=None (should return full precision)
     stats_full_precision = stats_service.describe_var(
-        df, "test_var", decimal_places=None,
+        df,
+        "test_var",
+        decimal_places=None,
     )
     assert len(str(stats_full_precision["mean"]).split(".")[-1]) > 2
     assert len(str(stats_full_precision["std"]).split(".")[-1]) > 2

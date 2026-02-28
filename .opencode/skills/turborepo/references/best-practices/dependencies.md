@@ -25,8 +25,8 @@ Each package's `package.json` lists exactly what it needs:
 // packages/ui/package.json
 {
   "dependencies": {
-    "react": "^18.0.0",
-    "class-variance-authority": "^0.7.0"
+    "class-variance-authority": "^0.7.0",
+    "react": "^18.0.0"
   }
 }
 ```
@@ -59,9 +59,9 @@ Only repository-level tools:
 // Root package.json
 {
   "devDependencies": {
-    "turbo": "latest",
     "husky": "^8.0.0",
-    "lint-staged": "^15.0.0"
+    "lint-staged": "^15.0.0",
+    "turbo": "latest"
   }
 }
 ```
@@ -195,12 +195,12 @@ For library packages that expect the consumer to provide dependencies:
 ```json
 // packages/ui/package.json
 {
-  "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
-  },
   "devDependencies": {
     "react": "^18.0.0", // For development/testing
+    "react-dom": "^18.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
     "react-dom": "^18.0.0"
   }
 }

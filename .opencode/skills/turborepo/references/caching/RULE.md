@@ -43,8 +43,8 @@ These affect specific tasks:
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "package.json", "tsconfig.json"],
-      "env": ["API_URL"]
+      "env": ["API_URL"],
+      "inputs": ["src/**", "package.json", "tsconfig.json"]
     }
   }
 }

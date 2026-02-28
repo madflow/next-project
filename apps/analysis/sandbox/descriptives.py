@@ -13,4 +13,3 @@ target = "Bundesland"
 stats = StatisticsService()
 
 res = stats.describe_var(df, target)
-
