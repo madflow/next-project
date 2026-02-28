@@ -26,17 +26,17 @@ packages:
 
 ```json
 {
+  "devDependencies": {
+    "turbo": "latest"
+  },
   "name": "my-monorepo",
-  "private": true,
   "packageManager": "pnpm@9.0.0",
+  "private": true,
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test"
-  },
-  "devDependencies": {
-    "turbo": "latest"
   }
 }
 ```
@@ -101,13 +101,13 @@ Package tasks enable Turborepo to:
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
-    "lint": {},
-    "test": {
-      "dependsOn": ["build"]
-    },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "lint": {},
+    "test": {
+      "dependsOn": ["build"]
     }
   }
 }
@@ -167,13 +167,13 @@ packages/ui/
 
 ```json
 {
-  "name": "@repo/ui", // Unique, namespaced name
-  "version": "0.0.0", // Version (can be 0.0.0 for internal)
-  "private": true, // Prevents accidental publishing
   "exports": {
     // Entry points
     "./button": "./src/button.tsx"
-  }
+  },
+  "name": "@repo/ui", // Unique, namespaced name
+  "private": true, // Prevents accidental publishing
+  "version": "0.0.0" // Version (can be 0.0.0 for internal)
 }
 ```
 
@@ -196,11 +196,11 @@ packages/
 // packages/typescript-config/base.json
 {
   "compilerOptions": {
-    "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
     "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "strict": true,
     "target": "ES2022"
   }
 }
@@ -211,13 +211,13 @@ packages/
 ```json
 // packages/ui/tsconfig.json
 {
-  "extends": "@repo/typescript-config/library.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "extends": "@repo/typescript-config/library.json",
+  "include": ["src"]
 }
 ```
 
@@ -241,12 +241,12 @@ packages/
 ```json
 // packages/eslint-config/package.json
 {
-  "name": "@repo/eslint-config",
   "exports": {
     "./base": "./base.js",
-    "./next": "./next.js",
-    "./library": "./library.js"
-  }
+    "./library": "./library.js",
+    "./next": "./next.js"
+  },
+  "name": "@repo/eslint-config"
 }
 ```
 
@@ -255,7 +255,7 @@ packages/
 ```js
 // apps/web/.eslintrc.js
 module.exports = {
-  extends: ["@repo/eslint-config/next"]
+  extends: ["@repo/eslint-config/next"],
 };
 ```
 

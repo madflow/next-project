@@ -297,8 +297,8 @@ Scripts like `prebuild` that manually build other packages bypass Turborepo's de
 // WRONG - manually building dependencies
 {
   "scripts": {
-    "prebuild": "cd ../../packages/types && bun run build && cd ../utils && bun run build",
-    "build": "next build"
+    "build": "next build",
+    "prebuild": "cd ../../packages/types && bun run build && cd ../utils && bun run build"
   }
 }
 ```
@@ -565,13 +565,13 @@ To determine correct outputs for TypeScript tasks:
     "build": {
       "dependsOn": ["^build"]
     },
-    // build (no ^) = run build in SAME PACKAGE first
-    "test": {
-      "dependsOn": ["build"]
-    },
     // pkg#task = specific package's task
     "deploy": {
       "dependsOn": ["web#build"]
+    },
+    // build (no ^) = run build in SAME PACKAGE first
+    "test": {
+      "dependsOn": ["build"]
     }
   }
 }
@@ -778,14 +778,14 @@ A `dev` task with `dependsOn: ["^dev"]` and `persistent: false` in root turbo.js
 ```json
 {
   "tasks": {
+    "dev": {
+      "cache": false,
+      "dependsOn": ["prepare"],
+      "persistent": true
+    },
     "prepare": {
       "dependsOn": ["^prepare"],
       "outputs": ["dist/**"]
-    },
-    "dev": {
-      "dependsOn": ["prepare"],
-      "cache": false,
-      "persistent": true
     }
   }
 }
@@ -809,8 +809,8 @@ Some tasks can run in parallel (don't need built output from dependencies) but m
 ```json
 {
   "tasks": {
-    "transit": { "dependsOn": ["^transit"] },
-    "my-task": { "dependsOn": ["transit"] }
+    "my-task": { "dependsOn": ["transit"] },
+    "transit": { "dependsOn": ["^transit"] }
   }
 }
 ```
@@ -823,13 +823,13 @@ The `transit` task creates dependency relationships without matching any actual 
 
 ```json
 {
-  "globalEnv": ["NODE_ENV"],
   "globalDependencies": [".env"],
+  "globalEnv": ["NODE_ENV"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
-      "env": ["API_URL", "DATABASE_URL"]
+      "env": ["API_URL", "DATABASE_URL"],
+      "outputs": ["dist/**"]
     }
   }
 }

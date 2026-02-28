@@ -95,6 +95,7 @@ lint.select = [
   "RUF", # Specific to Ruff checks
 ]
 lint.ignore = [
+  "COM812",
   "D101",
   "D105",    # Missing docstring in magic method
   "D107",    # Missing docstring in __init__
@@ -117,7 +118,7 @@ line-length = 88
 
 [tool.ruff.lint.per-file-ignores]
 "analysis/tests/*" = [
-  "S101", # Use of assert detected
+  "S101",   # Use of assert detected
   "ANN001", # Missing type annotation for function argument (pytest fixtures)
 ]
 

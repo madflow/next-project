@@ -20,14 +20,14 @@ Export TypeScript directly. The consuming app's bundler compiles it.
 ```json
 // packages/ui/package.json
 {
-  "name": "@repo/ui",
   "exports": {
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx"
   },
+  "name": "@repo/ui",
   "scripts": {
-    "lint": "eslint .",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "lint": "eslint ."
   }
 }
 ```
@@ -51,13 +51,13 @@ Package handles its own compilation.
 ```json
 // packages/ui/package.json
 {
-  "name": "@repo/ui",
   "exports": {
     "./button": {
-      "types": "./src/button.tsx",
-      "default": "./dist/button.js"
+      "default": "./dist/button.js",
+      "types": "./src/button.tsx"
     }
   },
+  "name": "@repo/ui",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"
@@ -68,13 +68,13 @@ Package handles its own compilation.
 ```json
 // packages/ui/tsconfig.json
 {
-  "extends": "@repo/typescript-config/library.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "extends": "@repo/typescript-config/library.json",
+  "include": ["src"]
 }
 ```
 
@@ -107,10 +107,10 @@ Package handles its own compilation.
 {
   "exports": {
     "./button": {
-      "types": "./src/button.tsx",
+      "default": "./dist/button.js",
       "import": "./dist/button.mjs",
       "require": "./dist/button.cjs",
-      "default": "./dist/button.js"
+      "types": "./src/button.tsx"
     }
   }
 }
@@ -190,12 +190,12 @@ packages/
 ```json
 // packages/typescript-config/package.json
 {
-  "name": "@repo/typescript-config",
   "exports": {
     "./base.json": "./base.json",
-    "./nextjs.json": "./nextjs.json",
-    "./library.json": "./library.json"
-  }
+    "./library.json": "./library.json",
+    "./nextjs.json": "./nextjs.json"
+  },
+  "name": "@repo/typescript-config"
 }
 ```
 
@@ -204,15 +204,15 @@ packages/
 ```json
 // packages/eslint-config/package.json
 {
-  "name": "@repo/eslint-config",
+  "dependencies": {
+    "eslint": "^8.0.0",
+    "eslint-config-next": "latest"
+  },
   "exports": {
     "./base": "./base.js",
     "./next": "./next.js"
   },
-  "dependencies": {
-    "eslint": "^8.0.0",
-    "eslint-config-next": "latest"
-  }
+  "name": "@repo/eslint-config"
 }
 ```
 
@@ -287,7 +287,9 @@ TypeScript `compilerOptions.paths` breaks with JIT packages. Use Node.js subpath
 
 ```typescript
 // packages/ui/button.tsx
-import { MY_STRING } from "#utils.ts"; // Uses .ts extension
+import { MY_STRING } from "#utils.ts";
+
+// Uses .ts extension
 ```
 
 **Compiled Package:**
@@ -303,7 +305,9 @@ import { MY_STRING } from "#utils.ts"; // Uses .ts extension
 
 ```typescript
 // packages/ui/button.tsx
-import { MY_STRING } from "#utils.js"; // Uses .js extension
+import { MY_STRING } from "#utils.js";
+
+// Uses .js extension
 ```
 
 ### Use `tsc` for Internal Packages

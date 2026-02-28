@@ -1,4 +1,3 @@
-
 import logging
 import sys
 from pathlib import Path
@@ -13,6 +12,7 @@ from analysis.settings import settings
 # Configure basic logging to see output from the S3Client
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 def main() -> None:
     """Checks the S3 connection using the S3Client and prints the result."""
@@ -31,6 +31,7 @@ def main() -> None:
         logger.error("S3 Connection Check: FAILED")
         print(f"❌ {message}")  # noqa: T201
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

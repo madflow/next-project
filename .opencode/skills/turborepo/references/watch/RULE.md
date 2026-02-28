@@ -32,8 +32,8 @@ If your tool has built-in watching (like `next dev`), use its watcher:
 {
   "tasks": {
     "dev": {
-      "persistent": true,
-      "cache": false
+      "cache": false,
+      "persistent": true
     }
   }
 }
@@ -47,9 +47,9 @@ For tools that don't detect dependency changes, use `interruptible`:
 {
   "tasks": {
     "dev": {
-      "persistent": true,
+      "cache": false,
       "interruptible": true,
-      "cache": false
+      "persistent": true
     }
   }
 }

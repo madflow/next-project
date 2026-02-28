@@ -40,12 +40,12 @@ my-monorepo/
 ```json
 // apps/web/package.json
 {
-  "name": "web",
-  "private": true,
   "dependencies": {
     "@repo/ui": "workspace:*",
     "next": "latest"
-  }
+  },
+  "name": "web",
+  "private": true
 }
 ```
 
@@ -58,11 +58,11 @@ my-monorepo/
 ```json
 // packages/ui/package.json
 {
-  "name": "@repo/ui",
   "exports": {
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx"
-  }
+  },
+  "name": "@repo/ui"
 }
 ```
 
@@ -74,10 +74,10 @@ Export TypeScript directly; let the app's bundler compile it.
 
 ```json
 {
-  "name": "@repo/ui",
   "exports": {
     "./button": "./src/button.tsx"
-  }
+  },
+  "name": "@repo/ui"
 }
 ```
 
@@ -90,13 +90,13 @@ Package compiles itself with `tsc` or bundler.
 
 ```json
 {
-  "name": "@repo/ui",
   "exports": {
     "./button": {
-      "types": "./src/button.tsx",
-      "default": "./dist/button.js"
+      "default": "./dist/button.js",
+      "types": "./src/button.tsx"
     }
   },
+  "name": "@repo/ui",
   "scripts": {
     "build": "tsc"
   }

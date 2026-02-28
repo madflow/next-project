@@ -58,10 +58,12 @@ def test_stats_endpoint_split_variable_logic(
     mock_dataset.s3_key = "test/path.sav"
     mock_get_dataset.return_value = mock_dataset
 
-    mock_dataframe = pd.DataFrame({
-        "test_var": [1, 2, 3],
-        "split_var": ["A", "B", "A"],
-    })
+    mock_dataframe = pd.DataFrame(
+        {
+            "test_var": [1, 2, 3],
+            "split_var": ["A", "B", "A"],
+        }
+    )
     mock_read_df.return_value = mock_dataframe
 
     # Mock variables

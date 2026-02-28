@@ -4,6 +4,7 @@
     "scripts": {
         "clean": "git clean -xdf .cache dist .turbo __pycache__ '*.py[cod]' .pytest_cache .mypy_cache build",
         "env:copy": "cp -n .env.dist .env || true",
+        "format": "bash -c 'source .venv/bin/activate && poetry run ruff format .'",
         "start": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'",
         "dev": "bash -c 'source .venv/bin/activate && poetry run python -m analysis'",
         "test": "bash -c 'source .venv/bin/activate && poetry run pytest'",
