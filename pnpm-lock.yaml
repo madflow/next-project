@@ -150,8 +150,8 @@ importers:
         specifier: ^21.3.0
         version: 21.3.0
       html2canvas-pro:
-        specifier: ^1.5.11
-        version: 1.6.7
+        specifier: ^2.0.0
+        version: 2.0.2
       lucide-react:
         specifier: ^0.575.0
         version: 0.575.0(react@19.2.4)
@@ -4793,8 +4793,8 @@ packages:
     resolution: {integrity: sha512-qY60FjREgVZL03vJU6IfMV4GDjGBIoOyvuFdpBDIX9yTlDw0TjxVBQp+P8NvpdIXNJvfWBTNul7fsAQJq2FNpg==}
     engines: {node: '>=14'}
 
-  html2canvas-pro@1.6.7:
-    resolution: {integrity: sha512-BzuCTXx0jf2TfnrJrtjMCY1FR9rxlPdy7yLWt9ZMhZm7Ylaw9MLb7agSheqv2mT/ARduBHDAqvJIFlbxrZfyOA==}
+  html2canvas-pro@2.0.2:
+    resolution: {integrity: sha512-9G/t0XgCZWonLwL0JwI7su6NdbOPUY7Ur4Ihpp8+XMaW9ibA2nDXF181Jr6tm94k8lX6sthpaXB3XqEnsMd5Cw==}
     engines: {node: '>=16.0.0'}
 
   htmlparser2@8.0.2:
@@ -11227,7 +11227,7 @@ snapshots:
       htmlparser2: 8.0.2
       selderee: 0.11.0
 
-  html2canvas-pro@1.6.7:
+  html2canvas-pro@2.0.2:
     dependencies:
       css-line-break: 2.1.0
       text-segmentation: 1.0.3
