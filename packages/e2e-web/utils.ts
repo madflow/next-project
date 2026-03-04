@@ -40,4 +40,22 @@ export const extractLinkFromMessage = async (message: any, linkFragment: string)
   return foundLink;
 };
 
+export async function getLatestEmail(email: string) {
+  let tries = 0;
+  const maxTries = 5;
+  const delay = 1000; // 1 second
+
+  while (tries < maxTries) {
+    const searchMessages = await smtpServerApi.searchMessages({
+      query: `to:"${email}"`,
+    });
+    if (searchMessages.messages.length > 0) {
+      return searchMessages.messages[0];
+    }
+    tries++;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+  return null;
+}
+
 export { smtpServerApi };

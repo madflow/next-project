@@ -1,28 +1,10 @@
 import { Page, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
-import { extractLinkFromMessage, loginUser, logoutUser, smtpServerApi } from "../utils";
+import { extractLinkFromMessage, getLatestEmail, loginUser, logoutUser, smtpServerApi } from "../utils";
 
 async function switchLocale(page: Page, language: "German" | "Englisch") {
   await page.getByTestId("app.locale-switcher").click();
   await page.getByRole("option", { name: language }).click();
-}
-
-async function getLatestEmail(email: string) {
-  let tries = 0;
-  const maxTries = 5;
-  const delay = 1000; // 1 second
-
-  while (tries < maxTries) {
-    const searchMessages = await smtpServerApi.searchMessages({
-      query: `to:"${email}"`,
-    });
-    if (searchMessages.messages.length > 0) {
-      return searchMessages.messages[0];
-    }
-    tries++;
-    await new Promise((resolve) => setTimeout(resolve, delay));
-  }
-  return null;
 }
 
 test.describe.configure({ mode: "parallel" });
@@ -89,7 +71,8 @@ test.describe("Email Translations", () => {
     await changeEmailResponsePromise;
 
     const message = await getLatestEmail(userEmail);
-    expect(message.Subject).toBe("Confirm your new email address");
+
+    expect(message?.Subject).toBe("Confirm your new email address");
 
     const verifyLink = await extractLinkFromMessage(message, "verify-email");
     expect(verifyLink).toBeTruthy();
