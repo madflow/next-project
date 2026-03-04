@@ -36,4 +36,4 @@ Examples:
 - **CSV -> SAV**: Reads a CSV file, auto-detects numeric vs. string columns, and writes a valid SPSS `.sav` file.
 - **SAV -> CSV**: Reads an SPSS `.sav` file (including string variables) and writes a plain CSV.
 
-Uses `pyreadstat`. No pandas required. All dependencies pre-installed in virtual environment at `.opencode/skills/spss-file-convert/venv/`.
+Uses `pyreadstat` and `pandas`. Both are pre-installed in the virtual environment at `.opencode/skills/spss-file-convert/venv/`.

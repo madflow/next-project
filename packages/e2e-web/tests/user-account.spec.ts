@@ -53,6 +53,9 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.profile.update").click();
     await updateProfilePromise;
 
+    // router.refresh() triggers a Better Auth client session re-fetch (/api/auth/get-session).
+    // Wait for it so useSession() has the updated data before form.reset() fires with the new name.
+    await page.waitForResponse(/api\/auth\/get-session/);
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
 
     // Verify the name and locale were updated

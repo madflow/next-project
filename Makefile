@@ -164,4 +164,4 @@ e2e-single:
 ## Create python virtual environment
 .PHONY: venv
 venv:
-				python3 -m venv ./apps/analysis/.venv
+	python3 -m venv ./apps/analysis/.venv

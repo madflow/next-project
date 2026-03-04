@@ -7,6 +7,7 @@ Supported conversions:
   sav -> csv   (SPSS to CSV)
 """
 
+import re
 import sys
 import csv
 from pathlib import Path
@@ -30,6 +31,11 @@ except ImportError:
     sys.exit(1)
 
 
+# Matches strict decimal floats: optional leading minus, digits, a dot, digits.
+# Rejects strings like "1." or ".5" that some locales accept but SPSS tools may not.
+_FLOAT_RE = re.compile(r"^-?\d+\.\d+$")
+
+
 def csv_to_sav(input_path: str, output_path: str) -> None:
     """Convert a CSV file to SPSS .sav format."""
     # Read CSV manually to avoid pandas dependency
@@ -46,12 +52,14 @@ def csv_to_sav(input_path: str, output_path: str) -> None:
     for row in rows:
         for col in column_names:
             value = row.get(col, "")
-            try:
-                if "." in value:
-                    data[col].append(float(value))
-                else:
-                    data[col].append(int(value))
-            except (ValueError, TypeError):
+            stripped = value.lstrip("-")
+            if _FLOAT_RE.match(value):
+                data[col].append(float(value))
+            elif stripped.isdigit() and not (
+                len(stripped) > 1 and stripped.startswith("0")
+            ):
+                data[col].append(int(value))
+            else:
                 data[col].append(value)
 
     df = pd.DataFrame(data, columns=list(column_names))
