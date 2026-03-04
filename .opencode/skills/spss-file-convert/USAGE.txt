@@ -1,0 +1,52 @@
+DO NOT CREATE NEW SCRIPTS - USE EXISTING ONES!
+=================================================
+
+This skill has ready-to-use scripts. You should ALWAYS use them instead of creating new ones.
+
+EXISTING SCRIPTS:
+-----------------
+1. Wrapper script (RECOMMENDED):
+   .opencode/skills/spss-file-convert/run.sh
+
+2. Python script directly:
+   .opencode/skills/spss-file-convert/venv/bin/python .opencode/skills/spss-file-convert/convert_spss.py
+
+USAGE EXAMPLES:
+---------------
+# CSV to SPSS:
+.opencode/skills/spss-file-convert/run.sh data.csv data.sav
+
+# SPSS to CSV:
+.opencode/skills/spss-file-convert/run.sh data.sav data.csv
+
+# With full paths:
+.opencode/skills/spss-file-convert/run.sh /path/to/input.csv /path/to/output.sav
+.opencode/skills/spss-file-convert/run.sh /path/to/input.sav /path/to/output.csv
+
+CONVERSION DIRECTION:
+---------------------
+Detected automatically from file extensions:
+  .csv -> .sav   (CSV to SPSS)
+  .sav -> .csv   (SPSS to CSV)
+
+WHAT THE SCRIPT DOES:
+---------------------
+csv -> sav:
+  - Reads CSV (UTF-8, including BOM)
+  - Auto-detects integer, float, and string columns
+  - Writes a valid SPSS .sav file via pyreadstat
+
+sav -> csv:
+  - Reads SPSS .sav file (all variable types, including strings)
+  - Writes a UTF-8 CSV with a header row
+
+DO NOT:
+-------
+x Create a new Python script
+x Install pyreadstat again (already installed in venv)
+x Write inline Python code to do the conversion
+
+DO:
+---
++ Use the existing run.sh wrapper script
++ Pass input file as first argument, output file as second argument
