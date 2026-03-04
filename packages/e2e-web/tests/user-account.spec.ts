@@ -53,6 +53,10 @@ test.describe("User Account", () => {
     await page.getByTestId("app.user.account.profile.update").click();
     await updateProfilePromise;
 
+    // This is very sad
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await page.waitForTimeout(1000);
+
     // router.refresh() triggers a Better Auth client session re-fetch (/api/auth/get-session).
     // Wait for it so useSession() has the updated data before form.reset() fires with the new name.
     await page.waitForResponse(/api\/auth\/get-session/);
