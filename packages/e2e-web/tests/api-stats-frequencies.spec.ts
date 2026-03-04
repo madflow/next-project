@@ -28,7 +28,7 @@ test.describe("API Stats Endpoint with Frequencies", () => {
     const statsResponse = await fetchApiVariableStats(variables, 1, page);
 
     expect(Array.isArray(statsResponse)).toBe(true);
-    expect(statsResponse.length).toBe(variables.length);
+    expect(statsResponse).toHaveLength(variables.length);
 
     for (const variable of variables) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

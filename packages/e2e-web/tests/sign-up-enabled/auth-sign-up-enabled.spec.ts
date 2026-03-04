@@ -44,7 +44,7 @@ test("sign-up", { tag: ["@sign-up-enabled"] }, async ({ page }) => {
     query: `to:"${signUpUser.email}"`,
   });
 
-  expect(searchMessages.messages.length).toBe(1);
+  expect(searchMessages.messages).toHaveLength(1);
   const message = searchMessages.messages[0];
   const linkCheck = await smtpServerApi.linkCheck(message.ID);
   let verifyLink = "";

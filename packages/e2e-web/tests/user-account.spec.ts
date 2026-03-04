@@ -128,7 +128,7 @@ test.describe("User Account", () => {
       query: `to:"${testUsers.emailChanger.email}"`,
     });
 
-    expect(searchMessages.messages.length).toBe(1);
+    expect(searchMessages.messages).toHaveLength(1);
     const message = searchMessages.messages[0];
     const verifyLink = await extractLinkFromMessage(message, "verify-email");
 
@@ -141,7 +141,7 @@ test.describe("User Account", () => {
       query: `to:"${newEmail}"`,
     });
 
-    expect(newEmailMessages.messages.length).toBe(1);
+    expect(newEmailMessages.messages).toHaveLength(1);
     smtpServerApi.deleteMessagesBySearch({ query: `to:"${newEmail}"` });
   });
 

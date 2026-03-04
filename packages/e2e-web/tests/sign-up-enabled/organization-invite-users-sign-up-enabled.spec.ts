@@ -29,7 +29,7 @@ async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
   const searchMessages = await smtpServerApi.searchMessages({
     query: `to:"${userEmail}"`,
   });
-  expect(searchMessages.messages.length).toBe(1);
+  expect(searchMessages.messages).toHaveLength(1);
   const message = searchMessages.messages[0];
   const acceptLink = await extractLinkFromMessage(message, "accept-invitation");
   expect(acceptLink).toBeTruthy();
