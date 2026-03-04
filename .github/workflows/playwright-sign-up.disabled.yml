@@ -59,7 +59,7 @@ jobs:
 
       - name: Run Playwright tests (sign-up-disabled)
         run: pnpm run e2e:sign-up-disabled
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-sign-up-disabled-test-results
