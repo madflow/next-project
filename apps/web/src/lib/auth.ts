@@ -92,7 +92,7 @@ export const auth = betterAuth({
           newEmail: string;
           url: string;
         },
-        request
+        request: Request
       ) => {
         const { user, newEmail, url } = data;
 
