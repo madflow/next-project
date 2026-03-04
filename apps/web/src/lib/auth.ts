@@ -86,16 +86,15 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async (
-        data: {
-          user: { email: string; locale?: string };
-          newEmail: string;
-          url: string;
-        },
-        request: Request
-      ) => {
-        const { user, newEmail, url } = data;
 
+      sendChangeEmailConfirmation: async (
+        {
+          user,
+          newEmail,
+          url,
+        }: { user: { email: string; locale?: string }; newEmail: string; url: string; token: string },
+        request
+      ) => {
         const cookieHeader = request?.headers.get("cookie");
         const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
         const locale = user.locale || requestedLocale || defaultLocale;
