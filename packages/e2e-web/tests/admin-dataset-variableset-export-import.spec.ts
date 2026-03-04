@@ -192,7 +192,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
 
       // Find the imported variablesets
       const importedSets = verifyExportData.variableSets.filter((vs) => vs.name.endsWith("_imported"));
-      expect(importedSets.length).toBe(modifiedExport.variableSets.length);
+      expect(importedSets).toHaveLength(modifiedExport.variableSets.length);
 
       // Verify orderIndex is preserved for each imported set
       for (const originalSet of modifiedExport.variableSets) {
@@ -254,7 +254,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       const importedSet = verifyExportData.variableSets.find((vs) => vs.name === `${originalSet.name}_order_test`);
 
       expect(importedSet).toBeDefined();
-      expect(importedSet!.variables.length).toBe(originalSet.variables.length);
+      expect(importedSet!.variables).toHaveLength(originalSet.variables.length);
 
       // Verify each variable's orderIndex matches
       for (const originalVar of originalSet.variables) {

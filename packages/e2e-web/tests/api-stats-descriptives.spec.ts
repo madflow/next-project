@@ -158,7 +158,7 @@ test.describe("API Stats Endpoint", () => {
       expect(response.status()).toBe(200);
       const data = await response.json();
 
-      expect(data.length).toBe(surveyResults.descriptive_statistics.length);
+      expect(data).toHaveLength(surveyResults.descriptive_statistics.length);
 
       // Verify each variable matches the fixture exactly
       for (const expectedStat of surveyResults.descriptive_statistics) {

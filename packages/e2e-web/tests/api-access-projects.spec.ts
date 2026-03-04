@@ -101,7 +101,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows.length).toBe(0);
+      expect(data.rows).toHaveLength(0);
       expect(data.count).toBe(0);
     });
 
@@ -257,7 +257,7 @@ test.describe("API Projects", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows.length).toBe(0);
+      expect(data.rows).toHaveLength(0);
       expect(data.count).toBe(0);
     });
 

@@ -84,11 +84,11 @@ test.describe("Admin Dataset Split Variables", () => {
     await expect(page.getByTestId("admin.dataset.splitvariables.assignment.remove").first()).toBeVisible();
 
     // Verify the variable was moved from available to assigned section
-    const newAvailableCount = await addButtons.count();
-    const newAssignedCount = await page.getByTestId("admin.dataset.splitvariables.assignment.remove").count();
+    const newAvailableCount = addButtons;
+    const newAssignedCount = page.getByTestId("admin.dataset.splitvariables.assignment.remove");
 
-    expect(newAvailableCount).toBe(initialAvailableCount - 1);
-    expect(newAssignedCount).toBe(initialAssignedCount + 1);
+    await expect(newAvailableCount).toHaveCount(initialAvailableCount - 1);
+    await expect(newAssignedCount).toHaveCount(initialAssignedCount + 1);
   });
 
   test("should remove a split variable successfully", async ({ page }) => {
@@ -123,11 +123,11 @@ test.describe("Admin Dataset Split Variables", () => {
     await expect(addButtons).toHaveCount(initialAvailableCount + 1);
 
     // Verify the variable was moved back from assigned to available section
-    const newAvailableCount = await addButtons.count();
-    const newAssignedCount = await page.getByTestId("admin.dataset.splitvariables.assignment.remove").count();
+    const newAvailableCount = addButtons;
+    const newAssignedCount = page.getByTestId("admin.dataset.splitvariables.assignment.remove");
 
-    expect(newAvailableCount).toBe(initialAvailableCount + 1);
-    expect(newAssignedCount).toBe(initialAssignedCount - 1);
+    await expect(newAvailableCount).toHaveCount(initialAvailableCount + 1);
+    await expect(newAssignedCount).toHaveCount(initialAssignedCount - 1);
   });
 
   test("should filter variables using search functionality", async ({ page }) => {

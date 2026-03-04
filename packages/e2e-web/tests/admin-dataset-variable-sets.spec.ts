@@ -344,8 +344,8 @@ test.describe("Admin Dataset Variable Sets", () => {
     );
     await searchInput.clear();
     await searchResponsePromiseClear;
-    const restoredVariableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
-    expect(restoredVariableCount).toBe(initialVariableCount);
+    const restoredVariableCount = page.getByTestId("admin.dataset.variableset.assignment.add");
+    await expect(restoredVariableCount).toHaveCount(initialVariableCount);
 
     // Test search with no results
     // http://localhost:3000/api/datasets/0198e639-3e96-734b-b0db-af0c4350a2c4/variables/unassigned?limit=100&offset=0&search=nonexistentvariablename123
@@ -357,8 +357,8 @@ test.describe("Admin Dataset Variable Sets", () => {
     );
     await searchInput.fill("nonexistentvariablename123");
     await searchResponsePromise;
-    const noResultsCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
-    expect(noResultsCount).toBe(0);
+    const noResultsCount = page.getByTestId("admin.dataset.variableset.assignment.add");
+    await expect(noResultsCount).toHaveCount(0);
   });
 
   test("should test search functionality in assigned variables", async ({ page }) => {
@@ -410,8 +410,8 @@ test.describe("Admin Dataset Variable Sets", () => {
     );
     await assignedSearchInput.clear();
     await clearSearchResponsePromise;
-    const restoredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
-    expect(restoredAssignedCount).toBe(initialAssignedCount);
+    const restoredAssignedCount = page.getByTestId("admin.dataset.variableset.assignment.remove");
+    await expect(restoredAssignedCount).toHaveCount(initialAssignedCount);
   });
 
   test("should test search functionality in available variables", async ({ page }) => {
@@ -454,8 +454,8 @@ test.describe("Admin Dataset Variable Sets", () => {
     );
     await availableSearchInput.clear();
     await clearAvailableResponsePromise;
-    const restoredAvailableCount = await page.getByTestId("admin.dataset.variableset.assignment.add").count();
-    expect(restoredAvailableCount).toBe(initialAvailableCount);
+    const restoredAvailableCount = page.getByTestId("admin.dataset.variableset.assignment.add");
+    await expect(restoredAvailableCount).toHaveCount(initialAvailableCount);
   });
 
   test("should preserve variable set state during navigation", async ({ page }) => {

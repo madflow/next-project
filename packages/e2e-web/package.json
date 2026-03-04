@@ -24,17 +24,17 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@eslint/js": "^9.28.0",
-    "@playwright/test": "^1.53.1",
+    "@eslint/js": "^9.39.3",
+    "@playwright/test": "^1.58.2",
     "@repo/eslint-config": "workspace:*",
-    "@types/node": "^24.10.1",
-    "eslint": "^9.29.0",
-    "eslint-plugin-playwright": "^2.4.0",
-    "globals": "^17.0.0",
-    "typescript-eslint": "^8.34.1"
+    "@types/node": "^24.11.0",
+    "eslint": "^9.39.3",
+    "eslint-plugin-playwright": "^2.9.0",
+    "globals": "^17.4.0",
+    "typescript-eslint": "^8.56.1"
   },
   "dependencies": {
-    "dotenv": "^17.0.0",
-    "mailpit-api": "^1.5.1"
+    "dotenv": "^17.3.1",
+    "mailpit-api": "^1.7.2"
   }
 }
