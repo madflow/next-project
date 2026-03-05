@@ -165,29 +165,6 @@ export function AllowedStatisticsSelector({
               </div>
             </>
           )}
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="distribution"
-              checked={distribution}
-              onCheckedChange={(checked) => setDistribution(checked === true)}
-              data-testid="admin.dataset.variableset.allowed-statistics.distribution"
-            />
-            <Label htmlFor="distribution" className="cursor-pointer text-sm font-normal">
-              {t("distribution")}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="mean"
-              checked={mean}
-              onCheckedChange={(checked) => setMean(checked === true)}
-              data-testid="admin.dataset.variableset.allowed-statistics.mean"
-            />
-            <Label htmlFor="mean" className="cursor-pointer text-sm font-normal">
-              {t("mean")}
-            </Label>
-          </div>
-
           {showValueRange && (
             <div className="mt-4 space-y-3 border-t pt-4">
               <p className="text-sm font-medium">{t("valueRange.title")}</p>

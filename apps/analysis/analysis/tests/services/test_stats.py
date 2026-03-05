@@ -5,7 +5,7 @@ from analysis.services.stats import RawDataService, StatisticsService
 
 
 @pytest.fixture
-def raw_data_service():
+def raw_data_service() -> RawDataService:
     """Fixture to provide a RawDataService instance for testing."""
     return RawDataService()
 
@@ -66,7 +66,13 @@ raw_data_test_cases = [
     "df, variables, expected, options",
     [(*case, {}) if len(case) == 3 else case for case in raw_data_test_cases],
 )
-def test_get_raw_values(raw_data_service, df, variables, expected, options):
+def test_get_raw_values(
+    raw_data_service: RawDataService,
+    df: pd.DataFrame,
+    variables: list[str],
+    expected: dict,
+    options: dict,
+) -> None:
     """Test raw data service with various scenarios."""
     exclude_empty = options.get("exclude_empty", True)
     max_values = options.get("max_values", 1000)
@@ -82,7 +88,7 @@ def test_get_raw_values(raw_data_service, df, variables, expected, options):
         assert result[var_name]["totalCount"] == expected[var_name]["totalCount"]
 
 
-def test_get_raw_values_variable_not_found(raw_data_service):
+def test_get_raw_values_variable_not_found(raw_data_service: RawDataService) -> None:
     """Test error handling when variable doesn't exist."""
     df = pd.DataFrame({"existing": ["a", "b", "c"]})
 
@@ -94,7 +100,7 @@ def test_get_raw_values_variable_not_found(raw_data_service):
     assert result["nonexistent"]["nonEmptyCount"] == 0
 
 
-def test_get_raw_values_include_empty(raw_data_service):
+def test_get_raw_values_include_empty(raw_data_service: RawDataService) -> None:
     """Test including empty values when exclude_empty is False."""
     df = pd.DataFrame({"feedback": ["Great!", None, "", "Good"]})
 
@@ -683,8 +689,8 @@ def test_describe_var_with_split_variable_empty_after_filtering(stats_service) -
 
 
 def test_describe_var_with_split_variable_mixed_numeric_string_categories(
-    stats_service,
-):
+    stats_service: StatisticsService,
+) -> None:
     """Test split variable with mixed numeric and string categories."""
     df = pd.DataFrame({"score": [10, 20, 30, 40, 50], "group": [1, "A", 2, "A", 1]})
 
@@ -713,8 +719,7 @@ def test_split_variable_not_found_error(stats_service) -> None:
     df = pd.DataFrame({"score": [10, 20, 30], "group": ["A", "B", "C"]})
 
     with pytest.raises(
-        ValueError,
-        match="Split variable 'nonexistent' not found in the DataFrame."
+        ValueError, match=r"Split variable 'nonexistent' not found in the DataFrame\."
     ):
         stats_service.describe_var(df, "score", split_variable="nonexistent")
 
@@ -791,9 +796,7 @@ def test_decimal_places_rounding(stats_service) -> None:
 
     # Test with decimal_places=None (should return full precision)
     stats_full_precision = stats_service.describe_var(
-        df,
-        "test_var",
-        decimal_places=None
+        df, "test_var", decimal_places=None
     )
     assert len(str(stats_full_precision["mean"]).split(".")[-1]) > 2
     assert len(str(stats_full_precision["std"]).split(".")[-1]) > 2
@@ -810,7 +813,7 @@ def test_decimal_places_rounding(stats_service) -> None:
     for item in freq_table:
         percentage_str = str(item["percentages"])
         if "." in percentage_str:
-            decimal_places_count = len(percentage_str.split(".")[-1])
+            decimal_places_count = len(percentage_str.rsplit(".", maxsplit=1)[-1])
             assert decimal_places_count <= 2, (
                 f"Percentage {item['percentages']} has more than 2 decimal places"
             )
@@ -1029,19 +1032,29 @@ def test_missing_ranges_combined_with_missing_values(stats_service) -> None:
     assert "100.0" in values_in_freq
 
 
-def test_get_missing_ranges_values_helper(stats_service) -> None:
-    """Test the helper method that converts missing ranges to excluded values."""
+def test_missing_ranges_values_applied_via_describe_var(
+    stats_service: StatisticsService,
+) -> None:
+    """Test that missing ranges correctly exclude values when using the public describe_var API."""
+    df = pd.DataFrame({"test_var": [1, 2, 97, 98, 99, 100]})
+
     missing_ranges = [{"lo": 97, "hi": 97}, {"lo": 98, "hi": 98}, {"lo": 99, "hi": 99}]
 
-    excluded_values = stats_service._get_missing_ranges_values(missing_ranges)
+    stats = stats_service.describe_var(df, "test_var", missing_ranges=missing_ranges)
 
-    # Should include various string representations of 97, 98, 99
-    assert "97" in excluded_values
-    assert "97.0" in excluded_values
-    assert "98" in excluded_values
-    assert "98.0" in excluded_values
-    assert "99" in excluded_values
-    assert "99.0" in excluded_values
+    freq_table = stats["frequency_table"]
+    values_in_freq = [item["value"] for item in freq_table]
+
+    # 97, 98, 99 should be excluded by the missing ranges
+    assert "97.0" not in values_in_freq
+    assert "97" not in values_in_freq
+    assert "98.0" not in values_in_freq
+    assert "98" not in values_in_freq
+    assert "99.0" not in values_in_freq
+    assert "99" not in values_in_freq
+
+    # Valid values should still be present
+    assert stats["count"] == 3  # 1, 2, 100
 
 
 def test_missing_ranges_empty_or_none(stats_service) -> None:

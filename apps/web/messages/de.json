@@ -1083,6 +1083,12 @@
       "stats": "Statistiken",
       "variable": "Variable"
     },
+    "textExplorer": {
+      "count": "{nonEmpty} von {total} Werten",
+      "empty": "Keine Werte gefunden.",
+      "error": "Fehler beim Laden der Werte.",
+      "loading": "Werte werden geladen..."
+    },
     "variablePanel": {
       "hidePanel": "Variablen ausblenden",
       "showPanel": "Variablen anzeigen",
