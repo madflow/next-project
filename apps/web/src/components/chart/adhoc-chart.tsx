@@ -10,6 +10,7 @@ import {
   ChartPieIcon,
   DownloadIcon,
   SheetIcon,
+  TextIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
@@ -47,6 +48,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
+import { TextExplorerAdhoc } from "./text-explorer-adhoc";
 import { UnsupportedChartPlaceholder } from "./unsupported-chart-placeholder";
 
 type AdhocChartProps = {
@@ -354,6 +356,9 @@ export function AdhocChart({
       case "meanBar":
         return <MeanBarAdhoc variable={variable} stats={stats} datasetId={datasetId} ref={ref} />;
 
+      case "textExplorer":
+        return <TextExplorerAdhoc variable={variable} datasetId={datasetId} />;
+
       default:
         return null;
     }
@@ -373,6 +378,8 @@ export function AdhocChart({
         return <SheetIcon className="h-4 w-4" />;
       case "meanBar":
         return <ChartBarBigIcon className="h-4 w-4" />;
+      case "textExplorer":
+        return <TextIcon className="h-4 w-4" />;
       default:
         return <BarChart3Icon className="h-4 w-4" />;
     }
@@ -518,9 +525,11 @@ export function AdhocChart({
                   />
                 )}
               </div>
-              <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
-                <DownloadIcon className="h-4 w-4" />
-              </Button>
+              {actualSelectedChartType !== "textExplorer" && (
+                <Button className="cursor-pointer" variant="outline" onClick={exportPNG}>
+                  <DownloadIcon className="h-4 w-4" />
+                </Button>
+              )}
             </CardFooter>
           </Card>
         </TabsContent>

@@ -12,6 +12,8 @@ class RawDataService:
         variable_names: List[str],
         exclude_empty: bool = True,
         max_values: int = 1000,
+        page: int = 1,
+        page_size: int = 5,
     ) -> Dict[str, Dict[str, Any]]:
         """
         Get raw values for specified variables from a DataFrame.
@@ -20,7 +22,9 @@ class RawDataService:
             data: The input DataFrame.
             variable_names: List of variable (column) names to fetch values for.
             exclude_empty: Whether to filter out empty/null values.
-            max_values: Maximum number of values to return per variable.
+            max_values: Maximum total number of values to consider per variable.
+            page: 1-based page number to return.
+            page_size: Number of values per page.
 
         Returns:
             A dictionary mapping variable names to their raw data:
@@ -28,7 +32,10 @@ class RawDataService:
                 "variable_name": {
                     "values": ["value1", "value2", ...],
                     "totalCount": 10,
-                    "nonEmptyCount": 8
+                    "nonEmptyCount": 2,
+                    "totalNonEmptyCount": 8,
+                    "totalPages": 2,
+                    "page": 1,
                 }
             }
         """
@@ -40,6 +47,9 @@ class RawDataService:
                     "values": [],
                     "totalCount": 0,
                     "nonEmptyCount": 0,
+                    "totalNonEmptyCount": 0,
+                    "totalPages": 0,
+                    "page": page,
                     "error": f"Variable '{variable_name}' not found in the DataFrame.",
                 }
                 continue
@@ -61,16 +71,32 @@ class RawDataService:
             # Convert all values to strings for consistent serialization
             values = [str(v) for v in values]
 
-            # Limit to max_values
+            # Limit to max_values before pagination
             if len(values) > max_values:
                 values = values[:max_values]
 
-            non_empty_count = len(values)
+            total_non_empty_count = len(values)
+
+            # Calculate total pages
+            total_pages = max(
+                1, -(-total_non_empty_count // page_size)
+            )  # ceiling division
+
+            # Clamp page to valid range
+            clamped_page = max(1, min(page, total_pages))
+
+            # Slice for current page
+            start = (clamped_page - 1) * page_size
+            end = start + page_size
+            page_values = values[start:end]
 
             result[variable_name] = {
-                "values": values,
+                "values": page_values,
                 "totalCount": total_count,
-                "nonEmptyCount": non_empty_count,
+                "nonEmptyCount": len(page_values),
+                "totalNonEmptyCount": total_non_empty_count,
+                "totalPages": total_pages,
+                "page": clamped_page,
             }
 
         return result

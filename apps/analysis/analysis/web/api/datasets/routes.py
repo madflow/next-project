@@ -44,6 +44,8 @@ class RawDataRequestOptions(BaseModel):
 
     exclude_empty: bool = True
     max_values: int = 1000
+    page: int = 1
+    page_size: int = 5
 
 
 class RawDataRequest(BaseModel):
@@ -59,6 +61,9 @@ class RawDataVariableResponse(BaseModel):
     values: List[str]
     total_count: int
     non_empty_count: int
+    total_non_empty_count: int
+    total_pages: int
+    page: int
     error: Optional[str] = None
 
 
@@ -414,6 +419,8 @@ async def get_dataset_raw_data(
             raw_data_request.variables,
             exclude_empty=raw_data_request.options.exclude_empty,
             max_values=raw_data_request.options.max_values,
+            page=raw_data_request.options.page,
+            page_size=raw_data_request.options.page_size,
         )
 
         # Convert to response model format
@@ -423,6 +430,9 @@ async def get_dataset_raw_data(
                 values=var_data["values"],
                 total_count=var_data["totalCount"],
                 non_empty_count=var_data["nonEmptyCount"],
+                total_non_empty_count=var_data["totalNonEmptyCount"],
+                total_pages=var_data["totalPages"],
+                page=var_data["page"],
                 error=var_data.get("error"),
             )
 

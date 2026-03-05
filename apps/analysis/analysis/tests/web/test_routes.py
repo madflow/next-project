@@ -2,15 +2,22 @@ from unittest.mock import Mock, patch
 
 import pandas as pd
 
-from analysis.web.api.datasets.routes import StatsRequest, StatsVariable
+from analysis.web.api.datasets.routes import (
+    RawDataRequest,
+    RawDataRequestOptions,
+    RawDataResponse,
+    RawDataVariableResponse,
+    StatsRequest,
+    StatsVariable,
+    get_dataset_raw_data,
+    get_dataset_stats,
+)
 
 
 # Since the actual integration tests are complex to set up without full app context,
 # let's create unit tests that test the logic functions directly
 def test_stats_request_model_with_split_variables() -> None:
     """Test that the StatsRequest and StatsVariable models work correctly."""
-    from analysis.web.api.datasets.routes import StatsRequest, StatsVariable
-
     # Test per-variable split variable
     request = StatsRequest(
         variables=[StatsVariable(variable="test_var", split_variable="group")]
@@ -42,16 +49,12 @@ def test_stats_request_model_with_split_variables() -> None:
 @patch("analysis.web.api.datasets.routes._get_dataset_variable_by_name")
 @patch("analysis.web.api.datasets.routes.StatisticsService")
 def test_stats_endpoint_split_variable_logic(
-    mock_stats_service_class, mock_get_variable, mock_read_df, mock_get_dataset
-):
+    mock_stats_service_class: Mock,
+    mock_get_variable: Mock,
+    mock_read_df: Mock,
+    mock_get_dataset: Mock,
+) -> None:
     """Test the split variable logic in the stats endpoint directly."""
-    from analysis.web.api.datasets.routes import (
-        get_dataset_stats,
-        StatsRequest,
-        StatsVariable,
-    )
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     # Mock setup
     mock_dataset = Mock()
     mock_dataset.s3_key = "test/path.sav"
@@ -92,6 +95,9 @@ def test_stats_endpoint_split_variable_logic(
     # Verify the mocks would be set up correctly
     assert stats_request.variables[0].split_variable == "split_var"
 
+    # Verify get_dataset_stats is importable (used in integration)
+    assert get_dataset_stats is not None
+
 
 def test_value_labels_conversion() -> None:
     """Test that JSONB value labels are properly converted to string keys."""
@@ -107,8 +113,6 @@ def test_value_labels_conversion() -> None:
 
 def test_split_variable_precedence() -> None:
     """Test that per-variable split variable takes precedence over global."""
-    from analysis.web.api.datasets.routes import StatsRequest, StatsVariable
-
     request = StatsRequest(
         variables=[StatsVariable(variable="test_var", split_variable="per_var_split")],
         split_variable="global_split",
@@ -134,8 +138,6 @@ def test_split_variable_precedence() -> None:
 
 def test_stats_request_model_with_decimal_places() -> None:
     """Test that the StatsRequest model accepts decimal_places parameter."""
-    from analysis.web.api.datasets.routes import StatsRequest, StatsVariable
-
     # Test with decimal_places
     request = StatsRequest(
         variables=[StatsVariable(variable="test_var")], decimal_places=2
@@ -154,41 +156,39 @@ def test_stats_request_model_with_decimal_places() -> None:
 
 
 # Tests for raw data endpoint
-def test_raw_data_request_model():
+def test_raw_data_request_model() -> None:
     """Test that the RawDataRequest model works correctly."""
-    from analysis.web.api.datasets.routes import RawDataRequest, RawDataRequestOptions
-
     # Test with default options
     request = RawDataRequest(variables=["var1", "var2"])
     assert request.variables == ["var1", "var2"]
     assert request.options.exclude_empty is True
     assert request.options.max_values == 1000
+    assert request.options.page == 1
+    assert request.options.page_size == 5
 
     # Test with custom options
     request = RawDataRequest(
         variables=["var1"],
-        options=RawDataRequestOptions(exclude_empty=False, max_values=500),
+        options=RawDataRequestOptions(
+            exclude_empty=False, max_values=500, page=2, page_size=10
+        ),
     )
     assert request.options.exclude_empty is False
     assert request.options.max_values == 500
+    assert request.options.page == 2
+    assert request.options.page_size == 10
 
 
 @patch("analysis.web.api.datasets.routes._get_dataset_by_id")
 @patch("analysis.web.api.datasets.routes._read_dataframe_from_s3")
 @patch("analysis.web.api.datasets.routes.RawDataService")
 def test_raw_data_endpoint_logic(
-    mock_raw_data_service_class, mock_read_df, mock_get_dataset
-):
+    mock_raw_data_service_class: Mock,
+    mock_read_df: Mock,
+    mock_get_dataset: Mock,
+) -> None:
     """Test the raw data endpoint logic directly."""
-    from analysis.web.api.datasets.routes import (
-        get_dataset_raw_data,
-        RawDataRequest,
-        RawDataRequestOptions,
-    )
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     # Mock setup
-    mock_db = AsyncMock(spec=AsyncSession)
     mock_dataset = Mock()
     mock_dataset.s3_key = "test/path.sav"
     mock_get_dataset.return_value = mock_dataset
@@ -224,24 +224,32 @@ def test_raw_data_endpoint_logic(
     assert raw_data_request.variables == ["feedback", "comments"]
     assert raw_data_request.options.exclude_empty is True
 
+    # Verify get_dataset_raw_data is importable (used in integration)
+    assert get_dataset_raw_data is not None
 
-def test_raw_data_response_model():
+
+def test_raw_data_response_model() -> None:
     """Test that the RawDataResponse model works correctly."""
-    from analysis.web.api.datasets.routes import (
-        RawDataResponse,
-        RawDataVariableResponse,
-    )
-
     response = RawDataResponse(
         status="success",
         message="Successfully retrieved raw data for 2 variable(s)",
         dataset_id="test-dataset-id",
         data={
             "var1": RawDataVariableResponse(
-                values=["value1", "value2", "value3"], total_count=5, non_empty_count=3
+                values=["value1", "value2", "value3"],
+                total_count=5,
+                non_empty_count=3,
+                total_non_empty_count=3,
+                total_pages=1,
+                page=1,
             ),
             "var2": RawDataVariableResponse(
-                values=["a", "b"], total_count=5, non_empty_count=2
+                values=["a", "b"],
+                total_count=5,
+                non_empty_count=2,
+                total_non_empty_count=2,
+                total_pages=1,
+                page=1,
             ),
         },
     )
@@ -251,3 +259,6 @@ def test_raw_data_response_model():
     assert response.data["var1"].values == ["value1", "value2", "value3"]
     assert response.data["var1"].total_count == 5
     assert response.data["var1"].non_empty_count == 3
+    assert response.data["var1"].total_non_empty_count == 3
+    assert response.data["var1"].total_pages == 1
+    assert response.data["var1"].page == 1
