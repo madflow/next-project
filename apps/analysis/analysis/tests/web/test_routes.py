@@ -1,6 +1,7 @@
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pandas as pd
+import pytest
 
 from analysis.web.api.datasets.routes import (
     RawDataRequest,
@@ -179,10 +180,11 @@ def test_raw_data_request_model() -> None:
     assert request.options.page_size == 10
 
 
+@pytest.mark.anyio
 @patch("analysis.web.api.datasets.routes._get_dataset_by_id")
 @patch("analysis.web.api.datasets.routes._read_dataframe_from_s3")
 @patch("analysis.web.api.datasets.routes.RawDataService")
-def test_raw_data_endpoint_logic(
+async def test_raw_data_endpoint_logic(
     mock_raw_data_service_class: Mock,
     mock_read_df: Mock,
     mock_get_dataset: Mock,
@@ -201,31 +203,75 @@ def test_raw_data_endpoint_logic(
     )
     mock_read_df.return_value = mock_dataframe
 
-    # Mock RawDataService
+    # Mock RawDataService with all fields the route mapper expects
     mock_raw_data_service = Mock()
     mock_raw_data_result = {
-        "feedback": {"values": ["Great!", "Good"], "totalCount": 4, "nonEmptyCount": 2},
+        "feedback": {
+            "values": ["Great!", "Good"],
+            "totalCount": 4,
+            "nonEmptyCount": 2,
+            "totalNonEmptyCount": 2,
+            "totalPages": 1,
+            "page": 1,
+        },
         "comments": {
             "values": ["Nice", "Thanks", "Appreciate it"],
             "totalCount": 4,
             "nonEmptyCount": 3,
+            "totalNonEmptyCount": 3,
+            "totalPages": 1,
+            "page": 1,
         },
     }
     mock_raw_data_service.get_raw_values.return_value = mock_raw_data_result
     mock_raw_data_service_class.return_value = mock_raw_data_service
 
-    # Test request
+    # Test request with exclude_empty=True and pagination options
     raw_data_request = RawDataRequest(
         variables=["feedback", "comments"],
-        options=RawDataRequestOptions(exclude_empty=True, max_values=1000),
+        options=RawDataRequestOptions(
+            exclude_empty=True, max_values=1000, page=1, page_size=5
+        ),
     )
 
-    # Verify the mocks would be set up correctly
-    assert raw_data_request.variables == ["feedback", "comments"]
-    assert raw_data_request.options.exclude_empty is True
+    # Invoke the route handler directly
+    result = await get_dataset_raw_data(
+        dataset_id="test-dataset-id",
+        raw_data_request=raw_data_request,
+        db=AsyncMock(),
+        api_key="test-key",
+    )
 
-    # Verify get_dataset_raw_data is importable (used in integration)
-    assert get_dataset_raw_data is not None
+    # Verify the service was called with the correct parameters
+    mock_raw_data_service.get_raw_values.assert_called_once_with(
+        mock_dataframe,
+        ["feedback", "comments"],
+        exclude_empty=True,
+        max_values=1000,
+        page=1,
+        page_size=5,
+    )
+
+    # Verify the response structure
+    assert result.status == "success"
+    assert result.dataset_id == "test-dataset-id"
+    assert "feedback" in result.data
+    assert "comments" in result.data
+
+    # Verify pagination and count fields are mapped correctly
+    feedback = result.data["feedback"]
+    assert feedback.values == ["Great!", "Good"]
+    assert feedback.total_count == 4
+    assert feedback.non_empty_count == 2
+    assert feedback.total_non_empty_count == 2
+    assert feedback.total_pages == 1
+    assert feedback.page == 1
+
+    comments = result.data["comments"]
+    assert comments.values == ["Nice", "Thanks", "Appreciate it"]
+    assert comments.total_non_empty_count == 3
+    assert comments.total_pages == 1
+    assert comments.page == 1
 
 
 def test_raw_data_response_model() -> None:
