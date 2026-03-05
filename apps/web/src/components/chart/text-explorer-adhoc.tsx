@@ -85,9 +85,9 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
 
   return (
     <div className="space-y-3">
-      <ul className="list-disc space-y-1 pl-5">
+      <ul className="overflow-hidden rounded-md">
         {values.map((value, index) => (
-          <li key={index} className="text-sm">
+          <li key={index} className={`border-b px-3 py-2 text-sm ${index % 2 === 0 ? "bg-muted/50" : "bg-background"}`}>
             {value}
           </li>
         ))}
