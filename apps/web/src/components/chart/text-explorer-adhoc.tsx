@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -52,6 +52,10 @@ function buildPageNumbers(currentPage: number, totalPages: number): (number | "e
 export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProps) {
   const t = useTranslations("projectAdhocAnalysis.textExplorer");
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [variable.name, datasetId]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["text-explorer", datasetId, variable.name, page],
