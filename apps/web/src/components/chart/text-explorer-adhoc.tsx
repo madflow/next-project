@@ -101,7 +101,6 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                label={t("pagination.previous")}
                 onClick={(e) => {
                   e.preventDefault();
                   if (currentPage > 1) setPage(currentPage - 1);
@@ -132,7 +131,6 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
             <PaginationItem>
               <PaginationNext
                 href="#"
-                label={t("pagination.next")}
                 onClick={(e) => {
                   e.preventDefault();
                   if (currentPage < totalPages) setPage(currentPage + 1);
