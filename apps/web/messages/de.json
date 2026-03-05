@@ -1084,10 +1084,14 @@
       "variable": "Variable"
     },
     "textExplorer": {
-      "count": "{nonEmpty} von {total} Werten",
-      "empty": "Keine Werte gefunden.",
-      "error": "Fehler beim Laden der Werte.",
-      "loading": "Werte werden geladen..."
+      "count": "Anzahl: {total}",
+      "empty": "Keine Angaben gefunden.",
+      "error": "Fehler beim Laden der Angaben.",
+      "loading": "Angaben werden geladen...",
+      "pagination": {
+        "next": "Weiter",
+        "previous": "Zurück"
+      }
     },
     "variablePanel": {
       "hidePanel": "Variablen ausblenden",

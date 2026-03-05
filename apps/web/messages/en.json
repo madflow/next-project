@@ -1084,10 +1084,14 @@
       "variable": "Variable"
     },
     "textExplorer": {
-      "count": "{nonEmpty} of {total} values",
-      "empty": "No values found.",
-      "error": "Error loading values.",
-      "loading": "Loading values..."
+      "count": "Total: {total}",
+      "empty": "No responses found.",
+      "error": "Error loading responses.",
+      "loading": "Loading responses...",
+      "pagination": {
+        "next": "Next",
+        "previous": "Previous"
+      }
     },
     "variablePanel": {
       "hidePanel": "Hide variables",

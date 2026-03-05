@@ -62,7 +62,6 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
   const variableData = data?.data[variable.name];
   const values = variableData?.values ?? [];
   const totalNonEmptyCount = variableData?.total_non_empty_count ?? 0;
-  const totalCount = variableData?.total_count ?? 0;
   const totalPages = variableData?.total_pages ?? 1;
   const currentPage = variableData?.page ?? page;
 
@@ -86,7 +85,6 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
 
   return (
     <div className="space-y-3">
-      <p className="text-muted-foreground text-xs">{t("count", { nonEmpty: totalNonEmptyCount, total: totalCount })}</p>
       <ul className="list-disc space-y-1 pl-5">
         {values.map((value, index) => (
           <li key={index} className="text-sm">
@@ -94,12 +92,13 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
           </li>
         ))}
       </ul>
-      {totalPages > 1 && (
-        <Pagination className="justify-start">
+      <div className="flex items-center gap-2">
+        <Pagination className="flex-1 justify-start">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
                 href="#"
+                label={t("pagination.previous")}
                 onClick={(e) => {
                   e.preventDefault();
                   if (currentPage > 1) setPage(currentPage - 1);
@@ -130,6 +129,7 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
             <PaginationItem>
               <PaginationNext
                 href="#"
+                label={t("pagination.next")}
                 onClick={(e) => {
                   e.preventDefault();
                   if (currentPage < totalPages) setPage(currentPage + 1);
@@ -140,7 +140,8 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
             </PaginationItem>
           </PaginationContent>
         </Pagination>
-      )}
+        <p className="text-muted-foreground shrink-0 text-xs">{t("count", { total: totalNonEmptyCount })}</p>
+      </div>
     </div>
   );
 }
