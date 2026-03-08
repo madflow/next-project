@@ -1,6 +1,6 @@
 import { Page, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
-import { extractLinkFromMessage, loginUser, logoutUser } from "../utils";
+import { extractLinkFromMessage, getLatestEmail, loginUser, logoutUser } from "../utils";
 import { smtpServerApi } from "../utils";
 
 const orgWithPermission = "Test Organization 3";
@@ -26,11 +26,7 @@ async function selectOrganization(page: Page, orgName: string) {
 }
 
 async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
-  const searchMessages = await smtpServerApi.searchMessages({
-    query: `to:"${userEmail}"`,
-  });
-  expect(searchMessages.messages).toHaveLength(1);
-  const message = searchMessages.messages[0];
+  const message = await getLatestEmail(userEmail);
   const acceptLink = await extractLinkFromMessage(message, "accept-invitation");
   expect(acceptLink).toBeTruthy();
   await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
