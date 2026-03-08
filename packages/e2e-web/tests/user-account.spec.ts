@@ -1,268 +1,257 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 import path from "path";
 import { testUsers } from "../config";
-import { extractLinkFromMessage, loginUser, logoutUser, smtpServerApi } from "../utils";
+import { extractLinkFromMessage, getLatestEmail, loginUser, logoutUser, smtpServerApi } from "../utils";
 
-test.afterAll(async () => {
-  await smtpServerApi.deleteMessages();
-});
+const ALTERNATE_PASSWORD = "Tester1234567";
+const EMAIL_PRIMARY = testUsers.adminInNoOrg.email;
+const EMAIL_SECONDARY = "admin-in-no-org-alt@example.com";
+const EMAIL_PASSWORD = testUsers.adminInNoOrg.password;
+
+function getNextLocale(currentLang: string) {
+  return currentLang === "de" ? "en" : "de";
+}
+
+function getLocaleOptionName(currentLang: string) {
+  return currentLang === "de" ? "Englisch" : "German";
+}
+
+function getNextPassword(currentPassword: string) {
+  return currentPassword === testUsers.accountInNoOrg.password ? ALTERNATE_PASSWORD : testUsers.accountInNoOrg.password;
+}
+
+function getNextEmail(currentEmail: string) {
+  return currentEmail === EMAIL_PRIMARY ? EMAIL_SECONDARY : EMAIL_PRIMARY;
+}
+
+async function openAccountPage(page: Page, email: string, password: string) {
+  await page.goto("/");
+  await loginUser(page, email, password);
+  await page.goto("/user/account");
+  await expect(page).toHaveURL(/\/user\/account$/);
+  await expect(page.getByTestId("app.user.account.page")).toBeVisible();
+}
+
+async function tryLogin(page: Page, email: string, password: string) {
+  await page.goto("/");
+  await expect(page.getByTestId("auth.login.form.submit")).toBeVisible();
+  await page.getByTestId("auth.login.form.email").fill(email);
+  await page.getByTestId("auth.login.form.password").fill(password);
+  await page.getByTestId("auth.login.form.submit").click();
+
+  try {
+    await expect(page.getByTestId("app.sidebar.user-menu-trigger")).toBeVisible({ timeout: 5000 });
+    return true;
+  } catch {
+    await expect(page.getByTestId("auth.login.form.submit")).toBeVisible();
+    return false;
+  }
+}
+
+async function loginWithAnyPassword(page: Page, email: string, passwords: string[]) {
+  for (const password of passwords) {
+    if (await tryLogin(page, email, password)) {
+      return password;
+    }
+  }
+
+  throw new Error(`Unable to log in as ${email} with any known password`);
+}
+
+async function loginWithAnyEmail(page: Page, emails: string[], password: string) {
+  for (const email of emails) {
+    if (await tryLogin(page, email, password)) {
+      return email;
+    }
+  }
+
+  throw new Error("Unable to log in with any known email");
+}
+
+async function clearMailbox(email: string) {
+  await smtpServerApi.deleteMessagesBySearch({ query: `to:"${email}"` });
+}
+
+async function waitForMailboxMessage(email: string) {
+  const message = await getLatestEmail(email);
+  expect(message, `Expected a Mailpit message for ${email}`).toBeTruthy();
+  return message!;
+}
 
 test.describe("User Account", () => {
-  test.describe.configure({ mode: "serial" });
+  test.describe.configure({ mode: "parallel" });
 
-  test("should log in and navigate to account settings", async ({ page }) => {
-    // Navigate to the login page
+  test("navigates to account settings and updates profile name and locale", async ({ page }) => {
     await page.goto("/");
-
-    // Log in as the profile user
     await loginUser(page, testUsers.profileChanger.email, testUsers.profileChanger.password);
+    await page.getByTestId("app.sidebar.user-menu-trigger").click();
+    await page.getByTestId("app.nav-user.account").click();
 
-    // Open user menu
-    const userMenuTrigger = page.getByTestId("app.sidebar.user-menu-trigger");
-    await userMenuTrigger.click();
-
-    // Click on Account menu item
-    const accountLink = page.getByTestId("app.nav-user.account");
-    await accountLink.click();
-
-    // Navigate to account page and verify container is visible
-    await page.waitForURL(/\/user\/account/);
+    await expect(page).toHaveURL(/\/user\/account$/);
     await expect(page.getByTestId("app.user.account.page")).toBeVisible();
-  });
 
-  test("should update profile name and locale", async ({ page }) => {
-    // Navigate to the login page
-    await page.goto("/");
+    const newName = `Profile Changer ${Date.now()}`;
+    const currentLang = (await page.locator("html").getAttribute("lang")) ?? "en";
+    const nextLang = getNextLocale(currentLang);
+    const optionName = getLocaleOptionName(currentLang);
 
-    // Log in as the profile user
-    await loginUser(page, testUsers.profileChanger.email, testUsers.profileChanger.password);
-
-    // Navigate to account page
-    await page.goto("/user/account");
-
-    // Update name using test ID
-    const newName = `Test User ${Date.now()}`;
     await page.getByTestId("app.user.account.profile.name").fill(newName);
-
-    // Update locale to German
     await page.getByTestId("app.user.account.profile.locale").click();
-    await page.getByRole("option", { name: "German" }).click();
+    await page.getByRole("option", { name: optionName }).click();
 
-    // Submit the form and wait for the server action to complete
-    const updateProfilePromise = page.waitForResponse(/api\/auth\/update-user/);
+    const updateProfileResponse = page.waitForResponse(
+      (response) => response.url().includes("/api/auth/update-user") && response.ok()
+    );
     await page.getByTestId("app.user.account.profile.update").click();
-    await updateProfilePromise;
+    await updateProfileResponse;
 
-    // This is very sad
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(1000);
-
-    await expect(page.locator("html")).toHaveAttribute("lang", "de");
-
-    // Verify the name and locale were updated
+    await expect(page.locator("html")).toHaveAttribute("lang", nextLang);
     await expect(page.getByTestId("app.user.account.profile.name")).toHaveValue(newName);
-    await expect(page.getByTestId("app.user.account.profile.locale")).toContainText("Deutsch");
 
-    await page.getByTestId("app.user.account.profile.locale").click();
-    await page.getByRole("option", { name: "Englisch" }).click();
-
-    // Submit the form
-    await page.getByTestId("app.user.account.profile.update").click();
+    await page.reload();
+    await expect(page.getByTestId("app.user.account.page")).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("lang", nextLang);
+    await expect(page.getByTestId("app.user.account.profile.name")).toHaveValue(newName);
   });
 
-  test("should update user password", async ({ page }) => {
-    // Navigate to the login page and log in
-    await page.goto("/");
-    await loginUser(page, testUsers.profileChanger.email, testUsers.profileChanger.password);
+  test("updates password and logs in with the new password", async ({ page }) => {
+    const email = testUsers.accountInNoOrg.email;
+    const currentPassword = await loginWithAnyPassword(page, email, [
+      testUsers.accountInNoOrg.password,
+      ALTERNATE_PASSWORD,
+    ]);
+    const nextPassword = getNextPassword(currentPassword);
 
-    // Navigate to account page
     await page.goto("/user/account");
-    await page.waitForURL(/\/user\/account/);
+    await expect(page.getByTestId("app.user.account.page")).toBeVisible();
 
-    // Fill out the password update form
-    await page.locator("html").click();
-    await page.getByTestId("app.user.account.password.current").click();
-    await page.getByTestId("app.user.account.password.current").fill("Tester12345");
+    const currentPasswordInput = page.getByTestId("app.user.account.password.current");
+    const newPasswordInput = page.getByTestId("app.user.account.password.new");
+    const confirmPasswordInput = page.getByTestId("app.user.account.password.confirm");
 
-    const newPassword = "Tester1234567";
-    await page.getByTestId("app.user.account.password.new").click();
-    await page.getByTestId("app.user.account.password.new").fill(newPassword);
-    await page.getByTestId("app.user.account.password.confirm").click();
-    await page.getByTestId("app.user.account.password.confirm").fill(newPassword);
-
-    // Submit the password update form
+    await currentPasswordInput.fill(currentPassword);
+    await newPasswordInput.fill(nextPassword);
+    await confirmPasswordInput.fill(nextPassword);
     await page.getByTestId("app.user.account.password.update").click();
 
+    await expect(currentPasswordInput).toHaveValue("");
+    await expect(newPasswordInput).toHaveValue("");
+    await expect(confirmPasswordInput).toHaveValue("");
+
     await logoutUser(page);
-
-    // Log in with the new password
-    await loginUser(page, testUsers.profileChanger.email, newPassword);
-
-    // Verify login was successful by checking for user menu
+    await loginUser(page, email, nextPassword);
     await expect(page.getByTestId("app.sidebar.user-menu-trigger")).toBeVisible();
   });
 
-  test("should update user email", async ({ page }) => {
-    // Generate a unique email with timestamp
-    const newEmail = `updated-${Date.now()}@example.com`;
+  test("updates email, verifies it, and logs in with the new email", async ({ page }) => {
+    await clearMailbox(EMAIL_PRIMARY);
+    await clearMailbox(EMAIL_SECONDARY);
 
-    // Navigate to the login page and log in as email changer
-    await page.goto("/");
-    await loginUser(page, testUsers.emailChanger.email, testUsers.emailChanger.password);
+    const currentEmail = await loginWithAnyEmail(page, [EMAIL_PRIMARY, EMAIL_SECONDARY], EMAIL_PASSWORD);
+    const nextEmail = getNextEmail(currentEmail);
 
-    // Navigate to account page
     await page.goto("/user/account");
-    await page.waitForURL(/\/user\/account/);
+    await expect(page.getByTestId("app.user.account.page")).toBeVisible();
 
-    // Fill out the email update form
-    await page.getByTestId("app.user.account.email").fill(newEmail);
-
-    // Submit the form
-    // http://localhost:3000/api/auth/change-email
-    const updateEmailPromise = page.waitForResponse(/change-email/);
+    const changeEmailResponse = page.waitForResponse(
+      (response) => response.url().includes("/api/auth/change-email") && response.ok()
+    );
+    await page.getByTestId("app.user.account.email").fill(nextEmail);
     await page.getByTestId("app.user.account.email.update").click();
-    await updateEmailPromise;
+    await changeEmailResponse;
 
-    // Wait for the verification email (sent to the old email address)
-    const searchMessages = await smtpServerApi.searchMessages({
-      query: `to:"${testUsers.emailChanger.email}"`,
-    });
+    await expect(page.getByTestId("app.user.account.email")).toHaveValue("");
 
-    expect(searchMessages.messages).toHaveLength(1);
-    const message = searchMessages.messages[0];
-    const verifyLink = await extractLinkFromMessage(message, "verify-email");
-
+    const verificationMessage = await waitForMailboxMessage(currentEmail);
+    const verifyLink = await extractLinkFromMessage(verificationMessage, "verify-email");
     expect(verifyLink).toBeTruthy();
 
-    // Navigate to the verification link
+    await logoutUser(page);
     await page.goto(verifyLink);
+    await page.waitForURL(/\/auth\/login|\/auth\/verify-email|\/user\/account/, { timeout: 10000 });
 
-    const newEmailMessages = await smtpServerApi.searchMessages({
-      query: `to:"${newEmail}"`,
+    const newAddressMessage = await waitForMailboxMessage(nextEmail);
+    expect(newAddressMessage.Subject).toBeTruthy();
+
+    const newEmailVerifyLink = await extractLinkFromMessage(newAddressMessage, "verify-email");
+    expect(newEmailVerifyLink).toBeTruthy();
+
+    await page.goto(newEmailVerifyLink);
+    await page.waitForURL(/\/auth\/login|\/auth\/verify-email|\/user\/account/, { timeout: 10000 });
+    await page.goto("/");
+    await expect(page.getByTestId("app.sidebar.user-menu-trigger")).toBeVisible();
+    await expect(page.getByTestId("app.sidebar.user-menu-trigger")).toContainText(nextEmail);
+
+    await clearMailbox(EMAIL_PRIMARY);
+    await clearMailbox(EMAIL_SECONDARY);
+  });
+
+  test.describe("avatar", () => {
+    test.describe.configure({ mode: "serial" });
+
+    test("uploads an avatar and keeps showing it after reload", async ({ page }) => {
+      await openAccountPage(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
+
+      const avatarPath = path.join(__dirname, "../testdata/avatar.png");
+      await page.getByTestId("app.user.account.avatar-file-input").setInputFiles(avatarPath);
+
+      const saveButton = page.getByTestId("app.user.account.avatar-save-button");
+      const avatarPreview = page.getByTestId("app.user.account.avatar-image-preview");
+
+      await expect(saveButton).toBeVisible();
+      await expect(saveButton).toBeEnabled();
+      await saveButton.click();
+
+      await expect(saveButton).toBeHidden();
+      await expect(avatarPreview).toBeVisible();
+      await expect(avatarPreview).toHaveAttribute("src", /\/api\/users\/.+\/avatars\/.+\.(png|jpe?g|webp)$/i);
+
+      await page.reload();
+      await expect(page.getByTestId("app.user.account.page")).toBeVisible();
+      await expect(avatarPreview).toBeVisible();
+      await expect(avatarPreview).toHaveAttribute("src", /\/api\/users\/.+\/avatars\/.+\.(png|jpe?g|webp)$/i);
     });
 
-    expect(newEmailMessages.messages).toHaveLength(1);
-    smtpServerApi.deleteMessagesBySearch({ query: `to:"${newEmail}"` });
+    test("rejects fake PNG and SVG avatar uploads", async ({ page }) => {
+      await openAccountPage(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
+
+      const fileInput = page.getByTestId("app.user.account.avatar-file-input");
+      const errorMessage = page.getByText(
+        /Could not detect file type|Only WebP, PNG, and JPEG images are allowed|Invalid file type: Only WebP, PNG, and JPEG images are allowed/i
+      );
+
+      const fakePngPath = path.join(__dirname, "../testdata/avatar-fake.png");
+      await fileInput.setInputFiles(fakePngPath);
+      await page.getByTestId("app.user.account.avatar-save-button").click();
+      await expect(errorMessage.first()).toBeVisible();
+
+      await page.reload();
+      await expect(page.getByTestId("app.user.account.page")).toBeVisible();
+
+      const svgPath = path.join(__dirname, "../testdata/avatar.svg");
+      await fileInput.setInputFiles(svgPath);
+      await expect(
+        page.getByText(/Invalid file type: Only WebP, PNG, and JPEG images are allowed/i).first()
+      ).toBeVisible();
+      await expect(page.getByTestId("app.user.account.avatar-save-button")).toBeHidden();
+    });
   });
 
-  test("should upload and display a new avatar", async ({ page }) => {
-    await page.goto("/");
-    await loginUser(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
+  test("deletes the account and redirects to goodbye", async ({ page }) => {
+    await openAccountPage(page, testUsers.accountDeleter.email, testUsers.accountDeleter.password);
 
-    await page.goto("/user/account");
+    const deleteButton = page.getByTestId("app.user.account.delete-account");
+    await deleteButton.scrollIntoViewIfNeeded();
+    await deleteButton.click();
 
-    const avatarContainer = page.getByTestId("app.user.account.avatar-container");
-    await avatarContainer.waitFor({ state: "visible", timeout: 5000 });
-
-    await page.getByTestId("app.user.account.avatar-upload-button").waitFor({ state: "visible" });
-    await page.getByTestId("app.user.account.avatar-upload-button").click();
-
-    const fileInput = page.getByTestId("app.user.account.avatar-file-input");
-    const avatarPath = path.join(__dirname, "../testdata/avatar.png");
-    await fileInput.setInputFiles(avatarPath);
-
-    // Wait for save button to be visible and enabled before clicking
-    const saveButton = page.getByTestId("app.user.account.avatar-save-button");
-    await saveButton.waitFor({ state: "visible", timeout: 5000 });
-    await expect(saveButton).toBeEnabled();
-
-    // Wait for the user update response after clicking save
-    // The avatar upload is handled by a Server Action that calls /api/auth/update-user
-    const uploadPromise = page.waitForResponse(/api\/auth\/update-user/);
-    await saveButton.click();
-    await uploadPromise;
-
-    await page.getByTestId("app.user.account.avatar-container").waitFor({ state: "visible" });
-    await expect(page.getByTestId("app.user.account.avatar-container")).toBeVisible();
-
-    // After reload, verify the avatar image is loaded from the API
-    const avatarExistsResponse = page.waitForResponse(
-      /\/api\/users\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/avatars\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.png/i
-    );
-    await page.reload();
-    await avatarExistsResponse;
-    await page.getByTestId("app.user.account.avatar-container").waitFor({ state: "visible" });
-    await expect(page.getByTestId("app.user.account.avatar-container")).toBeVisible();
-  });
-
-  test("should reject fake PNG file (SVG with .png extension)", async ({ page }) => {
-    await page.goto("/");
-    await loginUser(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
-
-    await page.goto("/user/account");
-
-    const avatarContainer = page.getByTestId("app.user.account.avatar-container");
-    await avatarContainer.waitFor({ state: "visible", timeout: 5000 });
-
-    await page.getByTestId("app.user.account.avatar-upload-button").waitFor({ state: "visible" });
-    await page.getByTestId("app.user.account.avatar-upload-button").click();
-
-    const fileInput = page.getByTestId("app.user.account.avatar-file-input");
-    const fakePngPath = path.join(__dirname, "../testdata/avatar-fake.png");
-    await fileInput.setInputFiles(fakePngPath);
-
-    // Click save and expect an error
-    await page.getByTestId("app.user.account.avatar-save-button").click();
-
-    // Wait for error message or toast notification
-    // The system should detect that the file content doesn't match the extension
-    const errorMessage = page.locator("text=/invalid.*file.*type|unsupported.*format|file.*type.*not.*allowed/i");
-    await expect(errorMessage.first()).toBeVisible({ timeout: 5000 });
-  });
-
-  test("should reject SVG file upload", async ({ page }) => {
-    await page.goto("/");
-    await loginUser(page, testUsers.avatarUser.email, testUsers.avatarUser.password);
-
-    await page.goto("/user/account");
-
-    const avatarContainer = page.getByTestId("app.user.account.avatar-container");
-    await avatarContainer.waitFor({ state: "visible", timeout: 5000 });
-
-    await page.getByTestId("app.user.account.avatar-upload-button").waitFor({ state: "visible" });
-    await page.getByTestId("app.user.account.avatar-upload-button").click();
-
-    const fileInput = page.getByTestId("app.user.account.avatar-file-input");
-    const svgPath = path.join(__dirname, "../testdata/avatar.svg");
-    await fileInput.setInputFiles(svgPath);
-
-    // Frontend validation should reject the file immediately and show an error toast
-    // The error message appears immediately after file selection, no need to click save
-    const errorMessage = page.locator(
-      "text=/invalid.*file.*type|unsupported.*format|svg.*not.*allowed|file.*type.*not.*allowed/i"
-    );
-    await expect(errorMessage.first()).toBeVisible({ timeout: 5000 });
-
-    // Verify that the Save Changes button does NOT appear (file was rejected)
-    await expect(page.getByTestId("app.user.account.avatar-save-button")).toBeHidden();
-  });
-
-  test("should delete user account and redirect to goodbye page", async ({ page }) => {
-    // Log in as the account deleter user
-    await page.goto("/");
-    await loginUser(page, testUsers.accountDeleter.email, testUsers.accountDeleter.password);
-
-    // Navigate to account page
-    await page.goto("/user/account");
-    await page.waitForURL(/\/user\/account/);
-
-    // Scroll to the delete account section (it's at the bottom of the page)
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-
-    // Click the delete account button
-    await page.getByTestId("app.user.account.delete-account").click();
-
-    // Wait for the confirmation dialog
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
 
-    page.getByTestId("app.user.account.delete.password").fill(testUsers.accountDeleter.password);
-
-    // Confirm account deletion using the test ID from the dialog
+    await page.getByTestId("app.user.account.delete.password").fill(testUsers.accountDeleter.password);
     const confirmButton = page.getByTestId("app.user.account.delete-account-confirm");
+    await expect(confirmButton).toBeEnabled();
     await confirmButton.click();
 
-    // Wait for the goodbye page to load
-    await page.waitForURL("/goodbye");
+    await expect(page).toHaveURL(/\/goodbye$/);
   });
 });
