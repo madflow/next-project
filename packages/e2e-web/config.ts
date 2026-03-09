@@ -44,6 +44,11 @@ export const testUsers = {
     password: "Tester12345",
     name: "Admin In No Org",
   },
+  inviteTarget: {
+    email: "invite-target@example.com",
+    password: "Tester12345",
+    name: "Invite Target",
+  },
 } as const;
 
 export const baseUrl = process.env.E2E_BASE_URL || "http://localhost:3000";
