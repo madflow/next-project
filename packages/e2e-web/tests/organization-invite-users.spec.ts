@@ -6,16 +6,32 @@ import { smtpServerApi } from "../utils";
 const orgWithPermission = "Test Organization 3";
 
 async function inviteUser(page: Page, userEmail: string) {
-  // /api/auth/organization/get-full-organization
-  const getOrgResponsePromise = page.waitForResponse("api/auth/organization/get-full-organization");
   await page.getByTestId("app.organization-switcher").click();
-  await getOrgResponsePromise;
+  // Wait for the invite button to be visible — this implies permissions have loaded
+  await expect(page.getByTestId("app.organization-switcher.invite")).toBeVisible();
   await page.getByTestId("app.organization-switcher.invite").click();
   await page.getByTestId("admin.users.invite.form.email").fill(userEmail);
   const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
   await page.getByTestId("admin.users.invite.form.submit").click();
   await inviteResponsePromise;
   await page.getByTestId("invite-user-modal.close").click();
+}
+
+async function tryLoginUser(page: Page, email: string, passwords: string[]) {
+  for (const password of passwords) {
+    await expect(page.getByTestId("auth.login.form.email")).toBeVisible();
+    await page.getByTestId("auth.login.form.email").fill(email);
+    await page.getByTestId("auth.login.form.password").fill(password);
+    await page.getByTestId("auth.login.form.submit").click();
+    try {
+      await expect(page.getByTestId("app.sidebar.user-menu-trigger")).toBeVisible({ timeout: 5000 });
+      return;
+    } catch {
+      // Login failed with this password, try the next one
+      await page.goto("/auth/login");
+    }
+  }
+  throw new Error(`Unable to log in as ${email} with any known password`);
 }
 
 async function selectOrganization(page: Page, orgName: string) {
@@ -47,7 +63,8 @@ test.describe("User invitations", () => {
     await expect(page.getByTestId("auth-accept-invitation-card-not-signed-in")).toBeVisible();
     const acceptUrl = "" + page.url();
     await page.goto("/auth/login");
-    await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);
+    // The password may have been changed by user-account tests; try both known passwords
+    await tryLoginUser(page, testUsers.accountInNoOrg.email, [testUsers.accountInNoOrg.password, "Tester1234567"]);
     await page.goto(acceptUrl);
     await page.getByTestId("auth-accept-invitation-card.accept").click();
     await page.goto("/");
