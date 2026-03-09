@@ -6,10 +6,20 @@ import { smtpServerApi } from "../utils";
 const orgWithPermission = "Test Organization 3";
 
 async function inviteUser(page: Page, userEmail: string) {
-  await page.getByTestId("app.organization-switcher").click();
-  // Wait for the invite button to be visible — this implies permissions have loaded
-  await expect(page.getByTestId("app.organization-switcher.invite")).toBeVisible();
-  await page.getByTestId("app.organization-switcher.invite").click();
+  // The invite button only renders once canCreateInvitations resolves.
+  // The dropdown may close or re-render while permissions load, so we retry the
+  // entire open-and-click sequence until it succeeds.
+  const inviteButton = page.getByTestId("app.organization-switcher.invite");
+  const switcher = page.getByTestId("app.organization-switcher");
+  await expect(async () => {
+    // Re-open the dropdown if it's not showing the invite button
+    if (!(await inviteButton.isVisible())) {
+      await switcher.click();
+    }
+    // Click the invite button; this will throw if element is not stable or detaches
+    await inviteButton.click({ timeout: 2000 });
+  }).toPass({ timeout: 15000 });
+
   await page.getByTestId("admin.users.invite.form.email").fill(userEmail);
   const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
   await page.getByTestId("admin.users.invite.form.submit").click();
@@ -37,7 +47,11 @@ async function tryLoginUser(page: Page, email: string, passwords: string[]) {
 async function selectOrganization(page: Page, orgName: string) {
   const organizationSwitcher = page.getByTestId("app.organization-switcher");
   await organizationSwitcher.click();
-  await page.getByText(orgName, { exact: true }).click();
+  // Scope the click to within the dropdown menu to avoid matching org name text
+  // elsewhere on the page (e.g. page headings, breadcrumbs, project lists).
+  const menu = page.getByTestId("app.organization-switcher.menu");
+  await expect(menu).toBeVisible();
+  await menu.getByText(orgName, { exact: true }).click();
   await expect(organizationSwitcher.locator("span")).toHaveText(orgName);
 }
 
