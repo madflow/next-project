@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4"
-fastapi = "^0.134.0"
+fastapi = "^0.135.0"
 uvicorn = { version = "^0.41.0", extras = ["standard"] }
 gunicorn = "^25.0.0"
 pydantic = "^2.10.4"
