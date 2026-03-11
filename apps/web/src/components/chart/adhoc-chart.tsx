@@ -244,9 +244,10 @@ export function AdhocChart({
 
       case "horizontalBar": {
         // Use different transformation for multi-response individual
-        const horizontalBarData = isMultiResponseIndividual
-          ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
-          : transformToRechartsBarData(variable, stats);
+        const horizontalBarData: { label: string | number; value: string | number; count: number; percentage: number }[] =
+          isMultiResponseIndividual
+            ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
+            : transformToRechartsBarData(variable, stats);
 
         return (
           <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
