@@ -35,6 +35,9 @@
     "e2e": {
       "cache": false
     },
+    "e2e:api": {
+      "cache": false
+    },
     "e2e:deps": {
       "cache": false
     },
