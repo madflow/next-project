@@ -19,7 +19,7 @@ interface VariableStats {
   };
 }
 
-test.describe("API Stats Endpoint", () => {
+test.describe("API Stats Endpoint @api", () => {
   test.describe("Authentication", () => {
     test("denies access when not logged in", async ({ page }) => {
       const response = await page.request.post(`/api/datasets/${DATASET_TEST_ID}/stats`, {

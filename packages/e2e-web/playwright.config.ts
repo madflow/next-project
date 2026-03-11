@@ -40,7 +40,7 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      testIgnore: ["**/sign-up-enabled/**", "**/sign-up-disabled/**"],
+      testIgnore: ["**/sign-up-enabled/**", "**/sign-up-disabled/**", "**/api/**"],
     },
 
     {
@@ -52,6 +52,12 @@ export default defineConfig({
     {
       name: "sign-up-disabled",
       testDir: "./tests/sign-up-disabled/",
+      use: { ...devices["Desktop Chrome"] },
+    },
+
+    {
+      name: "api",
+      testDir: "./tests/api",
       use: { ...devices["Desktop Chrome"] },
     },
 

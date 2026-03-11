@@ -18,7 +18,7 @@ async function fetchApiVariableStats(variables: string[], decimals: number, page
   return await response.json();
 }
 
-test.describe("API Stats Endpoint with Frequencies", () => {
+test.describe("API Stats Endpoint with Frequencies @api", () => {
   test("returns correct Frequencies for all fixture variables", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);

@@ -3,7 +3,7 @@ import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 
-test.describe("API Dataset Variable Sets", () => {
+test.describe("API Dataset Variable Sets @api", () => {
   let testDatasetId: string;
 
   test.beforeAll(async ({ browser }) => {

@@ -14,6 +14,7 @@
     "e2e:webkit": "playwright test --project=webkit",
     "e2e:debug": "playwright test --debug",
     "e2e:ui": "playwright test --ui",
+    "e2e:api": "playwright test --project=api",
     "e2e:sign-up-enabled": "playwright test --project=sign-up-enabled",
     "e2e:sign-up-disabled": "playwright test --project=sign-up-disabled",
     "e2e:deps": "playwright install --with-deps",
