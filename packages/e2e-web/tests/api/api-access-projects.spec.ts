@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { testUsers } from "../config";
-import { loginUser } from "../utils";
+import { testUsers } from "../../config";
+import { loginUser } from "../../utils";
 
 
 test.describe("API Projects @api", () => {

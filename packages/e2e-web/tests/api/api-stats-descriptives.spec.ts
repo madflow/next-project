@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { testUsers } from "../config";
-import { loginUser } from "../utils";
-import surveyResults from "./analysis/fixtures/survey_sample_de_descriptives.json";
+import { testUsers } from "../../config";
+import { loginUser } from "../../utils";
+import surveyResults from "../analysis/fixtures/survey_sample_de_descriptives.json";
 
 
 const DATASET_TEST_ID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
