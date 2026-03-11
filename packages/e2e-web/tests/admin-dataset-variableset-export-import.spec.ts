@@ -33,7 +33,6 @@ interface ExportData {
   variableSets: VariableSet[];
 }
 
-test.describe.configure({ mode: "parallel" });
 
 test.describe("Dataset Variableset Export/Import with Order Index", () => {
   let testDatasetId: string;

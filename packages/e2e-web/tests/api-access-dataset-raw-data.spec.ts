@@ -10,7 +10,6 @@ const TEST_BODY = JSON.stringify({
 });
 
 test.describe("Api access dataset raw-data", () => {
-  test.describe.configure({ mode: "parallel" });
 
   test("deny when not logged in", async ({ page }) => {
     const response = await page.request.post(TEST_ENDPOINT, { data: TEST_BODY });

@@ -37,7 +37,6 @@ async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
   await page.goto(acceptLink);
 }
 
-test.describe.configure({ mode: "parallel" });
 
 test.describe("User invitations", () => {
   test("an owner can invite a not existing user", { tag: ["@sign-up-enabled"] }, async ({ page }) => {
