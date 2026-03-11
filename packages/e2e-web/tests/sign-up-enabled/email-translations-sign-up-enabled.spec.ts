@@ -24,7 +24,6 @@ async function getLatestEmail(email: string) {
   return null;
 }
 
-test.describe.configure({ mode: "parallel" });
 
 test.describe("Email Translations", () => {
   test(

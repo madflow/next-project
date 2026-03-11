@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
-test.describe.configure({ mode: "parallel" });
 
 test.describe("API Dataset Variable Sets", () => {
   let testDatasetId: string;

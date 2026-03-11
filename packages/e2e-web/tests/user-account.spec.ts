@@ -79,7 +79,6 @@ async function waitForMailboxMessage(email: string) {
 }
 
 test.describe("User Account", () => {
-  test.describe.configure({ mode: "parallel" });
 
   test("navigates to account settings and updates profile name and locale", async ({ page }) => {
     await page.goto("/");

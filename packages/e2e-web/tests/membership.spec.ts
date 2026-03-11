@@ -48,7 +48,6 @@ const testCases: TestCase[] = [
   },
 ];
 
-test.describe.configure({ mode: "parallel" });
 
 test.describe("Organization members", () => {
   for (const testCase of testCases) {

@@ -7,7 +7,6 @@ async function switchLocale(page: Page, language: "German" | "Englisch") {
   await page.getByRole("option", { name: language }).click();
 }
 
-test.describe.configure({ mode: "parallel" });
 
 test.describe("Email Translations", () => {
   test.afterAll(async () => {
