@@ -13,6 +13,7 @@
     "db:push": "turbo run db:push",
     "db:studio": "turbo run db:studio",
     "e2e": "turbo run e2e --",
+    "e2e:api": "turbo run e2e:api --",
     "e2e:sign-up-enabled": "turbo run e2e:sign-up-enabled --",
     "e2e:sign-up-disabled": "turbo run e2e:sign-up-disabled --",
     "e2e:single": "turbo run e2e:single --",
