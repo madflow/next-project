@@ -3,24 +3,24 @@ import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 
-test.describe("API Organizations", () => {
+test.describe("API Datasets @api", () => {
   test.describe("Authentication", () => {
     test("denies access when not logged in", async ({ page }) => {
-      const response = await page.request.get("/api/organizations");
+      const response = await page.request.get("/api/datasets");
       expect(response.status()).toBe(401);
     });
 
     test("denies access for regular user", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
-      const response = await page.request.get("/api/organizations");
+      const response = await page.request.get("/api/datasets");
       expect(response.status()).toBe(401);
     });
 
     test("allows access for admin user", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      const response = await page.request.get("/api/organizations");
+      const response = await page.request.get("/api/datasets");
       expect(response.status()).toBe(200);
     });
   });
@@ -30,7 +30,7 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations");
+      const response = await page.request.get("/api/datasets");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -45,7 +45,7 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?limit=5&offset=0");
+      const response = await page.request.get("/api/datasets?limit=5&offset=0");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -58,7 +58,7 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?limit=10&offset=1000");
+      const response = await page.request.get("/api/datasets?limit=10&offset=1000");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -68,100 +68,67 @@ test.describe("API Organizations", () => {
   });
 
   test.describe("Search", () => {
-    test("searches by organization name", async ({ page }) => {
+    test("searches by dataset name", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?search=Test Organization");
+      const response = await page.request.get("/api/datasets?search=test");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].name).toContain("Test");
-    });
-
-    test("searches by organization slug", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      const response = await page.request.get("/api/organizations?search=test-organization");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data.rows.length).toBeGreaterThan(0);
-    });
-
-    test("returns empty results for non-existent search", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      const response = await page.request.get("/api/organizations?search=nonexistentorg123");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data.rows).toHaveLength(0);
-      expect(data.count).toBe(0);
-    });
-
-    test("performs case-insensitive search", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      const response = await page.request.get("/api/organizations?search=TEST");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data.rows[0].name.toLowerCase()).toContain("test");
+      expect(data.rows[0].datasets.name.toLowerCase()).toContain("test");
     });
   });
 
   test.describe("Ordering", () => {
-    test("orders by organization name ascending", async ({ page }) => {
+    test("orders by dataset name ascending", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?order=name.asc");
-      expect(response.status()).toBe(200);
-
-      const data = await response.json();
-      expect(data.rows[0].name <= data.rows[1].name).toBe(true);
-    });
-
-    test("orders by organization name descending", async ({ page }) => {
-      await page.goto("/");
-      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-      const response = await page.request.get("/api/organizations?order=name.desc");
+      const response = await page.request.get("/api/datasets?order=name.asc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].name >= data.rows[1].name).toBe(true);
+      expect(data.rows[0].datasets.name <= data.rows[1].datasets.name).toBe(true);
     });
 
-    test("orders by organization slug", async ({ page }) => {
+    test("orders by dataset name descending", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?order=slug.asc");
+      const response = await page.request.get("/api/datasets?order=name.desc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].slug <= data.rows[1].slug).toBe(true);
+      expect(data.rows[0].datasets.name >= data.rows[1].datasets.name).toBe(true);
+    });
+
+    test("orders by dataset filename", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+      const response = await page.request.get("/api/datasets?order=filename.asc");
+      expect(response.status()).toBe(200);
+
+      const data = await response.json();
+      expect(data.rows.length).toBeGreaterThanOrEqual(2);
+      expect(data.rows[0].datasets.filename <= data.rows[1].datasets.filename).toBe(true);
     });
 
     test("orders by creation date", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?order=createdAt.desc");
+      const response = await page.request.get("/api/datasets?order=createdAt.desc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      const firstDate = new Date(data.rows[0].createdAt);
-      const secondDate = new Date(data.rows[1].createdAt);
+      const firstDate = new Date(data.rows[0].datasets.createdAt);
+      const secondDate = new Date(data.rows[1].datasets.createdAt);
       expect(firstDate >= secondDate).toBe(true);
     });
 
@@ -169,18 +136,18 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?order=name.asc,slug.desc");
+      const response = await page.request.get("/api/datasets?order=name.asc,slug.desc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows.length).toBeGreaterThan(0);
+      expect(data.rows.length).toBeGreaterThanOrEqual(0);
     });
 
     test("ignores invalid order parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?order=invalidcolumn.asc");
+      const response = await page.request.get("/api/datasets?order=invalidcolumn.asc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -189,45 +156,45 @@ test.describe("API Organizations", () => {
   });
 
   test.describe("Filtering", () => {
-    test("filters by organization name", async ({ page }) => {
+    test("filters by dataset name", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?name=Test Organization");
+      const response = await page.request.get("/api/datasets?name=Test Dataset");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].name).toBe("Test Organization");
+      expect(data.rows[0].datasets.name).toContain("Test Dataset");
     });
 
-    test("filters by organization slug", async ({ page }) => {
+    test("filters by dataset filename", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?slug=test-organization");
+      const response = await page.request.get("/api/datasets?filename=demo.sav");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].slug).toBe("test-organization");
+      expect(data.rows.length).toBeGreaterThan(0);
+      expect(data.rows[0].datasets.filename).toBe("demo.sav");
     });
 
     test("applies multiple filters with AND logic", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?name=Test Organization&slug=test-organization");
+      const response = await page.request.get("/api/datasets?filename=demo.sav&name=Test Dataset");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].name).toBe("Test Organization");
-      expect(data.rows[0].slug).toBe("test-organization");
+      expect(data.rows[0].datasets.filename).toBe("demo.sav");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?name=NonExistentOrganization");
+      const response = await page.request.get("/api/datasets?name=NonExistentDataset");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -239,7 +206,7 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?invalidcolumn=value");
+      const response = await page.request.get("/api/datasets?invalidcolumn=value");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -252,9 +219,7 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get(
-        "/api/organizations?search=Test&name=Test Organization&order=name.asc&limit=5"
-      );
+      const response = await page.request.get("/api/datasets?search=demo&name=demo.sav&order=name.asc&limit=5");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -266,13 +231,14 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations?slug=test-organization&limit=3&offset=0");
+      const response = await page.request.get("/api/datasets?filename=demo.sav&limit=3&offset=0");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
-      expect(data.rows[0].slug).toBe("test-organization");
+      expect(data.rows.length).toBeGreaterThan(0);
+      expect(data.rows[0].datasets.filename).toBe("demo.sav");
     });
   });
 
@@ -281,7 +247,7 @@ test.describe("API Organizations", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations");
+      const response = await page.request.get("/api/datasets");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -295,20 +261,23 @@ test.describe("API Organizations", () => {
       expect(typeof data.offset).toBe("number");
     });
 
-    test("includes expected organization data fields", async ({ page }) => {
+    test("includes expected dataset data fields", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/organizations");
+      const response = await page.request.get("/api/datasets");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      const organization = data.rows[0];
-      expect(organization).toHaveProperty("id");
-      expect(organization).toHaveProperty("name");
-      expect(organization).toHaveProperty("slug");
-      expect(organization).toHaveProperty("createdAt");
+      const dataset = data.rows[0];
+      expect(dataset).toHaveProperty("datasets");
+      expect(dataset).toHaveProperty("organizations");
+      expect(dataset.datasets).toHaveProperty("id");
+      expect(dataset.datasets).toHaveProperty("name");
+      expect(dataset.datasets).toHaveProperty("filename");
+      expect(dataset.datasets).toHaveProperty("createdAt");
+      expect(dataset.datasets).toHaveProperty("updatedAt");
     });
 
     test("count accuracy with filters", async ({ page }) => {
@@ -316,28 +285,44 @@ test.describe("API Organizations", () => {
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       // Get total count
-      const allResponse = await page.request.get("/api/organizations");
+      const allResponse = await page.request.get("/api/datasets");
       const allData = await allResponse.json();
 
       // Get filtered count
-      const filteredResponse = await page.request.get("/api/organizations?name=Test Organization");
+      const filteredResponse = await page.request.get("/api/datasets?name=demo.sav");
       const filteredData = await filteredResponse.json();
 
       expect(filteredData.count).toBeLessThanOrEqual(allData.count);
       expect(filteredData.rows.length).toBeLessThanOrEqual(filteredData.count);
     });
+  });
 
-    test("verifies test data exists", async ({ page }) => {
+  test.describe("Project Datasets", () => {
+    test("list project datasets as admin user", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      // Check if test organization exists
-      const response = await page.request.get("/api/organizations?name=Test Organization");
+      const response = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].name).toBe("Test Organization");
-      expect(data.rows[0].slug).toBe("test-organization");
+      expect(data.count).toBeGreaterThan(0);
+    });
+
+    test("deny project datasets as unauthorized user", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);
+
+      const response = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
+      expect(response.status()).toBe(401);
+    });
+
+    test("list project datasets as authorized regular user", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
+
+      const response = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
+      expect(response.status()).toBe(200);
     });
   });
 });

@@ -1,0 +1,64 @@
+name: Playwright API Tests
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  NEXT_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
+  NEXT_PUBLIC_BASE_URL: http://localhost:3000
+  NEXT_PUBLIC_SITE_NAME: app
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  ANALYSIS_SENTRY_DSN: ${{ secrets.ANALYSIS_SENTRY_DSN }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  build-run-test:
+    services:
+      mailpit:
+        image: axllent/mailpit
+        ports:
+          - 1025:1025
+          - 8025:8025
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      s3:
+        image: versity/versitygw:latest
+        env:
+          ROOT_ACCESS_KEY: s3
+          ROOT_SECRET_KEY: s3
+          VGW_BACKEND: posix
+          VGW_BACKEND_ARG: /tmp
+        ports:
+          - 7070:7070
+        options: >-
+          --health-cmd="curl -s -o /dev/null http://localhost:7070 || true"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/playwright-setup
+
+      - name: Run Playwright API tests
+        run: pnpm run e2e:api
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-api-test-results
+          path: ./packages/e2e-web/test-results
+          retention-days: 30

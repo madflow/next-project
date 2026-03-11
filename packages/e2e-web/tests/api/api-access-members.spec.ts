@@ -3,7 +3,7 @@ import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 
-test.describe("Api members", () => {
+test.describe("Api members @api", () => {
   test("list not logged in", async ({ page }) => {
     const notLoggedIn = await page.request.get("/api/members");
     expect(notLoggedIn.status()).toBe(401);

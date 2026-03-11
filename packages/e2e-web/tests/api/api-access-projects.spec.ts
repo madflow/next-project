@@ -3,7 +3,7 @@ import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 
-test.describe("API Projects", () => {
+test.describe("API Projects @api", () => {
   test.describe("Authentication", () => {
     test("denies access when not logged in", async ({ page }) => {
       const response = await page.request.get("/api/projects");

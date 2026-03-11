@@ -9,7 +9,7 @@ const TEST_BODY = JSON.stringify({
   options: { exclude_empty: true, page: 1, page_size: 5 },
 });
 
-test.describe("Api access dataset raw-data", () => {
+test.describe("Api access dataset raw-data @api", () => {
 
   test("deny when not logged in", async ({ page }) => {
     const response = await page.request.post(TEST_ENDPOINT, { data: TEST_BODY });
