@@ -5,6 +5,7 @@ import {
   datasetSplitVariable,
   datasetVariable,
   datasetVariableset,
+  datasetVariablesetContent,
   datasetVariablesetItem,
   project,
 } from "./app.js";
@@ -94,6 +95,7 @@ export const datasetVariableRelations = relations(datasetVariable, ({ one, many 
     references: [dataset.id],
   }),
   variablesetItems: many(datasetVariablesetItem),
+  variablesetContents: many(datasetVariablesetContent),
   splitVariableUsages: many(datasetSplitVariable),
 }));
 
@@ -121,6 +123,7 @@ export const datasetVariablesetRelations = relations(datasetVariableset, ({ one,
   }),
   children: many(datasetVariableset),
   items: many(datasetVariablesetItem),
+  contents: many(datasetVariablesetContent),
 }));
 
 // DatasetVariablesetItem relations
@@ -131,6 +134,18 @@ export const datasetVariablesetItemRelations = relations(datasetVariablesetItem,
   }),
   variable: one(datasetVariable, {
     fields: [datasetVariablesetItem.variableId],
+    references: [datasetVariable.id],
+  }),
+}));
+
+// DatasetVariablesetContent relations
+export const datasetVariablesetContentRelations = relations(datasetVariablesetContent, ({ one }) => ({
+  variableset: one(datasetVariableset, {
+    fields: [datasetVariablesetContent.variablesetId],
+    references: [datasetVariableset.id],
+  }),
+  variable: one(datasetVariable, {
+    fields: [datasetVariablesetContent.variableId],
     references: [datasetVariable.id],
   }),
 }));

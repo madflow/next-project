@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useThemeConfig } from "@/components/active-theme";
 import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
+import { useVariablesetContents } from "@/hooks/use-variableset-contents";
 import { useVariablesetVariables } from "@/hooks/use-variableset-variables";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
@@ -51,22 +52,47 @@ function VariablesetNode({
   search,
 }: VariablesetNodeProps) {
   const isExpanded = expandedNodes.has(node.id);
-  const { data: variablesData } = useVariablesetVariables(isExpanded ? node.id : null);
-  const variables = variablesData?.rows || [];
+  const shouldFetch = isExpanded || !!search;
+  const { data: contentsData } = useVariablesetContents(shouldFetch ? node.id : null);
+  // Keep useVariablesetVariables for when the user selects an entire set
+  const { data: variablesData } = useVariablesetVariables(shouldFetch ? node.id : null);
+  const contents = contentsData || [];
 
-  const filteredVariables = variables.filter(
-    (variable) =>
-      variable.name.toLowerCase().includes(search.toLowerCase()) ||
-      getVariableLabel(variable).toLowerCase().includes(search.toLowerCase())
-  );
+  // Build a map of child nodes by ID for subset rendering
+  const childNodeMap = new Map<string, VariablesetTreeNode>();
+  for (const child of node.children) {
+    childNodeMap.set(child.id, child);
+  }
 
-  const hasMatchingVariables = search ? filteredVariables.length > 0 : true;
+  // Filter contents based on search
+  const filteredContents = contents.filter((entry) => {
+    if (!search) return true;
+    const lowerSearch = search.toLowerCase();
+    if (entry.contentType === "variable") {
+      return (
+        entry.variableName?.toLowerCase().includes(lowerSearch) ||
+        entry.variableLabel?.toLowerCase().includes(lowerSearch)
+      );
+    }
+    if (entry.contentType === "subset") {
+      const childNode = entry.subsetId ? childNodeMap.get(entry.subsetId) : null;
+      return (
+        entry.subsetName?.toLowerCase().includes(lowerSearch) ||
+        entry.subsetDescription?.toLowerCase().includes(lowerSearch) ||
+        // Also show subset if any of its children match (recursive match handled by child rendering)
+        (childNode && childNode.name.toLowerCase().includes(lowerSearch))
+      );
+    }
+    return true;
+  });
+
+  const hasMatchingContent = search ? filteredContents.length > 0 : true;
   const nodeMatches = search
     ? node.name.toLowerCase().includes(search.toLowerCase()) ||
       node.description?.toLowerCase().includes(search.toLowerCase())
     : true;
 
-  if (search && !nodeMatches && !hasMatchingVariables) {
+  if (search && !nodeMatches && !hasMatchingContent) {
     return null;
   }
 
@@ -106,39 +132,73 @@ function VariablesetNode({
 
       {isExpanded && (
         <div>
-          {filteredVariables.map((variable) => {
-            // Use stable identifier for data-testid: prefer sanitized name, fallback to id
-            const testId = variable.name
-              ? `variable-item-${variable.name.replace(/[^a-zA-Z0-9-_]/g, "-")}`
-              : `variable-item-${variable.id}`;
+          {filteredContents.map((entry) => {
+            if (entry.contentType === "variable" && entry.variableId) {
+              // Render variable item inline
+              const variable = variablesData?.rows.find((v) => v.id === entry.variableId);
+              const displayLabel = entry.variableLabel || entry.variableName || entry.variableId;
+              const testId = entry.variableName
+                ? `variable-item-${entry.variableName.replace(/[^a-zA-Z0-9-_]/g, "-")}`
+                : `variable-item-${entry.variableId}`;
 
-            return (
-              <div
-                key={variable.id}
-                className="flex items-center py-1"
-                style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
-                <button
-                  className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
-                  onClick={() => onSelectVariable(variable, node)}
-                  data-testid={testId}>
-                  {getVariableLabel(variable)}
-                </button>
-              </div>
-            );
+              return (
+                <div
+                  key={entry.id}
+                  className="flex items-center py-1"
+                  style={{ paddingLeft: `${(level + 1) * 16 + 24}px` }}>
+                  <button
+                    className="hover:bg-accent hover:text-accent-foreground flex-1 cursor-pointer rounded px-1 py-0.5 text-left text-sm transition-colors"
+                    onClick={() => {
+                      if (variable) {
+                        onSelectVariable(variable, node);
+                      }
+                    }}
+                    data-testid={testId}>
+                    {variable ? getVariableLabel(variable) : displayLabel}
+                  </button>
+                </div>
+              );
+            }
+
+            if (entry.contentType === "subset" && entry.subsetId) {
+              // Render child variableset node recursively
+              const childNode = childNodeMap.get(entry.subsetId);
+              if (!childNode) return null;
+
+              return (
+                <VariablesetNode
+                  key={entry.id}
+                  node={childNode}
+                  level={level + 1}
+                  onSelectSet={onSelectSet}
+                  onSelectVariable={(variable, childVariableset) =>
+                    onSelectVariable(variable, childVariableset || node)
+                  }
+                  expandedNodes={expandedNodes}
+                  onToggleExpand={onToggleExpand}
+                  search={search}
+                />
+              );
+            }
+
+            return null;
           })}
 
-          {node.children.map((child) => (
-            <VariablesetNode
-              key={child.id}
-              node={child}
-              level={level + 1}
-              onSelectSet={onSelectSet}
-              onSelectVariable={(variable, childVariableset) => onSelectVariable(variable, childVariableset || node)}
-              expandedNodes={expandedNodes}
-              onToggleExpand={onToggleExpand}
-              search={search}
-            />
-          ))}
+          {/* Render any child nodes that aren't in the contents table yet (fallback) */}
+          {node.children
+            .filter((child) => !contents.some((c) => c.contentType === "subset" && c.subsetId === child.id))
+            .map((child) => (
+              <VariablesetNode
+                key={child.id}
+                node={child}
+                level={level + 1}
+                onSelectSet={onSelectSet}
+                onSelectVariable={(variable, childVariableset) => onSelectVariable(variable, childVariableset || node)}
+                expandedNodes={expandedNodes}
+                onToggleExpand={onToggleExpand}
+                search={search}
+              />
+            ))}
         </div>
       )}
     </div>

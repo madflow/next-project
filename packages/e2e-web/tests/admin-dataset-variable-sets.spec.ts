@@ -388,30 +388,13 @@ test.describe("Admin Dataset Variable Sets", () => {
     expect(initialAssignedCount).toBeGreaterThan(0);
 
     // Test search in assigned section
-    const searchResponsePromise = page.waitForResponse(
-      (response) =>
-        response.url().includes("/variablesets/") &&
-        response.url().includes("/variables") &&
-        response.request().url().includes("search=nonexistent") &&
-        response.status() === 200
-    );
+    // Assigned variables are filtered client-side (no API request), so we check the DOM directly
     await assignedSearchInput.fill("nonexistent");
-    await searchResponsePromise;
-    const filteredAssignedCount = await page.getByTestId("admin.dataset.variableset.assignment.remove").count();
-    expect(filteredAssignedCount).toBeLessThanOrEqual(initialAssignedCount);
+    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove")).toHaveCount(0);
 
     // Clear search in assigned section
-    const clearSearchResponsePromise = page.waitForResponse(
-      (response) =>
-        response.url().includes("/variablesets/") &&
-        response.url().includes("/variables") &&
-        !response.request().url().includes("search") &&
-        response.status() === 200
-    );
     await assignedSearchInput.clear();
-    await clearSearchResponsePromise;
-    const restoredAssignedCount = page.getByTestId("admin.dataset.variableset.assignment.remove");
-    await expect(restoredAssignedCount).toHaveCount(initialAssignedCount);
+    await expect(page.getByTestId("admin.dataset.variableset.assignment.remove")).toHaveCount(initialAssignedCount);
   });
 
   test("should test search functionality in available variables", async ({ page }) => {

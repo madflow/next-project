@@ -1,13 +1,10 @@
 import "server-only";
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
-import { dataset, datasetVariable, datasetVariableset, datasetVariablesetItem } from "@repo/database/schema";
+import { dataset, datasetVariable, datasetVariableset, datasetVariablesetContent } from "@repo/database/schema";
+import type { DatasetVariablesetItemAttributes } from "@repo/database/schema";
 import type {
-  DatasetVariablesetAttributes,
-  DatasetVariablesetCategory,
-  DatasetVariablesetItemAttributes,
-} from "@repo/database/schema";
-import type {
+  ContentItemExport,
   VariableItemExport,
   VariableSetExport,
   VariableSetExportFile,
@@ -30,97 +27,114 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
     throw new Error("Dataset not found");
   }
 
-  // Get all variable sets with their variables
-  const variableSetsQuery = await db
-    .select({
-      setId: datasetVariableset.id,
-      setName: datasetVariableset.name,
-      setDescription: datasetVariableset.description,
-      setParentId: datasetVariableset.parentId,
-      setOrderIndex: datasetVariableset.orderIndex,
-      setCategory: datasetVariableset.category,
-      setAttributes: datasetVariableset.attributes,
-      variableName: datasetVariable.name,
-      variableOrderIndex: datasetVariablesetItem.orderIndex,
-      variableAttributes: datasetVariablesetItem.attributes,
-    })
-    .from(datasetVariableset)
-    .leftJoin(datasetVariablesetItem, eq(datasetVariableset.id, datasetVariablesetItem.variablesetId))
-    .leftJoin(datasetVariable, eq(datasetVariablesetItem.variableId, datasetVariable.id))
-    .where(eq(datasetVariableset.datasetId, datasetId))
-    .orderBy(datasetVariableset.orderIndex, datasetVariableset.name);
-
-  // Create a map of parent IDs to parent names
-  const parentMap = new Map<string, string>();
+  // Get all variable sets
   const allSets = await db
     .select({
       id: datasetVariableset.id,
       name: datasetVariableset.name,
+      description: datasetVariableset.description,
+      parentId: datasetVariableset.parentId,
+      orderIndex: datasetVariableset.orderIndex,
+      category: datasetVariableset.category,
+      attributes: datasetVariableset.attributes,
     })
     .from(datasetVariableset)
-    .where(eq(datasetVariableset.datasetId, datasetId));
+    .where(eq(datasetVariableset.datasetId, datasetId))
+    .orderBy(datasetVariableset.orderIndex, datasetVariableset.name);
 
+  // Build name map for parent lookups
+  const setNameMap = new Map<string, string>();
   allSets.forEach((set) => {
-    parentMap.set(set.id, set.name);
+    setNameMap.set(set.id, set.name);
   });
 
-  // Group variables by variable set
-  const variableSetMap = new Map<
-    string,
-    {
-      name: string;
-      description: string | null;
-      parentId: string | null;
-      orderIndex: number;
-      category: DatasetVariablesetCategory;
-      attributes: DatasetVariablesetAttributes | null;
-      variables: VariableItemExport[];
-    }
-  >();
+  // Get all contents for all sets in this dataset, joined with variable info
+  const allContents = await db
+    .select({
+      variablesetId: datasetVariablesetContent.variablesetId,
+      position: datasetVariablesetContent.position,
+      contentType: datasetVariablesetContent.contentType,
+      variableId: datasetVariablesetContent.variableId,
+      subsetId: datasetVariablesetContent.subsetId,
+      attributes: datasetVariablesetContent.attributes,
+      variableName: datasetVariable.name,
+    })
+    .from(datasetVariablesetContent)
+    .leftJoin(datasetVariable, eq(datasetVariablesetContent.variableId, datasetVariable.id))
+    .innerJoin(datasetVariableset, eq(datasetVariablesetContent.variablesetId, datasetVariableset.id))
+    .where(eq(datasetVariableset.datasetId, datasetId))
+    .orderBy(datasetVariablesetContent.variablesetId, datasetVariablesetContent.position);
 
-  variableSetsQuery.forEach((row) => {
-    if (!variableSetMap.has(row.setId)) {
-      variableSetMap.set(row.setId, {
-        name: row.setName,
-        description: row.setDescription,
-        parentId: row.setParentId,
-        orderIndex: row.setOrderIndex,
-        category: row.setCategory,
-        attributes: row.setAttributes,
-        variables: [],
-      });
+  // Group contents by variableset ID
+  const contentsBySet = new Map<string, typeof allContents>();
+  allContents.forEach((content) => {
+    if (!contentsBySet.has(content.variablesetId)) {
+      contentsBySet.set(content.variablesetId, []);
     }
-
-    if (row.variableName && row.variableOrderIndex !== null) {
-      const variableItem: VariableItemExport = {
-        name: row.variableName,
-        orderIndex: row.variableOrderIndex,
-      };
-      // Only include attributes if they exist
-      if (row.variableAttributes) {
-        variableItem.attributes = row.variableAttributes as DatasetVariablesetItemAttributes;
-      }
-      variableSetMap.get(row.setId)!.variables.push(variableItem);
-    }
+    contentsBySet.get(content.variablesetId)!.push(content);
   });
 
   // Convert to export format
-  const variableSets: VariableSetExport[] = Array.from(variableSetMap.values()).map((set) => ({
-    name: set.name,
-    description: set.description,
-    parentName: set.parentId ? parentMap.get(set.parentId) || null : null,
-    orderIndex: set.orderIndex,
-    category: set.category,
-    attributes: set.attributes,
-    variables: set.variables.sort((a, b) => a.orderIndex - b.orderIndex), // Sort variables by orderIndex
-  }));
+  const variableSets: VariableSetExport[] = allSets.map((set) => {
+    const setContents = contentsBySet.get(set.id) || [];
+
+    // Build variables array (backward compatible)
+    const variables: VariableItemExport[] = setContents
+      .filter((c) => c.contentType === "variable" && c.variableName)
+      .map((c) => {
+        const item: VariableItemExport = {
+          name: c.variableName!,
+          orderIndex: c.position,
+        };
+        if (c.attributes) {
+          item.attributes = c.attributes as DatasetVariablesetItemAttributes;
+        }
+        return item;
+      });
+
+    // Build unified contents array
+    const contents: ContentItemExport[] = setContents
+      .map((c): ContentItemExport | null => {
+        if (c.contentType === "variable" && c.variableName) {
+          return {
+            position: c.position,
+            contentType: "variable",
+            variableName: c.variableName,
+            ...(c.attributes ? { variableAttributes: c.attributes as DatasetVariablesetItemAttributes } : {}),
+          };
+        }
+        if (c.contentType === "subset" && c.subsetId) {
+          const subsetName = setNameMap.get(c.subsetId);
+          if (subsetName) {
+            return {
+              position: c.position,
+              contentType: "subset",
+              subsetName,
+            };
+          }
+        }
+        return null;
+      })
+      .filter((entry): entry is ContentItemExport => entry !== null);
+
+    return {
+      name: set.name,
+      description: set.description,
+      parentName: set.parentId ? setNameMap.get(set.parentId) || null : null,
+      orderIndex: set.orderIndex,
+      category: set.category,
+      attributes: set.attributes,
+      variables: variables.sort((a, b) => a.orderIndex - b.orderIndex),
+      contents,
+    };
+  });
 
   return {
     metadata: {
       datasetId: datasetInfo.id,
       datasetName: datasetInfo.name,
       exportedAt: new Date().toISOString(),
-      version: "2.0",
+      version: "3.0",
     },
     variableSets,
   };
@@ -199,20 +213,42 @@ export async function importVariableSets(
           }
         }
 
-        // Validate variables
-        const validVariables: { id: string; orderIndex: number; attributes?: DatasetVariablesetItemAttributes }[] = [];
+        // Validate variables from either contents (v3.0) or variables (v2.0) array
+        const validVariables: { id: string; position: number; attributes?: DatasetVariablesetItemAttributes }[] = [];
         const unmatchedVariables: string[] = [];
 
-        for (const variableItem of importSet.variables) {
-          const variableId = variableNameToIdMap.get(variableItem.name);
-          if (variableId) {
-            validVariables.push({
-              id: variableId,
-              orderIndex: variableItem.orderIndex,
-              attributes: variableItem.attributes,
-            });
-          } else {
-            unmatchedVariables.push(variableItem.name);
+        // Prefer contents array (v3.0 format) if available
+        const hasContents = importSet.contents && importSet.contents.length > 0;
+
+        if (hasContents) {
+          // v3.0 format: use contents array for variable entries
+          for (const contentItem of importSet.contents!) {
+            if (contentItem.contentType === "variable" && contentItem.variableName) {
+              const variableId = variableNameToIdMap.get(contentItem.variableName);
+              if (variableId) {
+                validVariables.push({
+                  id: variableId,
+                  position: contentItem.position,
+                  attributes: contentItem.variableAttributes,
+                });
+              } else {
+                unmatchedVariables.push(contentItem.variableName);
+              }
+            }
+          }
+        } else {
+          // v2.0 format: use variables array
+          for (const variableItem of importSet.variables) {
+            const variableId = variableNameToIdMap.get(variableItem.name);
+            if (variableId) {
+              validVariables.push({
+                id: variableId,
+                position: variableItem.orderIndex * 100, // Convert to position granularity
+                attributes: variableItem.attributes,
+              });
+            } else {
+              unmatchedVariables.push(variableItem.name);
+            }
           }
         }
 
@@ -248,14 +284,15 @@ export async function importVariableSets(
         const createdSetId = createdSetResult[0]!.id;
         createdSetsMap.set(importSet.name, createdSetId);
 
-        // Create variable set items with attributes
+        // Create contents entries for variables
         if (validVariables.length > 0) {
-          await db.insert(datasetVariablesetItem).values(
+          await db.insert(datasetVariablesetContent).values(
             validVariables.map((variable) => ({
               variablesetId: createdSetId,
               variableId: variable.id,
-              orderIndex: variable.orderIndex,
-              ...(variable.attributes && { attributes: variable.attributes }),
+              position: variable.position,
+              contentType: "variable" as const,
+              attributes: variable.attributes || null,
             }))
           );
         }
@@ -295,7 +332,7 @@ export async function importVariableSets(
       }
     }
 
-    // Second pass: update parent relationships
+    // Second pass: update parent relationships and create subset content entries
     for (const importSet of importData.variableSets) {
       if (importSet.parentName && createdSetsMap.has(importSet.name)) {
         const setId = createdSetsMap.get(importSet.name)!;
@@ -303,6 +340,43 @@ export async function importVariableSets(
 
         if (parentId) {
           await db.update(datasetVariableset).set({ parentId }).where(eq(datasetVariableset.id, setId));
+
+          // Check if this subset is already in the parent's contents (from v3.0 import)
+          const hasContents = importData.variableSets.find((s) => s.name === importSet.parentName)?.contents;
+          const subsetInContents = hasContents?.some(
+            (c) => c.contentType === "subset" && c.subsetName === importSet.name
+          );
+
+          if (!subsetInContents) {
+            // Add subset content entry to parent (for v2.0 imports or missing entries)
+            // Get max position in parent's contents
+            const existingContents = await db
+              .select({ position: datasetVariablesetContent.position })
+              .from(datasetVariablesetContent)
+              .where(eq(datasetVariablesetContent.variablesetId, parentId))
+              .orderBy(datasetVariablesetContent.position);
+
+            const maxPosition =
+              existingContents.length > 0 ? existingContents[existingContents.length - 1]!.position : -100;
+
+            await db.insert(datasetVariablesetContent).values({
+              variablesetId: parentId,
+              position: maxPosition + 100,
+              contentType: "subset",
+              subsetId: setId,
+            });
+          } else {
+            // v3.0: find the subset entry and use its position
+            const subsetEntry = hasContents!.find((c) => c.contentType === "subset" && c.subsetName === importSet.name);
+            if (subsetEntry) {
+              await db.insert(datasetVariablesetContent).values({
+                variablesetId: parentId,
+                position: subsetEntry.position,
+                contentType: "subset",
+                subsetId: setId,
+              });
+            }
+          }
         } else {
           result.warnings.push(`Parent "${importSet.parentName}" not found for variable set "${importSet.name}"`);
         }

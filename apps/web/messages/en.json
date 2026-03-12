@@ -400,6 +400,7 @@
       "assigned": "Assigned Variables",
       "available": "Available Variables",
       "description": "Select a variable set and manage its assigned variables",
+      "detachSubset": "Subset detached from parent",
       "noAssigned": "No variables assigned to this set",
       "noVariables": "No variables available",
       "removeFromSet": "Remove from Set",

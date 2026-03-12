@@ -33,7 +33,6 @@ interface ExportData {
   variableSets: VariableSet[];
 }
 
-
 test.describe("Dataset Variableset Export/Import with Order Index", () => {
   let testDatasetId: string;
 
@@ -79,8 +78,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
 
       const exportData = (await response.json()) as ExportData;
 
-      // Verify metadata version is 2.0
-      expect(exportData.metadata.version).toBe("2.0");
+      expect(exportData.metadata.version).toBe("3.0");
 
       // Verify variableSets exist and have at least one item
       expect(exportData.variableSets).toBeDefined();
