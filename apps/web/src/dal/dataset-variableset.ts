@@ -4,8 +4,8 @@ import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariablesetData,
   DatasetVariablesetContentType,
-  DatasetVariablesetItemAttributes,
   UpdateDatasetVariablesetData,
+  VariablesetContentAttributes,
   datasetVariable,
   datasetVariablesetContent,
   datasetVariableset as entity,
@@ -313,10 +313,10 @@ async function removeVariableFromSetFn(variablesetId: string, variableId: string
     );
 }
 
-async function updateVariablesetItemAttributesFn(
+async function updateContentAttributesFn(
   variablesetId: string,
   variableId: string,
-  attributes: DatasetVariablesetItemAttributes | null
+  attributes: VariablesetContentAttributes | null
 ) {
   const [updated] = await db
     .update(datasetVariablesetContent)
@@ -369,7 +369,7 @@ async function reorderVariablesetsFn(datasetId: string, parentId: string | null,
   return { success: true };
 }
 
-async function reorderVariablesetItemsFn(variablesetId: string, reorderedVariableIds: string[]) {
+async function reorderVariableContentsOrderFn(variablesetId: string, reorderedVariableIds: string[]) {
   // Verify all variable IDs are in the variableset (as variable-type content entries)
   const items = await db
     .select()
@@ -417,7 +417,7 @@ type ContentEntry = {
   contentType: DatasetVariablesetContentType;
   variableId: string | null;
   subsetId: string | null;
-  attributes: DatasetVariablesetItemAttributes | null;
+  attributes: VariablesetContentAttributes | null;
   // Variable fields (populated when contentType = 'variable')
   variableName: string | null;
   variableLabel: string | null;
@@ -460,7 +460,7 @@ async function addContentToVariablesetFn(
   variablesetId: string,
   contentType: DatasetVariablesetContentType,
   referenceId: string,
-  attributes?: DatasetVariablesetItemAttributes | null
+  attributes?: VariablesetContentAttributes | null
 ) {
   // Get max position to append at end
   const maxPosition = await db
@@ -570,9 +570,9 @@ export const getVariablesInSet = withSessionCheck(getVariablesInSetFn);
 export const getUnassignedVariables = withSessionCheck(getUnassignedVariablesFn);
 export const addVariableToSet = withAdminCheck(addVariableToSetFn);
 export const removeVariableFromSet = withAdminCheck(removeVariableFromSetFn);
-export const updateVariablesetItemAttributes = withAdminCheck(updateVariablesetItemAttributesFn);
+export const updateContentAttributes = withAdminCheck(updateContentAttributesFn);
 export const reorderVariablesets = withAdminCheck(reorderVariablesetsFn);
-export const reorderVariablesetItems = withAdminCheck(reorderVariablesetItemsFn);
+export const reorderVariableContentsOrder = withAdminCheck(reorderVariableContentsOrderFn);
 // New unified contents exports
 export const getContents = withSessionCheck(getContentsFn);
 export const addContentToVariableset = withAdminCheck(addContentToVariablesetFn);

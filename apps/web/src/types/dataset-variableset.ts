@@ -1,20 +1,16 @@
 import {
   type CreateDatasetVariablesetContentData,
   type CreateDatasetVariablesetData,
-  type CreateDatasetVariablesetItemData,
   type DatasetVariableset,
   type DatasetVariablesetCategory,
   type DatasetVariablesetContent,
   type DatasetVariablesetContentType,
-  type DatasetVariablesetItem,
-  type DatasetVariablesetItemAttributes,
   type UpdateDatasetVariablesetData,
   type ValueRange,
+  type VariablesetContentAttributes,
   insertDatasetVariablesetContentSchema,
-  insertDatasetVariablesetItemSchema,
   insertDatasetVariablesetSchema,
   selectDatasetVariablesetContentSchema,
-  selectDatasetVariablesetItemSchema,
   selectDatasetVariablesetSchema,
   updateDatasetVariablesetSchema,
 } from "@repo/database/schema";
@@ -29,20 +25,14 @@ export {
   type DatasetVariablesetCategory,
   type CreateDatasetVariablesetData,
   type UpdateDatasetVariablesetData,
-  // Variable set item schemas (legacy)
-  insertDatasetVariablesetItemSchema,
-  selectDatasetVariablesetItemSchema,
-  // Variable set item types (legacy)
-  type DatasetVariablesetItem,
-  type CreateDatasetVariablesetItemData,
-  // Variable set content schemas (new unified)
+  // Variable set content schemas
   insertDatasetVariablesetContentSchema,
   selectDatasetVariablesetContentSchema,
-  // Variable set content types (new unified)
+  // Variable set content types
   type DatasetVariablesetContent,
   type CreateDatasetVariablesetContentData,
   type DatasetVariablesetContentType,
-  type DatasetVariablesetItemAttributes,
+  type VariablesetContentAttributes,
   // Value range type
   type ValueRange,
 };

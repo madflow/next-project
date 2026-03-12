@@ -6,7 +6,6 @@ import {
   datasetVariable,
   datasetVariableset,
   datasetVariablesetContent,
-  datasetVariablesetItem,
   project,
 } from "./app.js";
 import { account, invitation, member, organization, session, user } from "./auth.js";
@@ -94,7 +93,6 @@ export const datasetVariableRelations = relations(datasetVariable, ({ one, many 
     fields: [datasetVariable.datasetId],
     references: [dataset.id],
   }),
-  variablesetItems: many(datasetVariablesetItem),
   variablesetContents: many(datasetVariablesetContent),
   splitVariableUsages: many(datasetSplitVariable),
 }));
@@ -122,20 +120,7 @@ export const datasetVariablesetRelations = relations(datasetVariableset, ({ one,
     references: [datasetVariableset.id],
   }),
   children: many(datasetVariableset),
-  items: many(datasetVariablesetItem),
   contents: many(datasetVariablesetContent),
-}));
-
-// DatasetVariablesetItem relations
-export const datasetVariablesetItemRelations = relations(datasetVariablesetItem, ({ one }) => ({
-  variableset: one(datasetVariableset, {
-    fields: [datasetVariablesetItem.variablesetId],
-    references: [datasetVariableset.id],
-  }),
-  variable: one(datasetVariable, {
-    fields: [datasetVariablesetItem.variableId],
-    references: [datasetVariable.id],
-  }),
 }));
 
 // DatasetVariablesetContent relations

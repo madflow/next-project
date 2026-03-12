@@ -15,13 +15,9 @@ import { FolderOpen, GripVertical, Plus, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import type {
-  DatasetVariableMeasure,
-  DatasetVariableType,
-  DatasetVariablesetItemAttributes,
-} from "@repo/database/schema";
+import type { DatasetVariableMeasure, DatasetVariableType, VariablesetContentAttributes } from "@repo/database/schema";
 import {
-  addVariableToVariableset,
+  addContentToVariablesetAction,
   detachSubsetAction,
   removeContentFromVariablesetAction,
   reorderContentsAction,
@@ -69,7 +65,7 @@ function SortableVariableItem({ entry, selectedSetId, onRemove, onRefresh, isRem
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const variableAttributes = entry.attributes as DatasetVariablesetItemAttributes | null;
+  const variableAttributes = entry.attributes as VariablesetContentAttributes | null;
 
   return (
     <div
@@ -253,7 +249,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
 
     setIsAssigning(variableId);
     try {
-      await addVariableToVariableset(selectedSetId, variableId);
+      await addContentToVariablesetAction(selectedSetId, "variable", variableId);
       toast.success(t("assignment.addToSet"));
       refetchUnassigned();
       refetchContents();

@@ -2,7 +2,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { dataset, datasetVariable, datasetVariableset, datasetVariablesetContent } from "@repo/database/schema";
-import type { DatasetVariablesetItemAttributes } from "@repo/database/schema";
+import type { VariablesetContentAttributes } from "@repo/database/schema";
 import type {
   ContentItemExport,
   VariableItemExport,
@@ -87,7 +87,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
           orderIndex: c.position,
         };
         if (c.attributes) {
-          item.attributes = c.attributes as DatasetVariablesetItemAttributes;
+          item.attributes = c.attributes as VariablesetContentAttributes;
         }
         return item;
       });
@@ -100,7 +100,7 @@ export async function exportVariableSets(datasetId: string): Promise<VariableSet
             position: c.position,
             contentType: "variable",
             variableName: c.variableName,
-            ...(c.attributes ? { variableAttributes: c.attributes as DatasetVariablesetItemAttributes } : {}),
+            ...(c.attributes ? { variableAttributes: c.attributes as VariablesetContentAttributes } : {}),
           };
         }
         if (c.contentType === "subset" && c.subsetId) {
@@ -214,7 +214,7 @@ export async function importVariableSets(
         }
 
         // Validate variables from either contents (v3.0) or variables (v2.0) array
-        const validVariables: { id: string; position: number; attributes?: DatasetVariablesetItemAttributes }[] = [];
+        const validVariables: { id: string; position: number; attributes?: VariablesetContentAttributes }[] = [];
         const unmatchedVariables: string[] = [];
 
         // Prefer contents array (v3.0 format) if available

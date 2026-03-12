@@ -281,7 +281,7 @@ async function createDatasetVariableSets(datasetId: string) {
     console.log(`Created variable set: ${variableSet.name}`);
 
     // Add variables to the set
-    const variableSetItems = [];
+    const variableSetContents = [];
     for (let j = 0; j < variableSet.variables.length; j++) {
       const variableName = variableSet.variables[j];
       if (!variableName) continue;
@@ -289,7 +289,7 @@ async function createDatasetVariableSets(datasetId: string) {
       const variableId = variableMap.get(variableName);
 
       if (variableId) {
-        variableSetItems.push({
+        variableSetContents.push({
           variablesetId: variableSetId,
           variableId: variableId,
           contentType: "variable" as const,
@@ -300,9 +300,9 @@ async function createDatasetVariableSets(datasetId: string) {
       }
     }
 
-    if (variableSetItems.length > 0) {
-      await adminClient.insert(datasetVariablesetContent).values(variableSetItems);
-      console.log(`Added ${variableSetItems.length} variables to ${variableSet.name}`);
+    if (variableSetContents.length > 0) {
+      await adminClient.insert(datasetVariablesetContent).values(variableSetContents);
+      console.log(`Added ${variableSetContents.length} variables to ${variableSet.name}`);
     }
   }
 

@@ -3,22 +3,19 @@
 import {
   CreateDatasetVariablesetData,
   DatasetVariablesetContentType,
-  DatasetVariablesetItemAttributes,
   UpdateDatasetVariablesetData,
+  VariablesetContentAttributes,
 } from "@repo/database/schema";
 import {
   addContentToVariableset,
-  addVariableToSet,
   create,
   detachSubset,
   remove,
   removeContentFromVariableset,
-  removeVariableFromSet,
   reorderContents,
-  reorderVariablesetItems,
   reorderVariablesets,
   update,
-  updateVariablesetItemAttributes as updateVariablesetItemAttributesDal,
+  updateContentAttributes,
 } from "@/dal/dataset-variableset";
 import { ServerActionFailureException } from "@/lib/exception";
 
@@ -46,27 +43,19 @@ export async function deleteVariableset(id: string) {
   await remove(id);
 }
 
-export async function addVariableToVariableset(variablesetId: string, variableId: string, orderIndex?: number) {
-  await addVariableToSet(variablesetId, variableId, orderIndex);
-}
-
-export async function removeVariableFromVariableset(variablesetId: string, variableId: string) {
-  await removeVariableFromSet(variablesetId, variableId);
-}
-
-export async function updateVariablesetItemAttributes(
+export async function updateContentAttributesAction(
   variablesetId: string,
   variableId: string,
-  attributes: DatasetVariablesetItemAttributes | null
+  attributes: VariablesetContentAttributes | null
 ) {
   if (attributes?.valueRange && attributes.valueRange.min > attributes.valueRange.max) {
     throw new ServerActionFailureException("Min value must be less than or equal to max value");
   }
 
-  const updated = await updateVariablesetItemAttributesDal(variablesetId, variableId, attributes);
+  const updated = await updateContentAttributes(variablesetId, variableId, attributes);
 
   if (!updated) {
-    throw new ServerActionFailureException("Failed to update variableset item attributes");
+    throw new ServerActionFailureException("Failed to update content attributes");
   }
 
   return updated;
@@ -82,23 +71,11 @@ export async function reorderVariablesetsAction(datasetId: string, parentId: str
   return result;
 }
 
-export async function reorderVariablesetItemsAction(variablesetId: string, reorderedVariableIds: string[]) {
-  const result = await reorderVariablesetItems(variablesetId, reorderedVariableIds);
-
-  if (!result || !result.success) {
-    throw new ServerActionFailureException("Failed to reorder variableset items");
-  }
-
-  return result;
-}
-
-// --- New unified contents actions ---
-
 export async function addContentToVariablesetAction(
   variablesetId: string,
   contentType: DatasetVariablesetContentType,
   referenceId: string,
-  attributes?: DatasetVariablesetItemAttributes | null
+  attributes?: VariablesetContentAttributes | null
 ) {
   const created = await addContentToVariableset(variablesetId, contentType, referenceId, attributes);
 

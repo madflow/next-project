@@ -4,8 +4,8 @@ import { Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { DatasetVariableMeasure, DatasetVariablesetItemAttributes } from "@repo/database/schema";
-import { updateVariablesetItemAttributes } from "@/actions/dataset-variableset";
+import type { DatasetVariableMeasure, VariablesetContentAttributes } from "@repo/database/schema";
+import { updateContentAttributesAction } from "@/actions/dataset-variableset";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -24,7 +24,7 @@ interface AllowedStatisticsSelectorProps {
   variablesetId: string;
   variableId: string;
   variableMeasure: DatasetVariableMeasure;
-  currentAttributes: DatasetVariablesetItemAttributes;
+  currentAttributes: VariablesetContentAttributes;
   onUpdate: () => void;
   variableType?: string;
 }
@@ -72,7 +72,7 @@ export function AllowedStatisticsSelector({
 
     setIsSaving(true);
     try {
-      const attributes: DatasetVariablesetItemAttributes = {
+      const attributes: VariablesetContentAttributes = {
         allowedStatistics: { distribution, mean },
       };
 
@@ -83,7 +83,7 @@ export function AllowedStatisticsSelector({
         };
       }
 
-      await updateVariablesetItemAttributes(variablesetId, variableId, attributes);
+      await updateContentAttributesAction(variablesetId, variableId, attributes);
       toast.success(t("success"));
       onUpdate();
       setIsOpen(false);
