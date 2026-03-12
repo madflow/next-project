@@ -1,8 +1,8 @@
 import {
   type CreateDatasetVariableData,
   type DatasetVariable,
-  type DatasetVariablesetItemAttributes,
   type UpdateDatasetVariableData,
+  type VariablesetContentAttributes,
   insertDatasetVariableSchema,
   selectDatasetVariableSchema,
   updateDatasetVariableSchema,
@@ -17,7 +17,7 @@ export {
   type UpdateDatasetVariableData,
 };
 
-// Extended type for variables that include attributes from variableset items
+// Extended type for variables that include attributes from variableset contents
 export type DatasetVariableWithAttributes = DatasetVariable & {
-  attributes?: DatasetVariablesetItemAttributes | null;
+  attributes?: VariablesetContentAttributes | null;
 };

@@ -1,4 +1,4 @@
-import { DatasetVariablesetItemAttributes } from "@repo/database/schema";
+import { VariablesetContentAttributes } from "@repo/database/schema";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { AnalysisChartType, StatsResponse } from "@/types/stats";
 import { extractVariableStats, isSplitVariableStats } from "./analysis-bridge";
@@ -21,7 +21,7 @@ export interface ChartSelectionCriteria {
   /** Whether a split variable is currently selected */
   hasSplitVariable?: boolean;
   /** Variable attributes including allowed statistics configuration */
-  attributes?: DatasetVariablesetItemAttributes | null;
+  attributes?: VariablesetContentAttributes | null;
   /** Whether this is a multi-response individual chart (simplified view) */
   isMultiResponseIndividual?: boolean;
 }
@@ -91,7 +91,7 @@ const MEAN_CHART_TYPES: AnalysisChartType[] = ["meanBar", "metrics"];
  */
 function filterChartsByAllowedStatistics(
   chartTypes: AnalysisChartType[],
-  attributes?: DatasetVariablesetItemAttributes | null
+  attributes?: VariablesetContentAttributes | null
 ): AnalysisChartType[] {
   // If no attributes or no allowedStatistics config, allow all charts
   if (!attributes?.allowedStatistics) {

@@ -248,7 +248,7 @@ export const valueRangeSchema = z.object({
   max: z.number(),
 });
 
-export const datasetVariablesetItemAttributes = z.object({
+export const variablesetContentAttributes = z.object({
   allowedStatistics: z
     .object({
       distribution: z.boolean(),
@@ -259,43 +259,7 @@ export const datasetVariablesetItemAttributes = z.object({
 });
 
 export type ValueRange = z.infer<typeof valueRangeSchema>;
-export type DatasetVariablesetItemAttributes = z.infer<typeof datasetVariablesetItemAttributes>;
-
-export const datasetVariablesetItem = pgTable(
-  "dataset_variableset_items",
-  {
-    id: uuid("id")
-      .primaryKey()
-      .default(sql`uuidv7()`),
-    variablesetId: uuid("variableset_id")
-      .notNull()
-      .references(() => datasetVariableset.id, { onDelete: "cascade" }),
-    variableId: uuid("variable_id")
-      .notNull()
-      .references(() => datasetVariable.id, { onDelete: "cascade" }),
-    attributes: jsonb("attributes")
-      .$type<DatasetVariablesetItemAttributes>()
-      .default({
-        allowedStatistics: { distribution: true, mean: false },
-      }),
-    orderIndex: integer("order_index").notNull().default(0),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [
-    uniqueIndex("dataset_variableset_items_unique_idx").on(table.variablesetId, table.variableId),
-    index("dataset_variableset_items_variableset_id_idx").on(table.variablesetId),
-  ]
-);
-
-export const insertDatasetVariablesetItemSchema = createInsertSchema(datasetVariablesetItem).extend({
-  attributes: datasetVariablesetItemAttributes.optional(),
-});
-export const selectDatasetVariablesetItemSchema = createSelectSchema(datasetVariablesetItem).extend({
-  attributes: datasetVariablesetItemAttributes.nullable(),
-});
-
-export type CreateDatasetVariablesetItemData = z.infer<typeof insertDatasetVariablesetItemSchema>;
-export type DatasetVariablesetItem = z.infer<typeof selectDatasetVariablesetItemSchema>;
+export type VariablesetContentAttributes = z.infer<typeof variablesetContentAttributes>;
 
 export const datasetVariablesetContentTypeEnum = pgEnum("dataset_variableset_content_type", [
   "variable",
@@ -317,7 +281,7 @@ export const datasetVariablesetContent = pgTable(
     contentType: datasetVariablesetContentTypeEnum("content_type").notNull(),
     variableId: uuid("variable_id").references(() => datasetVariable.id, { onDelete: "cascade" }),
     subsetId: uuid("subset_id").references((): AnyPgColumn => datasetVariableset.id, { onDelete: "cascade" }),
-    attributes: jsonb("attributes").$type<DatasetVariablesetItemAttributes>(),
+    attributes: jsonb("attributes").$type<VariablesetContentAttributes>(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
   },
@@ -341,10 +305,10 @@ export const datasetVariablesetContent = pgTable(
 );
 
 export const insertDatasetVariablesetContentSchema = createInsertSchema(datasetVariablesetContent).extend({
-  attributes: datasetVariablesetItemAttributes.optional().nullable(),
+  attributes: variablesetContentAttributes.optional().nullable(),
 });
 export const selectDatasetVariablesetContentSchema = createSelectSchema(datasetVariablesetContent).extend({
-  attributes: datasetVariablesetItemAttributes.nullable(),
+  attributes: variablesetContentAttributes.nullable(),
 });
 
 export type CreateDatasetVariablesetContentData = z.infer<typeof insertDatasetVariablesetContentSchema>;
