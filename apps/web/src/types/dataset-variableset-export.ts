@@ -21,6 +21,25 @@ export const VariableItemExportSchema = z.object({
   attributes: VariableItemAttributesExportSchema.optional(),
 });
 
+// New: unified content entry for interleaved ordering
+const ContentItemVariableVariant = z.object({
+  position: z.number(),
+  contentType: z.literal("variable"),
+  variableName: z.string(),
+  variableAttributes: VariableItemAttributesExportSchema.optional(),
+});
+
+const ContentItemSubsetVariant = z.object({
+  position: z.number(),
+  contentType: z.literal("subset"),
+  subsetName: z.string(),
+});
+
+export const ContentItemExportSchema = z.discriminatedUnion("contentType", [
+  ContentItemVariableVariant,
+  ContentItemSubsetVariant,
+]);
+
 export const VariableSetExportSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
@@ -39,6 +58,8 @@ export const VariableSetExportSchema = z.object({
     .nullable()
     .optional(),
   variables: z.array(VariableItemExportSchema),
+  // New: unified contents array for interleaved ordering
+  contents: z.array(ContentItemExportSchema).optional(),
 });
 
 export const VariableSetExportFileSchema = z.object({
@@ -79,6 +100,7 @@ export const VariableSetImportResultSchema = z.object({
 export type ValueRangeExport = z.infer<typeof ValueRangeExportSchema>;
 export type VariableItemAttributesExport = z.infer<typeof VariableItemAttributesExportSchema>;
 export type VariableItemExport = z.infer<typeof VariableItemExportSchema>;
+export type ContentItemExport = z.infer<typeof ContentItemExportSchema>;
 export type VariableSetExport = z.infer<typeof VariableSetExportSchema>;
 export type VariableSetExportFile = z.infer<typeof VariableSetExportFileSchema>;
 export type VariableSetImportOptions = z.infer<typeof VariableSetImportOptionsSchema>;

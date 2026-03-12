@@ -400,6 +400,7 @@
       "assigned": "Zugewiesene Variablen",
       "available": "Verfügbare Variablen",
       "description": "Wählen Sie ein Variablen-Set aus und verwalten Sie dessen zugewiesene Variablen",
+      "detachSubset": "Teilmenge vom übergeordneten Set getrennt",
       "noAssigned": "Keine Variablen diesem Set zugewiesen",
       "noVariables": "Keine Variablen verfügbar",
       "removeFromSet": "Aus Set entfernen",

@@ -3,10 +3,11 @@ import { and, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariablesetData,
-  CreateDatasetVariablesetItemData,
+  DatasetVariablesetContentType,
+  DatasetVariablesetItemAttributes,
   UpdateDatasetVariablesetData,
   datasetVariable,
-  datasetVariablesetItem,
+  datasetVariablesetContent,
   datasetVariableset as entity,
   insertDatasetVariablesetSchema,
   selectDatasetVariablesetSchema,
@@ -31,7 +32,7 @@ async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
 }
 
 async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]> {
-  // Get all variablesets for the dataset with variable counts
+  // Get all variablesets for the dataset with variable counts from contents table
   const variablesets = await db
     .select({
       id: entity.id,
@@ -41,10 +42,13 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
       orderIndex: entity.orderIndex,
       category: entity.category,
       attributes: entity.attributes,
-      variableCount: sql<number>`COALESCE(COUNT(${datasetVariablesetItem.variableId}), 0)`,
+      variableCount: sql<number>`COALESCE(COUNT(${datasetVariablesetContent.variableId}), 0)`,
     })
     .from(entity)
-    .leftJoin(datasetVariablesetItem, eq(entity.id, datasetVariablesetItem.variablesetId))
+    .leftJoin(
+      datasetVariablesetContent,
+      and(eq(entity.id, datasetVariablesetContent.variablesetId), eq(datasetVariablesetContent.contentType, "variable"))
+    )
     .where(eq(entity.datasetId, datasetId))
     .groupBy(
       entity.id,
@@ -110,6 +114,21 @@ async function createFn(data: CreateDatasetVariablesetData) {
     throw new DalException("Failed to create dataset variableset");
   }
 
+  // If this set has a parent, add it as a subset content entry in the parent
+  if (created.parentId) {
+    const maxPosition = await db
+      .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
+      .from(datasetVariablesetContent)
+      .where(eq(datasetVariablesetContent.variablesetId, created.parentId));
+
+    await db.insert(datasetVariablesetContent).values({
+      variablesetId: created.parentId,
+      position: (maxPosition[0]?.maxPos ?? -100) + 100,
+      contentType: "subset",
+      subsetId: created.id,
+    });
+  }
+
   return created;
 }
 
@@ -131,8 +150,11 @@ async function removeFn(id: string) {
 async function getVariablesInSetFn(variablesetId: string, options: ListOptions = {}) {
   const { search } = options;
 
-  // Build where conditions
-  const whereConditions = [eq(datasetVariablesetItem.variablesetId, variablesetId)];
+  // Build where conditions using the contents table
+  const whereConditions = [
+    eq(datasetVariablesetContent.variablesetId, variablesetId),
+    eq(datasetVariablesetContent.contentType, "variable"),
+  ];
 
   // Add search if provided
   if (search) {
@@ -158,13 +180,19 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
       valueLabels: datasetVariable.valueLabels,
       missingValues: datasetVariable.missingValues,
       missingRanges: datasetVariable.missingRanges,
-      orderIndex: datasetVariablesetItem.orderIndex,
-      attributes: datasetVariablesetItem.attributes,
+      orderIndex: datasetVariablesetContent.position,
+      attributes: datasetVariablesetContent.attributes,
     })
     .from(datasetVariable)
-    .innerJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
+    .innerJoin(
+      datasetVariablesetContent,
+      and(
+        eq(datasetVariable.id, datasetVariablesetContent.variableId),
+        eq(datasetVariablesetContent.contentType, "variable")
+      )
+    )
     .where(whereCondition)
-    .orderBy(datasetVariablesetItem.orderIndex, datasetVariable.name);
+    .orderBy(datasetVariablesetContent.position, datasetVariable.name);
 
   const results = await query;
   return {
@@ -178,8 +206,8 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
 async function getUnassignedVariablesFn(datasetId: string, options: ListOptions = {}) {
   const { search } = options;
 
-  // Build where conditions
-  const whereConditions = [eq(datasetVariable.datasetId, datasetId), isNull(datasetVariablesetItem.variableId)];
+  // Build where conditions — variables not in any variableset contents
+  const whereConditions = [eq(datasetVariable.datasetId, datasetId), isNull(datasetVariablesetContent.variableId)];
 
   // Add search if provided
   if (search) {
@@ -208,7 +236,13 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
       missingRanges: datasetVariable.missingRanges,
     })
     .from(datasetVariable)
-    .leftJoin(datasetVariablesetItem, eq(datasetVariable.id, datasetVariablesetItem.variableId))
+    .leftJoin(
+      datasetVariablesetContent,
+      and(
+        eq(datasetVariable.id, datasetVariablesetContent.variableId),
+        eq(datasetVariablesetContent.contentType, "variable")
+      )
+    )
     .where(whereCondition)
     .orderBy(datasetVariable.name);
 
@@ -226,9 +260,13 @@ async function addVariableToSetFn(variablesetId: string, variableId: string, ord
   // Check if variable is already in the set
   const existing = await db
     .select()
-    .from(datasetVariablesetItem)
+    .from(datasetVariablesetContent)
     .where(
-      and(eq(datasetVariablesetItem.variablesetId, variablesetId), eq(datasetVariablesetItem.variableId, variableId))
+      and(
+        eq(datasetVariablesetContent.variablesetId, variablesetId),
+        eq(datasetVariablesetContent.variableId, variableId),
+        eq(datasetVariablesetContent.contentType, "variable")
+      )
     )
     .limit(1);
 
@@ -236,49 +274,59 @@ async function addVariableToSetFn(variablesetId: string, variableId: string, ord
     throw new DalException("Variable is already assigned to this set");
   }
 
-  // If no order index provided, append to end
-  if (orderIndex === undefined) {
-    const maxOrder = await db
-      .select({ maxOrder: sql<number>`COALESCE(MAX(${datasetVariablesetItem.orderIndex}), -1)` })
-      .from(datasetVariablesetItem)
-      .where(eq(datasetVariablesetItem.variablesetId, variablesetId));
+  // If no order index provided, append to end (after all existing content)
+  let position: number;
+  if (orderIndex !== undefined) {
+    position = orderIndex;
+  } else {
+    const maxPosition = await db
+      .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
+      .from(datasetVariablesetContent)
+      .where(eq(datasetVariablesetContent.variablesetId, variablesetId));
 
-    orderIndex = (maxOrder[0]?.maxOrder ?? -1) + 1;
+    position = (maxPosition[0]?.maxPos ?? -100) + 100;
   }
 
-  const insertData: CreateDatasetVariablesetItemData = {
+  await db.insert(datasetVariablesetContent).values({
     variablesetId,
     variableId,
-    orderIndex,
+    position,
+    contentType: "variable",
     attributes: {
       allowedStatistics: {
         distribution: true,
         mean: false,
       },
     },
-  };
-
-  await db.insert(datasetVariablesetItem).values(insertData);
+  });
 }
 
 async function removeVariableFromSetFn(variablesetId: string, variableId: string) {
   await db
-    .delete(datasetVariablesetItem)
+    .delete(datasetVariablesetContent)
     .where(
-      and(eq(datasetVariablesetItem.variablesetId, variablesetId), eq(datasetVariablesetItem.variableId, variableId))
+      and(
+        eq(datasetVariablesetContent.variablesetId, variablesetId),
+        eq(datasetVariablesetContent.variableId, variableId),
+        eq(datasetVariablesetContent.contentType, "variable")
+      )
     );
 }
 
 async function updateVariablesetItemAttributesFn(
   variablesetId: string,
   variableId: string,
-  attributes: CreateDatasetVariablesetItemData["attributes"]
+  attributes: DatasetVariablesetItemAttributes | null
 ) {
   const [updated] = await db
-    .update(datasetVariablesetItem)
-    .set({ attributes })
+    .update(datasetVariablesetContent)
+    .set({ attributes, updatedAt: new Date() })
     .where(
-      and(eq(datasetVariablesetItem.variablesetId, variablesetId), eq(datasetVariablesetItem.variableId, variableId))
+      and(
+        eq(datasetVariablesetContent.variablesetId, variablesetId),
+        eq(datasetVariablesetContent.variableId, variableId),
+        eq(datasetVariablesetContent.contentType, "variable")
+      )
     )
     .returning();
 
@@ -322,11 +370,16 @@ async function reorderVariablesetsFn(datasetId: string, parentId: string | null,
 }
 
 async function reorderVariablesetItemsFn(variablesetId: string, reorderedVariableIds: string[]) {
-  // Verify all variable IDs are in the variableset
+  // Verify all variable IDs are in the variableset (as variable-type content entries)
   const items = await db
     .select()
-    .from(datasetVariablesetItem)
-    .where(eq(datasetVariablesetItem.variablesetId, variablesetId));
+    .from(datasetVariablesetContent)
+    .where(
+      and(
+        eq(datasetVariablesetContent.variablesetId, variablesetId),
+        eq(datasetVariablesetContent.contentType, "variable")
+      )
+    );
 
   const existingIds = new Set(items.map((item) => item.variableId));
   const invalidIds = reorderedVariableIds.filter((id) => !existingIds.has(id));
@@ -335,20 +388,171 @@ async function reorderVariablesetItemsFn(variablesetId: string, reorderedVariabl
     throw new DalException("Some variables do not belong to the specified variableset");
   }
 
-  // Update order indexes in a transaction
+  // Update positions in a transaction
   await db.transaction(async (tx) => {
     for (let i = 0; i < reorderedVariableIds.length; i++) {
       const variableId = reorderedVariableIds[i];
       if (!variableId) continue;
       await tx
-        .update(datasetVariablesetItem)
-        .set({ orderIndex: i })
+        .update(datasetVariablesetContent)
+        .set({ position: i * 100, updatedAt: new Date() })
         .where(
           and(
-            eq(datasetVariablesetItem.variablesetId, variablesetId),
-            eq(datasetVariablesetItem.variableId, variableId)
+            eq(datasetVariablesetContent.variablesetId, variablesetId),
+            eq(datasetVariablesetContent.variableId, variableId),
+            eq(datasetVariablesetContent.contentType, "variable")
           )
         );
+    }
+  });
+
+  return { success: true };
+}
+
+// --- New unified contents functions ---
+
+type ContentEntry = {
+  id: string;
+  position: number;
+  contentType: DatasetVariablesetContentType;
+  variableId: string | null;
+  subsetId: string | null;
+  attributes: DatasetVariablesetItemAttributes | null;
+  // Variable fields (populated when contentType = 'variable')
+  variableName: string | null;
+  variableLabel: string | null;
+  variableType: string | null;
+  variableMeasure: string | null;
+  // Subset fields (populated when contentType = 'subset')
+  subsetName: string | null;
+  subsetDescription: string | null;
+  subsetCategory: string | null;
+};
+
+async function getContentsFn(variablesetId: string): Promise<ContentEntry[]> {
+  // Get all contents for a variableset, joining variable and subset details
+  const results = await db
+    .select({
+      id: datasetVariablesetContent.id,
+      position: datasetVariablesetContent.position,
+      contentType: datasetVariablesetContent.contentType,
+      variableId: datasetVariablesetContent.variableId,
+      subsetId: datasetVariablesetContent.subsetId,
+      attributes: datasetVariablesetContent.attributes,
+      variableName: datasetVariable.name,
+      variableLabel: datasetVariable.label,
+      variableType: datasetVariable.type,
+      variableMeasure: datasetVariable.measure,
+      subsetName: entity.name,
+      subsetDescription: entity.description,
+      subsetCategory: entity.category,
+    })
+    .from(datasetVariablesetContent)
+    .leftJoin(datasetVariable, eq(datasetVariablesetContent.variableId, datasetVariable.id))
+    .leftJoin(entity, eq(datasetVariablesetContent.subsetId, entity.id))
+    .where(eq(datasetVariablesetContent.variablesetId, variablesetId))
+    .orderBy(datasetVariablesetContent.position);
+
+  return results;
+}
+
+async function addContentToVariablesetFn(
+  variablesetId: string,
+  contentType: DatasetVariablesetContentType,
+  referenceId: string,
+  attributes?: DatasetVariablesetItemAttributes | null
+) {
+  // Get max position to append at end
+  const maxPosition = await db
+    .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
+    .from(datasetVariablesetContent)
+    .where(eq(datasetVariablesetContent.variablesetId, variablesetId));
+
+  const position = (maxPosition[0]?.maxPos ?? -100) + 100;
+
+  const values = {
+    variablesetId,
+    position,
+    contentType,
+    variableId: contentType === "variable" ? referenceId : null,
+    subsetId: contentType === "subset" ? referenceId : null,
+    attributes:
+      contentType === "variable" ? (attributes ?? { allowedStatistics: { distribution: true, mean: false } }) : null,
+  };
+
+  if (contentType === "subset") {
+    // Insert the content row and update the subset's parentId atomically
+    let created: (typeof values & { id: string }) | undefined;
+    await db.transaction(async (tx) => {
+      const [inserted] = await tx.insert(datasetVariablesetContent).values(values).returning();
+      created = inserted;
+      await tx.update(entity).set({ parentId: variablesetId, updatedAt: new Date() }).where(eq(entity.id, referenceId));
+    });
+
+    if (!created) {
+      throw new DalException("Failed to add content to variableset");
+    }
+
+    return created;
+  }
+
+  const [created] = await db.insert(datasetVariablesetContent).values(values).returning();
+
+  if (!created) {
+    throw new DalException("Failed to add content to variableset");
+  }
+
+  return created;
+}
+
+async function removeContentFromVariablesetFn(variablesetId: string, contentId: string) {
+  await db
+    .delete(datasetVariablesetContent)
+    .where(
+      and(eq(datasetVariablesetContent.id, contentId), eq(datasetVariablesetContent.variablesetId, variablesetId))
+    );
+}
+
+async function detachSubsetFn(subsetId: string) {
+  // Remove the content entry from the parent's contents table and clear parentId
+  await db.transaction(async (tx) => {
+    // Remove the subset content entry from the parent variableset
+    await tx
+      .delete(datasetVariablesetContent)
+      .where(
+        and(eq(datasetVariablesetContent.subsetId, subsetId), eq(datasetVariablesetContent.contentType, "subset"))
+      );
+    // Detach the subset from its parent (make it a root variableset)
+    await tx.update(entity).set({ parentId: null, updatedAt: new Date() }).where(eq(entity.id, subsetId));
+  });
+}
+
+async function reorderContentsFn(variablesetId: string, reorderedContentIds: string[]) {
+  // Verify all content IDs belong to this variableset
+  const items = await db
+    .select()
+    .from(datasetVariablesetContent)
+    .where(eq(datasetVariablesetContent.variablesetId, variablesetId));
+
+  const existingIds = new Set(items.map((item) => item.id));
+
+  if (
+    reorderedContentIds.length !== items.length ||
+    new Set(reorderedContentIds).size !== reorderedContentIds.length ||
+    reorderedContentIds.some((id) => !existingIds.has(id))
+  ) {
+    throw new DalException("Reorder payload must contain each content id exactly once");
+  }
+
+  // Update positions in a transaction using gap-based positioning
+  await db.transaction(async (tx) => {
+    for (let i = 0; i < reorderedContentIds.length; i++) {
+      const contentId = reorderedContentIds[i];
+      if (!contentId) continue;
+      await tx
+        .update(datasetVariablesetContent)
+        .set({ position: i * 100, updatedAt: new Date() })
+        .where(eq(datasetVariablesetContent.id, contentId));
     }
   });
 
@@ -369,3 +573,9 @@ export const removeVariableFromSet = withAdminCheck(removeVariableFromSetFn);
 export const updateVariablesetItemAttributes = withAdminCheck(updateVariablesetItemAttributesFn);
 export const reorderVariablesets = withAdminCheck(reorderVariablesetsFn);
 export const reorderVariablesetItems = withAdminCheck(reorderVariablesetItemsFn);
+// New unified contents exports
+export const getContents = withSessionCheck(getContentsFn);
+export const addContentToVariableset = withAdminCheck(addContentToVariablesetFn);
+export const removeContentFromVariableset = withAdminCheck(removeContentFromVariablesetFn);
+export const reorderContents = withAdminCheck(reorderContentsFn);
+export const detachSubset = withAdminCheck(detachSubsetFn);

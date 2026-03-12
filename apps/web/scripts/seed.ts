@@ -12,7 +12,7 @@ import {
   datasetSplitVariable,
   datasetVariable,
   datasetVariableset,
-  datasetVariablesetItem,
+  datasetVariablesetContent,
   invitation,
   member,
   organization,
@@ -292,7 +292,8 @@ async function createDatasetVariableSets(datasetId: string) {
         variableSetItems.push({
           variablesetId: variableSetId,
           variableId: variableId,
-          orderIndex: j,
+          contentType: "variable" as const,
+          position: j,
         });
       } else {
         console.warn(`Variable not found: ${variableName}`);
@@ -300,7 +301,7 @@ async function createDatasetVariableSets(datasetId: string) {
     }
 
     if (variableSetItems.length > 0) {
-      await adminClient.insert(datasetVariablesetItem).values(variableSetItems);
+      await adminClient.insert(datasetVariablesetContent).values(variableSetItems);
       console.log(`Added ${variableSetItems.length} variables to ${variableSet.name}`);
     }
   }

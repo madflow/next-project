@@ -297,6 +297,59 @@ export const selectDatasetVariablesetItemSchema = createSelectSchema(datasetVari
 export type CreateDatasetVariablesetItemData = z.infer<typeof insertDatasetVariablesetItemSchema>;
 export type DatasetVariablesetItem = z.infer<typeof selectDatasetVariablesetItemSchema>;
 
+export const datasetVariablesetContentTypeEnum = pgEnum("dataset_variableset_content_type", [
+  "variable",
+  "subset",
+] as const);
+
+export type DatasetVariablesetContentType = (typeof datasetVariablesetContentTypeEnum.enumValues)[number];
+
+export const datasetVariablesetContent = pgTable(
+  "dataset_variableset_contents",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    variablesetId: uuid("variableset_id")
+      .notNull()
+      .references(() => datasetVariableset.id, { onDelete: "cascade" }),
+    position: integer("position").notNull().default(0),
+    contentType: datasetVariablesetContentTypeEnum("content_type").notNull(),
+    variableId: uuid("variable_id").references(() => datasetVariable.id, { onDelete: "cascade" }),
+    subsetId: uuid("subset_id").references((): AnyPgColumn => datasetVariableset.id, { onDelete: "cascade" }),
+    attributes: jsonb("attributes").$type<DatasetVariablesetItemAttributes>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("dataset_variableset_contents_variable_idx")
+      .on(table.variablesetId, table.variableId)
+      .where(sql`${table.contentType} = 'variable'`),
+    uniqueIndex("dataset_variableset_contents_subset_idx")
+      .on(table.variablesetId, table.subsetId)
+      .where(sql`${table.contentType} = 'subset'`),
+    index("dataset_variableset_contents_set_position_idx").on(table.variablesetId, table.position),
+    check(
+      "content_type_variable_check",
+      sql`(${table.contentType} != 'variable' OR (${table.variableId} IS NOT NULL AND ${table.subsetId} IS NULL))`
+    ),
+    check(
+      "content_type_subset_check",
+      sql`(${table.contentType} != 'subset' OR (${table.subsetId} IS NOT NULL AND ${table.variableId} IS NULL))`
+    ),
+  ]
+);
+
+export const insertDatasetVariablesetContentSchema = createInsertSchema(datasetVariablesetContent).extend({
+  attributes: datasetVariablesetItemAttributes.optional().nullable(),
+});
+export const selectDatasetVariablesetContentSchema = createSelectSchema(datasetVariablesetContent).extend({
+  attributes: datasetVariablesetItemAttributes.nullable(),
+});
+
+export type CreateDatasetVariablesetContentData = z.infer<typeof insertDatasetVariablesetContentSchema>;
+export type DatasetVariablesetContent = z.infer<typeof selectDatasetVariablesetContentSchema>;
+
 export const datasetSplitVariable = pgTable(
   "dataset_splitvariables",
   {

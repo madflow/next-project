@@ -2,14 +2,19 @@
 
 import {
   CreateDatasetVariablesetData,
-  CreateDatasetVariablesetItemData,
+  DatasetVariablesetContentType,
+  DatasetVariablesetItemAttributes,
   UpdateDatasetVariablesetData,
 } from "@repo/database/schema";
 import {
+  addContentToVariableset,
   addVariableToSet,
   create,
+  detachSubset,
   remove,
+  removeContentFromVariableset,
   removeVariableFromSet,
+  reorderContents,
   reorderVariablesetItems,
   reorderVariablesets,
   update,
@@ -52,7 +57,7 @@ export async function removeVariableFromVariableset(variablesetId: string, varia
 export async function updateVariablesetItemAttributes(
   variablesetId: string,
   variableId: string,
-  attributes: CreateDatasetVariablesetItemData["attributes"]
+  attributes: DatasetVariablesetItemAttributes | null
 ) {
   if (attributes?.valueRange && attributes.valueRange.min > attributes.valueRange.max) {
     throw new ServerActionFailureException("Min value must be less than or equal to max value");
@@ -85,4 +90,39 @@ export async function reorderVariablesetItemsAction(variablesetId: string, reord
   }
 
   return result;
+}
+
+// --- New unified contents actions ---
+
+export async function addContentToVariablesetAction(
+  variablesetId: string,
+  contentType: DatasetVariablesetContentType,
+  referenceId: string,
+  attributes?: DatasetVariablesetItemAttributes | null
+) {
+  const created = await addContentToVariableset(variablesetId, contentType, referenceId, attributes);
+
+  if (!created) {
+    throw new ServerActionFailureException("Failed to add content to variableset");
+  }
+
+  return created;
+}
+
+export async function removeContentFromVariablesetAction(variablesetId: string, contentId: string) {
+  await removeContentFromVariableset(variablesetId, contentId);
+}
+
+export async function reorderContentsAction(variablesetId: string, reorderedContentIds: string[]) {
+  const result = await reorderContents(variablesetId, reorderedContentIds);
+
+  if (!result || !result.success) {
+    throw new ServerActionFailureException("Failed to reorder variableset contents");
+  }
+
+  return result;
+}
+
+export async function detachSubsetAction(subsetId: string) {
+  await detachSubset(subsetId);
 }
