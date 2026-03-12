@@ -32,6 +32,11 @@ const formSchema = z.object({
   countedValue: z.number(),
 });
 
+const CATEGORY_LABEL_KEYS = {
+  general: "form.categoryGeneral",
+  multi_response: "form.categoryMultiResponse",
+} as const satisfies Record<(typeof CATEGORY_OPTIONS)[number], string>;
+
 const NO_PARENT_VALUE = "__NO_PARENT__";
 
 type FormData = z.infer<typeof formSchema>;
@@ -227,8 +232,7 @@ export function VariablesetForm({
                       <SelectItem value={NO_PARENT_VALUE}>{t("form.noParent")}</SelectItem>
                       {filteredParents.map((parent) => (
                         <SelectItem key={parent.id} value={parent.id}>
-                          {"  ".repeat(parent.level)}
-                          {parent.name}
+                          <span style={{ paddingLeft: `${parent.level * 16}px` }}>{parent.name}</span>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -256,7 +260,7 @@ export function VariablesetForm({
                     <SelectContent>
                       {CATEGORY_OPTIONS.map((category) => (
                         <SelectItem key={category} value={category}>
-                          {category}
+                          {t(CATEGORY_LABEL_KEYS[category])}
                         </SelectItem>
                       ))}
                     </SelectContent>

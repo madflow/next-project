@@ -397,10 +397,13 @@
     "assignVariables": "Variablen zuweisen",
     "assignment": {
       "addToSet": "Zu Set hinzufügen",
-      "assigned": "Zugewiesene Variablen",
+      "assigned": "Zugewiesene Inhalte",
+      "assignedCount": "{count, plural, =0 {Keine Einträge} =1 {1 Eintrag} other {# Einträge}}",
       "available": "Verfügbare Variablen",
       "description": "Wählen Sie ein Variablen-Set aus und verwalten Sie dessen zugewiesene Variablen",
       "detachSubset": "Teilmenge vom übergeordneten Set getrennt",
+      "detachSubsetTooltip": "Teilmenge lösen (entfernt die Eltern-Kind-Beziehung)",
+      "loading": "Wird geladen...",
       "noAssigned": "Keine Variablen diesem Set zugewiesen",
       "noVariables": "Keine Variablen verfügbar",
       "removeFromSet": "Aus Set entfernen",
@@ -464,6 +467,8 @@
     "form": {
       "cancel": "Abbrechen",
       "category": "Kategorie",
+      "categoryGeneral": "Allgemein",
+      "categoryMultiResponse": "Mehrfachantwort",
       "countedValue": "Gezählter Wert",
       "countedValueHelp": "Der numerische Wert, der 'ausgewählt' in Ihren Daten darstellt",
       "create": "Erstellen",

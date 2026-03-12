@@ -397,10 +397,13 @@
     "assignVariables": "Assign Variables",
     "assignment": {
       "addToSet": "Add to Set",
-      "assigned": "Assigned Variables",
+      "assigned": "Assigned Contents",
+      "assignedCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
       "available": "Available Variables",
       "description": "Select a variable set and manage its assigned variables",
       "detachSubset": "Subset detached from parent",
+      "detachSubsetTooltip": "Detach subset (removes parent-child relationship)",
+      "loading": "Loading...",
       "noAssigned": "No variables assigned to this set",
       "noVariables": "No variables available",
       "removeFromSet": "Remove from Set",
@@ -464,6 +467,8 @@
     "form": {
       "cancel": "Cancel",
       "category": "Category",
+      "categoryGeneral": "General",
+      "categoryMultiResponse": "Multiple Response",
       "countedValue": "Counted Value",
       "countedValueHelp": "The numeric value that represents 'selected' in your data",
       "create": "Create",

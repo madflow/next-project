@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { FolderOpen, GripVertical, Plus, Search, X } from "lucide-react";
+import { FolderOpen, GripVertical, Plus, Search, Unlink, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { type VariablesetContentEntry, useVariablesetContents } from "@/hooks/use-variableset-contents";
 import type { DatasetVariable } from "@/types/dataset-variable";
@@ -128,9 +129,10 @@ interface SortableSubsetItemProps {
   entry: VariablesetContentEntry;
   onDetach: (subsetId: string) => void;
   isDetaching: boolean;
+  detachTooltip: string;
 }
 
-function SortableSubsetItem({ entry, onDetach, isDetaching }: SortableSubsetItemProps) {
+function SortableSubsetItem({ entry, onDetach, isDetaching, detachTooltip }: SortableSubsetItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: entry.id });
 
   const style = {
@@ -143,7 +145,7 @@ function SortableSubsetItem({ entry, onDetach, isDetaching }: SortableSubsetItem
     <div
       ref={setNodeRef}
       style={style}
-      className="hover:bg-muted group flex items-center gap-2 rounded-md p-2"
+      className="bg-muted/40 group hover:bg-muted flex items-center gap-2 rounded-md border-l-2 border-l-blue-300 p-2 dark:border-l-blue-600"
       data-testid={`admin.dataset.variableset.assigned.subset.${entry.subsetId}`}>
       <div
         {...attributes}
@@ -153,16 +155,23 @@ function SortableSubsetItem({ entry, onDetach, isDetaching }: SortableSubsetItem
         data-testid="admin.dataset.variableset.subset.drag-handle">
         <GripVertical className="h-3 w-3" />
       </div>
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => entry.subsetId && onDetach(entry.subsetId)}
-        disabled={isDetaching}
-        className="h-6 w-6 shrink-0 p-0"
-        data-testid="admin.dataset.variableset.assignment.detach-subset">
-        {isDetaching ? "..." : <X className="h-3 w-3" />}
-      </Button>
-      <FolderOpen className="text-muted-foreground h-4 w-4 shrink-0" />
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => entry.subsetId && onDetach(entry.subsetId)}
+              disabled={isDetaching}
+              className="h-6 w-6 shrink-0 p-0"
+              data-testid="admin.dataset.variableset.assignment.detach-subset">
+              {isDetaching ? "..." : <Unlink className="h-3 w-3" />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top">{detachTooltip}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <FolderOpen className="h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
       <span className="min-w-0 flex-1 truncate text-sm font-medium">{entry.subsetName}</span>
     </div>
   );
@@ -324,91 +333,98 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
   }
 
   return (
-    <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
-      {/* Available Variables */}
-      <Card className="rounded-md shadow-xs">
-        <CardHeader className="pb-3">
-          <CardTitle>{t("assignment.available")}</CardTitle>
-          <div className="relative">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              placeholder={t("assignment.search")}
-              value={availableSearch}
-              onChange={(e) => setAvailableSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-        </CardHeader>
-        <Separator />
-        <CardContent className="p-0">
-          <ScrollArea className="h-96">
-            {isLoadingUnassigned ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
-            ) : unassignedResponse?.rows.length === 0 ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noVariables")}</div>
-            ) : (
-              <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.available.variables.list">
-                {unassignedResponse?.rows.map((variable) => (
-                  <div
-                    key={variable.id}
-                    className="hover:bg-muted flex items-start gap-2 rounded-md p-2"
-                    data-testid={`admin.dataset.variableset.available.variable.${variable.id}`}>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleAssignVariable(variable.id)}
-                      disabled={isAssigning === variable.id}
-                      className="mt-0.5 h-6 w-6 shrink-0 p-0"
-                      data-testid="admin.dataset.variableset.assignment.add">
-                      {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
-                    </Button>
-                    <div className="min-w-0 flex-1 overflow-hidden">
-                      {variable.label && <p className="mb-1 text-sm font-medium break-words">{variable.label}</p>}
-                      <p className="text-muted-foreground mb-1 truncate text-xs">{variable.name}</p>
-                      <div className="flex flex-wrap gap-1">
-                        <Badge variant="outline" className="shrink-0 text-xs">
-                          {variable.measure}
-                        </Badge>
-                        <Badge variant="outline" className="shrink-0 text-xs">
-                          {variable.type}
-                        </Badge>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}>
+      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* Available Variables */}
+        <Card className="rounded-md shadow-xs">
+          <CardHeader className="pb-3">
+            <CardTitle>{t("assignment.available")}</CardTitle>
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder={t("assignment.search")}
+                value={availableSearch}
+                onChange={(e) => setAvailableSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </CardHeader>
+          <Separator />
+          <CardContent className="p-0">
+            <ScrollArea className="h-96">
+              {isLoadingUnassigned ? (
+                <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.loading")}</div>
+              ) : unassignedResponse?.rows.length === 0 ? (
+                <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noVariables")}</div>
+              ) : (
+                <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.available.variables.list">
+                  {unassignedResponse?.rows.map((variable) => (
+                    <div
+                      key={variable.id}
+                      className="hover:bg-muted flex items-start gap-2 rounded-md p-2"
+                      data-testid={`admin.dataset.variableset.available.variable.${variable.id}`}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleAssignVariable(variable.id)}
+                        disabled={isAssigning === variable.id}
+                        className="mt-0.5 h-6 w-6 shrink-0 p-0"
+                        data-testid="admin.dataset.variableset.assignment.add">
+                        {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
+                      </Button>
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        {variable.label && <p className="mb-1 text-sm font-medium break-words">{variable.label}</p>}
+                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.name}</p>
+                        <div className="flex flex-wrap gap-1">
+                          <Badge variant="outline" className="shrink-0 text-xs">
+                            {variable.measure}
+                          </Badge>
+                          <Badge variant="outline" className="shrink-0 text-xs">
+                            {variable.type}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
 
-      {/* Assigned Contents (variables + subsets interleaved) */}
-      <Card className="rounded-md shadow-xs">
-        <CardHeader className="pb-3">
-          <CardTitle>{t("assignment.assigned")}</CardTitle>
-          <div className="relative">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              placeholder={t("assignment.search")}
-              value={assignedSearch}
-              onChange={(e) => setAssignedSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-        </CardHeader>
-        <Separator />
-        <CardContent className="p-0">
-          <ScrollArea className="h-96">
-            {isLoadingContents ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
-            ) : filteredContents.length === 0 ? (
-              <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAssigned")}</div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}>
+        {/* Assigned Contents (variables + subsets interleaved) */}
+        <Card className="rounded-md shadow-xs">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle>{t("assignment.assigned")}</CardTitle>
+              {!isLoadingContents && (
+                <Badge variant="secondary" className="text-xs font-normal">
+                  {t("assignment.assignedCount", { count: filteredContents.length })}
+                </Badge>
+              )}
+            </div>
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder={t("assignment.search")}
+                value={assignedSearch}
+                onChange={(e) => setAssignedSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </CardHeader>
+          <Separator />
+          <CardContent className="p-0">
+            <ScrollArea className="h-96">
+              {isLoadingContents ? (
+                <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.loading")}</div>
+              ) : filteredContents.length === 0 ? (
+                <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAssigned")}</div>
+              ) : (
                 <SortableContext items={filteredContents.map((c) => c.id)} strategy={verticalListSortingStrategy}>
                   <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.assigned.variables.list">
                     {filteredContents.map((entry) =>
@@ -427,23 +443,24 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                           entry={entry}
                           onDetach={handleDetachSubset}
                           isDetaching={isDetaching === entry.subsetId}
+                          detachTooltip={t("assignment.detachSubsetTooltip")}
                         />
                       )
                     )}
                   </div>
                 </SortableContext>
-                <DragOverlay>
-                  {activeDragLabel ? (
-                    <div className="bg-background rounded-md border p-2 opacity-80 shadow-lg">
-                      <span className="text-sm">{activeDragLabel}</span>
-                    </div>
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
-    </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+      <DragOverlay>
+        {activeDragLabel ? (
+          <div className="bg-background rounded-md border p-2 opacity-80 shadow-lg">
+            <span className="text-sm">{activeDragLabel}</span>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
