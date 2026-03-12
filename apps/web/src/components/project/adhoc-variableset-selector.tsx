@@ -1,8 +1,8 @@
 "use client";
 
-import * as SelectPrimitive from "@radix-ui/react-select";
 import { ChevronDown, ChevronRight, Palette } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Select as SelectPrimitive } from "radix-ui";
 import { useState } from "react";
 import { useThemeConfig } from "@/components/active-theme";
 import { useOrganizationTheme } from "@/context/organization-theme-context";
@@ -251,7 +251,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
               <Palette className="h-4 w-4" />
             </Button>
           </SelectPrimitive.Trigger>
-          <SelectContent align="end">
+          <SelectContent align="end" position="popper" side="top">
             <SelectGroup>
               {DEFAULT_THEMES.map((theme) => (
                 <SelectItem key={theme.name} value={theme.value} className="data-[state=checked]:opacity-50">
