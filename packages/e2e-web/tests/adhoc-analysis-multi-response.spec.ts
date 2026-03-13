@@ -26,6 +26,11 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // Wait for variable groups to load
 
+    // "Informationsquellen" is a child of "Mediennutzung" — expand the parent first
+    const mediennutzungExpandButton = page.getByTestId("variable-group-expand-Mediennutzung");
+    await expect(mediennutzungExpandButton).toBeVisible({ timeout: 5000 });
+    await mediennutzungExpandButton.click();
+
     // Find "Informationsquellen" variable group and wait for it to be visible
     const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
 
@@ -83,6 +88,11 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     await expect(datasetTrigger).toContainText("SPSS Beispielumfrage");
 
     // Wait for variable groups to load
+
+    // "Informationsquellen" is a child of "Mediennutzung" — expand the parent first
+    const mediennutzungExpandButton = page.getByTestId("variable-group-expand-Mediennutzung");
+    await expect(mediennutzungExpandButton).toBeVisible({ timeout: 5000 });
+    await mediennutzungExpandButton.click();
 
     // Find "Informationsquellen" variable group
     const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
