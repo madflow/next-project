@@ -2,6 +2,9 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
+const DATASET_TEST_2_UID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
+const VARIABLESET_INFORMATIONSQUELLEN_UID = "0198e639-3e96-734b-b0db-af0c4350a2d2";
+
 test.describe("Admin Dataset Variable Sets", () => {
   let datasetName: string;
 
@@ -459,6 +462,64 @@ test.describe("Admin Dataset Variable Sets", () => {
     // Verify the set still exists
     await expect(
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: setName })
+    ).toBeVisible();
+  });
+});
+
+test.describe("Admin Dataset Variable Sets - seeded data", () => {
+  const datasetEditorUrl = `/admin/datasets/${DATASET_TEST_2_UID}/editor`;
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto(datasetEditorUrl);
+    await page.getByTestId("app.admin.editor.variablesets.tab").click();
+  });
+
+  test("should display subset in Assigned Variables column when parent set is selected", async ({ page }) => {
+    // Click on "Mediennutzung" in the variable sets tree
+    await page
+      .locator('[data-testid*="admin.dataset.variableset.tree.item"]')
+      .filter({ hasText: "Mediennutzung" })
+      .click();
+
+    // Wait for the Assigned Variables column to load
+    await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
+
+    // The subset "Informationsquellen" should appear in the Assigned Variables column
+    await expect(
+      page.getByTestId(`admin.dataset.variableset.assigned.subset.${VARIABLESET_INFORMATIONSQUELLEN_UID}`)
+    ).toBeVisible();
+
+    // Verify the subset name text is shown
+    await expect(
+      page.getByTestId(`admin.dataset.variableset.assigned.subset.${VARIABLESET_INFORMATIONSQUELLEN_UID}`)
+    ).toContainText("Informationsquellen");
+  });
+
+  test("should detach subset and restore it as a standalone set in the tree", async ({ page }) => {
+    // Click on "Mediennutzung" in the variable sets tree
+    await page
+      .locator('[data-testid*="admin.dataset.variableset.tree.item"]')
+      .filter({ hasText: "Mediennutzung" })
+      .click();
+
+    // Wait for the Assigned Variables column to load and verify subset is present
+    await expect(
+      page.getByTestId(`admin.dataset.variableset.assigned.subset.${VARIABLESET_INFORMATIONSQUELLEN_UID}`)
+    ).toBeVisible();
+
+    // Click the detach button on the "Informationsquellen" subset
+    await page.getByTestId("admin.dataset.variableset.assignment.detach-subset").click();
+
+    // The subset should no longer appear in the Assigned Variables column
+    await expect(
+      page.getByTestId(`admin.dataset.variableset.assigned.subset.${VARIABLESET_INFORMATIONSQUELLEN_UID}`)
+    ).toBeHidden();
+
+    // "Informationsquellen" should now appear as a root-level set in the tree
+    await expect(
+      page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: "Informationsquellen" })
     ).toBeVisible();
   });
 });

@@ -48,6 +48,8 @@ const PROJECT_TEST_4_UID = "0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59";
 
 const DATASET_TEST_UID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
 const DATASET_TEST_2_UID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
+const VARIABLESET_MEDIENNUTZUNG_UID = "0198e639-3e96-734b-b0db-af0c4350a2d1";
+const VARIABLESET_INFORMATIONSQUELLEN_UID = "0198e639-3e96-734b-b0db-af0c4350a2d2";
 
 interface CreateUserParams {
   id: string;
@@ -201,6 +203,8 @@ async function createDatasetVariableSets(datasetId: string) {
   const newsVariables = ["news1", "news2", "news3", "news4", "news5"];
 
   // Define variable sets with their variables
+  // Note: "Mediennutzung" and "Informationsquellen" are handled separately below
+  // to establish a parent-child relationship with fixed UUIDs
   const variableSets = [
     {
       name: "Demografische Daten",
@@ -233,17 +237,6 @@ async function createDatasetVariableSets(datasetId: string) {
       variables: ["confinan", "conbus", "coneduc", "conpress", "conmedic", "contv"],
     },
     {
-      name: "Mediennutzung",
-      description: "Medienkonsum und Informationsquellen",
-      variables: ["news", "tvhours"],
-    },
-    {
-      name: "Informationsquellen",
-      description: "Informationsquellen für Nachrichten",
-      variables: [...newsVariables].reverse(),
-      category: "multi_response" as const,
-    },
-    {
       name: "Lebensstil",
       description: "Lebensstil und persönliche Einstellungen",
       variables: ["happy", "hapmar", "postlife", "owngun"],
@@ -268,7 +261,6 @@ async function createDatasetVariableSets(datasetId: string) {
         description: variableSet.description,
         datasetId: datasetId,
         orderIndex: i,
-        ...(variableSet.category && { category: variableSet.category }),
       })
       .returning();
 
@@ -293,7 +285,7 @@ async function createDatasetVariableSets(datasetId: string) {
           variablesetId: variableSetId,
           variableId: variableId,
           contentType: "variable" as const,
-          position: j,
+          position: j * 100,
         });
       } else {
         console.warn(`Variable not found: ${variableName}`);
@@ -305,6 +297,86 @@ async function createDatasetVariableSets(datasetId: string) {
       console.log(`Added ${variableSetContents.length} variables to ${variableSet.name}`);
     }
   }
+
+  // Create "Mediennutzung" with a fixed UUID — must be inserted before "Informationsquellen"
+  // because Informationsquellen has a parentId FK referencing Mediennutzung
+  await adminClient.insert(datasetVariableset).values({
+    id: VARIABLESET_MEDIENNUTZUNG_UID,
+    name: "Mediennutzung",
+    description: "Medienkonsum und Informationsquellen",
+    datasetId: datasetId,
+    orderIndex: variableSets.length,
+  });
+  console.log("Created variable set: Mediennutzung");
+
+  // Create "Informationsquellen" with a fixed UUID as a child of "Mediennutzung"
+  await adminClient.insert(datasetVariableset).values({
+    id: VARIABLESET_INFORMATIONSQUELLEN_UID,
+    name: "Informationsquellen",
+    description: "Informationsquellen für Nachrichten",
+    datasetId: datasetId,
+    orderIndex: variableSets.length + 1,
+    category: "multi_response",
+    parentId: VARIABLESET_MEDIENNUTZUNG_UID,
+  });
+  console.log("Created variable set: Informationsquellen");
+
+  // Add variables to "Informationsquellen"
+  const informationsquellenVariables = [...newsVariables].reverse();
+  const informationsquellenContents = [];
+  for (let j = 0; j < informationsquellenVariables.length; j++) {
+    const variableName = informationsquellenVariables[j];
+    if (!variableName) continue;
+    const variableId = variableMap.get(variableName);
+    if (variableId) {
+      informationsquellenContents.push({
+        variablesetId: VARIABLESET_INFORMATIONSQUELLEN_UID,
+        variableId: variableId,
+        contentType: "variable" as const,
+        position: j * 100,
+      });
+    } else {
+      console.warn(`Variable not found: ${variableName}`);
+    }
+  }
+  if (informationsquellenContents.length > 0) {
+    await adminClient.insert(datasetVariablesetContent).values(informationsquellenContents);
+    console.log(`Added ${informationsquellenContents.length} variables to Informationsquellen`);
+  }
+
+  // Add variables to "Mediennutzung" and link "Informationsquellen" as a subset content entry
+  const mediennutzungVariableNames = ["news", "tvhours"];
+  const mediennutzungContents: Array<{
+    variablesetId: string;
+    contentType: "variable" | "subset";
+    position: number;
+    variableId?: string;
+    subsetId?: string;
+  }> = [];
+  for (let j = 0; j < mediennutzungVariableNames.length; j++) {
+    const variableName = mediennutzungVariableNames[j];
+    if (!variableName) continue;
+    const variableId = variableMap.get(variableName);
+    if (variableId) {
+      mediennutzungContents.push({
+        variablesetId: VARIABLESET_MEDIENNUTZUNG_UID,
+        variableId: variableId,
+        contentType: "variable",
+        position: j * 100,
+      });
+    } else {
+      console.warn(`Variable not found: ${variableName}`);
+    }
+  }
+  // Add "Informationsquellen" as a subset content entry at the end
+  mediennutzungContents.push({
+    variablesetId: VARIABLESET_MEDIENNUTZUNG_UID,
+    subsetId: VARIABLESET_INFORMATIONSQUELLEN_UID,
+    contentType: "subset",
+    position: 200,
+  });
+  await adminClient.insert(datasetVariablesetContent).values(mediennutzungContents);
+  console.log(`Added ${mediennutzungContents.length - 1} variables and 1 subset to Mediennutzung`);
 
   // Create split variables for agecat, marital, and sex
   const splitVariableNames = ["agecat", "marital", "sex"];

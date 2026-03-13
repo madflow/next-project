@@ -1,5 +1,6 @@
 import "server-only";
 import { and, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariablesetData,
@@ -431,6 +432,9 @@ type ContentEntry = {
 
 async function getContentsFn(variablesetId: string): Promise<ContentEntry[]> {
   // Get all contents for a variableset, joining variable and subset details
+  // Use alias to avoid self-join collision since entity (datasetVariableset) is both
+  // the table being filtered and the table being joined for subset name resolution
+  const subsetVariableset = alias(entity, "subset_variableset");
   const results = await db
     .select({
       id: datasetVariablesetContent.id,
@@ -443,13 +447,13 @@ async function getContentsFn(variablesetId: string): Promise<ContentEntry[]> {
       variableLabel: datasetVariable.label,
       variableType: datasetVariable.type,
       variableMeasure: datasetVariable.measure,
-      subsetName: entity.name,
-      subsetDescription: entity.description,
-      subsetCategory: entity.category,
+      subsetName: subsetVariableset.name,
+      subsetDescription: subsetVariableset.description,
+      subsetCategory: subsetVariableset.category,
     })
     .from(datasetVariablesetContent)
     .leftJoin(datasetVariable, eq(datasetVariablesetContent.variableId, datasetVariable.id))
-    .leftJoin(entity, eq(datasetVariablesetContent.subsetId, entity.id))
+    .leftJoin(subsetVariableset, eq(datasetVariablesetContent.subsetId, subsetVariableset.id))
     .where(eq(datasetVariablesetContent.variablesetId, variablesetId))
     .orderBy(datasetVariablesetContent.position);
 
