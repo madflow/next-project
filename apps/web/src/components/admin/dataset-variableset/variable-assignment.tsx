@@ -65,7 +65,10 @@ function SortableVariableItem({ entry, selectedSetId, onRemove, onRefresh, isRem
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const variableAttributes = entry.attributes as VariablesetContentAttributes | null;
+  const variableAttributes: VariablesetContentAttributes =
+    (entry.attributes as VariablesetContentAttributes | null) ?? {
+      allowedStatistics: { distribution: true, mean: false },
+    };
 
   return (
     <div
@@ -105,7 +108,7 @@ function SortableVariableItem({ entry, selectedSetId, onRemove, onRefresh, isRem
             </Badge>
           )}
         </div>
-        {variableAttributes && entry.variableId && entry.variableMeasure && entry.variableType && (
+        {entry.variableId && entry.variableMeasure && entry.variableType && (
           <div className="mt-2">
             <AllowedStatisticsSelector
               variablesetId={selectedSetId}

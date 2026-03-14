@@ -522,4 +522,107 @@ test.describe("Admin Dataset Variable Sets - seeded data", () => {
       page.locator('[data-testid*="admin.dataset.variableset.tree.name"]').filter({ hasText: "Informationsquellen" })
     ).toBeVisible();
   });
+
+  test("should show allowed statistics configure button for assigned variables", async ({ page }) => {
+    // Select "Informationsquellen" which has variables assigned via seed data
+    await page
+      .locator('[data-testid*="admin.dataset.variableset.tree.item"]')
+      .filter({ hasText: "Informationsquellen" })
+      .click();
+
+    // Wait for assigned variables list to load
+    await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
+
+    // The "Configure" button must be visible for at least one assigned variable
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.open").first()).toBeVisible();
+  });
+
+  test("should open allowed statistics dialog and display checkboxes", async ({ page }) => {
+    // Select "Informationsquellen" which has variables assigned
+    await page
+      .locator('[data-testid*="admin.dataset.variableset.tree.item"]')
+      .filter({ hasText: "Informationsquellen" })
+      .click();
+
+    await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
+
+    // Open the configure dialog for the first variable
+    await page.getByTestId("admin.dataset.variableset.allowed-statistics.open").first().click();
+
+    // Dialog must be open with both checkboxes visible
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.distribution")).toBeVisible();
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.mean")).toBeVisible();
+
+    // Save button must be present
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.save")).toBeVisible();
+  });
+
+  test("should save allowed statistics changes and persist them", async ({ page }) => {
+    // Select "Informationsquellen" which has variables assigned
+    await page
+      .locator('[data-testid*="admin.dataset.variableset.tree.item"]')
+      .filter({ hasText: "Informationsquellen" })
+      .click();
+
+    await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
+
+    // Open the configure dialog for the first variable
+    await page.getByTestId("admin.dataset.variableset.allowed-statistics.open").first().click();
+
+    // By default distribution should be checked, mean unchecked (seed defaults)
+    const distributionCheckbox = page.getByTestId("admin.dataset.variableset.allowed-statistics.distribution");
+    const meanCheckbox = page.getByTestId("admin.dataset.variableset.allowed-statistics.mean");
+
+    await expect(distributionCheckbox).toBeChecked();
+    await expect(meanCheckbox).not.toBeChecked();
+
+    // Enable mean
+    await meanCheckbox.click();
+    await expect(meanCheckbox).toBeChecked();
+
+    // Save the changes
+    await page.getByTestId("admin.dataset.variableset.allowed-statistics.save").click();
+
+    // Dialog should close after save
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.save")).toBeHidden();
+
+    // Re-open the dialog to verify the change persisted
+    await page.getByTestId("admin.dataset.variableset.allowed-statistics.open").first().click();
+
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.distribution")).toBeChecked();
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.mean")).toBeChecked();
+  });
+
+  test("should cancel allowed statistics changes without saving", async ({ page }) => {
+    // Use "Demografische Daten" which has its own variables and is not affected by other tests
+    await page
+      .locator('[data-testid*="admin.dataset.variableset.tree.item"]')
+      .filter({ hasText: "Demografische Daten" })
+      .click();
+
+    await expect(page.getByTestId("admin.dataset.variableset.assigned.variables.list")).toBeVisible();
+
+    // Open the configure dialog for the first variable
+    await page.getByTestId("admin.dataset.variableset.allowed-statistics.open").first().click();
+
+    // Seed defaults: distribution=true, mean=false
+    // Ensure distribution is checked (so we can safely uncheck it without triggering validation)
+    const distributionCheckbox = page.getByTestId("admin.dataset.variableset.allowed-statistics.distribution");
+    const meanCheckbox = page.getByTestId("admin.dataset.variableset.allowed-statistics.mean");
+
+    await expect(distributionCheckbox).toBeChecked();
+    await expect(meanCheckbox).not.toBeChecked();
+
+    // Toggle mean on — this is the unsaved change
+    await meanCheckbox.click();
+    await expect(meanCheckbox).toBeChecked();
+
+    // Cancel — must discard the change
+    await page.getByTestId("admin.dataset.variableset.allowed-statistics.cancel").click();
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.save")).toBeHidden();
+
+    // Re-open: mean must still be unchecked (change was not persisted)
+    await page.getByTestId("admin.dataset.variableset.allowed-statistics.open").first().click();
+    await expect(page.getByTestId("admin.dataset.variableset.allowed-statistics.mean")).not.toBeChecked();
+  });
 });
