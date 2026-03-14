@@ -286,6 +286,7 @@ async function createDatasetVariableSets(datasetId: string) {
           variableId: variableId,
           contentType: "variable" as const,
           position: j * 100,
+          attributes: { allowedStatistics: { distribution: true, mean: false } },
         });
       } else {
         console.warn(`Variable not found: ${variableName}`);
@@ -334,6 +335,7 @@ async function createDatasetVariableSets(datasetId: string) {
         variableId: variableId,
         contentType: "variable" as const,
         position: j * 100,
+        attributes: { allowedStatistics: { distribution: true, mean: false } },
       });
     } else {
       console.warn(`Variable not found: ${variableName}`);
@@ -352,6 +354,7 @@ async function createDatasetVariableSets(datasetId: string) {
     position: number;
     variableId?: string;
     subsetId?: string;
+    attributes?: { allowedStatistics: { distribution: boolean; mean: boolean } };
   }> = [];
   for (let j = 0; j < mediennutzungVariableNames.length; j++) {
     const variableName = mediennutzungVariableNames[j];
@@ -363,6 +366,7 @@ async function createDatasetVariableSets(datasetId: string) {
         variableId: variableId,
         contentType: "variable",
         position: j * 100,
+        attributes: { allowedStatistics: { distribution: true, mean: false } },
       });
     } else {
       console.warn(`Variable not found: ${variableName}`);

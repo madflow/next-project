@@ -95,6 +95,16 @@ export function AllowedStatisticsSelector({
     }
   };
 
+  const handleCancel = () => {
+    setDistribution(currentAttributes.allowedStatistics.distribution);
+    setMean(currentAttributes.allowedStatistics.mean);
+    setValueRange({
+      min: currentAttributes.valueRange?.min,
+      max: currentAttributes.valueRange?.max,
+    });
+    setIsOpen(false);
+  };
+
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setDistribution(currentAttributes.allowedStatistics.distribution);
@@ -204,7 +214,7 @@ export function AllowedStatisticsSelector({
           <Button
             type="button"
             variant="outline"
-            onClick={() => setIsOpen(false)}
+            onClick={handleCancel}
             disabled={isSaving}
             data-testid="admin.dataset.variableset.allowed-statistics.cancel">
             {t("cancel")}
