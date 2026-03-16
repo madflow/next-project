@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getContents, reorderContents } from "@/dal/dataset-variableset";
+import { assertUserIsAdmin } from "@/dal/dal";
+import { assertVariablesetAccess, getContents, reorderContents } from "@/dal/dataset-variableset";
 import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 
   try {
+    await assertUserIsAdmin();
+    await assertVariablesetAccess(id);
+
     const body = await request.json();
     const { contentIds } = body;
 

@@ -141,6 +141,12 @@ export class DalNotAuthorizedException extends DalException {
   }
 }
 
+export class DalNotFoundException extends DalException {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export class ServerActionException extends Error {
   constructor(message: string) {
     super(message);
@@ -168,6 +174,8 @@ export class ServerActionValidationException extends ServerActionException {
 const toHttpException = (error: unknown): HttpException => {
   if (error instanceof DalNotAuthorizedException) {
     return new HttpException(401, { message: error.message });
+  } else if (error instanceof DalNotFoundException) {
+    return new HttpException(404, { message: error.message });
   } else if (error instanceof ServerActionNotAuthorizedException) {
     return new HttpException(401, { message: error.message });
   } else if (error instanceof ServerActionFailureException) {

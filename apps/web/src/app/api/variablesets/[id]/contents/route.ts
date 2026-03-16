@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { addContentToVariableset, getContents, removeContentFromVariableset } from "@/dal/dataset-variableset";
+import { assertUserIsAdmin } from "@/dal/dal";
+import {
+  addContentToVariableset,
+  assertVariablesetAccess,
+  getContents,
+  removeContentFromVariableset,
+} from "@/dal/dataset-variableset";
 import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +24,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
   }
 
   try {
+    await assertVariablesetAccess(id);
+
     const contents = await getContents(id);
     return NextResponse.json({ contents });
   } catch (error: unknown) {
@@ -33,6 +41,9 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
 
   try {
+    await assertUserIsAdmin();
+    await assertVariablesetAccess(id);
+
     const body = await request.json();
     const { contentType, referenceId, attributes } = body;
 
@@ -59,6 +70,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   }
 
   try {
+    await assertUserIsAdmin();
+    await assertVariablesetAccess(id);
+
     const body = await request.json();
     const { contentId } = body;
 

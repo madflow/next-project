@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { assertAccess } from "@/dal/dataset";
-import { getUnassignedVariables, getVariablesInSet } from "@/dal/dataset-variableset";
+import { assertVariablesetAccess, getUnassignedVariables, getVariablesInSet } from "@/dal/dataset-variableset";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { processUrlParams } from "../../../../../handler";
 
@@ -39,6 +39,8 @@ export async function GET(request: Request, { params }: RouteParams) {
       return NextResponse.json(result);
     } else {
       // Return variables in the specific set
+      await assertVariablesetAccess(setId, id);
+
       const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams);
       const result = await getVariablesInSet(setId, {
         filters,

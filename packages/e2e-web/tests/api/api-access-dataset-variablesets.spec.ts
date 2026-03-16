@@ -2,53 +2,33 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
+const TEST_DATASET_ID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
 
 test.describe("API Dataset Variable Sets @api", () => {
-  let testDatasetId: string;
-
-  test.beforeAll(async ({ browser }) => {
-    // Get an existing dataset ID by calling the API as admin
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    await page.goto("/");
-    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-
-    const response = await page.request.get("/api/datasets?limit=1");
-    const data = await response.json();
-
-    if (data.rows && data.rows.length > 0) {
-      testDatasetId = data.rows[0].datasets.id;
-    } else {
-      throw new Error("No datasets found in test environment");
-    }
-
-    await context.close();
-  });
-
   test.describe("Export Endpoint Authentication", () => {
     test("denies access when not logged in", async ({ page }) => {
-      const response = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      const response = await page.request.get(`/api/datasets/${TEST_DATASET_ID}/variablesets/export`);
       expect(response.status()).toBe(401);
     });
 
     test("denies access for regular user", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
-      const response = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      const response = await page.request.get(`/api/datasets/${TEST_DATASET_ID}/variablesets/export`);
       expect(response.status()).toBe(401);
     });
 
     test("denies access for user with no organization", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);
-      const response = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      const response = await page.request.get(`/api/datasets/${TEST_DATASET_ID}/variablesets/export`);
       expect(response.status()).toBe(401);
     });
 
     test("allows access for admin user", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      const response = await page.request.get(`/api/datasets/${testDatasetId}/variablesets/export`);
+      const response = await page.request.get(`/api/datasets/${TEST_DATASET_ID}/variablesets/export`);
       expect(response.status()).toBe(200);
 
       // Verify response headers for JSON export
@@ -82,7 +62,7 @@ test.describe("API Dataset Variable Sets @api", () => {
       const blob = new Blob([importData], { type: "application/json" });
       formData.append("file", blob, "test-variablesets.json");
 
-      const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
+      const response = await page.request.post(`/api/datasets/${TEST_DATASET_ID}/variablesets/import`, {
         multipart: {
           file: {
             name: "test-variablesets.json",
@@ -108,7 +88,7 @@ test.describe("API Dataset Variable Sets @api", () => {
         ],
       });
 
-      const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
+      const response = await page.request.post(`/api/datasets/${TEST_DATASET_ID}/variablesets/import`, {
         multipart: {
           file: {
             name: "test-variablesets.json",
@@ -134,7 +114,7 @@ test.describe("API Dataset Variable Sets @api", () => {
         ],
       });
 
-      const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
+      const response = await page.request.post(`/api/datasets/${TEST_DATASET_ID}/variablesets/import`, {
         multipart: {
           file: {
             name: "test-variablesets.json",
@@ -160,7 +140,7 @@ test.describe("API Dataset Variable Sets @api", () => {
         ],
       });
 
-      const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
+      const response = await page.request.post(`/api/datasets/${TEST_DATASET_ID}/variablesets/import`, {
         multipart: {
           file: {
             name: "test-variablesets.json",
@@ -210,7 +190,7 @@ test.describe("API Dataset Variable Sets @api", () => {
 
       const invalidData = "invalid json data";
 
-      const response = await page.request.post(`/api/datasets/${testDatasetId}/variablesets/import`, {
+      const response = await page.request.post(`/api/datasets/${TEST_DATASET_ID}/variablesets/import`, {
         multipart: {
           file: {
             name: "invalid.txt",

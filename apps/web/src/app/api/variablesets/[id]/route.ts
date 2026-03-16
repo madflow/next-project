@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { remove } from "@/dal/dataset-variableset";
+import { assertUserIsAdmin } from "@/dal/dal";
+import { assertVariablesetAccess, remove } from "@/dal/dataset-variableset";
 import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +11,7 @@ type RouteParams = {
   }>;
 };
 
-export async function DELETE(request: Request, { params }: RouteParams) {
+export async function DELETE(_request: Request, { params }: RouteParams) {
   const { id } = await params;
 
   if (!id) {
@@ -18,6 +19,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   }
 
   try {
+    await assertUserIsAdmin();
+    await assertVariablesetAccess(id);
+
     await remove(id);
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

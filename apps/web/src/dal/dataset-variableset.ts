@@ -15,7 +15,8 @@ import {
   updateDatasetVariablesetSchema,
 } from "@repo/database/schema";
 import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/dal/dal";
-import { DalException } from "@/lib/exception";
+import { assertAccess } from "@/dal/dataset";
+import { DalException, DalNotFoundException } from "@/lib/exception";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 
 const baseList = createList(entity, selectDatasetVariablesetSchema);
@@ -105,6 +106,22 @@ async function getHierarchyFn(datasetId: string): Promise<VariablesetTreeNode[]>
 async function findFn(id: string) {
   const [result] = await db.select().from(entity).where(eq(entity.id, id)).limit(1);
   return result;
+}
+
+async function assertVariablesetAccessFn(variablesetId: string, expectedDatasetId?: string) {
+  const variableset = await findFn(variablesetId);
+
+  if (!variableset) {
+    throw new DalNotFoundException("Variableset not found");
+  }
+
+  if (expectedDatasetId && variableset.datasetId !== expectedDatasetId) {
+    throw new DalNotFoundException("Variableset not found in dataset");
+  }
+
+  await assertAccess(variableset.datasetId);
+
+  return variableset;
 }
 
 async function createFn(data: CreateDatasetVariablesetData) {
@@ -567,6 +584,7 @@ async function reorderContentsFn(variablesetId: string, reorderedContentIds: str
 export const listByDataset = withSessionCheck(listByDatasetFn);
 export const getHierarchy = withSessionCheck(getHierarchyFn);
 export const find = withSessionCheck(findFn);
+export const assertVariablesetAccess = withSessionCheck(assertVariablesetAccessFn);
 export const create = withAdminCheck(createFn);
 export const update = withAdminCheck(updateFn);
 export const remove = withAdminCheck(removeFn);
