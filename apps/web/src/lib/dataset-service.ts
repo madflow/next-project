@@ -157,7 +157,7 @@ export async function createDataset({
 
       const insertVariable = insertDatasetVariableSchema.parse({
         name: columnName,
-        label: columnLabel,
+        label: columnLabel ?? columnName,
         measure: metadata.variable_measure[columnName],
         type: metadata.readstat_variable_types[columnName],
         variableLabels: columnLabels,
