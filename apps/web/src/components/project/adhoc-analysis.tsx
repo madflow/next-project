@@ -12,7 +12,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useVariablePanel } from "@/hooks/use-variable-panel";
 import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
-import BarSkeleton from "../chart/bar-skeleton";
+import { BarSkeleton } from "../chart/bar-skeleton";
 import { MultiVariableCharts } from "../chart/multi-variable-charts";
 import { Button } from "../ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";

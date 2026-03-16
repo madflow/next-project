@@ -6,6 +6,7 @@ import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
 import { AdhocChart } from "./adhoc-chart";
+import { BarSkeleton } from "./bar-skeleton";
 import { MultiResponseChart } from "./multi-response-chart";
 
 type MultiVariableChartsProps = {
@@ -25,52 +26,54 @@ export function MultiVariableCharts({
   datasetId,
   onStatsRequestAction,
 }: MultiVariableChartsProps) {
-  // Create a stable key from variables to detect changes
-  const variablesKey = variables
-    .map((v) => v.id)
-    .sort()
-    .join(",");
-
-  const [splitVariables, setSplitVariables] = useState<Record<string, string | null>>({});
-  const [currentVariablesKey, setCurrentVariablesKey] = useState(variablesKey);
-
-  // Reset split variables when variables change (using setState during render pattern)
-  if (currentVariablesKey !== variablesKey && currentVariablesKey !== "") {
-    setSplitVariables({});
-    setCurrentVariablesKey(variablesKey);
-  } else if (currentVariablesKey === "") {
-    setCurrentVariablesKey(variablesKey);
-  }
+  const [splitVariablesBySelection, setSplitVariablesBySelection] = useState<
+    Record<string, Record<string, string | null>>
+  >({});
 
   if (variables.length === 0) {
     return <div className="text-muted-foreground">{"No variables selected"}</div>;
   }
 
-  // Check if any variable is missing stats data and suspend if so
   const hasAllStats = variables.every((variable) => baseStatsData[variable.name]);
   if (!hasAllStats) {
-    // Create a suspended promise that will resolve when data is available
-    throw new Promise(() => {}); // This will trigger Suspense
+    return <BarSkeleton />;
   }
 
+  const selectionKey = variables
+    .map((variable) => variable.id)
+    .sort()
+    .join(",");
+
+  const splitVariables = splitVariablesBySelection[selectionKey] ?? {};
+
   const handleSplitVariableChange = (variableName: string, splitVariable: string | null) => {
-    setSplitVariables((prev) => ({
+    setSplitVariablesBySelection((prev) => ({
       ...prev,
-      [variableName]: splitVariable,
+      [selectionKey]: {
+        ...prev[selectionKey],
+        [variableName]: splitVariable,
+      },
     }));
 
-    // Request new stats with the split variable
     onStatsRequestAction(variableName, splitVariable || undefined);
   };
 
   const isMultiResponse = variableset?.category === "multi_response";
   const countedValue = parseCountedValue(variableset?.attributes);
+  const showVariablesetHeader = variableset && !isMultiResponse;
+  const showMultiResponseAggregate = Boolean(isMultiResponse && variableset);
 
   if (variables.length === 1) {
     const variable = variables[0];
-    if (!variable) return <div className="text-muted-foreground">{"No variable selected"}</div>;
+    if (!variable) {
+      return <div className="text-muted-foreground">{"No variable selected"}</div>;
+    }
 
-    const stats = splitStatsData[variable.name] || baseStatsData[variable.name]!; // We know it exists due to hasAllStats check
+    const stats = splitStatsData[variable.name] || baseStatsData[variable.name];
+    if (!stats) {
+      return null;
+    }
+
     return (
       <div className="flex flex-col gap-4">
         {variableset && (
@@ -85,9 +88,7 @@ export function MultiVariableCharts({
           datasetId={datasetId}
           className="w-full max-w-4xl"
           selectedSplitVariable={splitVariables[variable.name] || null}
-          onSplitVariableChangeAction={(splitVariable: string | null) =>
-            handleSplitVariableChange(variable.name, splitVariable)
-          }
+          onSplitVariableChangeAction={(splitVariable) => handleSplitVariableChange(variable.name, splitVariable)}
           isMultiResponseIndividual={isMultiResponse}
           countedValue={countedValue}
         />
@@ -95,12 +96,9 @@ export function MultiVariableCharts({
     );
   }
 
-  const showVariablesetHeader = variableset && !isMultiResponse;
-  const showMultiResponseAggregate = isMultiResponse;
-
   return (
     <div className="flex flex-col gap-4">
-      {showMultiResponseAggregate && (
+      {showMultiResponseAggregate && variableset && (
         <MultiResponseChart
           variables={variables}
           statsData={baseStatsData}
@@ -117,8 +115,13 @@ export function MultiVariableCharts({
           {variableset.description && <p className="text-muted-foreground mt-1 text-sm">{variableset.description}</p>}
         </div>
       )}
+
       {variables.map((variable) => {
-        const stats = splitStatsData[variable.name] || baseStatsData[variable.name]!; // We know it exists due to hasAllStats check
+        const stats = splitStatsData[variable.name] || baseStatsData[variable.name];
+        if (!stats) {
+          return null;
+        }
+
         return (
           <AdhocChart
             key={variable.id}
@@ -127,9 +130,7 @@ export function MultiVariableCharts({
             datasetId={datasetId}
             className="w-full max-w-4xl"
             selectedSplitVariable={splitVariables[variable.name] || null}
-            onSplitVariableChangeAction={(splitVariable: string | null) =>
-              handleSplitVariableChange(variable.name, splitVariable)
-            }
+            onSplitVariableChangeAction={(splitVariable) => handleSplitVariableChange(variable.name, splitVariable)}
             isMultiResponseIndividual={isMultiResponse}
             countedValue={countedValue}
           />
