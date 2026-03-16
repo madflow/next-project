@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getVariablesInSet } from "@/dal/dataset-variableset";
+import { assertVariablesetAccess, getVariablesInSet } from "@/dal/dataset-variableset";
 import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +18,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
   }
 
   try {
+    await assertVariablesetAccess(id);
+
     const result = await getVariablesInSet(id, {
       limit: 1000, // Get all variables in the set
       orderBy: [{ column: "name", direction: "asc" }],
