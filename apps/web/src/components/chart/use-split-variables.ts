@@ -9,6 +9,9 @@ import { type StatsResponse } from "@/types/stats";
 
 type SplitVariablesResponse = {
   rows: DatasetVariableWithAttributes[];
+  count: number;
+  limit: number;
+  offset: number;
 };
 
 export function useSplitVariables(datasetId?: string, enabled: boolean = true) {
