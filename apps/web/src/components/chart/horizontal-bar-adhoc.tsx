@@ -8,6 +8,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsBarData } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
@@ -44,7 +45,11 @@ export function HorizontalBarAdhoc({ variable, stats, ...props }: BarAdhocProps)
             barCategoryGap={1}
             accessibilityLayer
             data={transformToRechartsBarData(variable, stats)}>
-            <CartesianGrid vertical={true} horizontal={false} />
+            <CartesianGrid
+              vertical
+              horizontal
+              horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates}
+            />
             <XAxis
               domain={[0, 100]}
               dataKey="percentage"

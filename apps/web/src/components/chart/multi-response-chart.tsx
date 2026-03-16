@@ -8,6 +8,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
 import { Button } from "../ui/button";
@@ -59,7 +60,11 @@ export function MultiResponseChart({
             barCategoryGap={1}
             accessibilityLayer
             data={chartData}>
-            <CartesianGrid vertical={true} horizontal={false} />
+            <CartesianGrid
+              vertical
+              horizontal
+              horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates}
+            />
             <XAxis
               domain={[0, 100]}
               dataKey="percentage"

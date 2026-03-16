@@ -37,6 +37,7 @@ import {
   transformToRechartsPieData,
 } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getPlotAreaHorizontalBorderCoordinates, getPlotAreaVerticalBorderCoordinates } from "@/lib/chart-grid";
 import { determineChartSelection } from "@/lib/chart-selection";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
@@ -218,7 +219,7 @@ export function AdhocChart({
         return (
           <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
             <BarChart accessibilityLayer data={transformToRechartsBarData(variable, stats)}>
-              <CartesianGrid vertical={false} />
+              <CartesianGrid vertical verticalCoordinatesGenerator={getPlotAreaVerticalBorderCoordinates} />
               <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
               <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
               <YAxis
@@ -244,10 +245,14 @@ export function AdhocChart({
 
       case "horizontalBar": {
         // Use different transformation for multi-response individual
-        const horizontalBarData: { label: string | number; value: string | number; count: number; percentage: number }[] =
-          isMultiResponseIndividual
-            ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
-            : transformToRechartsBarData(variable, stats);
+        const horizontalBarData: {
+          label: string | number;
+          value: string | number;
+          count: number;
+          percentage: number;
+        }[] = isMultiResponseIndividual
+          ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
+          : transformToRechartsBarData(variable, stats);
 
         return (
           <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
@@ -256,8 +261,13 @@ export function AdhocChart({
               margin={{ left: 0 }}
               barCategoryGap={1}
               accessibilityLayer
+              responsive
               data={horizontalBarData}>
-              <CartesianGrid vertical={true} horizontal={false} />
+              <CartesianGrid
+                vertical
+                horizontal
+                horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates}
+              />
               <XAxis
                 domain={[0, 100]}
                 dataKey="percentage"

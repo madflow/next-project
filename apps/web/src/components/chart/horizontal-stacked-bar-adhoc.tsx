@@ -17,6 +17,7 @@ import {
   transformToSplitVariableStackedBarData,
 } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
@@ -91,7 +92,11 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
       return (
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={true} horizontal={false} />
+            <CartesianGrid
+              vertical
+              horizontal
+              horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates}
+            />
             <XAxis
               domain={[0, 100]}
               type="number"
@@ -196,7 +201,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
     return (
       <ChartContainer config={stackedChartConfig} ref={ref} data-export-filename={variable.name}>
         <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={singleBarData}>
-          <CartesianGrid vertical={true} horizontal={false} />
+          <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
           <XAxis
             domain={[0, 100]}
             type="number"
