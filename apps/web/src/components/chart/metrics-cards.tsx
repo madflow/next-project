@@ -2,24 +2,23 @@
 
 import { CircleHelp } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useQueryApi } from "@/hooks/use-query-api";
-import { getVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
+import { getVariableStats } from "@/lib/analysis-bridge";
 import { METRICS_CARD_DECIMALS, formatChartValue } from "@/lib/chart-constants";
-import { getVariableLabel } from "@/lib/variable-helpers";
-import { type DatasetVariable } from "@/types/dataset-variable";
-import { StatsResponse } from "@/types/stats";
+import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
+import { type StatsResponse } from "@/types/stats";
 
-type BarAdhocProps = {
-  variable: DatasetVariable;
+type MetricsCardsProps = {
+  variable: DatasetVariableWithAttributes;
   stats: StatsResponse;
-  datasetId?: string;
-  renderAsContent?: boolean;
-} & React.HTMLAttributes<HTMLDivElement>;
+};
 
 function formatDecimal(value?: number) {
-  if (!value) return "";
+  if (value === null || value === undefined) {
+    return "";
+  }
+
   return formatChartValue(value, METRICS_CARD_DECIMALS);
 }
 
@@ -52,49 +51,13 @@ function MetricHelp({
   );
 }
 
-export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...props }: BarAdhocProps) {
+export function MetricsCards({ variable, stats }: MetricsCardsProps) {
   const t = useTranslations("chartMetricsCard");
-  const tAdhoc = useTranslations("projectAdhocAnalysis");
   const variableStats = getVariableStats(variable, stats);
 
-  // Fetch split variables when datasetId is provided
-  const { data: splitVariablesResponse } = useQueryApi<{ rows: DatasetVariable[] }>({
-    endpoint: `/api/datasets/${datasetId}/splitvariables`,
-    pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
-    search: "",
-    queryKey: ["dataset-split-variables", datasetId],
-    enabled: !!datasetId,
-  });
-
-  const allVariables = splitVariablesResponse?.rows || [];
-
-  // Helper function to get split variable description
-  function getSplitVariableDescription(variable: DatasetVariable, stats: StatsResponse): string | null {
-    // Find the stats for this variable
-    const targetVariable = stats.find((item) => item.variable === variable.name);
-    if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
-      return null;
-    }
-
-    const splitVariableName = targetVariable.stats.split_variable;
-
-    // Try to find the split variable in allVariables to get its label
-    if (allVariables.length > 0) {
-      const splitVariable = allVariables.find((v: DatasetVariable) => v.name === splitVariableName);
-      if (splitVariable) {
-        const splitVariableLabel = getVariableLabel(splitVariable);
-        return tAdhoc("splitBy", { variable: splitVariableLabel });
-      }
-    }
-
-    // Fallback to variable name if no label found
-    return tAdhoc("splitBy", { variable: splitVariableName });
-  }
-
-  const content = (
+  return (
     <div className="grid grid-cols-3 gap-2">
-      <Card>
+      <Card className="shadow-xs">
         <CardHeader>
           <MetricHelp metricKey="count">
             <CardDescription>{t("count")}</CardDescription>
@@ -102,7 +65,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
           <CardTitle>{variableStats?.count}</CardTitle>
         </CardHeader>
       </Card>
-      <Card>
+      <Card className="shadow-xs">
         <CardHeader>
           <MetricHelp metricKey="mean">
             <CardDescription>{t("mean")}</CardDescription>
@@ -110,7 +73,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
           <CardTitle>{formatDecimal(variableStats?.mean)}</CardTitle>
         </CardHeader>
       </Card>
-      <Card>
+      <Card className="shadow-xs">
         <CardHeader>
           <MetricHelp metricKey="stdev">
             <CardDescription>{t("stdev")}</CardDescription>
@@ -118,7 +81,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
           <CardTitle>{formatDecimal(variableStats?.std)}</CardTitle>
         </CardHeader>
       </Card>
-      <Card>
+      <Card className="shadow-xs">
         <CardHeader>
           <MetricHelp metricKey="median">
             <CardDescription>{t("median")}</CardDescription>
@@ -126,7 +89,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
           <CardTitle>{variableStats?.median}</CardTitle>
         </CardHeader>
       </Card>
-      <Card>
+      <Card className="shadow-xs">
         <CardHeader>
           <MetricHelp metricKey="min">
             <CardDescription>{t("min")}</CardDescription>
@@ -134,7 +97,7 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
           <CardTitle>{variableStats?.min}</CardTitle>
         </CardHeader>
       </Card>
-      <Card>
+      <Card className="shadow-xs">
         <CardHeader>
           <MetricHelp metricKey="max">
             <CardDescription>{t("max")}</CardDescription>
@@ -143,21 +106,5 @@ export function MetricsCards({ variable, stats, datasetId, renderAsContent, ...p
         </CardHeader>
       </Card>
     </div>
-  );
-
-  if (renderAsContent) {
-    return content;
-  }
-
-  return (
-    <Card className="shadow-xs" {...props}>
-      <CardHeader>
-        <CardTitle>{getVariableLabel(variable)}</CardTitle>
-        {getSplitVariableDescription(variable, stats) && (
-          <CardDescription>{getSplitVariableDescription(variable, stats)}</CardDescription>
-        )}
-      </CardHeader>
-      <CardContent>{content}</CardContent>
-    </Card>
   );
 }

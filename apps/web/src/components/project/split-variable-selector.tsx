@@ -5,41 +5,32 @@ import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useQueryApi } from "@/hooks/use-query-api";
 import { getVariableLabel } from "@/lib/variable-helpers";
-import type { DatasetVariable } from "@/types/dataset-variable";
+import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
+import { useSplitVariables } from "../chart/use-split-variables";
 
 type SplitVariableSelectorProps = {
   datasetId: string;
   selectedSplitVariable: string | null;
   onSplitVariableChangeAction: (splitVariable: string | null) => void;
   compact?: boolean;
+  splitVariables?: DatasetVariableWithAttributes[];
+  isLoading?: boolean;
 };
-
-interface ApiResponse {
-  rows: DatasetVariable[];
-  count: number;
-  limit: number;
-  offset: number;
-}
 
 export function SplitVariableSelector({
   datasetId,
   selectedSplitVariable,
   onSplitVariableChangeAction,
   compact = false,
+  splitVariables: splitVariablesProp,
+  isLoading: isLoadingProp,
 }: SplitVariableSelectorProps) {
   const t = useTranslations("projectAdhocAnalysis.splitVariable");
-
-  const { data: splitVariablesResponse, isLoading } = useQueryApi<ApiResponse>({
-    endpoint: `/api/datasets/${datasetId}/splitvariables`,
-    pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
-    search: "",
-    queryKey: ["dataset-split-variables", datasetId],
-  });
-
-  const splitVariables = splitVariablesResponse?.rows || [];
+  const shouldFetch = splitVariablesProp === undefined || isLoadingProp === undefined;
+  const queryResult = useSplitVariables(datasetId, shouldFetch);
+  const splitVariables = splitVariablesProp ?? queryResult.splitVariables;
+  const isLoading = isLoadingProp ?? queryResult.isLoading;
 
   const handleValueChange = (value: string) => {
     if (value === "none") {
