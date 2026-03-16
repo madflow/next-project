@@ -72,7 +72,7 @@ export function MultiResponseChart({
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              fontSize={10}
+              fontSize={12}
               ticks={[0, 20, 40, 60, 80, 100]}
               tickFormatter={(value) => `${value}%`}
             />
@@ -82,14 +82,14 @@ export function MultiResponseChart({
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              fontSize={10}
+              fontSize={12}
               width={CHART_Y_AXIS_WIDTH}
             />
             <Bar dataKey="percentage" fill="var(--color-percentage)">
               <LabelList
                 dataKey="percentage"
                 position="right"
-                fontSize={10}
+                fontSize={12}
                 formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
               />
             </Bar>

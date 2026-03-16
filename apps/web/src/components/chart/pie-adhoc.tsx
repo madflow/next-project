@@ -69,7 +69,7 @@ export function PieAdhoc({ variable, stats, ...props }: PieAdhocProps) {
                 return <Cell key={`cell-${index}`} fill={`var(--chart-${colorIndex})`} />;
               })}
             </Pie>
-            <ChartLegend fontSize={10} content={renderOrderedLegend} />
+            <ChartLegend fontSize={12} content={renderOrderedLegend} />
           </PieChart>
         </ChartContainer>
       </CardContent>

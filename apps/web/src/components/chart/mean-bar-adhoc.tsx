@@ -104,7 +104,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            fontSize={10}
+            fontSize={12}
           />
           <YAxis
             dataKey="label"
@@ -112,7 +112,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            fontSize={10}
+            fontSize={12}
             width={CHART_Y_AXIS_WIDTH}
           />
           <Bar dataKey="value" fill="var(--color-value)">
