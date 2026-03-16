@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { assertUserIsAdmin } from "@/dal/dal";
-import { assertAccess } from "@/dal/dataset";
 import { importVariableSets } from "@/dal/dataset-variableset-export";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { VariableSetExportFileSchema, VariableSetImportOptionsSchema } from "@/types/dataset-variableset-export";
@@ -21,9 +20,7 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
 
   try {
-    // Ensure only admin users can import variable sets
     await assertUserIsAdmin();
-    await assertAccess(id);
 
     // Parse form data
     const formData = await request.formData();
