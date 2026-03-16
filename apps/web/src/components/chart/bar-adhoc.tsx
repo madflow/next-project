@@ -8,6 +8,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { useChartExport } from "@/hooks/use-chart-export";
 import { transformToRechartsBarData } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getPlotAreaVerticalBorderCoordinates } from "@/lib/chart-grid";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
@@ -37,7 +38,7 @@ export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
       <CardContent>
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <BarChart accessibilityLayer data={transformToRechartsBarData(variable, stats)}>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical verticalCoordinatesGenerator={getPlotAreaVerticalBorderCoordinates} />
             <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <YAxis

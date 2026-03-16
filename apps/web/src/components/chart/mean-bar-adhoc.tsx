@@ -10,6 +10,7 @@ import { useChartExport } from "@/hooks/use-chart-export";
 import { useQueryApi } from "@/hooks/use-query-api";
 import { extractVariableStats, isSplitVariableStats } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { StatsResponse } from "@/types/stats";
@@ -95,7 +96,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
           barCategoryGap={1}
           accessibilityLayer
           data={chartData}>
-          <CartesianGrid vertical={true} horizontal={false} />
+          <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
           <XAxis
             domain={[minValue, maxValue]}
             dataKey="value"
