@@ -103,7 +103,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              fontSize={10}
+              fontSize={12}
               ticks={[0, 20, 40, 60, 80, 100]}
               tickFormatter={(value) => `${Math.round(value)}%`}
             />
@@ -113,7 +113,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              fontSize={10}
+              fontSize={12}
               width={100}
             />
             <ChartTooltip
@@ -151,7 +151,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
                   <LabelList
                     dataKey={`segment${index}`}
                     position="center"
-                    fontSize={10}
+                    fontSize={12}
                     fill="white"
                     formatter={(value: unknown) =>
                       Number(value) > 5 ? `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%` : ""
@@ -208,7 +208,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            fontSize={10}
+            fontSize={12}
             ticks={[0, 20, 40, 60, 80, 100]}
             tickFormatter={(value) => `${Math.round(value)}%`}
           />
@@ -218,7 +218,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            fontSize={10}
+            fontSize={12}
             width={100}
           />
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
@@ -231,7 +231,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
               <LabelList
                 dataKey={`segment${index}`}
                 position="center"
-                fontSize={10}
+                fontSize={12}
                 fill="white"
                 formatter={(value: unknown) =>
                   Number(value) > 5 ? `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%` : ""

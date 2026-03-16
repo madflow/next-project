@@ -39,14 +39,14 @@ export function BarAdhoc({ variable, stats, ...props }: BarAdhocProps) {
         <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
           <BarChart accessibilityLayer data={transformToRechartsBarData(variable, stats)}>
             <CartesianGrid vertical verticalCoordinatesGenerator={getPlotAreaVerticalBorderCoordinates} />
-            <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={10} />
+            <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={12} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <YAxis
               domain={[0, 100]}
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              fontSize={10}
+              fontSize={12}
               ticks={[0, 20, 40, 60, 80, 100]}
               tickFormatter={(value) => `${value}%`}
             />
