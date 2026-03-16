@@ -14,7 +14,6 @@ type EditDatasetVariablePageProps = {
 export default async function EditDatasetVariablePage({ params }: EditDatasetVariablePageProps) {
   const { id } = await params;
 
-  // Fetch the dataset variable data
   const datasetVariable = (await find(id)) as DatasetVariable;
 
   if (!datasetVariable) {

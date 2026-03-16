@@ -39,7 +39,6 @@ export const acceptInvitationAfterSignup = withAuth(async (invitationId: string)
       role: existingInvitation.role ?? "member",
     });
 
-    // Mark invitation as accepted
     await db.update(invitation).set({ status: "accepted" }).where(eq(invitation.id, invitationId));
 
     return { success: true, message: "Invitation accepted successfully" };

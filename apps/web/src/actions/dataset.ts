@@ -18,9 +18,6 @@ type UploadDatasetParams = {
   missingValues: string[] | null;
 };
 
-/**
- * Upload dataset using FormData to properly handle file uploads
- */
 export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData): Promise<UploadDatasetResult> => {
   const session = await getSessionOrThrow();
 
