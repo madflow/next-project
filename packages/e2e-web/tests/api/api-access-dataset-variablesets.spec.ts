@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { testUsers } from "../../config";
+import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
-const TEST_DATASET_ID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
+const TEST_DATASET_ID = testIds.datasets.primary;
+const NON_EXISTENT_ID = testIds.nonExistent;
 
 test.describe("API Dataset Variable Sets @api", () => {
   test.describe("Export Endpoint Authentication", () => {
@@ -39,7 +40,7 @@ test.describe("API Dataset Variable Sets @api", () => {
     test("returns 404 for non-existent dataset", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
-      const response = await page.request.get("/api/datasets/00000000-0000-0000-0000-000000000000/variablesets/export");
+      const response = await page.request.get(`/api/datasets/${NON_EXISTENT_ID}/variablesets/export`);
       // Export endpoint explicitly checks dataset existence and returns 404
       expect(response.status()).toBe(404);
     });
@@ -168,18 +169,15 @@ test.describe("API Dataset Variable Sets @api", () => {
         ],
       });
 
-      const response = await page.request.post(
-        "/api/datasets/00000000-0000-0000-0000-000000000000/variablesets/import",
-        {
-          multipart: {
-            file: {
-              name: "test-variablesets.json",
-              mimeType: "application/json",
-              buffer: Buffer.from(importData),
-            },
+      const response = await page.request.post(`/api/datasets/${NON_EXISTENT_ID}/variablesets/import`, {
+        multipart: {
+          file: {
+            name: "test-variablesets.json",
+            mimeType: "application/json",
+            buffer: Buffer.from(importData),
           },
-        }
-      );
+        },
+      });
       // Import endpoint's assertAccess error gets converted differently due to form parsing
       expect(response.status()).toBe(400);
     });

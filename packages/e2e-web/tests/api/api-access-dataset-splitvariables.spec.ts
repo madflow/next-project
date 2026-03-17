@@ -1,9 +1,12 @@
 import { type Page, expect, test } from "@playwright/test";
-import { DATASET_WITH_VARIABLESETS_ID, loginAs, withUserPage } from "./helpers";
+import { testIds } from "../../config";
+import { loginAs, withUserPage } from "./helpers";
+
+const DATASET_WITH_VARIABLESETS_ID = testIds.datasets.withVariablesets;
 
 const LIST_ENDPOINT = `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/splitvariables`;
 const AVAILABLE_FOR_SPLIT_ENDPOINT = `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/variables/available-for-split`;
-const PLACEHOLDER_VARIABLE_ID = "00000000-0000-0000-0000-000000000000";
+const PLACEHOLDER_VARIABLE_ID = testIds.nonExistent;
 
 async function getAvailableVariableId(page: Page) {
   const response = await page.request.get(AVAILABLE_FOR_SPLIT_ENDPOINT);

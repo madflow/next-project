@@ -1,6 +1,7 @@
 import { type Browser, expect, test } from "@playwright/test";
 import path from "path";
-import { AVATAR_USER_ID, RESOLVED_BASE_URL, loginAs, withUserPage } from "./helpers";
+import { resolvedBaseUrl, testUsers } from "../../config";
+import { loginAs, withUserPage } from "./helpers";
 
 let avatarPath = "";
 
@@ -26,7 +27,7 @@ async function uploadAvatarAndGetPath(browser: Browser) {
       throw new Error("Avatar preview source not found");
     }
 
-    return new URL(src, RESOLVED_BASE_URL).pathname;
+    return new URL(src, resolvedBaseUrl).pathname;
   });
 }
 
@@ -66,6 +67,6 @@ test.describe("API user avatar access @api", () => {
   });
 
   test("uses the avatar owner route", async () => {
-    expect(avatarPath).toContain(`/api/users/${AVATAR_USER_ID}/avatars/`);
+    expect(avatarPath).toContain(`/api/users/${testUsers.avatarUser.id}/avatars/`);
   });
 });
