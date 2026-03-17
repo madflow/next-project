@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { testUsers } from "../../config";
-import { loginAs } from "./helpers";
+import { loginAs } from "../../utils";
 
 const USERS_ENDPOINT = "/api/users";
 const USER_DETAIL_ENDPOINT = `/api/users/${testUsers.regularUser.id}`;

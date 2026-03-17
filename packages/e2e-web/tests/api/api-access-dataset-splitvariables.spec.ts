@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 import { testIds } from "../../config";
-import { loginAs, withUserPage } from "./helpers";
+import { loginAs, withUserPage } from "../../utils";
 
 const DATASET_WITH_VARIABLESETS_ID = testIds.datasets.withVariablesets;
 

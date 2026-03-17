@@ -1,7 +1,7 @@
 import { type Browser, expect, test } from "@playwright/test";
 import path from "path";
 import { resolvedBaseUrl, testUsers } from "../../config";
-import { loginAs, withUserPage } from "./helpers";
+import { loginAs, withUserPage } from "../../utils";
 
 let avatarPath = "";
 
