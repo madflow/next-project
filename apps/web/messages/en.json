@@ -1073,6 +1073,28 @@
     "errors": {
       "fetchStats": "Error loading dataset statistics"
     },
+    "export": {
+      "buttonLabel": "Export chart",
+      "errors": {
+        "excel": "Failed to export the Excel file.",
+        "powerpoint": "Failed to export the PowerPoint file."
+      },
+      "excel": "Export as Excel",
+      "excelHeaders": {
+        "color": "Color",
+        "label": "Label",
+        "metric": "Metric",
+        "value": "Value",
+        "valuePercent": "Value (%)"
+      },
+      "image": "Export as image",
+      "meta": {
+        "dataset": "Dataset",
+        "exported": "Exported",
+        "split": "Split"
+      },
+      "powerpoint": "Export as PowerPoint"
+    },
     "noChartsAllowed": {
       "description": "No chart types are enabled for this variable. Please contact an administrator to configure allowed statistics.",
       "title": "No Charts Available"

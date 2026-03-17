@@ -3,20 +3,42 @@ from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
+import numpy as np
 import pandas as pd
 import pyreadstat
 from fastapi import Depends, HTTPException, Security, status
+from fastapi.concurrency import run_in_threadpool
+from fastapi.responses import Response
 from fastapi.routing import APIRouter
+from loguru import logger
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from analysis.db.dependencies import get_db_session
 from analysis.db.models.models import Dataset, DatasetVariable
+from analysis.services.excel_export import (
+    XLSX_MEDIA_TYPE,
+    build_workbook,
+)
+from analysis.services.excel_export import (
+    build_content_disposition as build_excel_content_disposition,
+)
+from analysis.services.powerpoint_export import (
+    PPTX_MEDIA_TYPE,
+    build_presentation,
+)
+from analysis.services.powerpoint_export import (
+    build_content_disposition as build_powerpoint_content_disposition,
+)
 from analysis.services.s3_client import S3Client
 from analysis.services.stats import RawDataService, StatisticsService
 from analysis.settings import settings
-from analysis.web.api.schemas.datasets import DatasetResponse
+from analysis.web.api.schemas.datasets import (
+    DatasetResponse,
+    ExcelExportRequest,
+    PowerPointExportRequest,
+)
 from analysis.web.api.security import get_api_key
 
 router = APIRouter(tags=["datasets"])
@@ -73,8 +95,8 @@ class RawDataResponse(BaseModel):
     model_config = ConfigDict(
         json_encoders={
             # Handle numpy types that might be in the metadata
-            "int64": int,
-            "float64": float,
+            np.int64: int,
+            np.float64: float,
         },
     )
 
@@ -132,8 +154,8 @@ class MetadataResponse(BaseModel):
     model_config = ConfigDict(
         json_encoders={
             # Handle numpy types that might be in the metadata
-            "int64": int,
-            "float64": float,
+            np.int64: int,
+            np.float64: float,
         },
     )
 
@@ -450,3 +472,83 @@ async def get_dataset_raw_data(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving raw data: {e!s}",
         ) from e
+
+
+@router.post("/datasets/{dataset_id}/exports/powerpoint")
+async def export_dataset_powerpoint(
+    dataset_id: str,
+    export_request: PowerPointExportRequest,
+    db: AsyncSession = Depends(get_db_session),
+    api_key: str = Security(get_api_key),
+) -> Response:
+    """Generate a PowerPoint export for a dataset chart selection."""
+    dataset = await _get_dataset_by_id(db, dataset_id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    try:
+        presentation_bytes = await run_in_threadpool(
+            build_presentation,
+            export_request.model_dump(),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("PowerPoint export failed for dataset {}", dataset_id)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error generating PowerPoint export",
+        ) from exc
+
+    return Response(
+        content=presentation_bytes,
+        media_type=PPTX_MEDIA_TYPE,
+        headers={
+            "Content-Disposition": build_powerpoint_content_disposition(
+                export_request.file_name
+            ),
+        },
+    )
+
+
+@router.post("/datasets/{dataset_id}/exports/excel")
+async def export_dataset_excel(
+    dataset_id: str,
+    export_request: ExcelExportRequest,
+    db: AsyncSession = Depends(get_db_session),
+    api_key: str = Security(get_api_key),
+) -> Response:
+    """Generate an Excel export for a dataset chart selection."""
+    dataset = await _get_dataset_by_id(db, dataset_id)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    try:
+        workbook_bytes = await run_in_threadpool(
+            build_workbook,
+            export_request.model_dump(),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Excel export failed for dataset {}", dataset_id)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error generating Excel export",
+        ) from exc
+
+    return Response(
+        content=workbook_bytes,
+        media_type=XLSX_MEDIA_TYPE,
+        headers={
+            "Content-Disposition": build_excel_content_disposition(
+                export_request.file_name
+            ),
+        },
+    )

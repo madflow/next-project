@@ -1,0 +1,60 @@
+import { NextResponse } from "next/server";
+import { assertAccess } from "@/dal/dataset";
+import { createAnalysisClient } from "@/lib/analysis-client";
+import { raiseExceptionResponse } from "@/lib/exception";
+
+export const dynamic = "force-dynamic";
+
+type RouteParams = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function POST(request: Request, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    await assertAccess(id);
+
+    const body = await request.text();
+
+    const analysisClient = createAnalysisClient();
+    const analysisResp = await analysisClient.fetch(`/datasets/${id}/exports/powerpoint`, {
+      method: "POST",
+      body,
+    });
+
+    if (!analysisResp.ok) {
+      const contentType = analysisResp.headers.get("Content-Type") ?? "application/json";
+
+      if (contentType.includes("application/json")) {
+        const errorPayload = await analysisResp.json();
+        return NextResponse.json(errorPayload, { status: analysisResp.status });
+      }
+
+      const errorText = await analysisResp.text();
+      return NextResponse.json({ error: errorText || "PowerPoint export failed" }, { status: analysisResp.status });
+    }
+
+    const buffer = await analysisResp.arrayBuffer();
+
+    return new NextResponse(buffer, {
+      status: analysisResp.status,
+      headers: {
+        "Content-Type":
+          analysisResp.headers.get("Content-Type") ??
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "Content-Disposition":
+          analysisResp.headers.get("Content-Disposition") ?? 'attachment; filename="chart-export.pptx"',
+        "Cache-Control": "private, max-age=0, must-revalidate",
+      },
+    });
+  } catch (error: unknown) {
+    return raiseExceptionResponse(error);
+  }
+}
