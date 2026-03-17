@@ -1,16 +1,29 @@
 "use client";
 
 import { BanIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { useThemeConfig } from "@/components/active-theme";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useChartExport } from "@/hooks/use-chart-export";
+import {
+  buildExportMetaLine,
+  createVariableChartExcelExportPayload,
+  createVariableChartPowerPointExportPayload,
+  exportExcelForDataset,
+  exportPowerPointForDataset,
+  getExportPalette,
+  sanitizeExportBaseName,
+} from "@/lib/adhoc-export";
 import { hasSplitVariableStatsForVariable } from "@/lib/analysis-bridge";
 import { determineChartSelection } from "@/lib/chart-selection";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
+import { ChartExportSurface } from "./chart-export-surface";
 import { ChartPanelCard } from "./chart-panel-card";
 import {
   BarChartContent,
@@ -23,12 +36,13 @@ import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";
 import { TextExplorerAdhoc } from "./text-explorer-adhoc";
 import { UnsupportedChartPlaceholder } from "./unsupported-chart-placeholder";
-import { useSplitVariableDescription, useSplitVariables } from "./use-split-variables";
+import { getSplitVariableLabel, useSplitVariableDescription, useSplitVariables } from "./use-split-variables";
 
 type AdhocChartProps = {
   variable: DatasetVariableWithAttributes;
   stats: StatsResponse;
   datasetId?: string;
+  datasetName?: string;
   selectedSplitVariable?: string | null;
   onSplitVariableChangeAction?: (splitVariable: string | null) => void;
   isMultiResponseIndividual?: boolean;
@@ -48,7 +62,7 @@ function ChartContent({
   chartType: AnalysisChartType;
   variable: DatasetVariableWithAttributes;
   stats: StatsResponse;
-  chartRef: React.Ref<HTMLDivElement>;
+  chartRef?: React.Ref<HTMLDivElement>;
   percentageChartConfig: ReturnType<typeof createPercentageChartConfig>;
   datasetId?: string;
   isMultiResponseIndividual: boolean;
@@ -97,6 +111,7 @@ export function AdhocChart({
   variable,
   stats,
   datasetId,
+  datasetName,
   selectedSplitVariable,
   onSplitVariableChangeAction,
   isMultiResponseIndividual = false,
@@ -104,8 +119,11 @@ export function AdhocChart({
   ...props
 }: AdhocChartProps) {
   const t = useTranslations("projectAdhocAnalysis");
+  const locale = useLocale();
   const tChart = useTranslations("chartMetricsCard");
-  const { ref, exportPNG } = useChartExport();
+  const { activeTheme } = useThemeConfig();
+  const { resolveTheme } = useOrganizationTheme();
+  const { displayRef, exportRef, isExportRendering, exportPNG } = useChartExport();
   const [chartSelectionState, setChartSelectionState] = useState<Record<string, AnalysisChartType | null>>({});
 
   const hasSplitVariable = useMemo(
@@ -135,6 +153,152 @@ export function AdhocChart({
   const shouldLoadSplitVariables = Boolean(datasetId) && (chartSelection.canUseSplitVariable || hasSplitVariable);
   const { splitVariables, isLoading: isSplitVariablesLoading } = useSplitVariables(datasetId, shouldLoadSplitVariables);
   const splitVariableDescription = useSplitVariableDescription(variable, stats, splitVariables);
+  const splitVariableLabel = useMemo(
+    () => getSplitVariableLabel(variable, stats, splitVariables),
+    [splitVariables, stats, variable]
+  );
+  const exportMetaLine = useMemo(
+    () =>
+      buildExportMetaLine({
+        datasetName: datasetName || datasetId || "",
+        exportedAtLabel: new Intl.DateTimeFormat(locale, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date()),
+        labels: {
+          dataset: t("export.meta.dataset"),
+          exported: t("export.meta.exported"),
+          split: t("export.meta.split"),
+        },
+        splitLabel: splitVariableLabel,
+      }),
+    [datasetId, datasetName, locale, splitVariableLabel, t]
+  );
+  const exportPalette = useMemo(
+    () => getExportPalette(resolveTheme(activeTheme).theme.chartColors),
+    [activeTheme, resolveTheme]
+  );
+  const exportBaseName = useMemo(() => sanitizeExportBaseName(variable.name), [variable.name]);
+
+  const handlePowerPointExport = useCallback(async () => {
+    if (!datasetId || actualSelectedChartType === "textExplorer") {
+      return;
+    }
+
+    try {
+      const payload = createVariableChartPowerPointExportPayload({
+        chartType: actualSelectedChartType,
+        countedValue,
+        fileBaseName: exportBaseName,
+        isMultiResponseIndividual,
+        metaLine: exportMetaLine,
+        metricsLabels: {
+          count: tChart("count"),
+          max: tChart("max"),
+          mean: tChart("mean"),
+          median: tChart("median"),
+          min: tChart("min"),
+          stdev: tChart("stdev"),
+        },
+        palette: exportPalette,
+        stats,
+        variable,
+      });
+
+      await exportPowerPointForDataset(datasetId, payload);
+    } catch (error) {
+      console.error("Failed to export PowerPoint", error);
+      toast.error(t("export.errors.powerpoint"));
+    }
+  }, [
+    actualSelectedChartType,
+    countedValue,
+    datasetId,
+    exportBaseName,
+    exportMetaLine,
+    exportPalette,
+    isMultiResponseIndividual,
+    stats,
+    t,
+    tChart,
+    variable,
+  ]);
+
+  const handleExcelExport = useCallback(async () => {
+    if (!datasetId || actualSelectedChartType === "textExplorer") {
+      return;
+    }
+
+    try {
+      const payload = createVariableChartExcelExportPayload({
+        chartType: actualSelectedChartType,
+        countedValue,
+        excelLabels: {
+          color: t("export.excelHeaders.color"),
+          label: t("export.excelHeaders.label"),
+          metric: t("export.excelHeaders.metric"),
+          value: t("export.excelHeaders.value"),
+          valuePercent: t("export.excelHeaders.valuePercent"),
+        },
+        fileBaseName: exportBaseName,
+        isMultiResponseIndividual,
+        metaLine: exportMetaLine,
+        metricsLabels: {
+          count: tChart("count"),
+          max: tChart("max"),
+          mean: tChart("mean"),
+          median: tChart("median"),
+          min: tChart("min"),
+          stdev: tChart("stdev"),
+        },
+        palette: exportPalette,
+        stats,
+        variable,
+      });
+
+      await exportExcelForDataset(datasetId, payload);
+    } catch (error) {
+      console.error("Failed to export Excel", error);
+      toast.error(t("export.errors.excel"));
+    }
+  }, [
+    actualSelectedChartType,
+    countedValue,
+    datasetId,
+    exportBaseName,
+    exportMetaLine,
+    exportPalette,
+    isMultiResponseIndividual,
+    stats,
+    t,
+    tChart,
+    variable,
+  ]);
+
+  const chartContent = (
+    <ChartContent
+      chartType={actualSelectedChartType}
+      variable={variable}
+      stats={stats}
+      chartRef={displayRef}
+      percentageChartConfig={percentageChartConfig}
+      datasetId={datasetId}
+      isMultiResponseIndividual={isMultiResponseIndividual}
+      countedValue={countedValue}
+    />
+  );
+
+  const exportChartContent = (
+    <ChartContent
+      chartType={actualSelectedChartType}
+      variable={variable}
+      stats={stats}
+      percentageChartConfig={percentageChartConfig}
+      datasetId={datasetId}
+      isMultiResponseIndividual={isMultiResponseIndividual}
+      countedValue={countedValue}
+    />
+  );
 
   if (chartSelection.showUnsupportedPlaceholder) {
     return (
@@ -175,24 +339,19 @@ export function AdhocChart({
 
   return (
     <div {...props}>
+      <ChartExportSurface exportRef={exportRef} fileName={exportBaseName} isRendering={isExportRendering}>
+        {exportChartContent}
+      </ChartExportSurface>
       <ChartPanelCard
         variable={variable}
         stats={stats}
         description={splitVariableDescription}
-        chartContent={
-          <ChartContent
-            chartType={actualSelectedChartType}
-            variable={variable}
-            stats={stats}
-            chartRef={ref}
-            percentageChartConfig={percentageChartConfig}
-            datasetId={datasetId}
-            isMultiResponseIndividual={isMultiResponseIndividual}
-            countedValue={countedValue}
-          />
-        }
+        chartContent={chartContent}
         exportable={actualSelectedChartType !== "textExplorer"}
-        onExport={exportPNG}
+        onExportImage={exportPNG}
+        onExportExcel={handleExcelExport}
+        onExportPowerPoint={handlePowerPointExport}
+        exportDisabled={!datasetId}
         availableChartTypes={chartSelection.availableChartTypes}
         selectedChartType={actualSelectedChartType}
         onChartTypeChange={(chartType) =>

@@ -15,6 +15,7 @@ type MultiVariableChartsProps = {
   splitStatsData: Record<string, StatsResponse>;
   variableset?: VariablesetTreeNode;
   datasetId: string;
+  datasetName: string;
   onStatsRequestAction: (variableName: string, splitVariable?: string) => void;
 };
 
@@ -24,6 +25,7 @@ export function MultiVariableCharts({
   splitStatsData,
   variableset,
   datasetId,
+  datasetName,
   onStatsRequestAction,
 }: MultiVariableChartsProps) {
   const [splitVariablesBySelection, setSplitVariablesBySelection] = useState<
@@ -86,6 +88,7 @@ export function MultiVariableCharts({
           variable={variable}
           stats={stats}
           datasetId={datasetId}
+          datasetName={datasetName}
           className="w-full max-w-4xl"
           selectedSplitVariable={splitVariables[variable.name] || null}
           onSplitVariableChangeAction={(splitVariable) => handleSplitVariableChange(variable.name, splitVariable)}
@@ -105,6 +108,8 @@ export function MultiVariableCharts({
           variablesetName={variableset.name}
           variablesetDescription={variableset.description}
           countedValue={countedValue}
+          datasetId={datasetId}
+          datasetName={datasetName}
           className="w-full max-w-4xl"
         />
       )}
@@ -128,6 +133,7 @@ export function MultiVariableCharts({
             variable={variable}
             stats={stats}
             datasetId={datasetId}
+            datasetName={datasetName}
             className="w-full max-w-4xl"
             selectedSplitVariable={splitVariables[variable.name] || null}
             onSplitVariableChangeAction={(splitVariable) => handleSplitVariableChange(variable.name, splitVariable)}

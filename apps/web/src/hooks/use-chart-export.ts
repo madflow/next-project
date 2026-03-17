@@ -1,29 +1,53 @@
-// useChartExport.ts
 import html2canvas from "html2canvas-pro";
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
+import { buildImageFileName } from "@/lib/adhoc-export";
+
+async function waitForExportSurface() {
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.setTimeout(resolve, 50);
+      });
+    });
+  });
+}
 
 export function useChartExport() {
-  const ref = useRef<HTMLDivElement>(null);
+  const displayRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
+  const [isExportRendering, setIsExportRendering] = useState(false);
 
-  const exportPNG = async () => {
-    if (!ref.current) return;
+  const exportPNG = useCallback(async () => {
+    setIsExportRendering(true);
 
-    const scale = 2;
-    const filename = ref.current.dataset.exportFilename ?? "chart.png";
+    try {
+      await waitForExportSurface();
 
-    const canvas = await html2canvas(ref.current, {
-      backgroundColor: "#ffffff", // white background
-      useCORS: true,
-      scale, // increase for sharper output (e.g. 2 or 3)
-    });
+      const target = exportRef.current ?? displayRef.current;
+      if (!target) {
+        return;
+      }
 
-    console.log(filename);
+      const scale = 2;
+      const baseFilename = target.dataset.exportFilename ?? "chart";
+      const filename = buildImageFileName(baseFilename);
 
-    const link = document.createElement("a");
-    link.download = filename;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  };
+      const canvas = await html2canvas(target, {
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        scale,
+      });
 
-  return { ref, exportPNG };
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (error) {
+      console.error("Failed to export chart image", error);
+    } finally {
+      setIsExportRendering(false);
+    }
+  }, []);
+
+  return { displayRef, exportRef, isExportRendering, exportPNG };
 }
