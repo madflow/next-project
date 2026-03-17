@@ -1073,6 +1073,19 @@
     "errors": {
       "fetchStats": "Error loading dataset statistics"
     },
+    "export": {
+      "buttonLabel": "Export chart",
+      "errors": {
+        "powerpoint": "Failed to export the PowerPoint file."
+      },
+      "image": "Export as image",
+      "meta": {
+        "dataset": "Dataset",
+        "exported": "Exported",
+        "split": "Split"
+      },
+      "powerpoint": "Export as PowerPoint"
+    },
     "noChartsAllowed": {
       "description": "No chart types are enabled for this variable. Please contact an administrator to configure allowed statistics.",
       "title": "No Charts Available"
