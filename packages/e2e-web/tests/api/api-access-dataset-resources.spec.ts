@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { testIds } from "../../config";
-import { loginAs } from "./helpers";
+import { loginAs } from "../../utils";
 
 const DATASET_WITH_VARIABLESETS_ID = testIds.datasets.withVariablesets;
 

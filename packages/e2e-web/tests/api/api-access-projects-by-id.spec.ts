@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { testIds } from "../../config";
-import { loginAs } from "./helpers";
+import { loginAs } from "../../utils";
 
 const TEST_PROJECT_ID = testIds.projects.primary;
 

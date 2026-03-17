@@ -1,6 +1,7 @@
-import { Page, expect } from "@playwright/test";
+import { type Browser, type Page, expect } from "@playwright/test";
 import { MailpitClient } from "mailpit-api";
 import assert from "node:assert";
+import { type AuthenticatedUser, resolvedBaseUrl, testUsers } from "./config";
 
 const { SMTP_SERVER_API } = process.env;
 assert(SMTP_SERVER_API);
@@ -83,6 +84,23 @@ export async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
   expect(acceptLink).toBeTruthy();
   await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
   await page.goto(acceptLink);
+}
+
+export async function loginAs(page: Page, user: AuthenticatedUser) {
+  await page.goto("/");
+  await loginUser(page, testUsers[user].email, testUsers[user].password);
+}
+
+export async function withUserPage<T>(browser: Browser, user: AuthenticatedUser, callback: (page: Page) => Promise<T>) {
+  const context = await browser.newContext({ baseURL: resolvedBaseUrl });
+  const page = await context.newPage();
+
+  try {
+    await loginAs(page, user);
+    return await callback(page);
+  } finally {
+    await context.close();
+  }
 }
 
 export { smtpServerApi };
