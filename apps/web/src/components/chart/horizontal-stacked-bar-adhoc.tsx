@@ -78,7 +78,7 @@ function HorizontalStackedBarChart({
   tooltipContent,
 }: {
   model: HorizontalStackedBarModel;
-  chartRef: React.Ref<HTMLDivElement>;
+  chartRef?: React.Ref<HTMLDivElement>;
   exportFilename: string;
   hideLegend?: boolean;
   tooltipContent?: React.ReactElement;

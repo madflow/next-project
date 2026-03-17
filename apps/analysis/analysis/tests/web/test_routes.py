@@ -10,9 +10,11 @@ from analysis.web.api.datasets.routes import (
     RawDataVariableResponse,
     StatsRequest,
     StatsVariable,
+    export_dataset_powerpoint,
     get_dataset_raw_data,
     get_dataset_stats,
 )
+from analysis.web.api.schemas.datasets import PowerPointExportRequest
 
 
 # Since the actual integration tests are complex to set up without full app context,
@@ -308,3 +310,72 @@ def test_raw_data_response_model() -> None:
     assert response.data["var1"].total_non_empty_count == 3
     assert response.data["var1"].total_pages == 1
     assert response.data["var1"].page == 1
+
+
+def test_powerpoint_export_request_model() -> None:
+    """Test PowerPoint export request validation."""
+    request = PowerPointExportRequest.model_validate(
+        {
+            "file_name": "chart-export-2026-03-17.pptx",
+            "title": "Age group",
+            "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+            "palette": ["#3b82f6", "#ef4444"],
+            "chart": {
+                "kind": "bar",
+                "points": [
+                    {"label": "18-29", "value": 55.0, "color": "#3b82f6"},
+                    {"label": "30-44", "value": 45.0, "color": "#3b82f6"},
+                ],
+            },
+        }
+    )
+
+    assert request.chart.kind == "bar"
+    assert request.file_name.endswith(".pptx")
+
+
+@pytest.mark.anyio
+@patch("analysis.web.api.datasets.routes._get_dataset_by_id")
+@patch("analysis.web.api.datasets.routes.build_presentation")
+async def test_powerpoint_export_endpoint_logic(
+    mock_build_presentation: Mock,
+    mock_get_dataset: Mock,
+) -> None:
+    """Test the PowerPoint export route returns a binary response."""
+    mock_dataset = Mock()
+    mock_get_dataset.return_value = mock_dataset
+    mock_build_presentation.return_value = b"pptx-bytes"
+
+    request = PowerPointExportRequest.model_validate(
+        {
+            "file_name": "chart-export-2026-03-17.pptx",
+            "title": "Age group",
+            "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+            "palette": ["#3b82f6", "#ef4444"],
+            "chart": {
+                "kind": "metrics",
+                "metrics": [
+                    {"label": "Count", "value": "100"},
+                    {"label": "Mean", "value": "1.5"},
+                ],
+            },
+        }
+    )
+
+    response = await export_dataset_powerpoint(
+        dataset_id="dataset-id",
+        export_request=request,
+        db=AsyncMock(),
+        api_key="test-key",
+    )
+
+    mock_build_presentation.assert_called_once_with(request.model_dump())
+    assert (
+        response.media_type
+        == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    )
+    assert (
+        response.headers["Content-Disposition"]
+        == 'attachment; filename="chart-export-2026-03-17.pptx"'
+    )
+    assert response.body == b"pptx-bytes"

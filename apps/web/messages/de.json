@@ -1073,6 +1073,19 @@
     "errors": {
       "fetchStats": "Fehler beim Laden der Statistiken"
     },
+    "export": {
+      "buttonLabel": "Diagramm exportieren",
+      "errors": {
+        "powerpoint": "Die PowerPoint-Datei konnte nicht exportiert werden."
+      },
+      "image": "Als Bild exportieren",
+      "meta": {
+        "dataset": "Datensatz",
+        "exported": "Exportiert",
+        "split": "Aufteilung"
+      },
+      "powerpoint": "Als PowerPoint exportieren"
+    },
     "noChartsAllowed": {
       "description": "Für diese Variable sind keine Diagrammtypen aktiviert. Bitte kontaktieren Sie einen Administrator, um die erlaubten Statistiken zu konfigurieren.",
       "title": "Keine Diagramme verfügbar"

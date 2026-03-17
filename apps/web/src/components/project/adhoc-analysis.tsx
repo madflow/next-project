@@ -47,11 +47,13 @@ function VariablePanelContent({
   selectedDataset,
   project,
   onDatasetChange,
+  onDatasetLabelChange,
   onSelectionChange,
 }: {
   selectedDataset: string | null;
   project: Project;
   onDatasetChange: (value: string | null) => void;
+  onDatasetLabelChange: (label: string | null) => void;
   onSelectionChange: (selection: SelectionItem) => void;
 }) {
   return (
@@ -59,6 +61,7 @@ function VariablePanelContent({
       <DatasetSelect
         projectId={project.id}
         defaultValue={selectedDataset || undefined}
+        onDatasetLabelChange={onDatasetLabelChange}
         onValueChange={(value) => onDatasetChange(value || null)}
       />
       {selectedDataset && (
@@ -96,6 +99,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     ? parsedUrlState.selectedDataset
     : restoredState?.selectedDataset || null;
   const [selectedDataset, setSelectedDataset] = useState<string | null>(initialSelectedDataset);
+  const [selectedDatasetName, setSelectedDatasetName] = useState<string | null>(null);
   const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
   const [baseStatsData, setBaseStatsData] = useState<Record<string, StatsResponse>>({});
   const [splitStatsData, setSplitStatsData] = useState<Record<string, StatsResponse>>({});
@@ -252,6 +256,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     }
 
     setSelectedDataset(parsedUrlState.selectedDataset);
+    setSelectedDatasetName(null);
     setCurrentSelection(null);
     clearStatsData();
     saveDataset(parsedUrlState.selectedDataset);
@@ -395,6 +400,9 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const handleDatasetChange = useCallback(
     (value: string | null) => {
       setSelectedDataset(value);
+      if (!value) {
+        setSelectedDatasetName(null);
+      }
       setCurrentSelection(null);
       clearStatsData();
       saveDataset(value);
@@ -471,6 +479,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             selectedDataset={selectedDataset}
             project={project}
             onDatasetChange={handleDatasetChange}
+            onDatasetLabelChange={setSelectedDatasetName}
             onSelectionChange={handleSelectionChange}
           />
         </div>
@@ -513,6 +522,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
               selectedDataset={selectedDataset}
               project={project}
               onDatasetChange={handleDatasetChange}
+              onDatasetLabelChange={setSelectedDatasetName}
               onSelectionChange={handleSelectionChange}
             />
           </div>
@@ -532,6 +542,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
               selectedDataset={selectedDataset}
               project={project}
               onDatasetChange={handleDatasetChange}
+              onDatasetLabelChange={setSelectedDatasetName}
               onSelectionChange={handleSelectionChange}
             />
           </div>
@@ -566,6 +577,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
                 currentSelection?.type === "set" ? currentSelection.variableset : currentSelection?.parentVariableset
               }
               datasetId={selectedDataset}
+              datasetName={selectedDatasetName ?? ""}
               onStatsRequestAction={handleStatsRequest}
             />
           </Suspense>

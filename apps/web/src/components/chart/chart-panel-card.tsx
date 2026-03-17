@@ -1,6 +1,5 @@
 "use client";
 
-import { DownloadIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import {
@@ -19,8 +18,8 @@ import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 import { SplitVariableSelector } from "../project/split-variable-selector";
-import { Button } from "../ui/button";
 import { Code } from "../ui/code";
+import { ChartExportMenu } from "./chart-export-menu";
 import { getChartIcon } from "./chart-shared";
 
 type ChartPanelCardProps = {
@@ -30,7 +29,9 @@ type ChartPanelCardProps = {
   chartContent: ReactNode;
   footerContent?: ReactNode;
   exportable?: boolean;
-  onExport?: () => void;
+  onExportImage?: () => void;
+  onExportPowerPoint?: () => void;
+  exportDisabled?: boolean;
   availableChartTypes: AnalysisChartType[];
   selectedChartType: AnalysisChartType;
   onChartTypeChange: (chartType: AnalysisChartType) => void;
@@ -50,7 +51,9 @@ export function ChartPanelCard({
   chartContent,
   footerContent,
   exportable = true,
-  onExport,
+  onExportImage,
+  onExportPowerPoint,
+  exportDisabled = false,
   availableChartTypes,
   selectedChartType,
   onChartTypeChange,
@@ -79,10 +82,12 @@ export function ChartPanelCard({
           />
         )}
       </div>
-      {exportable && onExport && (
-        <Button className="cursor-pointer" variant="outline" onClick={onExport}>
-          <DownloadIcon className="h-4 w-4" />
-        </Button>
+      {exportable && onExportImage && onExportPowerPoint && (
+        <ChartExportMenu
+          disabled={exportDisabled}
+          onExportImage={onExportImage}
+          onExportPowerPoint={onExportPowerPoint}
+        />
       )}
     </>
   );
