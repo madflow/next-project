@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { MailpitClient } from "mailpit-api";
 import assert from "node:assert";
 
@@ -56,6 +56,33 @@ export async function getLatestEmail(email: string) {
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
   return null;
+}
+
+export async function inviteUser(page: Page, userEmail: string) {
+  const getOrgResponsePromise = page.waitForResponse("api/auth/organization/get-full-organization");
+  await page.getByTestId("app.organization-switcher").click();
+  await getOrgResponsePromise;
+  await page.getByTestId("app.organization-switcher.invite").click();
+  await page.getByTestId("admin.users.invite.form.email").fill(userEmail);
+  const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
+  await page.getByTestId("admin.users.invite.form.submit").click();
+  await inviteResponsePromise;
+  await page.getByTestId("invite-user-modal.close").click();
+}
+
+export async function selectOrganization(page: Page, orgName: string) {
+  const organizationSwitcher = page.getByTestId("app.organization-switcher");
+  await organizationSwitcher.click();
+  await page.getByText(orgName, { exact: true }).click();
+  await expect(organizationSwitcher.locator("span")).toHaveText(orgName);
+}
+
+export async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
+  const message = await getLatestEmail(userEmail);
+  const acceptLink = await extractLinkFromMessage(message, "accept-invitation");
+  expect(acceptLink).toBeTruthy();
+  await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
+  await page.goto(acceptLink);
 }
 
 export { smtpServerApi };

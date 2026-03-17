@@ -1,12 +1,19 @@
 import { Page, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
-import { extractLinkFromMessage, getLatestEmail, loginUser, logoutUser, smtpServerApi } from "../utils";
+import {
+  extractLinkFromMessage,
+  getLatestEmail,
+  inviteUser,
+  loginUser,
+  logoutUser,
+  selectOrganization,
+  smtpServerApi,
+} from "../utils";
 
 async function switchLocale(page: Page, language: "German" | "Englisch") {
   await page.getByTestId("app.locale-switcher").click();
   await page.getByRole("option", { name: language }).click();
 }
-
 
 test.describe("Email Translations", () => {
   test.afterAll(async () => {
@@ -120,19 +127,8 @@ test.describe("Email Translations", () => {
 
     await loginUser(page, inviterEmail, testUsers.accountMultipleOrgs.password);
 
-    await page.getByTestId("app.organization-switcher").click();
-    await page.getByText(orgName, { exact: true }).click();
-
-    await page.getByTestId("app.organization-switcher").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.organization-switcher").click();
-    const inviteButton = page.getByTestId("app.organization-switcher.invite");
-    await inviteButton.waitFor({ state: "visible", timeout: 5000 });
-    await inviteButton.click();
-    await page.getByTestId("admin.users.invite.form.email").fill(newUserEmail);
-    const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
-    await page.getByTestId("admin.users.invite.form.submit").click();
-    await inviteResponsePromise;
-    await page.getByTestId("invite-user-modal.close").click();
+    await selectOrganization(page, orgName);
+    await inviteUser(page, newUserEmail);
 
     const message = await getLatestEmail(newUserEmail);
     expect(message?.Subject).toBe("You have been invited");
@@ -153,22 +149,8 @@ test.describe("Email Translations", () => {
 
     await loginUser(page, inviterEmail, testUsers.accountMultipleOrgs.password);
 
-    await page.getByTestId("app.organization-switcher").click();
-
-    // /api/auth/organization/get-full-organization
-    const orgResponsePromise = page.waitForResponse("api/auth/organization/get-full-organization");
-    await page.getByText(orgName, { exact: true }).click();
-    await orgResponsePromise;
-
-    await page.getByTestId("app.organization-switcher").click();
-    const inviteButton = page.getByTestId("app.organization-switcher.invite");
-    await inviteButton.waitFor({ state: "visible", timeout: 5000 });
-    await inviteButton.click();
-    await page.getByTestId("admin.users.invite.form.email").fill(newUserEmail);
-    const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
-    await page.getByTestId("admin.users.invite.form.submit").click();
-    await inviteResponsePromise;
-    await page.getByTestId("invite-user-modal.close").click();
+    await selectOrganization(page, orgName);
+    await inviteUser(page, newUserEmail);
 
     const message = await getLatestEmail(newUserEmail);
     expect(message?.Subject).toBe("Sie wurden eingeladen");
