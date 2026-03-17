@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { TEST_PROJECT_ID, loginAs } from "./helpers";
+import { testIds } from "../../config";
+import { loginAs } from "./helpers";
+
+const TEST_PROJECT_ID = testIds.projects.primary;
 
 const PROJECT_ENDPOINT = `/api/projects/${TEST_PROJECT_ID}`;
 

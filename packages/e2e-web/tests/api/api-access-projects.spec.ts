@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { testUsers } from "../../config";
+import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
+const TEST_PROJECT_ID = testIds.projects.primary;
+const TEST_ORGANIZATION_ID = testIds.organizations.primary;
 
 test.describe("API Projects @api", () => {
   test.describe("Authentication", () => {
@@ -362,12 +364,12 @@ test.describe("API Projects @api", () => {
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       // Check if test project exists
-      const response = await page.request.get("/api/projects?id=0198e5a9-a975-7ac3-9eec-a70e2a3df131");
+      const response = await page.request.get(`/api/projects?id=${TEST_PROJECT_ID}`);
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].projects.id).toBe("0198e5a9-a975-7ac3-9eec-a70e2a3df131");
-      expect(data.rows[0].organizations.id).toBe("0198e5a9-39c8-70db-9c7d-e11ab6d9aea7");
+      expect(data.rows[0].projects.id).toBe(TEST_PROJECT_ID);
+      expect(data.rows[0].organizations.id).toBe(TEST_ORGANIZATION_ID);
     });
   });
 });

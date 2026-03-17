@@ -1,11 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { testUsers } from "../../config";
+import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
-const TEST_ENDPOINT = "/api/datasets/0198e639-3e96-734b-b0db-af0c4350a2c4/variables";
+const TEST_ENDPOINT = `/api/datasets/${testIds.datasets.primary}/variables`;
 
 test.describe("Api access dataset variables @api", () => {
-
   test("deny logged in as regular user", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);

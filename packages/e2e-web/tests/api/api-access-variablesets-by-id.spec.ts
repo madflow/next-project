@@ -1,12 +1,12 @@
 import { type Browser, type Page, expect, test } from "@playwright/test";
-import { baseUrl, testUsers } from "../../config";
+import { type AuthenticatedUser, resolvedBaseUrl, testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
-const ACCESSIBLE_DATASET_ID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
-const ACCESSIBLE_VARIABLESET_ID = "0198e639-3e96-734b-b0db-af0c4350a2d1";
-const ACCESSIBLE_SUBSET_ID = "0198e639-3e96-734b-b0db-af0c4350a2d2";
-const OTHER_ACCESSIBLE_DATASET_ID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
-const RESOLVED_BASE_URL = process.env.BASE_URL || baseUrl;
+const ACCESSIBLE_DATASET_ID = testIds.datasets.withVariablesets;
+const ACCESSIBLE_VARIABLESET_ID = testIds.variablesets.mediaUse;
+const ACCESSIBLE_SUBSET_ID = testIds.variablesets.informationSources;
+const OTHER_ACCESSIBLE_DATASET_ID = testIds.datasets.primary;
+const NON_EXISTENT_ID = testIds.nonExistent;
 
 type VariablesetHierarchyNode = {
   id: string;
@@ -14,15 +14,13 @@ type VariablesetHierarchyNode = {
   children?: VariablesetHierarchyNode[];
 };
 
-type AuthenticatedUser = keyof typeof testUsers;
-
 async function loginAs(page: Page, user: AuthenticatedUser) {
   await page.goto("/");
   await loginUser(page, testUsers[user].email, testUsers[user].password);
 }
 
 async function withAdminPage<T>(browser: Browser, callback: (page: Page) => Promise<T>) {
-  const context = await browser.newContext({ baseURL: RESOLVED_BASE_URL });
+  const context = await browser.newContext({ baseURL: resolvedBaseUrl });
   const page = await context.newPage();
 
   try {
@@ -207,7 +205,7 @@ test.describe("API Variablesets by id @api", () => {
       const response = await page.request.post(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
         data: {
           contentType: "variable",
-          referenceId: "00000000-0000-0000-0000-000000000000",
+          referenceId: NON_EXISTENT_ID,
         },
       });
       expect(response.status()).toBe(401);
@@ -218,7 +216,7 @@ test.describe("API Variablesets by id @api", () => {
       const response = await page.request.post(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
         data: {
           contentType: "variable",
-          referenceId: "00000000-0000-0000-0000-000000000000",
+          referenceId: NON_EXISTENT_ID,
         },
       });
       expect(response.status()).toBe(401);
@@ -229,7 +227,7 @@ test.describe("API Variablesets by id @api", () => {
       const response = await page.request.post(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
         data: {
           contentType: "variable",
-          referenceId: "00000000-0000-0000-0000-000000000000",
+          referenceId: NON_EXISTENT_ID,
         },
       });
       expect(response.status()).toBe(401);
@@ -262,7 +260,7 @@ test.describe("API Variablesets by id @api", () => {
     test("denies access when not logged in", async ({ page }) => {
       const response = await page.request.delete(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
         data: {
-          contentId: "00000000-0000-0000-0000-000000000000",
+          contentId: NON_EXISTENT_ID,
         },
       });
       expect(response.status()).toBe(401);
@@ -272,7 +270,7 @@ test.describe("API Variablesets by id @api", () => {
       await loginAs(page, "accountInNoOrg");
       const response = await page.request.delete(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
         data: {
-          contentId: "00000000-0000-0000-0000-000000000000",
+          contentId: NON_EXISTENT_ID,
         },
       });
       expect(response.status()).toBe(401);
@@ -282,7 +280,7 @@ test.describe("API Variablesets by id @api", () => {
       await loginAs(page, "regularUser");
       const response = await page.request.delete(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
         data: {
-          contentId: "00000000-0000-0000-0000-000000000000",
+          contentId: NON_EXISTENT_ID,
         },
       });
       expect(response.status()).toBe(401);

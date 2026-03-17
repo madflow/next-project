@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { REGULAR_USER_ID, loginAs } from "./helpers";
+import { testUsers } from "../../config";
+import { loginAs } from "./helpers";
 
 const USERS_ENDPOINT = "/api/users";
-const USER_DETAIL_ENDPOINT = `/api/users/${REGULAR_USER_ID}`;
+const USER_DETAIL_ENDPOINT = `/api/users/${testUsers.regularUser.id}`;
 
 test.describe("API users admin access @api", () => {
   test.describe("GET /api/users", () => {
@@ -50,7 +51,7 @@ test.describe("API users admin access @api", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.id).toBe(REGULAR_USER_ID);
+      expect(data.id).toBe(testUsers.regularUser.id);
     });
   });
 });

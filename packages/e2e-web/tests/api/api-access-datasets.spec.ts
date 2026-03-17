@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { testUsers } from "../../config";
+import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
+const TEST_PROJECT_ID = testIds.projects.primary;
 
 test.describe("API Datasets @api", () => {
   test.describe("Authentication", () => {
@@ -302,7 +303,7 @@ test.describe("API Datasets @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
+      const response = await page.request.get(`/api/projects/${TEST_PROJECT_ID}/datasets`);
       expect(response.status()).toBe(200);
 
       const data = await response.json();
@@ -313,7 +314,7 @@ test.describe("API Datasets @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);
 
-      const response = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
+      const response = await page.request.get(`/api/projects/${TEST_PROJECT_ID}/datasets`);
       expect(response.status()).toBe(401);
     });
 
@@ -321,7 +322,7 @@ test.describe("API Datasets @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
 
-      const response = await page.request.get("/api/projects/0198e5a9-a975-7ac3-9eec-a70e2a3df131/datasets");
+      const response = await page.request.get(`/api/projects/${TEST_PROJECT_ID}/datasets`);
       expect(response.status()).toBe(200);
     });
   });

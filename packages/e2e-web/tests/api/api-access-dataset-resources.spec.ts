@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { DATASET_WITH_VARIABLESETS_ID, loginAs } from "./helpers";
+import { testIds } from "../../config";
+import { loginAs } from "./helpers";
+
+const DATASET_WITH_VARIABLESETS_ID = testIds.datasets.withVariablesets;
 
 const DOWNLOAD_ENDPOINT = `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/download`;
 const PROJECTS_ENDPOINT = `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/projects`;

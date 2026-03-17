@@ -1,10 +1,9 @@
 import { Page, expect, test } from "@playwright/test";
-import { testUsers } from "../../config";
+import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 import surveyFrequencies from "../analysis/fixtures/survey_sample_de_frequencies.json";
 
-
-const DATASET_TEST_ID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
+const DATASET_TEST_ID = testIds.datasets.withVariablesets;
 
 async function fetchApiVariableStats(variables: string[], decimals: number, page: Page) {
   const variablesList = variables.map((v) => {

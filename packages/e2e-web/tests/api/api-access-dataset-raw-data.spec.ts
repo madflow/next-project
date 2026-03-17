@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { testUsers } from "../../config";
+import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
-const TEST_ENDPOINT = "/api/datasets/0198e639-3e96-734b-b0db-af0c4350a2c4/raw-data";
+const TEST_ENDPOINT = `/api/datasets/${testIds.datasets.primary}/raw-data`;
 
 const TEST_BODY = JSON.stringify({
   variables: ["v1"],
@@ -10,7 +10,6 @@ const TEST_BODY = JSON.stringify({
 });
 
 test.describe("Api access dataset raw-data @api", () => {
-
   test("deny when not logged in", async ({ page }) => {
     const response = await page.request.post(TEST_ENDPOINT, { data: TEST_BODY });
     expect(response.status()).toBe(401);
