@@ -2,7 +2,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { env } from "@/env";
-import { auth } from "@/lib/auth";
+import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 import { raiseExceptionResponse } from "@/lib/exception";
 import { getS3Client } from "@/lib/storage";
 
@@ -29,8 +29,9 @@ export async function GET(request: Request, { params }: RouteParams) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Verify the user is requesting their own avatar
-    if (session.user.id !== id) {
+    const canAccessAvatar = session.user.id === id || session.user.role === USER_ADMIN_ROLE;
+
+    if (!canAccessAvatar) {
       return new NextResponse("Forbidden", { status: 403 });
     }
 

@@ -13,7 +13,14 @@ import {
 import { createListWithJoins } from "@/dal/dal-joins";
 import { DalNotAuthorizedException } from "@/lib/exception";
 
-export const find = withSessionCheck(createFind(entity, selectProjectSchema));
+const findFn = createFind(entity, selectProjectSchema);
+
+export const find = withSessionCheck(findFn);
+
+export const findAccessible = withSessionCheck(async (projectId: string) => {
+  await assertAccess(projectId);
+  return await findFn(projectId);
+});
 
 export const findBySlug = withSessionCheck(createFindBySlug(entity, selectProjectSchema));
 

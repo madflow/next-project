@@ -1,7 +1,7 @@
 import "server-only";
 import { eq } from "drizzle-orm";
 import { dataset, datasetProject as entity, project, selectDatasetVariableSchema } from "@repo/database/schema";
-import { withAdminCheck, withSessionCheck } from "@/dal/dal";
+import { withSessionCheck } from "@/dal/dal";
 import { createListWithJoins } from "@/dal/dal-joins";
 
 export const listByProject = withSessionCheck(
@@ -17,7 +17,7 @@ export const listByProject = withSessionCheck(
   ])
 );
 
-export const listByDataset = withAdminCheck(
+export const listByDataset = withSessionCheck(
   createListWithJoins(entity, selectDatasetVariableSchema, [
     {
       table: project,
