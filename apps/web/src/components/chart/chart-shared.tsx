@@ -64,7 +64,7 @@ export function BarChartContent({
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
-  chartRef: React.Ref<HTMLDivElement>;
+  chartRef?: React.Ref<HTMLDivElement>;
   chartConfig: ChartConfig;
 }) {
   return (
@@ -105,7 +105,7 @@ export function HorizontalBarChartContent({
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
-  chartRef: React.Ref<HTMLDivElement>;
+  chartRef?: React.Ref<HTMLDivElement>;
   chartConfig: ChartConfig;
   isMultiResponseIndividual?: boolean;
   countedValue?: number;
@@ -165,7 +165,7 @@ export function PieChartContent({
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
-  chartRef: React.Ref<HTMLDivElement>;
+  chartRef?: React.Ref<HTMLDivElement>;
 }) {
   const pieData = transformToRechartsPieData(variable, stats);
   const pieChartConfig: ChartConfig = {};

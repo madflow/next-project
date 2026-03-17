@@ -4,6 +4,7 @@ from .datasets import (
     DatasetInDB,
     DatasetResponse,
     DatasetUpdate,
+    PowerPointExportRequest,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "DatasetInDB",
     "DatasetResponse",
     "DatasetUpdate",
+    "PowerPointExportRequest",
 ]

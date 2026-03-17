@@ -17,11 +17,18 @@ import { useDatasetsByProject } from "@/hooks/use-datasets-by-project";
 type DatasetSelectProps = {
   projectId: string;
   onValueChange: (value: string) => void;
+  onDatasetLabelChange?: (label: string | null) => void;
   defaultValue?: string;
   triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
 };
 
-export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerProps }: DatasetSelectProps) {
+export function DatasetSelect({
+  projectId,
+  onValueChange,
+  onDatasetLabelChange,
+  defaultValue,
+  triggerProps,
+}: DatasetSelectProps) {
   const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data, isLoading, isError } = useDatasetsByProject(projectId);
   const t = useTranslations("formDatasetSelect");
@@ -47,7 +54,21 @@ export function DatasetSelect({ projectId, onValueChange, defaultValue, triggerP
       // Data not loaded yet, set the value optimistically
       setSelectedValue(defaultValue);
     }
-  }, [defaultValue, data?.rows, onValueChange]);
+  }, [defaultValue, data?.rows, onDatasetLabelChange, onValueChange]);
+
+  React.useEffect(() => {
+    if (!data?.rows) {
+      return;
+    }
+
+    if (!selectedValue) {
+      onDatasetLabelChange?.(null);
+      return;
+    }
+
+    const selectedDataset = data.rows.find((item) => item.datasets.id === selectedValue);
+    onDatasetLabelChange?.(selectedDataset?.datasets.name ?? null);
+  }, [data?.rows, onDatasetLabelChange, selectedValue]);
 
   if (isLoading) {
     return (
