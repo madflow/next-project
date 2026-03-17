@@ -2,14 +2,24 @@
 
 import { FolderXIcon, PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useThemeConfig } from "@/components/active-theme";
 import { DatasetSelect } from "@/components/form/dataset-select";
 import { OrganizationThemeStyleInjector } from "@/context/organization-theme-context";
 import { useAdhocPersistence } from "@/hooks/use-adhoc-persistence";
 import { useDatasetStats } from "@/hooks/use-dataset-stats";
+import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useVariablePanel } from "@/hooks/use-variable-panel";
+import {
+  type ParsedAdhocUrlSelection,
+  buildAdhocUrlSearchParams,
+  findVariablesetTreeNode,
+  matchesAdhocUrlSelection,
+  parseAdhocUrlState,
+} from "@/lib/adhoc-url-state";
+import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
 import { BarSkeleton } from "../chart/bar-skeleton";
@@ -23,6 +33,10 @@ import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-sel
 
 type AdHocAnalysisProps = {
   project: Project;
+};
+
+type VariablesResponse = {
+  rows: DatasetVariableWithAttributes[];
 };
 
 /**
@@ -58,18 +72,127 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const { activeTheme, setActiveTheme } = useThemeConfig();
   const { restoreState, saveDataset, saveCurrentSelection } = useAdhocPersistence(project.id);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isMobile = useIsMobile();
   const variablePanel = useVariablePanel(true);
 
   // Separate overlay state for tablet/mobile (Sheet/Drawer)
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
-  // Initialize state from localStorage
-  const restoredState = restoreState();
-  const [selectedDataset, setSelectedDataset] = useState<string | null>(restoredState?.selectedDataset || null);
+  const restoredState = useMemo(() => restoreState(), [restoreState]);
+  const parsedUrlState = useMemo(
+    () => parseAdhocUrlState(new URLSearchParams(searchParams.toString())),
+    [searchParams]
+  );
+  const isSearchParamsReady = useMemo(() => {
+    if (typeof window === "undefined") {
+      return true;
+    }
+
+    return searchParams.toString() === window.location.search.replace(/^\?/, "");
+  }, [searchParams]);
+  const initialSelectedDataset = parsedUrlState.hasKnownState
+    ? parsedUrlState.selectedDataset
+    : restoredState?.selectedDataset || null;
+  const [selectedDataset, setSelectedDataset] = useState<string | null>(initialSelectedDataset);
   const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
   const [baseStatsData, setBaseStatsData] = useState<Record<string, StatsResponse>>({});
   const [splitStatsData, setSplitStatsData] = useState<Record<string, StatsResponse>>({});
+  const syncedStoredDatasetRef = useRef(false);
+  const pendingUrlQueryRef = useRef<string | null>(null);
+  const { data: variablesets = [], isLoading: isVariablesetsLoading } = useDatasetVariablesets(selectedDataset);
+
+  const clearStatsData = useCallback(() => {
+    setBaseStatsData({});
+    setSplitStatsData({});
+  }, []);
+
+  const syncUrlState = useCallback(
+    (datasetId: string | null, selection: SelectionItem | null) => {
+      const currentSearchParams = new URLSearchParams(window.location.search);
+      const nextSearchParams = buildAdhocUrlSearchParams(currentSearchParams, {
+        selectedDataset: datasetId,
+        selection,
+      });
+      const nextQueryString = nextSearchParams.toString();
+      const currentQueryString = currentSearchParams.toString();
+
+      if (nextQueryString === currentQueryString) {
+        pendingUrlQueryRef.current = null;
+        return;
+      }
+
+      const nextUrl = nextQueryString ? `${pathname}?${nextQueryString}` : pathname;
+      pendingUrlQueryRef.current = nextQueryString;
+      window.history.replaceState(null, "", nextUrl);
+    },
+    [pathname]
+  );
+
+  const restoreSelectionFromUrl = useCallback(
+    async (datasetId: string, selection: ParsedAdhocUrlSelection) => {
+      if (selection.type === "set") {
+        const variableset = findVariablesetTreeNode(variablesets, selection.variablesetId);
+
+        if (!variableset) {
+          return null;
+        }
+
+        const response = await fetch(`/api/variablesets/${selection.variablesetId}/variables`);
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = (await response.json()) as VariablesResponse;
+        return {
+          type: "set" as const,
+          variableset,
+          variables: data.rows,
+        };
+      }
+
+      const parentVariableset = selection.parentVariablesetId
+        ? findVariablesetTreeNode(variablesets, selection.parentVariablesetId)
+        : null;
+
+      if (selection.parentVariablesetId) {
+        const response = await fetch(`/api/variablesets/${selection.parentVariablesetId}/variables`);
+        if (response.ok) {
+          const data = (await response.json()) as VariablesResponse;
+          const variable = data.rows.find((item) => item.name === selection.variableName);
+
+          if (variable) {
+            return {
+              type: "variable" as const,
+              variable,
+              parentVariableset: parentVariableset || undefined,
+            };
+          }
+        }
+      }
+
+      const params = new URLSearchParams({ name: selection.variableName, limit: "1" });
+      const response = await fetch(`/api/datasets/${datasetId}/variables?${params.toString()}`);
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = (await response.json()) as VariablesResponse;
+      const variable = data.rows.find((item) => item.name === selection.variableName);
+
+      if (!variable) {
+        return null;
+      }
+
+      return {
+        type: "variable" as const,
+        variable,
+        parentVariableset: parentVariableset || undefined,
+      };
+    },
+    [variablesets]
+  );
 
   // Set theme on mount if needed
   useEffect(() => {
@@ -84,6 +207,161 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       console.error(t("errors.fetchStats"), error);
     },
   });
+
+  useEffect(() => {
+    if (pendingUrlQueryRef.current !== null && searchParams.toString() === pendingUrlQueryRef.current) {
+      pendingUrlQueryRef.current = null;
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!isSearchParamsReady) {
+      return;
+    }
+
+    if (pendingUrlQueryRef.current !== null) {
+      return;
+    }
+
+    if (syncedStoredDatasetRef.current) {
+      return;
+    }
+
+    syncedStoredDatasetRef.current = true;
+
+    if (!parsedUrlState.hasKnownState && restoredState?.selectedDataset) {
+      syncUrlState(restoredState.selectedDataset, null);
+    }
+  }, [isSearchParamsReady, parsedUrlState.hasKnownState, restoredState?.selectedDataset, syncUrlState]);
+
+  useEffect(() => {
+    if (!isSearchParamsReady) {
+      return;
+    }
+
+    if (pendingUrlQueryRef.current !== null) {
+      return;
+    }
+
+    if (!parsedUrlState.hasKnownState) {
+      return;
+    }
+
+    if (parsedUrlState.selectedDataset === selectedDataset) {
+      return;
+    }
+
+    setSelectedDataset(parsedUrlState.selectedDataset);
+    setCurrentSelection(null);
+    clearStatsData();
+    saveDataset(parsedUrlState.selectedDataset);
+    saveCurrentSelection(null);
+  }, [
+    clearStatsData,
+    isSearchParamsReady,
+    parsedUrlState.hasKnownState,
+    parsedUrlState.selectedDataset,
+    saveCurrentSelection,
+    saveDataset,
+    selectedDataset,
+  ]);
+
+  useEffect(() => {
+    if (!isSearchParamsReady) {
+      return;
+    }
+
+    if (pendingUrlQueryRef.current !== null) {
+      return;
+    }
+
+    if (!parsedUrlState.hasKnownState || parsedUrlState.selectedDataset !== selectedDataset) {
+      return;
+    }
+
+    if (!parsedUrlState.selection) {
+      if (parsedUrlState.hasSelectionParams) {
+        syncUrlState(selectedDataset, null);
+      }
+
+      if (!currentSelection) {
+        return;
+      }
+
+      setCurrentSelection(null);
+      clearStatsData();
+      saveCurrentSelection(null);
+      return;
+    }
+
+    if (matchesAdhocUrlSelection(currentSelection, parsedUrlState.selection)) {
+      return;
+    }
+
+    if (isVariablesetsLoading) {
+      return;
+    }
+
+    let cancelled = false;
+    const datasetId = selectedDataset;
+
+    if (!datasetId) {
+      syncUrlState(null, null);
+      return;
+    }
+
+    const restoreSelection = async () => {
+      try {
+        const selectionToRestore = parsedUrlState.selection;
+        if (!selectionToRestore) {
+          return;
+        }
+
+        const restoredSelection = await restoreSelectionFromUrl(datasetId, selectionToRestore);
+        if (cancelled) {
+          return;
+        }
+
+        setCurrentSelection(restoredSelection);
+        clearStatsData();
+        saveCurrentSelection(restoredSelection);
+
+        if (!restoredSelection) {
+          syncUrlState(datasetId, null);
+        }
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error("Failed to restore adhoc selection from URL", error);
+        setCurrentSelection(null);
+        clearStatsData();
+        saveCurrentSelection(null);
+        syncUrlState(datasetId, null);
+      }
+    };
+
+    restoreSelection();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    clearStatsData,
+    currentSelection,
+    isSearchParamsReady,
+    isVariablesetsLoading,
+    parsedUrlState.hasKnownState,
+    parsedUrlState.hasSelectionParams,
+    parsedUrlState.selectedDataset,
+    parsedUrlState.selection,
+    restoreSelectionFromUrl,
+    saveCurrentSelection,
+    selectedDataset,
+    syncUrlState,
+    t,
+  ]);
 
   useEffect(() => {
     if (currentSelection) {
@@ -118,25 +396,25 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     (value: string | null) => {
       setSelectedDataset(value);
       setCurrentSelection(null);
-      setBaseStatsData({});
-      setSplitStatsData({});
+      clearStatsData();
       saveDataset(value);
       saveCurrentSelection(null);
+      syncUrlState(value, null);
     },
-    [saveDataset, saveCurrentSelection]
+    [clearStatsData, saveDataset, saveCurrentSelection, syncUrlState]
   );
 
   const handleSelectionChange = useCallback(
     (selection: SelectionItem) => {
       setCurrentSelection(selection);
-      setBaseStatsData({});
-      setSplitStatsData({});
+      clearStatsData();
       saveCurrentSelection(selection);
+      syncUrlState(selectedDataset, selection);
 
       // Auto-close the overlay on tablet/mobile after making a selection
       setIsOverlayOpen(false);
     },
-    [saveCurrentSelection]
+    [clearStatsData, saveCurrentSelection, selectedDataset, syncUrlState]
   );
 
   const handleStatsRequest = (variableName: string, splitVariable?: string) => {
