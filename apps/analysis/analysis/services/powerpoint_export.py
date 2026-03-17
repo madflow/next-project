@@ -15,6 +15,16 @@ from pptx.util import Inches, Pt
 PPTX_MEDIA_TYPE = (
     "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 )
+EXPORT_FONT_SIZE_DELTA_PT = 1
+TITLE_FONT_SIZE_PT = 24 + EXPORT_FONT_SIZE_DELTA_PT
+META_FONT_SIZE_PT = 10 + EXPORT_FONT_SIZE_DELTA_PT
+AXIS_FONT_SIZE_PT = 11 + EXPORT_FONT_SIZE_DELTA_PT
+DATA_LABEL_FONT_SIZE_PT = 10 + EXPORT_FONT_SIZE_DELTA_PT
+METRIC_LABEL_FONT_SIZE_PT = 10 + EXPORT_FONT_SIZE_DELTA_PT
+METRIC_VALUE_FONT_SIZE_PT = 18 + EXPORT_FONT_SIZE_DELTA_PT
+DEFAULT_LIGHT_TEXT_HEX = "#FFFFFF"
+DEFAULT_DARK_TEXT_HEX = "#000000"
+SLIDE_BACKGROUND_HEX = "#FFFFFF"
 
 
 class ExportPoint(TypedDict):
@@ -39,11 +49,61 @@ class ExportMetric(TypedDict):
     value: str
 
 
-def _hex_to_rgb_color(color: str) -> RGBColor:
+def _normalize_hex_color(color: str) -> str:
     normalized = color.strip().removeprefix("#")
     if len(normalized) != 6:
         raise ValueError(f"Unsupported color value '{color}'")
-    return RGBColor.from_string(normalized.upper())
+    return normalized.upper()
+
+
+def _rgb_components(color: str) -> tuple[int, int, int]:
+    normalized = _normalize_hex_color(color)
+    return (
+        int(normalized[0:2], 16),
+        int(normalized[2:4], 16),
+        int(normalized[4:6], 16),
+    )
+
+
+def _hex_to_rgb_color(color: str) -> RGBColor:
+    return RGBColor.from_string(_normalize_hex_color(color))
+
+
+def _relative_luminance(color: str) -> float:
+    def to_linear(channel: int) -> float:
+        value = channel / 255
+        if value <= 0.03928:
+            return value / 12.92
+        return ((value + 0.055) / 1.055) ** 2.4
+
+    red, green, blue = _rgb_components(color)
+    return (
+        0.2126 * to_linear(red) + 0.7152 * to_linear(green) + 0.0722 * to_linear(blue)
+    )
+
+
+def _contrast_ratio(first_color: str, second_color: str) -> float:
+    first_luminance = _relative_luminance(first_color)
+    second_luminance = _relative_luminance(second_color)
+    lighter = max(first_luminance, second_luminance)
+    darker = min(first_luminance, second_luminance)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def _best_text_color(background_color: str | None) -> RGBColor:
+    if not background_color:
+        return _hex_to_rgb_color(DEFAULT_LIGHT_TEXT_HEX)
+
+    try:
+        dark_contrast = _contrast_ratio(background_color, DEFAULT_DARK_TEXT_HEX)
+        light_contrast = _contrast_ratio(background_color, DEFAULT_LIGHT_TEXT_HEX)
+    except ValueError:
+        return _hex_to_rgb_color(DEFAULT_LIGHT_TEXT_HEX)
+
+    if dark_contrast >= light_contrast:
+        return _hex_to_rgb_color(DEFAULT_DARK_TEXT_HEX)
+
+    return _hex_to_rgb_color(DEFAULT_LIGHT_TEXT_HEX)
 
 
 def _set_chart_title(slide: Any, title: str, meta_line: str) -> None:
@@ -55,7 +115,7 @@ def _set_chart_title(slide: Any, title: str, meta_line: str) -> None:
     title_frame.word_wrap = True
     title_paragraph = title_frame.paragraphs[0]
     title_paragraph.text = title
-    title_paragraph.font.size = Pt(24)
+    title_paragraph.font.size = Pt(TITLE_FONT_SIZE_PT)
     title_paragraph.font.bold = True
 
     meta_box = slide.shapes.add_textbox(
@@ -66,7 +126,7 @@ def _set_chart_title(slide: Any, title: str, meta_line: str) -> None:
     meta_frame.word_wrap = True
     meta_paragraph = meta_frame.paragraphs[0]
     meta_paragraph.text = meta_line
-    meta_paragraph.font.size = Pt(10)
+    meta_paragraph.font.size = Pt(META_FONT_SIZE_PT)
 
 
 def _apply_series_fill(series: Any, color: str) -> None:
@@ -85,6 +145,12 @@ def _apply_point_fills(series: Any, points: Sequence[ExportPoint]) -> None:
         fill.fore_color.rgb = _hex_to_rgb_color(point["color"])
 
 
+def _style_data_label(data_label: Any, text_color: RGBColor) -> None:
+    font = data_label.font
+    font.size = Pt(DATA_LABEL_FONT_SIZE_PT)
+    font.color.rgb = text_color
+
+
 def _style_value_axis(
     chart: Any,
     minimum: float | None = None,
@@ -97,13 +163,13 @@ def _style_value_axis(
     tick_labels = value_axis.tick_labels
     tick_labels.number_format = number_format
     tick_labels.number_format_is_linked = False
-    tick_labels.font.size = Pt(11)
+    tick_labels.font.size = Pt(AXIS_FONT_SIZE_PT)
 
 
 def _style_category_axis(chart: Any, reverse_order: bool = False) -> None:
     category_axis = chart.category_axis
     category_axis.reverse_order = reverse_order
-    category_axis.tick_labels.font.size = Pt(11)
+    category_axis.tick_labels.font.size = Pt(AXIS_FONT_SIZE_PT)
 
 
 def _configure_default_legend(chart: Any) -> None:
@@ -113,7 +179,11 @@ def _configure_default_legend(chart: Any) -> None:
 
 
 def _configure_default_data_labels(
-    plot: Any, *, position: Any, number_format: str = '0"%"'
+    plot: Any,
+    *,
+    position: Any,
+    number_format: str = '0"%"',
+    text_color: RGBColor | None = None,
 ) -> None:
     plot.has_data_labels = True
     data_labels = plot.data_labels
@@ -121,7 +191,9 @@ def _configure_default_data_labels(
     data_labels.number_format = number_format
     data_labels.number_format_is_linked = False
     data_labels.show_value = True
-    data_labels.font.size = Pt(10)
+    data_labels.font.size = Pt(DATA_LABEL_FONT_SIZE_PT)
+    if text_color is not None:
+        data_labels.font.color.rgb = text_color
 
 
 def _add_distribution_chart(
@@ -146,6 +218,7 @@ def _add_distribution_chart(
         position=XL_LABEL_POSITION.RIGHT
         if reverse_order
         else XL_LABEL_POSITION.OUTSIDE_END,
+        text_color=_best_text_color(SLIDE_BACKGROUND_HEX),
     )
 
 
@@ -176,6 +249,9 @@ def _add_stacked_bar_chart(slide: Any, rows: Sequence[ExportStackedRow]) -> None
 
     for series_index, series in enumerate(chart.series):
         _apply_series_fill(series, first_row["segments"][series_index]["color"])
+        text_color = _best_text_color(first_row["segments"][series_index]["color"])
+        for point in series.points:
+            _style_data_label(point.data_label, text_color)
 
 
 def _add_pie_chart(slide: Any, points: Sequence[ExportPoint]) -> None:
@@ -199,7 +275,8 @@ def _add_pie_chart(slide: Any, points: Sequence[ExportPoint]) -> None:
     data_labels.show_percentage = True
     data_labels.number_format = "0%"
     data_labels.number_format_is_linked = False
-    data_labels.font.size = Pt(10)
+    data_labels.font.size = Pt(DATA_LABEL_FONT_SIZE_PT)
+    data_labels.font.color.rgb = _best_text_color(SLIDE_BACKGROUND_HEX)
 
     for index, point in enumerate(points):
         fill = chart.series[0].points[index].format.fill
@@ -237,7 +314,8 @@ def _add_mean_bar_chart(
     data_labels.number_format = "0.0"
     data_labels.number_format_is_linked = False
     data_labels.show_value = True
-    data_labels.font.size = Pt(10)
+    data_labels.font.size = Pt(DATA_LABEL_FONT_SIZE_PT)
+    data_labels.font.color.rgb = _best_text_color(SLIDE_BACKGROUND_HEX)
 
 
 def _add_metrics_cards(
@@ -268,12 +346,12 @@ def _add_metrics_cards(
 
         title_paragraph = frame.paragraphs[0]
         title_paragraph.text = metric["label"]
-        title_paragraph.font.size = Pt(10)
+        title_paragraph.font.size = Pt(METRIC_LABEL_FONT_SIZE_PT)
         title_paragraph.alignment = PP_ALIGN.CENTER
 
         value_paragraph = frame.add_paragraph()
         value_paragraph.text = metric["value"]
-        value_paragraph.font.size = Pt(18)
+        value_paragraph.font.size = Pt(METRIC_VALUE_FONT_SIZE_PT)
         value_paragraph.font.bold = True
         value_paragraph.alignment = PP_ALIGN.CENTER
 

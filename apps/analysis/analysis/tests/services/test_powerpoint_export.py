@@ -64,6 +64,39 @@ def test_build_presentation_for_distribution_preserves_point_colors() -> None:
     )
 
 
+def test_build_presentation_for_stacked_chart_uses_contrast_label_color() -> None:
+    """Stacked chart labels should use a contrasting color against segment fills."""
+    payload = {
+        "file_name": "stacked-export-2026-03-17.pptx",
+        "title": "Awareness by segment",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+        "palette": ["#1f2937", "#e5e7eb"],
+        "chart": {
+            "kind": "horizontalStackedBar",
+            "rows": [
+                {
+                    "label": "Group A",
+                    "segments": [
+                        {"label": "Yes", "value": 60, "color": "#1f2937"},
+                        {"label": "No", "value": 40, "color": "#e5e7eb"},
+                    ],
+                }
+            ],
+        },
+    }
+
+    presentation_bytes = build_presentation(payload)
+    presentation = Presentation(BytesIO(presentation_bytes))
+
+    chart = cast(Any, presentation.slides[0].shapes[2]).chart
+    assert chart.series[0].points[0].data_label.font.color.rgb == RGBColor.from_string(
+        "FFFFFF"
+    )
+    assert chart.series[1].points[0].data_label.font.color.rgb == RGBColor.from_string(
+        "000000"
+    )
+
+
 def test_powerpoint_request_rejects_too_many_metric_cards() -> None:
     """Metrics export is limited to six cards to match the slide layout."""
     with pytest.raises(ValidationError):
