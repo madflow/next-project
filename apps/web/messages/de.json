@@ -1076,7 +1076,16 @@
     "export": {
       "buttonLabel": "Diagramm exportieren",
       "errors": {
+        "excel": "Die Excel-Datei konnte nicht exportiert werden.",
         "powerpoint": "Die PowerPoint-Datei konnte nicht exportiert werden."
+      },
+      "excel": "Als Excel exportieren",
+      "excelHeaders": {
+        "color": "Farbe",
+        "label": "Bezeichnung",
+        "metric": "Kennzahl",
+        "value": "Wert",
+        "valuePercent": "Wert (%)"
       },
       "image": "Als Bild exportieren",
       "meta": {

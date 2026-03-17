@@ -10,7 +10,9 @@ import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useChartExport } from "@/hooks/use-chart-export";
 import {
   buildExportMetaLine,
+  createVariableChartExcelExportPayload,
   createVariableChartPowerPointExportPayload,
+  exportExcelForDataset,
   exportPowerPointForDataset,
   getExportPalette,
   sanitizeExportBaseName,
@@ -222,6 +224,57 @@ export function AdhocChart({
     variable,
   ]);
 
+  const handleExcelExport = useCallback(async () => {
+    if (!datasetId || actualSelectedChartType === "textExplorer") {
+      return;
+    }
+
+    try {
+      const payload = createVariableChartExcelExportPayload({
+        chartType: actualSelectedChartType,
+        countedValue,
+        excelLabels: {
+          color: t("export.excelHeaders.color"),
+          label: t("export.excelHeaders.label"),
+          metric: t("export.excelHeaders.metric"),
+          value: t("export.excelHeaders.value"),
+          valuePercent: t("export.excelHeaders.valuePercent"),
+        },
+        fileBaseName: exportBaseName,
+        isMultiResponseIndividual,
+        metaLine: exportMetaLine,
+        metricsLabels: {
+          count: tChart("count"),
+          max: tChart("max"),
+          mean: tChart("mean"),
+          median: tChart("median"),
+          min: tChart("min"),
+          stdev: tChart("stdev"),
+        },
+        palette: exportPalette,
+        stats,
+        variable,
+      });
+
+      await exportExcelForDataset(datasetId, payload);
+    } catch (error) {
+      console.error("Failed to export Excel", error);
+      toast.error(t("export.errors.excel"));
+    }
+  }, [
+    actualSelectedChartType,
+    countedValue,
+    datasetId,
+    exportBaseName,
+    exportMetaLine,
+    exportPalette,
+    isMultiResponseIndividual,
+    stats,
+    t,
+    tChart,
+    variable,
+  ]);
+
   const chartContent = (
     <ChartContent
       chartType={actualSelectedChartType}
@@ -296,6 +349,7 @@ export function AdhocChart({
         chartContent={chartContent}
         exportable={actualSelectedChartType !== "textExplorer"}
         onExportImage={exportPNG}
+        onExportExcel={handleExcelExport}
         onExportPowerPoint={handlePowerPointExport}
         exportDisabled={!datasetId}
         availableChartTypes={chartSelection.availableChartTypes}

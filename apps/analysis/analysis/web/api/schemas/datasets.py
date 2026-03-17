@@ -163,7 +163,7 @@ class MetricsExportSpec(BaseModel):
     metrics: list[ExportMetric] = Field(min_length=1, max_length=6)
 
 
-PowerPointChartExportSpec = Annotated[
+ChartExportSpec = Annotated[
     DistributionChartExportSpec
     | HorizontalStackedBarExportSpec
     | PieChartExportSpec
@@ -171,6 +171,9 @@ PowerPointChartExportSpec = Annotated[
     | MetricsExportSpec,
     Field(discriminator="kind"),
 ]
+
+PowerPointChartExportSpec = ChartExportSpec
+ExcelChartExportSpec = ChartExportSpec
 
 
 class PowerPointExportRequest(BaseModel):
@@ -183,3 +186,26 @@ class PowerPointExportRequest(BaseModel):
     meta_line: str = Field(min_length=1, max_length=400)
     palette: list[HexColor] = Field(min_length=1, max_length=6)
     chart: PowerPointChartExportSpec
+
+
+class ExcelExportLabels(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    label: str = Field(min_length=1, max_length=100)
+    value: str = Field(min_length=1, max_length=100)
+    value_percent: str = Field(min_length=1, max_length=100)
+    color: str = Field(min_length=1, max_length=100)
+    metric: str = Field(min_length=1, max_length=100)
+
+
+class ExcelExportRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    file_name: str = Field(
+        pattern=r"^[A-Za-z0-9._-]+\.xlsx$", min_length=1, max_length=120
+    )
+    title: str = Field(min_length=1, max_length=200)
+    meta_line: str = Field(min_length=1, max_length=400)
+    labels: ExcelExportLabels
+    palette: list[HexColor] = Field(min_length=1, max_length=6)
+    chart: ExcelChartExportSpec

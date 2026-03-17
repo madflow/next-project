@@ -80,12 +80,37 @@ export type AdhocPowerPointChartSpec =
   | MeanBarChartSpec
   | MetricsChartSpec;
 
+export type AdhocExcelChartSpec = AdhocPowerPointChartSpec;
+
 export type AdhocPowerPointExportPayload = {
   file_name: string;
   title: string;
   meta_line: string;
   palette: string[];
   chart: AdhocPowerPointChartSpec;
+};
+
+export type AdhocExcelExportPayload = {
+  file_name: string;
+  title: string;
+  meta_line: string;
+  labels: {
+    label: string;
+    value: string;
+    value_percent: string;
+    color: string;
+    metric: string;
+  };
+  palette: string[];
+  chart: AdhocExcelChartSpec;
+};
+
+type ExcelExportLabels = {
+  label: string;
+  value: string;
+  valuePercent: string;
+  color: string;
+  metric: string;
 };
 
 type MetricLabels = {
@@ -109,6 +134,10 @@ type VariableChartExportOptions = {
   variable: DatasetVariableWithAttributes;
 };
 
+type VariableChartExcelExportOptions = VariableChartExportOptions & {
+  excelLabels: ExcelExportLabels;
+};
+
 type MultiResponseChartExportOptions = {
   countedValue?: number;
   fileBaseName?: string;
@@ -118,6 +147,20 @@ type MultiResponseChartExportOptions = {
   title: string;
   variables: DatasetVariableWithAttributes[];
 };
+
+type MultiResponseExcelChartExportOptions = MultiResponseChartExportOptions & {
+  excelLabels: ExcelExportLabels;
+};
+
+function serializeExcelLabels(labels: ExcelExportLabels) {
+  return {
+    label: labels.label,
+    value: labels.value,
+    value_percent: labels.valuePercent,
+    color: labels.color,
+    metric: labels.metric,
+  };
+}
 
 function roundExportValue(value: number) {
   return Math.round(value * 100) / 100;
@@ -197,6 +240,11 @@ export function buildPowerPointFileName(value: string, date: Date = new Date()) 
   return `${sanitizeExportBaseName(value)}-${exportDate}.pptx`;
 }
 
+export function buildExcelFileName(value: string, date: Date = new Date()) {
+  const exportDate = date.toISOString().split("T")[0] ?? "export";
+  return `${sanitizeExportBaseName(value)}-${exportDate}.xlsx`;
+}
+
 export function getDownloadFilename(response: Response, fallbackFilename: string) {
   const contentDisposition = response.headers.get("Content-Disposition");
   const filenameMatch = contentDisposition?.match(/filename="?([^";]+)"?/i);
@@ -244,6 +292,93 @@ export async function exportPowerPointForDataset(datasetId: string, payload: Adh
   }
 
   await downloadResponseFile(response, payload.file_name);
+}
+
+export async function exportExcelForDataset(datasetId: string, payload: AdhocExcelExportPayload) {
+  const response = await fetch(`/api/datasets/${datasetId}/exports/excel`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    let message = `Excel export failed with status ${response.status}`;
+
+    try {
+      const errorPayload = (await response.json()) as { detail?: string; error?: string };
+      if (errorPayload.error) {
+        message = errorPayload.error;
+      } else if (errorPayload.detail) {
+        message = errorPayload.detail;
+      }
+    } catch {
+      // Ignore JSON parsing failures and keep fallback error message.
+    }
+
+    throw new Error(message);
+  }
+
+  await downloadResponseFile(response, payload.file_name);
+}
+
+export function createVariableChartExcelExportPayload({
+  chartType,
+  countedValue = 1,
+  excelLabels,
+  fileBaseName,
+  isMultiResponseIndividual = false,
+  metaLine,
+  metricsLabels,
+  palette,
+  stats,
+  variable,
+}: VariableChartExcelExportOptions): AdhocExcelExportPayload {
+  const powerpointPayload = createVariableChartPowerPointExportPayload({
+    chartType,
+    countedValue,
+    fileBaseName,
+    isMultiResponseIndividual,
+    metaLine,
+    metricsLabels,
+    palette,
+    stats,
+    variable,
+  });
+
+  return {
+    ...powerpointPayload,
+    labels: serializeExcelLabels(excelLabels),
+    file_name: buildExcelFileName(fileBaseName ?? variable.name),
+  };
+}
+
+export function createMultiResponseExcelExportPayload({
+  countedValue = 1,
+  excelLabels,
+  fileBaseName,
+  metaLine,
+  palette,
+  statsData,
+  title,
+  variables,
+}: MultiResponseExcelChartExportOptions): AdhocExcelExportPayload {
+  const powerpointPayload = createMultiResponsePowerPointExportPayload({
+    countedValue,
+    fileBaseName,
+    metaLine,
+    palette,
+    statsData,
+    title,
+    variables,
+  });
+
+  return {
+    ...powerpointPayload,
+    labels: serializeExcelLabels(excelLabels),
+    file_name: buildExcelFileName(fileBaseName ?? `${title}-multi-response`),
+  };
 }
 
 export function createVariableChartPowerPointExportPayload({

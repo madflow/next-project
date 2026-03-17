@@ -1076,7 +1076,16 @@
     "export": {
       "buttonLabel": "Export chart",
       "errors": {
+        "excel": "Failed to export the Excel file.",
         "powerpoint": "Failed to export the PowerPoint file."
+      },
+      "excel": "Export as Excel",
+      "excelHeaders": {
+        "color": "Color",
+        "label": "Label",
+        "metric": "Metric",
+        "value": "Value",
+        "valuePercent": "Value (%)"
       },
       "image": "Export as image",
       "meta": {

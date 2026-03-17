@@ -10,7 +10,9 @@ import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useChartExport } from "@/hooks/use-chart-export";
 import {
   buildExportMetaLine,
+  createMultiResponseExcelExportPayload,
   createMultiResponsePowerPointExportPayload,
+  exportExcelForDataset,
   exportPowerPointForDataset,
   getExportPalette,
   sanitizeExportBaseName,
@@ -169,6 +171,42 @@ export function MultiResponseChart({
     variablesetName,
   ]);
 
+  const handleExcelExport = useCallback(async () => {
+    try {
+      const payload = createMultiResponseExcelExportPayload({
+        countedValue,
+        excelLabels: {
+          color: tAdhoc("export.excelHeaders.color"),
+          label: tAdhoc("export.excelHeaders.label"),
+          metric: tAdhoc("export.excelHeaders.metric"),
+          value: tAdhoc("export.excelHeaders.value"),
+          valuePercent: tAdhoc("export.excelHeaders.valuePercent"),
+        },
+        fileBaseName: exportBaseName,
+        metaLine: exportMetaLine,
+        palette: exportPalette,
+        statsData,
+        title: variablesetName,
+        variables,
+      });
+
+      await exportExcelForDataset(datasetId, payload);
+    } catch (error) {
+      console.error("Failed to export multi-response Excel", error);
+      toast.error(tAdhoc("export.errors.excel"));
+    }
+  }, [
+    countedValue,
+    datasetId,
+    exportBaseName,
+    exportMetaLine,
+    exportPalette,
+    statsData,
+    tAdhoc,
+    variables,
+    variablesetName,
+  ]);
+
   return (
     <Card className="shadow-xs" data-testid="multi-response-chart" {...props}>
       <ChartExportSurface exportRef={exportRef} fileName={exportBaseName} isRendering={isExportRendering}>
@@ -188,7 +226,11 @@ export function MultiResponseChart({
       </CardContent>
 
       <CardFooter>
-        <ChartExportMenu onExportImage={exportPNG} onExportPowerPoint={handlePowerPointExport} />
+        <ChartExportMenu
+          onExportImage={exportPNG}
+          onExportExcel={handleExcelExport}
+          onExportPowerPoint={handlePowerPointExport}
+        />
       </CardFooter>
     </Card>
   );

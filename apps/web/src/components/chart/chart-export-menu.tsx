@@ -1,6 +1,6 @@
 "use client";
 
-import { DownloadIcon, FileImageIcon, PresentationIcon } from "lucide-react";
+import { DownloadIcon, FileImageIcon, PresentationIcon, SheetIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +13,16 @@ import {
 type ChartExportMenuProps = {
   disabled?: boolean;
   onExportImage: () => void | Promise<void>;
+  onExportExcel: () => void | Promise<void>;
   onExportPowerPoint: () => void | Promise<void>;
 };
 
-export function ChartExportMenu({ disabled = false, onExportImage, onExportPowerPoint }: ChartExportMenuProps) {
+export function ChartExportMenu({
+  disabled = false,
+  onExportImage,
+  onExportExcel,
+  onExportPowerPoint,
+}: ChartExportMenuProps) {
   const t = useTranslations("projectAdhocAnalysis.export");
 
   return (
@@ -36,6 +42,10 @@ export function ChartExportMenu({ disabled = false, onExportImage, onExportPower
         <DropdownMenuItem onClick={() => void onExportImage()} disabled={disabled}>
           <FileImageIcon className="h-4 w-4" />
           {t("image")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => void onExportExcel()} disabled={disabled}>
+          <SheetIcon className="h-4 w-4" />
+          {t("excel")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => void onExportPowerPoint()} disabled={disabled}>
           <PresentationIcon className="h-4 w-4" />

@@ -30,6 +30,7 @@ type ChartPanelCardProps = {
   footerContent?: ReactNode;
   exportable?: boolean;
   onExportImage?: () => void;
+  onExportExcel?: () => void;
   onExportPowerPoint?: () => void;
   exportDisabled?: boolean;
   availableChartTypes: AnalysisChartType[];
@@ -52,6 +53,7 @@ export function ChartPanelCard({
   footerContent,
   exportable = true,
   onExportImage,
+  onExportExcel,
   onExportPowerPoint,
   exportDisabled = false,
   availableChartTypes,
@@ -82,10 +84,11 @@ export function ChartPanelCard({
           />
         )}
       </div>
-      {exportable && onExportImage && onExportPowerPoint && (
+      {exportable && onExportImage && onExportExcel && onExportPowerPoint && (
         <ChartExportMenu
           disabled={exportDisabled}
           onExportImage={onExportImage}
+          onExportExcel={onExportExcel}
           onExportPowerPoint={onExportPowerPoint}
         />
       )}
