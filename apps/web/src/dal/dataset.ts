@@ -97,5 +97,5 @@ export async function hasAccess(datasetId: string) {
     .innerJoin(organization, eq(organization.id, project.organizationId))
     .innerJoin(member, eq(member.organizationId, organization.id))
     .where(and(eq(member.userId, user.id), eq(entity.id, datasetId)));
-  return rows.length === 1;
+  return rows.length > 0;
 }
