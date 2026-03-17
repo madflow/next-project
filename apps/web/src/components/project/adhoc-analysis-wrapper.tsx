@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import { ActiveThemeProvider } from "@/components/active-theme";
 import { useAdhocPersistence } from "@/hooks/use-adhoc-persistence";
 import { type Project } from "@/types/project";
@@ -19,7 +20,9 @@ export function AdhocAnalysisWrapper({ project }: AdhocAnalysisWrapperProps) {
 
   return (
     <ActiveThemeProvider onThemeChangeAction={saveTheme}>
-      <AdHocAnalysis project={project} />
+      <Suspense fallback={null}>
+        <AdHocAnalysis project={project} />
+      </Suspense>
     </ActiveThemeProvider>
   );
 }

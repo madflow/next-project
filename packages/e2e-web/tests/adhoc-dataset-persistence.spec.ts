@@ -61,6 +61,9 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
     const datasetTrigger = page.getByTestId("app.dropdown.dataset.trigger");
     await expect(datasetTrigger).toContainText(datasetName!);
 
+    const currentUrl = new URL(page.url());
+    expect(currentUrl.searchParams.get("dataset")).toBeTruthy();
+
     // Test page reload - should persist selection
     await page.reload();
     await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
@@ -68,5 +71,78 @@ test.describe("Adhoc Analysis - Dataset Persistence", () => {
     const datasetTriggerAfterReload = page.getByTestId("app.dropdown.dataset.trigger");
     // Verify the selected dataset persists after reload
     await expect(datasetTriggerAfterReload).toContainText(datasetName!);
+
+    const reloadedUrl = new URL(page.url());
+    expect(reloadedUrl.searchParams.get("dataset")).toBe(currentUrl.searchParams.get("dataset"));
+  });
+
+  test("should persist selected variable in URL across reload and shared link", async ({ page, context }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    await page.goto("/project/test-project/adhoc");
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
+
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
+    await page.getByText("SPSS Beispielumfrage").click();
+
+    const expandButton = page.getByTestId("variable-group-expand-Demografische Daten");
+    await expect(expandButton).toBeVisible();
+    await expandButton.click();
+
+    const variable = page.getByTestId("variable-item-sex");
+    await expect(variable).toBeVisible();
+    await variable.click();
+
+    const chartTypeSelector = page.getByTestId("chart-type-selector");
+    await expect(chartTypeSelector).toBeVisible();
+
+    const selectionUrl = new URL(page.url());
+    expect(selectionUrl.searchParams.get("dataset")).toBeTruthy();
+    expect(selectionUrl.searchParams.get("selectionType")).toBe("variable");
+    expect(selectionUrl.searchParams.get("variable")).toBe("sex");
+
+    await page.reload();
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
+    await expect(page.getByTestId("app.dropdown.dataset.trigger")).toContainText("SPSS Beispielumfrage");
+    await expect(page.getByTestId("chart-type-selector")).toBeVisible();
+
+    const sharedPage = await context.newPage();
+    await sharedPage.goto(selectionUrl.toString());
+    await expect(sharedPage.getByTestId("app.project.adhoc")).toBeVisible();
+    await expect(sharedPage.getByTestId("app.dropdown.dataset.trigger")).toContainText("SPSS Beispielumfrage");
+    await expect(sharedPage.getByTestId("chart-type-selector")).toBeVisible();
+  });
+
+  test("should persist selected variableset in URL across reload", async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    await page.goto("/project/test-project/adhoc");
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
+
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
+    await page.getByText("SPSS Beispielumfrage").click();
+
+    const mediennutzungExpandButton = page.getByTestId("variable-group-expand-Mediennutzung");
+    await expect(mediennutzungExpandButton).toBeVisible();
+    await mediennutzungExpandButton.click();
+
+    const informationsquellenGroup = page.getByTestId("variable-group-Informationsquellen");
+    await expect(informationsquellenGroup).toBeVisible();
+    await informationsquellenGroup.click();
+
+    const multiResponseChart = page.getByTestId("multi-response-chart");
+    await expect(multiResponseChart).toBeVisible();
+
+    const selectionUrl = new URL(page.url());
+    expect(selectionUrl.searchParams.get("dataset")).toBeTruthy();
+    expect(selectionUrl.searchParams.get("selectionType")).toBe("set");
+    expect(selectionUrl.searchParams.get("set")).toBeTruthy();
+
+    await page.reload();
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
+    await expect(page.getByTestId("app.dropdown.dataset.trigger")).toContainText("SPSS Beispielumfrage");
+    await expect(page.getByTestId("multi-response-chart")).toBeVisible();
   });
 });

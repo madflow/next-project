@@ -36,6 +36,8 @@ export function useProjectStorage(projectId: string) {
       // Only save if there's actual data to preserve
       if (newState.selectedDataset || newState.selectedTheme !== "default" || newState.currentSelection) {
         localStorage.setItem(key, JSON.stringify(newState));
+      } else {
+        localStorage.removeItem(key);
       }
     } catch (error) {
       console.warn("Failed to save adhoc selection state:", error);
