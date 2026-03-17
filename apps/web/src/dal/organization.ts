@@ -1,11 +1,33 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { organization as entity, member, selectOrganizationSchema } from "@repo/database/schema";
-import { createFind, createList, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/dal/dal";
+import {
+  createFind,
+  createList,
+  getAuthenticatedClient,
+  getSessionUser,
+  withAdminCheck,
+  withSessionCheck,
+} from "@/dal/dal";
+import { DalNotAuthorizedException } from "@/lib/exception";
 
-export const find = withAdminCheck(createFind(entity, selectOrganizationSchema));
+const findFn = createFind(entity, selectOrganizationSchema);
+
+export const find = withAdminCheck(findFn);
+
+export const findAccessible = withSessionCheck(async (organizationId: string) => {
+  await assertAccess(organizationId);
+  return await findFn(organizationId);
+});
 
 export const list = withAdminCheck(createList(entity, selectOrganizationSchema));
+
+export async function assertAccess(organizationId: string) {
+  const canAccess = await hasAccess(organizationId);
+  if (!canAccess) {
+    throw new DalNotAuthorizedException("You do not have access to this organization");
+  }
+}
 
 export async function hasAccess(organizationId: string) {
   const user = await getSessionUser();

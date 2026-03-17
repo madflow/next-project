@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { find } from "@/dal/project";
+import { findAccessible } from "@/dal/project";
 import { raiseExceptionResponse } from "@/lib/exception";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
-    const entity = await find(id);
+    const entity = await findAccessible(id);
     return NextResponse.json(entity);
   } catch (error) {
     return raiseExceptionResponse(error);
