@@ -6,21 +6,21 @@ This skill has ready-to-use scripts. You should ALWAYS use them instead of creat
 EXISTING SCRIPTS:
 -----------------
 1. Wrapper script (RECOMMENDED):
-   .opencode/skills/spss-file-metadata/run.sh
+   ./spss-file-metadata-skill.sh
 
 2. Python script with venv:
-   .opencode/skills/spss-file-metadata/venv/bin/python .opencode/skills/spss-file-metadata/extract_sav_metadata.py
+   ./venv/bin/python ./extract_sav_metadata.py
 
 USAGE EXAMPLES:
 ---------------
 # Basic usage (output to stdout):
-.opencode/skills/spss-file-metadata/run.sh blueprint.sav
+./spss-file-metadata-skill.sh blueprint.sav
 
 # Save to file:
-.opencode/skills/spss-file-metadata/run.sh blueprint.sav output.json
+./spss-file-metadata-skill.sh blueprint.sav output.json
 
 # With full paths:
-.opencode/skills/spss-file-metadata/run.sh /path/to/file.sav /path/to/output.json
+./spss-file-metadata-skill.sh /path/to/file.sav /path/to/output.json
 
 WHAT THE SCRIPT DOES:
 ---------------------
@@ -37,6 +37,6 @@ DO NOT:
 
 DO:
 ---
-✅ Use the existing run.sh wrapper script
+✅ Use the existing spss-file-metadata-skill.sh wrapper script
 ✅ Pass the .sav file path as argument
 ✅ Optionally specify output file path as second argument

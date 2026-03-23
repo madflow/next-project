@@ -13,7 +13,7 @@ metadata:
 **DO NOT CREATE A NEW SCRIPT!** Use the pre-installed script:
 
 ```bash
-.opencode/skills/spss-file-convert/run.sh <input_file> <output_file>
+./spss-file-convert-skill.sh <input_file> <output_file>
 ```
 
 The conversion direction is detected automatically from the file extensions.
@@ -22,13 +22,13 @@ Examples:
 
 ```bash
 # CSV to SPSS
-.opencode/skills/spss-file-convert/run.sh data.csv data.sav
+./spss-file-convert-skill.sh data.csv data.sav
 
 # SPSS to CSV
-.opencode/skills/spss-file-convert/run.sh data.sav data.csv
+./spss-file-convert-skill.sh data.sav data.csv
 
 # With full paths
-.opencode/skills/spss-file-convert/run.sh /path/to/input.csv /path/to/output.sav
+./spss-file-convert-skill.sh /path/to/input.csv /path/to/output.sav
 ```
 
 ## What it does
@@ -36,4 +36,4 @@ Examples:
 - **CSV -> SAV**: Reads a CSV file, auto-detects numeric vs. string columns, and writes a valid SPSS `.sav` file.
 - **SAV -> CSV**: Reads an SPSS `.sav` file (including string variables) and writes a plain CSV.
 
-Uses `pyreadstat` and `pandas`. Both are pre-installed in the virtual environment at `.opencode/skills/spss-file-convert/venv/`.
+Uses `pyreadstat` and `pandas`. Both are pre-installed in the skill-local virtual environment at `./venv/`.
