@@ -1,0 +1,41 @@
+DO NOT CREATE NEW SCRIPTS - USE THE EXISTING ONE!
+=================================================
+
+This skill uses the DeepL REST API through a bundled curl helper.
+Always use the wrapper script and the DEEPL_API_KEY environment variable.
+
+REQUIREMENT:
+------------
+export DEEPL_API_KEY="your-deepl-api-key"
+
+EXISTING SCRIPT:
+----------------
+.opencode/skills/deepl-translate/run.sh
+
+COMMANDS:
+---------
+1. Translate text:
+   printf '%s' 'Hello, world!' | .opencode/skills/deepl-translate/run.sh translate --target-lang DE
+
+2. Translate text from stdin:
+   printf '%s' "Save changes" | .opencode/skills/deepl-translate/run.sh translate --target-lang FR --context "UI button label"
+
+3. List source languages:
+   .opencode/skills/deepl-translate/run.sh languages --type source
+
+4. List target languages:
+   .opencode/skills/deepl-translate/run.sh languages --type target
+
+5. Check usage:
+   .opencode/skills/deepl-translate/run.sh usage
+
+IMPORTANT NOTES:
+----------------
+- Free API keys end with :fx and use https://api-free.deepl.com
+- Other keys use https://api.deepl.com
+- If you pass --glossary-id, you must also pass --source-lang
+- Use --tag-handling html or --tag-handling xml for markup
+- Use --show-billed-characters when the user asks about billing
+- The helper prints JSON so you can read the translated text and metadata
+- Prefer stdin unless the text is hardcoded and trusted, because stdin avoids shell quoting and history-expansion issues
+- In interactive bash/zsh, `!` is shell history expansion, so `--text "...!"` can break before the helper runs

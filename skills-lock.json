@@ -16,6 +16,11 @@
       "sourceType": "github",
       "computedHash": "31c027d02dbf1faa37f58191f574b9443143042fb2b684fe32df53ab0270487c"
     },
+    "deepl-translate": {
+      "source": "madflow/skills",
+      "sourceType": "github",
+      "computedHash": "488397cb4795596053660ce79cb9fb201cc2e8997bd71ae1d422d69d6dc6b9e0"
+    },
     "email-and-password-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
