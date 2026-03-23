@@ -24,7 +24,7 @@ It uses `https://api-free.deepl.com` for keys ending in `:fx`; otherwise it uses
 **DO NOT CREATE A NEW SCRIPT!** Use the bundled helper:
 
 ```bash
-printf '%s' 'Hello, world!' | .opencode/skills/deepl-translate/run.sh translate --target-lang DE
+printf '%s' 'Hello, world!' | ./deepl-translate-skill.sh translate --target-lang DE
 ```
 
 Prefer stdin for all free-form text because it is the most shell-safe option.
@@ -33,7 +33,7 @@ Use `--text` only when the text is hardcoded and trusted.
 For longer text or content with quotes, pipe the text through stdin:
 
 ```bash
-printf '%s' "$TEXT" | .opencode/skills/deepl-translate/run.sh translate --target-lang FR
+printf '%s' "$TEXT" | ./deepl-translate-skill.sh translate --target-lang FR
 ```
 
 In interactive `bash` or `zsh`, `!` is expanded by the shell before the helper sees the argument, which is why stdin is the safest default.
@@ -58,8 +58,8 @@ The `translate` command returns DeepL's JSON response, including `translations[*
 ## Examples
 
 ```bash
-printf '%s' 'Please review the attached proposal.' | .opencode/skills/deepl-translate/run.sh translate --target-lang JA
-printf '%s' 'Can you send the invoice today?' | .opencode/skills/deepl-translate/run.sh translate --target-lang DE --source-lang EN --formality more
-printf '%s' '<p>Hello <strong>world</strong></p>' | .opencode/skills/deepl-translate/run.sh translate --target-lang ES --tag-handling html
-.opencode/skills/deepl-translate/run.sh usage
+printf '%s' 'Please review the attached proposal.' | ./deepl-translate-skill.sh translate --target-lang JA
+printf '%s' 'Can you send the invoice today?' | ./deepl-translate-skill.sh translate --target-lang DE --source-lang EN --formality more
+printf '%s' '<p>Hello <strong>world</strong></p>' | ./deepl-translate-skill.sh translate --target-lang ES --tag-handling html
+./deepl-translate-skill.sh usage
 ```

@@ -10,24 +10,24 @@ export DEEPL_API_KEY="your-deepl-api-key"
 
 EXISTING SCRIPT:
 ----------------
-.opencode/skills/deepl-translate/run.sh
+./deepl-translate-skill.sh
 
 COMMANDS:
 ---------
 1. Translate text:
-   printf '%s' 'Hello, world!' | .opencode/skills/deepl-translate/run.sh translate --target-lang DE
+   printf '%s' 'Hello, world!' | ./deepl-translate-skill.sh translate --target-lang DE
 
 2. Translate text from stdin:
-   printf '%s' "Save changes" | .opencode/skills/deepl-translate/run.sh translate --target-lang FR --context "UI button label"
+   printf '%s' "Save changes" | ./deepl-translate-skill.sh translate --target-lang FR --context "UI button label"
 
 3. List source languages:
-   .opencode/skills/deepl-translate/run.sh languages --type source
+   ./deepl-translate-skill.sh languages --type source
 
 4. List target languages:
-   .opencode/skills/deepl-translate/run.sh languages --type target
+   ./deepl-translate-skill.sh languages --type target
 
 5. Check usage:
-   .opencode/skills/deepl-translate/run.sh usage
+   ./deepl-translate-skill.sh usage
 
 IMPORTANT NOTES:
 ----------------

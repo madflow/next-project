@@ -6,22 +6,22 @@ This skill has ready-to-use scripts. You should ALWAYS use them instead of creat
 EXISTING SCRIPTS:
 -----------------
 1. Wrapper script (RECOMMENDED):
-   .opencode/skills/spss-file-convert/run.sh
+   ./spss-file-convert-skill.sh
 
 2. Python script directly:
-   .opencode/skills/spss-file-convert/venv/bin/python .opencode/skills/spss-file-convert/convert_spss.py
+   ./venv/bin/python ./convert_spss.py
 
 USAGE EXAMPLES:
 ---------------
 # CSV to SPSS:
-.opencode/skills/spss-file-convert/run.sh data.csv data.sav
+./spss-file-convert-skill.sh data.csv data.sav
 
 # SPSS to CSV:
-.opencode/skills/spss-file-convert/run.sh data.sav data.csv
+./spss-file-convert-skill.sh data.sav data.csv
 
 # With full paths:
-.opencode/skills/spss-file-convert/run.sh /path/to/input.csv /path/to/output.sav
-.opencode/skills/spss-file-convert/run.sh /path/to/input.sav /path/to/output.csv
+./spss-file-convert-skill.sh /path/to/input.csv /path/to/output.sav
+./spss-file-convert-skill.sh /path/to/input.sav /path/to/output.csv
 
 CONVERSION DIRECTION:
 ---------------------
@@ -48,5 +48,5 @@ x Write inline Python code to do the conversion
 
 DO:
 ---
-+ Use the existing run.sh wrapper script
++ Use the existing spss-file-convert-skill.sh wrapper script
 + Pass input file as first argument, output file as second argument

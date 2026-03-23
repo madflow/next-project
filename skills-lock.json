@@ -19,7 +19,7 @@
     "deepl-translate": {
       "source": "madflow/skills",
       "sourceType": "github",
-      "computedHash": "488397cb4795596053660ce79cb9fb201cc2e8997bd71ae1d422d69d6dc6b9e0"
+      "computedHash": "8cc5e7e7631f6efedeedc35908c1b173750ac435a251dbc7e35efbd946df923f"
     },
     "email-and-password-best-practices": {
       "source": "better-auth/skills",
@@ -54,12 +54,12 @@
     "spss-file-convert": {
       "source": "madflow/skills",
       "sourceType": "github",
-      "computedHash": "e23cffabdc4aa4c69b3e023d31db8bb0c08486b3ba54d5aeebdd57fd4ecde25b"
+      "computedHash": "621bc2c9b95ef2d3fe1e236b18efc4582de8efaeec5cf445195a147c512a19e9"
     },
     "spss-file-metadata": {
       "source": "madflow/skills",
       "sourceType": "github",
-      "computedHash": "b1af85239f8256f6b4a6b0801dbacb663e3760bb6bfec8f4f46b44cd3919cae8"
+      "computedHash": "acba9c09e87535f592e0757493bccff583477bfeb61e423cd1b5e8d90745cc88"
     },
     "two-factor-authentication-best-practices": {
       "source": "better-auth/skills",

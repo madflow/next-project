@@ -68,9 +68,9 @@ main_usage() {
         "DeepL translation skill helper" \
         "" \
         "Usage:" \
-        "  .opencode/skills/deepl-translate/run.sh translate [options]" \
-        "  .opencode/skills/deepl-translate/run.sh languages [--type source|target]" \
-        "  .opencode/skills/deepl-translate/run.sh usage"
+        "  ./deepl-translate-skill.sh translate [options]" \
+        "  ./deepl-translate-skill.sh languages [--type source|target]" \
+        "  ./deepl-translate-skill.sh usage"
 }
 
 translate_usage() {
@@ -103,7 +103,7 @@ languages_usage() {
         "List DeepL languages" \
         "" \
         "Usage:" \
-        "  .opencode/skills/deepl-translate/run.sh languages [--type source|target]"
+        "  ./deepl-translate-skill.sh languages [--type source|target]"
 }
 
 translate() {
@@ -304,7 +304,7 @@ usage() {
                     "Show DeepL usage and limits" \
                     "" \
                     "Usage:" \
-                    "  .opencode/skills/deepl-translate/run.sh usage"
+                    "  ./deepl-translate-skill.sh usage"
                 return 0
                 ;;
             *)
