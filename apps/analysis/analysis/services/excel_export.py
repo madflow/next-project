@@ -9,10 +9,12 @@ from typing import Any, cast
 
 from openpyxl import Workbook
 from openpyxl.chart import BarChart, PieChart, Reference
+from openpyxl.chart.axis import ChartLines
 from openpyxl.chart.data_source import AxDataSource, StrRef
 from openpyxl.chart.label import DataLabelList
 from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.chart.text import RichText as ChartRichText
+from openpyxl.drawing.colors import ColorChoice
 from openpyxl.drawing.spreadsheet_drawing import AbsoluteAnchor
 from openpyxl.drawing.text import (
     CharacterProperties,
@@ -46,6 +48,10 @@ STACKED_CHART_NUMBER_FORMAT = '0"%"'
 PIE_PERCENT_NUMBER_FORMAT = "0%"
 MEAN_NUMBER_FORMAT = "0.0"
 CHARTSHEET_SIZE_MULTIPLIER = 2
+CHART_BORDER_WIDTH = 9360
+AXIS_BORDER_WIDTH = 3600
+CHART_BACKGROUND_HEX = "#FFFFFF"
+CHART_LINE_HEX = "#999999"
 
 
 @dataclass
@@ -256,6 +262,72 @@ def _graphical_properties(color: str) -> GraphicalProperties:
     properties = GraphicalProperties(solidFill=normalized)
     properties.line.solidFill = normalized
     return properties
+
+
+def _chart_color_choice(color: str) -> ColorChoice:
+    return ColorChoice(srgbClr=cast(Any, _normalize_hex_color(color)))
+
+
+def _chart_graphical_properties(
+    *,
+    fill_color: str | None = None,
+    line_color: str | None = None,
+    line_width: int | None = None,
+    no_fill: bool = False,
+    no_line: bool = False,
+    round_line: bool = False,
+) -> GraphicalProperties:
+    properties = GraphicalProperties()
+
+    if fill_color is not None:
+        properties.solidFill = _chart_color_choice(fill_color)
+    if no_fill:
+        properties.noFill = True
+    if line_width is not None:
+        properties.line.width = line_width
+    if line_color is not None:
+        properties.line.solidFill = _chart_color_choice(line_color)
+    if no_line:
+        properties.line.noFill = True
+    if round_line:
+        properties.line.round = True
+
+    return properties
+
+
+def _apply_chart_styling(chart: BarChart | PieChart) -> None:
+    chart.graphical_properties = _chart_graphical_properties(
+        fill_color=CHART_BACKGROUND_HEX,
+        line_width=CHART_BORDER_WIDTH,
+        no_line=True,
+    )
+    chart.plot_area.spPr = _chart_graphical_properties(
+        fill_color=CHART_BACKGROUND_HEX,
+        line_color=CHART_LINE_HEX,
+        line_width=AXIS_BORDER_WIDTH,
+        round_line=True,
+    )
+
+    if not isinstance(chart, BarChart):
+        return
+
+    chart.x_axis.spPr = _chart_graphical_properties(
+        line_color=CHART_LINE_HEX,
+        line_width=AXIS_BORDER_WIDTH,
+        round_line=True,
+    )
+    chart.y_axis.spPr = _chart_graphical_properties(
+        line_color=CHART_LINE_HEX,
+        line_width=AXIS_BORDER_WIDTH,
+        round_line=True,
+    )
+    chart.y_axis.majorGridlines = ChartLines(
+        spPr=_chart_graphical_properties(
+            line_color=CHART_LINE_HEX,
+            line_width=AXIS_BORDER_WIDTH,
+            round_line=True,
+        )
+    )
 
 
 def _new_data_point(index: int, color: str) -> Any:
@@ -813,6 +885,7 @@ def build_workbook(payload: dict[str, Any]) -> bytes:
         payload["chart"],
     )
     if chart is not None:
+        _apply_chart_styling(chart)
         _apply_chart_font(chart, font_name=EXPORT_FONT_NAME)
     if chart is not None and chart_sheet_title is not None:
         _add_chart_sheet(workbook, chart=chart, title=chart_sheet_title)
