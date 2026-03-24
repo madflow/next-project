@@ -23,6 +23,16 @@ const EXPORT_PALETTE_KEYS = ["chart-1", "chart-2", "chart-3", "chart-4", "chart-
 
 const DEFAULT_EXPORT_PALETTE = ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"] as const;
 
+const RGB_COLOR_PATTERN =
+  /^rgba?\(\s*([0-9.]+%?)(?:\s*,\s*|\s+)([0-9.]+%?)(?:\s*,\s*|\s+)([0-9.]+%?)(?:\s*(?:,\s*|\/\s*|\s+)([0-9.]+%?))?\s*\)$/i;
+
+type PaletteDomAdapter = {
+  createProbe: () => HTMLElement;
+  getComputedColor: (probe: HTMLElement) => string;
+  resolveScope: (scopeElement: HTMLElement | null) => HTMLElement | null;
+  colorToHex?: (color: string) => string | null;
+};
+
 type ExportPoint = {
   label: string;
   value: number;
@@ -166,6 +176,131 @@ function roundExportValue(value: number) {
   return Math.round(value * 100) / 100;
 }
 
+function normalizeHexColor(color: string) {
+  const normalized = color.trim();
+
+  if (/^#[0-9a-f]{6}$/i.test(normalized)) {
+    return normalized.toLowerCase();
+  }
+
+  if (/^#[0-9a-f]{3}$/i.test(normalized)) {
+    const [red, green, blue] = normalized.slice(1).split("");
+    return `#${red}${red}${green}${green}${blue}${blue}`.toLowerCase();
+  }
+
+  return null;
+}
+
+function clampRgbChannel(value: number) {
+  return Math.max(0, Math.min(255, value));
+}
+
+function parseRgbChannel(channel: string) {
+  const numericValue = Number.parseFloat(channel);
+
+  if (Number.isNaN(numericValue)) {
+    return null;
+  }
+
+  if (channel.endsWith("%")) {
+    return clampRgbChannel(Math.round((numericValue / 100) * 255));
+  }
+
+  return clampRgbChannel(Math.round(numericValue));
+}
+
+function channelToHex(channel: number) {
+  return channel.toString(16).padStart(2, "0");
+}
+
+function rgbChannelsToHex(red: number, green: number, blue: number) {
+  return `#${channelToHex(red)}${channelToHex(green)}${channelToHex(blue)}`;
+}
+
+function cssColorToHex(color: string) {
+  const normalizedHexColor = normalizeHexColor(color);
+  if (normalizedHexColor) {
+    return normalizedHexColor;
+  }
+
+  const match = RGB_COLOR_PATTERN.exec(color.trim());
+  if (!match) {
+    return null;
+  }
+
+  const [, redChannel, greenChannel, blueChannel] = match;
+  if (!redChannel || !greenChannel || !blueChannel) {
+    return null;
+  }
+
+  const red = parseRgbChannel(redChannel);
+  const green = parseRgbChannel(greenChannel);
+  const blue = parseRgbChannel(blueChannel);
+
+  if (red === null || green === null || blue === null) {
+    return null;
+  }
+
+  return rgbChannelsToHex(red, green, blue);
+}
+
+function createPaletteDomAdapter(): PaletteDomAdapter | null {
+  if (typeof document === "undefined" || typeof getComputedStyle === "undefined") {
+    return null;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = 1;
+  const context = canvas.getContext("2d", { willReadFrequently: true }) ?? canvas.getContext("2d");
+  const sentinelColor = "#010203";
+
+  return {
+    createProbe: () => document.createElement("span"),
+    getComputedColor: (probe) => getComputedStyle(probe).color,
+    resolveScope: (scopeElement) =>
+      scopeElement?.closest<HTMLElement>(".theme-container") ?? document.querySelector<HTMLElement>(".theme-container"),
+    colorToHex: (color) => {
+      const normalizedHexColor = cssColorToHex(color);
+      if (normalizedHexColor) {
+        return normalizedHexColor;
+      }
+
+      if (!context) {
+        return null;
+      }
+
+      context.clearRect(0, 0, 1, 1);
+      context.fillStyle = sentinelColor;
+      const beforeFillStyle = context.fillStyle.toLowerCase();
+
+      try {
+        context.fillStyle = color;
+      } catch {
+        return null;
+      }
+
+      const normalizedInput = color.trim().toLowerCase();
+      const afterFillStyle = context.fillStyle.toLowerCase();
+      if (
+        afterFillStyle === beforeFillStyle &&
+        normalizedInput !== beforeFillStyle &&
+        normalizedInput !== sentinelColor
+      ) {
+        return null;
+      }
+
+      context.fillRect(0, 0, 1, 1);
+      const data = context.getImageData(0, 0, 1, 1).data;
+      const red = data[0] ?? 0;
+      const green = data[1] ?? 0;
+      const blue = data[2] ?? 0;
+
+      return rgbChannelsToHex(red, green, blue);
+    },
+  };
+}
+
 function formatMetricValue(value?: number, decimals?: number) {
   if (value === null || value === undefined) {
     return "";
@@ -193,6 +328,39 @@ function mapDistributionPoints(
 
 export function getExportPalette(chartColors?: ThemeItem["chartColors"] | null) {
   return EXPORT_PALETTE_KEYS.map((key, index) => chartColors?.[key] ?? DEFAULT_EXPORT_PALETTE[index]!);
+}
+
+export function getComputedExportPalette(
+  scopeElement: HTMLElement | null,
+  fallbackChartColors?: ThemeItem["chartColors"] | null,
+  domAdapter: PaletteDomAdapter | null = createPaletteDomAdapter()
+) {
+  if (!domAdapter) {
+    return getExportPalette(fallbackChartColors);
+  }
+
+  const scope = domAdapter.resolveScope(scopeElement);
+  if (!scope) {
+    return getExportPalette(fallbackChartColors);
+  }
+
+  const palette = EXPORT_PALETTE_KEYS.map((key) => {
+    const probe = domAdapter.createProbe();
+    probe.style.color = `var(--${key})`;
+    probe.style.position = "absolute";
+    probe.style.visibility = "hidden";
+    probe.style.pointerEvents = "none";
+    scope.appendChild(probe);
+
+    try {
+      const color = domAdapter.getComputedColor(probe);
+      return domAdapter.colorToHex?.(color) ?? cssColorToHex(color);
+    } finally {
+      probe.remove();
+    }
+  });
+
+  return palette.every((color): color is string => color !== null) ? palette : getExportPalette(fallbackChartColors);
 }
 
 export function buildExportMetaLine({
