@@ -46,6 +46,11 @@
       "sourceType": "github",
       "computedHash": "7075ab30f588019197a2f1518bb4c9d33d69d33352af079b5f9c60303ad3886e"
     },
+    "pptx-manipulation": {
+      "source": "madflow/skills",
+      "sourceType": "github",
+      "computedHash": "8cb2f288ff88f5d1760fa5366d40e3ab02a76da86ec77bee621e69146bf76464"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
@@ -65,6 +70,11 @@
       "source": "better-auth/skills",
       "sourceType": "github",
       "computedHash": "7e297aaf887e11fdc03e52bdbf44974e161e8f7c393170ced7dc66cace4f6d46"
+    },
+    "xlsx-manipulation": {
+      "source": "madflow/skills",
+      "sourceType": "github",
+      "computedHash": "08491dd6f5b4b0a2b7946150e4f1c601552ef12b02e6882386b6ba2c55489aca"
     }
   }
 }
