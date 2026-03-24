@@ -11,6 +11,11 @@ from analysis.services.excel_export import EXPORT_FONT_NAME, build_workbook
 from analysis.web.api.schemas.datasets import ExcelExportRequest
 
 
+def _chart_xml(workbook_bytes: bytes) -> str:
+    with ZipFile(BytesIO(workbook_bytes)) as archive:
+        return archive.read("xl/charts/chart1.xml").decode("utf-8")
+
+
 def test_build_workbook_for_mean_bar_uses_numeric_axis_format() -> None:
     """Mean bar exports should keep a numeric axis instead of percentages."""
     payload = {
@@ -77,6 +82,83 @@ def test_build_workbook_for_distribution_preserves_point_colors() -> None:
 
     assert '<a:srgbClr val="FF0000"/>' in chart_xml
     assert '<a:srgbClr val="00FF00"/>' in chart_xml
+
+
+def test_build_workbook_for_bar_chart_uses_light_gray_axis_and_plot_area_lines() -> (
+    None
+):
+    """Bar chart exports should use the sandbox light-gray axis and plot-area lines."""
+    payload = {
+        "file_name": "bar-export-2026-03-24.xlsx",
+        "title": "Age group",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 24, 2026",
+        "labels": {
+            "label": "Label",
+            "value": "Value",
+            "value_percent": "Value (%)",
+            "color": "Color",
+            "metric": "Metric",
+        },
+        "palette": ["#ff0000", "#00ff00"],
+        "chart": {
+            "kind": "bar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+    }
+
+    chart_xml = _chart_xml(build_workbook(payload))
+
+    assert re.search(
+        r"<catAx>.*?<spPr><a:ln[^>]*><a:solidFill><a:srgbClr val=\"999999\"/></a:solidFill>",
+        chart_xml,
+    )
+    assert re.search(
+        r"<valAx>.*?<majorGridlines><spPr><a:ln[^>]*><a:solidFill><a:srgbClr val=\"999999\"/></a:solidFill>",
+        chart_xml,
+    )
+    assert re.search(
+        r"<valAx>.*?<spPr><a:ln[^>]*><a:solidFill><a:srgbClr val=\"999999\"/></a:solidFill>",
+        chart_xml,
+    )
+    assert (
+        "<plotArea>" in chart_xml
+        and '<a:srgbClr val="FFFFFF"/>' in chart_xml
+        and '<a:srgbClr val="999999"/>' in chart_xml
+    )
+
+
+def test_build_workbook_for_pie_chart_uses_light_gray_plot_area_line() -> None:
+    """Pie chart exports should use the same light-gray plot-area border."""
+    payload = {
+        "file_name": "pie-export-2026-03-24.xlsx",
+        "title": "Preferred contact",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 24, 2026",
+        "labels": {
+            "label": "Label",
+            "value": "Value",
+            "value_percent": "Value (%)",
+            "color": "Color",
+            "metric": "Metric",
+        },
+        "palette": ["#ff0000", "#00ff00"],
+        "chart": {
+            "kind": "pie",
+            "points": [
+                {"label": "Email", "value": 55, "color": "#ff0000"},
+                {"label": "Phone", "value": 45, "color": "#00ff00"},
+            ],
+        },
+    }
+
+    chart_xml = _chart_xml(build_workbook(payload))
+
+    assert re.search(
+        r"<plotArea>.*?<spPr><a:solidFill[^>]*><a:srgbClr val=\"FFFFFF\"/></a:solidFill><a:ln[^>]*><a:solidFill><a:srgbClr val=\"999999\"/></a:solidFill>",
+        chart_xml,
+    )
 
 
 @pytest.mark.parametrize(
