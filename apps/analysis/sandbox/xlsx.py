@@ -1,66 +1,139 @@
+from typing import Any, Optional, cast
+
 from openpyxl import Workbook
 from openpyxl.chart import BarChart, Reference
+from openpyxl.chart.axis import ChartLines
 from openpyxl.chart.marker import DataPoint
-
 from openpyxl.chart.shapes import GraphicalProperties
-from openpyxl.drawing.fill import (
-    PatternFillProperties,
-    ColorChoice,
-    SolidColorFillProperties,
-)
+from openpyxl.drawing.colors import ColorChoice
+from openpyxl.worksheet.worksheet import Worksheet
 
-wb = Workbook()
-ws = wb.active
-
-rows = [
-    ("Sample",),
-    (1,),
-    (2,),
-    (3,),
-    (2,),
-    (3,),
-    (3,),
-    (1,),
-    (2,),
-]
-
-for r in rows:
-    ws.append(r)
+CHART_BORDER_WIDTH = 9360
+AXIS_BORDER_WIDTH = 3600
+SERIES_BORDER_WIDTH = 12600
 
 
-c = BarChart()
-data = Reference(ws, min_col=1, min_row=1, max_row=8)
-c.add_data(data, titles_from_data=True)
-c.title = "Chart with patterns"
-
-# Styling the plot area
-
-plot_area_properties = GraphicalProperties()
-# plot_area_properties.solidFill = ColorChoice(prstClr="blue")
-c.plot_area.graphicalProperties = plot_area_properties
+def make_color(color: str) -> ColorChoice:
+    """Create a chart color from a hex RGB string."""
+    return ColorChoice(srgbClr=cast(Any, color))
 
 
-# Styling the chart area
+def make_graphical_properties(
+    *,
+    fill_color: Optional[str] = None,
+    line_color: Optional[str] = None,
+    line_width: Optional[int] = None,
+    no_fill: bool = False,
+    no_line: bool = False,
+    round_line: bool = False,
+) -> GraphicalProperties:
+    """Build chart graphical properties for fills and borders."""
+    properties = GraphicalProperties()
 
-c.graphical_properties = GraphicalProperties()
-c.graphical_properties.line.noFill = True
-c.graphical_properties.line.prstDash = None
+    if fill_color is not None:
+        properties.solidFill = make_color(fill_color)
+    if no_fill:
+        properties.noFill = True
+    if line_width is not None:
+        properties.line.width = line_width
+    if line_color is not None:
+        properties.line.solidFill = make_color(line_color)
+    if no_line:
+        properties.line.noFill = True
+    if round_line:
+        properties.line.round = True
 
-# Styling the series
+    return properties
 
-series_properties = GraphicalProperties()
-series_properties.solidFill = ColorChoice(prstClr="yellow")
-series_properties.line.solidFill = ColorChoice(prstClr="red")
 
-# set a pattern for the whole series
-series = c.series[0]
-series.graphicalProperties = series_properties
+def main() -> None:
+    """Generate the patterned bar chart workbook."""
+    wb = Workbook()
+    ws = cast(Worksheet, wb.active)
 
-# set a pattern for a 6th data point (0-indexed)
-pt = DataPoint(idx=5)
-pt.graphicalProperties.pattFill = PatternFillProperties(prst="ltHorz")
-series.dPt.append(pt)
+    rows = [
+        ("Sample",),
+        (1,),
+        (2,),
+        (3,),
+        (2,),
+        (3,),
+        (3,),
+        (1,),
+        (2,),
+    ]
 
-ws.add_chart(c, "C1")
+    for row in rows:
+        ws.append(row)
 
-wb.save("pattern.xlsx")
+    chart = BarChart()
+    data = Reference(ws, min_col=1, min_row=1, max_row=8)
+    chart.add_data(data, titles_from_data=True)
+    chart.title = "Chart with patterns"
+
+    chart.graphical_properties = make_graphical_properties(
+        fill_color="ffffff",
+        line_width=CHART_BORDER_WIDTH,
+        no_line=True,
+    )
+    chart.plot_area.spPr = make_graphical_properties(
+        fill_color="ffffff",
+        line_color="999999",
+        line_width=AXIS_BORDER_WIDTH,
+        round_line=True,
+    )
+
+    chart.x_axis.axPos = "b"
+    chart.x_axis.crossesAt = 0
+    chart.x_axis.tickLblPos = "nextTo"
+    chart.x_axis.spPr = make_graphical_properties(
+        line_color="999999",
+        line_width=AXIS_BORDER_WIDTH,
+        round_line=True,
+    )
+
+    chart.y_axis.crossesAt = 0
+    chart.y_axis.tickLblPos = "nextTo"
+    chart.y_axis.spPr = make_graphical_properties(
+        line_color="999999",
+        line_width=AXIS_BORDER_WIDTH,
+        round_line=True,
+    )
+    chart.y_axis.majorGridlines = ChartLines(
+        spPr=make_graphical_properties(
+            line_color="999999",
+            line_width=AXIS_BORDER_WIDTH,
+            round_line=True,
+        )
+    )
+
+    chart.legend.spPr = make_graphical_properties(
+        no_fill=True,
+        line_width=0,
+        no_line=True,
+    )
+
+    series = chart.series[0]
+    series.invertIfNegative = False
+    series.graphicalProperties = make_graphical_properties(
+        fill_color="ffff00",
+        line_color="ff0000",
+        line_width=SERIES_BORDER_WIDTH,
+        round_line=True,
+    )
+
+    point = DataPoint(idx=5)
+    point.invertIfNegative = False
+    point.graphicalProperties = make_graphical_properties(
+        no_fill=True,
+        line_width=0,
+        no_line=True,
+    )
+    series.dPt = [point]
+
+    ws.add_chart(chart, "C1")
+    wb.save("pattern.xlsx")
+
+
+if __name__ == "__main__":
+    main()
