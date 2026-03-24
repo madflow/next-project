@@ -329,6 +329,11 @@ def _set_value_axis_range(
     chart.y_axis.numFmt = number_format
 
 
+def _reverse_horizontal_category_axis(chart: BarChart) -> None:
+    chart.x_axis.scaling.orientation = "maxMin"
+    chart.y_axis.crosses = "max"
+
+
 def _apply_point_fills(series: Any, colors: list[str]) -> None:
     if not colors:
         return
@@ -504,6 +509,8 @@ def _build_distribution_chart(
         position="outEnd",
         number_format=PERCENT_NUMBER_FORMAT,
     )
+    if horizontal:
+        _reverse_horizontal_category_axis(chart)
     _apply_point_fills(chart.ser[0], [point["color"] for point in points])
 
     return chart
@@ -541,6 +548,7 @@ def _build_stacked_bar_chart(
         position="ctr",
         number_format=STACKED_CHART_NUMBER_FORMAT,
     )
+    _reverse_horizontal_category_axis(chart)
     _apply_series_fills(
         list(chart.ser),
         [segment["color"] for segment in rows[0]["segments"]],
@@ -609,6 +617,7 @@ def _build_mean_bar_chart(
         position="outEnd",
         number_format=MEAN_NUMBER_FORMAT,
     )
+    _reverse_horizontal_category_axis(chart)
     _apply_series_fills(list(chart.ser), [chart_payload["color"]])
 
     return chart

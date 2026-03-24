@@ -1,3 +1,4 @@
+import re
 from io import BytesIO
 from zipfile import ZipFile
 
@@ -76,6 +77,80 @@ def test_build_workbook_for_distribution_preserves_point_colors() -> None:
 
     assert '<a:srgbClr val="FF0000"/>' in chart_xml
     assert '<a:srgbClr val="00FF00"/>' in chart_xml
+
+
+@pytest.mark.parametrize(
+    "chart",
+    [
+        {
+            "kind": "horizontalBar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "multiResponse",
+            "points": [
+                {"label": "Email", "value": 55, "color": "#ff0000"},
+                {"label": "Phone", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "horizontalStackedBar",
+            "rows": [
+                {
+                    "label": "Group A",
+                    "segments": [
+                        {"label": "Yes", "value": 60, "color": "#1f2937"},
+                        {"label": "No", "value": 40, "color": "#e5e7eb"},
+                    ],
+                }
+            ],
+        },
+        {
+            "kind": "meanBar",
+            "points": [
+                {"label": "Mean", "value": 4.2},
+                {"label": "Median", "value": 4.0},
+            ],
+            "min_value": 1,
+            "max_value": 5,
+            "color": "#3b82f6",
+        },
+    ],
+    ids=["horizontal-bar", "multi-response", "stacked", "mean-bar"],
+)
+def test_build_workbook_for_horizontal_charts_reverses_category_axis_and_axis_crossing(
+    chart: dict[str, object],
+) -> None:
+    """Horizontal charts should match worksheet row order and keep the axis line at the end."""
+    payload = {
+        "file_name": f"{chart['kind']}-export-2026-03-24.xlsx",
+        "title": "Chart export",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 24, 2026",
+        "labels": {
+            "label": "Label",
+            "value": "Value",
+            "value_percent": "Value (%)",
+            "color": "Color",
+            "metric": "Metric",
+        },
+        "palette": ["#3b82f6", "#ef4444"],
+        "chart": chart,
+    }
+
+    workbook_bytes = build_workbook(payload)
+
+    with ZipFile(BytesIO(workbook_bytes)) as archive:
+        chart_xml = archive.read("xl/charts/chart1.xml").decode("utf-8")
+
+    assert re.search(
+        r"<catAx>.*?<orientation val=\"maxMin\"/>.*?</catAx>",
+        chart_xml,
+    )
+    assert re.search(r"<valAx>.*?<crosses val=\"max\"/>.*?</valAx>", chart_xml)
+    assert not re.search(r"<catAx>.*?<crosses val=\"max\"/>.*?</catAx>", chart_xml)
 
 
 @pytest.mark.parametrize(
