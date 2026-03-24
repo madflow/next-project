@@ -14,7 +14,7 @@ import {
   createMultiResponsePowerPointExportPayload,
   exportExcelForDataset,
   exportPowerPointForDataset,
-  getExportPalette,
+  getComputedExportPalette,
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
@@ -137,18 +137,17 @@ export function MultiResponseChart({
       }),
     [datasetName, locale, tAdhoc]
   );
-  const exportPalette = useMemo(
-    () => getExportPalette(resolveTheme(activeTheme).theme.chartColors),
-    [activeTheme, resolveTheme]
-  );
+  const fallbackChartColors = useMemo(() => resolveTheme(activeTheme).theme.chartColors, [activeTheme, resolveTheme]);
 
   const handlePowerPointExport = useCallback(async () => {
     try {
+      const palette = getComputedExportPalette(displayRef.current ?? exportRef.current, fallbackChartColors);
+
       const payload = createMultiResponsePowerPointExportPayload({
         countedValue,
         fileBaseName: exportBaseName,
         metaLine: exportMetaLine,
-        palette: exportPalette,
+        palette,
         statsData,
         title: variablesetName,
         variables,
@@ -162,9 +161,11 @@ export function MultiResponseChart({
   }, [
     countedValue,
     datasetId,
+    displayRef,
     exportBaseName,
+    exportRef,
     exportMetaLine,
-    exportPalette,
+    fallbackChartColors,
     statsData,
     tAdhoc,
     variables,
@@ -173,6 +174,8 @@ export function MultiResponseChart({
 
   const handleExcelExport = useCallback(async () => {
     try {
+      const palette = getComputedExportPalette(displayRef.current ?? exportRef.current, fallbackChartColors);
+
       const payload = createMultiResponseExcelExportPayload({
         countedValue,
         excelLabels: {
@@ -184,7 +187,7 @@ export function MultiResponseChart({
         },
         fileBaseName: exportBaseName,
         metaLine: exportMetaLine,
-        palette: exportPalette,
+        palette,
         statsData,
         title: variablesetName,
         variables,
@@ -198,9 +201,11 @@ export function MultiResponseChart({
   }, [
     countedValue,
     datasetId,
+    displayRef,
     exportBaseName,
+    exportRef,
     exportMetaLine,
-    exportPalette,
+    fallbackChartColors,
     statsData,
     tAdhoc,
     variables,

@@ -10,6 +10,7 @@ import {
   createMultiResponsePowerPointExportPayload,
   createVariableChartExcelExportPayload,
   createVariableChartPowerPointExportPayload,
+  getComputedExportPalette,
   getExportPalette,
 } from "./adhoc-export";
 
@@ -85,6 +86,90 @@ describe("adhoc export helpers", () => {
   test("getExportPalette falls back to defaults", () => {
     const result = getExportPalette(undefined);
     assert.deepStrictEqual(result, ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"]);
+  });
+
+  test("getComputedExportPalette resolves live chart CSS colors", () => {
+    const paletteByVariable: Record<string, string> = {
+      "var(--chart-1)": "rgb(59, 130, 246)",
+      "var(--chart-2)": "rgb(29, 78, 216)",
+      "var(--chart-3)": "rgb(96, 165, 250)",
+      "var(--chart-4)": "rgb(147, 197, 253)",
+      "var(--chart-5)": "rgb(219, 234, 254)",
+      "var(--chart-6)": "rgb(239, 246, 255)",
+    };
+
+    const result = getComputedExportPalette(null, undefined, {
+      createProbe: () =>
+        ({
+          style: { color: "", pointerEvents: "", position: "", visibility: "" },
+          remove() {},
+        }) as unknown as HTMLElement,
+      getComputedColor: (probe) => paletteByVariable[probe.style.color] ?? "",
+      resolveScope: () =>
+        ({
+          appendChild() {},
+        }) as unknown as HTMLElement,
+    });
+
+    assert.deepStrictEqual(result, ["#3b82f6", "#1d4ed8", "#60a5fa", "#93c5fd", "#dbeafe", "#eff6ff"]);
+  });
+
+  test("getComputedExportPalette supports non-rgb computed CSS colors", () => {
+    const paletteByVariable: Record<string, string> = {
+      "var(--chart-1)": "lab(77.5052 -6.4629 -36.42)",
+      "var(--chart-2)": "lab(54.1736 13.3369 -74.6839)",
+      "var(--chart-3)": "lab(0 0 0)",
+      "var(--chart-4)": "lab(0 0 0)",
+      "var(--chart-5)": "lab(0 0 0)",
+      "var(--chart-6)": "lab(0 0 0)",
+    };
+    const convertedColors: Record<string, string> = {
+      "lab(77.5052 -6.4629 -36.42)": "#8ec5ff",
+      "lab(54.1736 13.3369 -74.6839)": "#2b7fff",
+      "lab(0 0 0)": "#000000",
+    };
+
+    const result = getComputedExportPalette(null, undefined, {
+      createProbe: () =>
+        ({
+          style: { color: "", pointerEvents: "", position: "", visibility: "" },
+          remove() {},
+        }) as unknown as HTMLElement,
+      getComputedColor: (probe) => paletteByVariable[probe.style.color] ?? "",
+      resolveScope: () =>
+        ({
+          appendChild() {},
+        }) as unknown as HTMLElement,
+      colorToHex: (color) => convertedColors[color] ?? null,
+    });
+
+    assert.deepStrictEqual(result, ["#8ec5ff", "#2b7fff", "#000000", "#000000", "#000000", "#000000"]);
+  });
+
+  test("getComputedExportPalette falls back when CSS colors cannot be resolved", () => {
+    const fallbackChartColors = {
+      "chart-1": "#111111",
+      "chart-2": "#222222",
+      "chart-3": "#333333",
+      "chart-4": "#444444",
+      "chart-5": "#555555",
+      "chart-6": "#666666",
+    };
+
+    const result = getComputedExportPalette(null, fallbackChartColors, {
+      createProbe: () =>
+        ({
+          style: { color: "", pointerEvents: "", position: "", visibility: "" },
+          remove() {},
+        }) as unknown as HTMLElement,
+      getComputedColor: () => "not-a-color",
+      resolveScope: () =>
+        ({
+          appendChild() {},
+        }) as unknown as HTMLElement,
+    });
+
+    assert.deepStrictEqual(result, ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666"]);
   });
 
   test("createVariableChartPowerPointExportPayload maps bar chart data", () => {

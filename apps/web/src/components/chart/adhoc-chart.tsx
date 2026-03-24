@@ -14,7 +14,7 @@ import {
   createVariableChartPowerPointExportPayload,
   exportExcelForDataset,
   exportPowerPointForDataset,
-  getExportPalette,
+  getComputedExportPalette,
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
 import { hasSplitVariableStatsForVariable } from "@/lib/analysis-bridge";
@@ -174,10 +174,7 @@ export function AdhocChart({
       }),
     [datasetId, datasetName, locale, splitVariableLabel, t]
   );
-  const exportPalette = useMemo(
-    () => getExportPalette(resolveTheme(activeTheme).theme.chartColors),
-    [activeTheme, resolveTheme]
-  );
+  const fallbackChartColors = useMemo(() => resolveTheme(activeTheme).theme.chartColors, [activeTheme, resolveTheme]);
   const exportBaseName = useMemo(() => sanitizeExportBaseName(variable.name), [variable.name]);
 
   const handlePowerPointExport = useCallback(async () => {
@@ -186,6 +183,8 @@ export function AdhocChart({
     }
 
     try {
+      const palette = getComputedExportPalette(displayRef.current ?? exportRef.current, fallbackChartColors);
+
       const payload = createVariableChartPowerPointExportPayload({
         chartType: actualSelectedChartType,
         countedValue,
@@ -200,7 +199,7 @@ export function AdhocChart({
           min: tChart("min"),
           stdev: tChart("stdev"),
         },
-        palette: exportPalette,
+        palette,
         stats,
         variable,
       });
@@ -214,9 +213,11 @@ export function AdhocChart({
     actualSelectedChartType,
     countedValue,
     datasetId,
+    displayRef,
     exportBaseName,
+    exportRef,
     exportMetaLine,
-    exportPalette,
+    fallbackChartColors,
     isMultiResponseIndividual,
     stats,
     t,
@@ -230,6 +231,8 @@ export function AdhocChart({
     }
 
     try {
+      const palette = getComputedExportPalette(displayRef.current ?? exportRef.current, fallbackChartColors);
+
       const payload = createVariableChartExcelExportPayload({
         chartType: actualSelectedChartType,
         countedValue,
@@ -251,7 +254,7 @@ export function AdhocChart({
           min: tChart("min"),
           stdev: tChart("stdev"),
         },
-        palette: exportPalette,
+        palette,
         stats,
         variable,
       });
@@ -265,9 +268,11 @@ export function AdhocChart({
     actualSelectedChartType,
     countedValue,
     datasetId,
+    displayRef,
     exportBaseName,
+    exportRef,
     exportMetaLine,
-    exportPalette,
+    fallbackChartColors,
     isMultiResponseIndividual,
     stats,
     t,
