@@ -165,3 +165,35 @@ e2e-single:
 .PHONY: venv
 venv:
 	python3 -m venv ./apps/analysis/.venv
+
+
+## Production: Docker docker-up
+.PHONY: prod-up
+prod-up:
+	docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+
+## Production: Docker docker-down
+.PHONY: prod-down
+prod-down:
+	docker compose -f docker-compose.prod.yml down
+
+## Production: Docker logs for all services
+.PHONY: prod-logs
+prod-logs:
+	docker compose -f docker-compose.prod.yml logs -f -n 100
+
+## Production: Docker shell into a running container. Usage: make prod-shell SERVICE=web
+.PHONY: prod-shell
+prod-shell:
+	@if [ -z "$(SERVICE)" ]; then \
+		echo "Error: SERVICE parameter is required. Usage: make prod-shell SERVICE=web";
+		exit 1; \
+	fi
+	docker compose -f docker-compose.prod.yml exec $(SERVICE) sh
+
+## Production: Update images and restart services
+.PHONY: prod-update
+prod-update:
+	docker compose -f docker-compose.prod.yml pull
+	docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+	
