@@ -1,48 +1,20 @@
-# Global options (must be first)
-{
-	# Email for Let's Encrypt
-	# email {$CADDY_EMAIL}
-}
-
-# Main application - facing the internet
 {$SITE_ADDRESS} {
-
-	basic_auth {
-		{$BASIC_AUTH}
-	}
-
-  redir /__mail /__mail/
-	handle_path /__mail/* {
-    rewrite * /__mail{path}
-		reverse_proxy smtp:8025
-	}
-
-	# Main application (catch-all)
 	reverse_proxy app:3000 {
-		# Health check endpoint
 		health_uri /api/health
 		health_interval 10s
 		health_timeout 5s
 	}
 
-	# Enable gzip compression
 	encode gzip
 
-	# Security headers
 	header {
-		# HSTS
 		Strict-Transport-Security max-age=31536000;
-		# Prevent MIME sniffing
 		X-Content-Type-Options nosniff
-		# XSS protection
 		X-XSS-Protection "1; mode=block"
-		# Clickjacking protection
 		X-Frame-Options DENY
-		# Remove server info
 		-Server
 	}
 
-	# Logging
 	log {
 		output file /var/log/caddy/access.log
 		format console
