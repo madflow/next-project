@@ -25,12 +25,23 @@ const emailTranslations = {
       urlInstructions: "or copy and paste this URL into your browser:",
     },
     organizationInvite: {
-      subject: "You have been invited",
+      subject: (_organizationName: string, siteName: string) =>
+        siteName ? `Invitation to join ${siteName}` : "Invitation to join an organization",
       heading: "You have been invited",
-      content: (organizationName: string) => `You have been invited to join an organization.`,
+      content: (organizationName: string, siteName: string) => {
+        const organization = organizationName ? `the organization "${organizationName}"` : "an organization";
+        const platform = siteName ? ` on the platform "${siteName}"` : "";
+
+        return `You have been invited to join ${organization}${platform}.`;
+      },
       action: "Accept invitation",
-      invitedBy: (inviterName: string, organizationName: string) => `has invited you to join ${organizationName}.`,
-      joinPrompt: (organizationName: string) => `Join ${organizationName} to get started.`,
+      invitedBy: (_inviterName: string, organizationName: string, siteName: string) => {
+        const organization = organizationName ? `the organization "${organizationName}"` : "an organization";
+        const platform = siteName ? ` on the platform "${siteName}"` : "";
+
+        return `has invited you to join ${organization}${platform}.`;
+      },
+      joinPrompt: (_organizationName: string, _siteName: string) => "Click the button below to accept this invitation.",
       urlInstructions: "or copy and paste this URL into your browser:",
     },
     footer: {
@@ -66,13 +77,24 @@ const emailTranslations = {
       urlInstructions: "oder kopieren Sie diese URL und fügen Sie sie in Ihren Browser ein:",
     },
     organizationInvite: {
-      subject: "Sie wurden eingeladen",
+      subject: (_organizationName: string, siteName: string) =>
+        siteName ? `Einladung zum Beitritt zu ${siteName}` : "Einladung zum Beitritt zu einer Organisation",
       heading: "Sie wurden eingeladen",
-      content: (organizationName: string) => `Sie wurden eingeladen, einer Organisation beizutreten.`,
+      content: (organizationName: string, siteName: string) => {
+        const organization = organizationName ? `der Organisation "${organizationName}"` : "einer Organisation";
+        const platform = siteName ? ` auf der Plattform "${siteName}"` : "";
+
+        return `Sie wurden eingeladen, ${organization}${platform} beizutreten.`;
+      },
       action: "Einladung annehmen",
-      invitedBy: (inviterName: string, organizationName: string) =>
-        `hat Sie eingeladen, der Organisation ${organizationName} beizutreten.`,
-      joinPrompt: (organizationName: string) => `Treten Sie ${organizationName} bei, um loszulegen.`,
+      invitedBy: (_inviterName: string, organizationName: string, siteName: string) => {
+        const organization = organizationName ? `der Organisation "${organizationName}"` : "einer Organisation";
+        const platform = siteName ? ` auf der Plattform "${siteName}"` : "";
+
+        return `hat Sie eingeladen, ${organization}${platform} beizutreten.`;
+      },
+      joinPrompt: (_organizationName: string, _siteName: string) =>
+        "Klicken Sie auf die Schaltfläche unten, um diese Einladung anzunehmen.",
       urlInstructions: "oder kopieren Sie diese URL und fügen Sie sie in Ihren Browser ein:",
     },
     footer: {
@@ -86,56 +108,105 @@ const emailTranslations = {
 export type EmailType = "emailVerification" | "passwordReset" | "emailChange" | "organizationInvite";
 export type Locale = "en" | "de";
 
+type BaseEmailTranslations = {
+  subject: string;
+  heading: string;
+  content: string;
+  action: string;
+  urlInstructions: string;
+};
+
+type PasswordResetEmailTranslations = BaseEmailTranslations & {
+  instructions: string;
+};
+
+type EmailChangeEmailTranslations = BaseEmailTranslations & {
+  newEmailLabel: string;
+  confirmInstructions: string;
+};
+
+type OrganizationInviteEmailTranslations = BaseEmailTranslations & {
+  invitedBy: string;
+  joinPrompt: string;
+};
+
+type EmailTranslationsByType = {
+  emailVerification: BaseEmailTranslations;
+  passwordReset: PasswordResetEmailTranslations;
+  emailChange: EmailChangeEmailTranslations;
+  organizationInvite: OrganizationInviteEmailTranslations;
+};
+
 interface EmailTranslationData {
   newEmail?: string;
   organizationName?: string;
   inviterName?: string;
+  siteName?: string;
 }
 
-export function getEmailTranslations(type: EmailType, locale?: string, data?: EmailTranslationData) {
+export function getEmailTranslations<T extends EmailType>(
+  type: T,
+  locale?: string,
+  data?: EmailTranslationData
+): EmailTranslationsByType[T] {
   const lang: Locale = locale === "de" ? "de" : "en";
-  const template = emailTranslations[lang][type];
 
-  const content =
-    typeof template.content === "function"
-      ? template.content(data?.newEmail || data?.organizationName || "")
-      : template.content;
+  switch (type) {
+    case "emailVerification": {
+      const template = emailTranslations[lang].emailVerification;
 
-  let invitedBy = "";
-  let joinPrompt = "";
+      return {
+        subject: template.subject,
+        heading: template.heading,
+        content: template.content,
+        action: template.action,
+        urlInstructions: template.urlInstructions,
+      } as EmailTranslationsByType[T];
+    }
 
-  if (type === "organizationInvite" && "invitedBy" in template) {
-    invitedBy =
-      typeof template.invitedBy === "function"
-        ? template.invitedBy(data?.inviterName || "", data?.organizationName || "")
-        : template.invitedBy;
+    case "passwordReset": {
+      const template = emailTranslations[lang].passwordReset;
 
-    joinPrompt =
-      typeof template.joinPrompt === "function"
-        ? template.joinPrompt(data?.organizationName || "")
-        : template.joinPrompt;
+      return {
+        subject: template.subject,
+        heading: template.heading,
+        content: template.content,
+        action: template.action,
+        instructions: template.instructions,
+        urlInstructions: template.urlInstructions,
+      } as EmailTranslationsByType[T];
+    }
+
+    case "emailChange": {
+      const template = emailTranslations[lang].emailChange;
+
+      return {
+        subject: template.subject,
+        heading: template.heading,
+        content: template.content,
+        action: template.action,
+        newEmailLabel: template.newEmailLabel,
+        confirmInstructions: template.confirmInstructions,
+        urlInstructions: template.urlInstructions,
+      } as EmailTranslationsByType[T];
+    }
+
+    case "organizationInvite": {
+      const template = emailTranslations[lang].organizationInvite;
+
+      return {
+        subject: template.subject(data?.organizationName || "", data?.siteName || ""),
+        heading: template.heading,
+        content: template.content(data?.organizationName || "", data?.siteName || ""),
+        action: template.action,
+        invitedBy: template.invitedBy(data?.inviterName || "", data?.organizationName || "", data?.siteName || ""),
+        joinPrompt: template.joinPrompt(data?.organizationName || "", data?.siteName || ""),
+        urlInstructions: template.urlInstructions,
+      } as EmailTranslationsByType[T];
+    }
   }
 
-  return {
-    subject: template.subject,
-    heading: template.heading,
-    content,
-    action: template.action,
-    ...(type === "passwordReset" && "instructions" in template ? { instructions: template.instructions } : {}),
-    ...(type === "emailChange" && "newEmailLabel" in template
-      ? {
-          newEmailLabel: template.newEmailLabel,
-          confirmInstructions: template.confirmInstructions,
-        }
-      : {}),
-    ...(type === "organizationInvite"
-      ? {
-          invitedBy,
-          joinPrompt,
-        }
-      : {}),
-    urlInstructions: template.urlInstructions,
-  };
+  throw new Error(`Unsupported email translation type: ${type}`);
 }
 
 export function getFooterTranslations(locale?: string) {
