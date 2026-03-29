@@ -7,8 +7,6 @@ export default function OrganizationInvite({
   email,
   url,
   organizationName,
-  inviterName,
-  inviterEmail,
   heading,
   content,
   action,
@@ -16,27 +14,18 @@ export default function OrganizationInvite({
   siteName,
   locale = "en",
 }: OrganizationInviteProps) {
-  const t = getEmailTranslations("organizationInvite", locale, { organizationName, inviterName });
+  const t = getEmailTranslations("organizationInvite", locale, { organizationName, siteName });
 
   return (
     <Html>
       <Head />
-      <Preview>Join {organizationName}</Preview>
+      <Preview>{content}</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">{heading}</Heading>
-            {inviterName && inviterEmail ? (
-              <Text className="text-sm leading-6 text-black">
-                <strong>{inviterName}</strong> (
-                <Link className="text-blue-600 no-underline" href={`mailto:${inviterEmail}`}>
-                  {inviterEmail}
-                </Link>
-                ) {t.invitedBy}
-              </Text>
-            ) : (
-              <Text className="text-sm leading-6 text-black">{t.joinPrompt}</Text>
-            )}
+            <Text className="text-sm leading-6 text-black">{content}</Text>
+            <Text className="text-sm leading-6 text-black">{t.joinPrompt}</Text>
             <Section className="my-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
@@ -60,9 +49,18 @@ OrganizationInvite.PreviewProps = {
   organizationName: "Acme Corporation",
   inviterName: "John Doe",
   inviterEmail: "john@example.com",
-  heading: getEmailTranslations("organizationInvite", "en", { organizationName: "Acme Corporation" }).heading,
-  content: getEmailTranslations("organizationInvite", "en", { organizationName: "Acme Corporation" }).content,
-  action: getEmailTranslations("organizationInvite", "en", { organizationName: "Acme Corporation" }).action,
+  heading: getEmailTranslations("organizationInvite", "en", {
+    organizationName: "Acme Corporation",
+    siteName: "Next.js App",
+  }).heading,
+  content: getEmailTranslations("organizationInvite", "en", {
+    organizationName: "Acme Corporation",
+    siteName: "Next.js App",
+  }).content,
+  action: getEmailTranslations("organizationInvite", "en", {
+    organizationName: "Acme Corporation",
+    siteName: "Next.js App",
+  }).action,
   baseUrl: "http://localhost:3000",
   siteName: "Next.js App",
   locale: "en",

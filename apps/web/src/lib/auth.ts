@@ -214,13 +214,11 @@ export const auth = betterAuth({
         },
       },
       async sendInvitationEmail(data, request) {
-        const inviter = await db
-          .select()
-          .from(authSchema.user)
-          .where(eq(authSchema.user.id, data.invitation.inviterId))
-          .limit(1);
+        const inviter = (
+          await db.select().from(authSchema.user).where(eq(authSchema.user.id, data.invitation.inviterId)).limit(1)
+        )[0];
 
-        const inviterLocale = inviter[0]?.locale ?? undefined;
+        const inviterLocale = inviter?.locale ?? undefined;
         const cookieHeader = request?.headers.get("cookie");
         const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
         const locale = inviterLocale || requestedLocale || defaultLocale;
@@ -228,6 +226,7 @@ export const auth = betterAuth({
         const inviteLink = `${env.BASE_URL}/auth/accept-invitation/${data.invitation.id}`;
         const { subject, heading, content, action } = getEmailTranslations("organizationInvite", locale, {
           organizationName: data.organization.name,
+          siteName: env.SITE_NAME,
         });
         await sendEmail({
           to: data.invitation.email,
@@ -241,6 +240,8 @@ export const auth = betterAuth({
             content,
             action,
             organizationName: data.organization.name,
+            inviterName: inviter?.name,
+            inviterEmail: inviter?.email,
             baseUrl: env.BASE_URL,
             siteName: env.SITE_NAME,
             locale,
