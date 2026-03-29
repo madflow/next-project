@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "env": ["DATABASE_*"],
+      "env": ["DATABASE_*", "SENTRY_DSN"],
       "inputs": ["$TURBO_DEFAULT$", ".env"]
     },
     "dev": {
