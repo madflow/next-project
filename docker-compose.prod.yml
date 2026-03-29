@@ -81,6 +81,7 @@ services:
     environment:
       - DOCKER_RUN_MIGRATIONS=1
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      - SENTRY_DSN=${APP_SENTRY_DSN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,6 +91,7 @@ services:
     image: ghcr.io/madflow/next-project-cli:main
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      - SENTRY_DSN=${APP_SENTRY_DSN}
     depends_on:
       postgres:
         condition: service_healthy
