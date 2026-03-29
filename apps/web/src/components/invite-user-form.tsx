@@ -6,12 +6,12 @@ import { useTranslations } from "next-intl";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { inviteMember as inviteMemberAction } from "@/actions/invitation";
 import { OrganizationSelect } from "@/components/form/organization-select";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { organization } from "@/lib/auth-client";
 import { User } from "@/types/user";
 
 type InviteFormTranslations = {
@@ -63,23 +63,17 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
 
   const onSubmit = async (formData: FormValues) => {
     try {
-      const { error } = await organization.inviteMember({
+      await inviteMemberAction({
         email: formData.email,
         role: formData.role,
         organizationId: formData.organizationId,
         resend: true,
       });
 
-      if (error) {
-        toast.error(t("messages.inviteError"));
-        console.error(error);
-        return;
-      }
-
       toast.success(t("messages.inviteSuccess"));
       form.reset();
     } catch (error) {
-      toast.error(t("messages.inviteError"));
+      toast.error(error instanceof Error ? error.message : t("messages.inviteError"));
       console.error(error);
       return;
     }

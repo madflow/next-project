@@ -12,9 +12,8 @@ async function inviteUser(page: Page, userEmail: string) {
   await getOrgResponsePromise;
   await page.getByTestId("app.organization-switcher.invite").click();
   await page.getByTestId("admin.users.invite.form.email").fill(userEmail);
-  const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
   await page.getByTestId("admin.users.invite.form.submit").click();
-  await inviteResponsePromise;
+  await expect(page.getByText(/Invitation sent successfully|Einladung erfolgreich gesendet/)).toBeVisible();
   await page.getByTestId("invite-user-modal.close").click();
 }
 
@@ -36,7 +35,6 @@ async function visitAcceptPageFromEmail(page: Page, userEmail: string) {
   await smtpServerApi.deleteMessagesBySearch({ query: `to:"${userEmail}"` });
   await page.goto(acceptLink);
 }
-
 
 test.describe("User invitations", () => {
   test("an owner can invite a not existing user", { tag: ["@sign-up-enabled"] }, async ({ page }) => {

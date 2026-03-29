@@ -5,16 +5,10 @@ import { admin as adminPlugin, organization as organizationPlugin } from "better
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
-import {
-  EmailChange,
-  EmailVerification,
-  OrganizationInvite,
-  PasswordReset,
-  getEmailTranslations,
-  sendEmail,
-} from "@repo/email";
+import { EmailChange, EmailVerification, OrganizationInvite, PasswordReset, getEmailTranslations } from "@repo/email";
 import { env } from "@/env";
 import { defaultLocale, extractAppLocale } from "@/i18n/config";
+import { sendAuthEmail } from "./auth-email";
 
 export const USER_ADMIN_ROLE = "admin";
 export const USER_ROLE = "user";
@@ -100,23 +94,28 @@ export const auth = betterAuth({
         const locale = user.locale || requestedLocale || defaultLocale;
         const { subject, heading, content, action } = getEmailTranslations("emailChange", locale, { newEmail });
 
-        await sendEmail({
-          to: user.email,
-          from: env.MAIL_DEFAULT_SENDER,
-          subject,
-          text: `${content}\n\n${action}: ${url}`,
-          react: EmailChange({
-            email: user.email,
-            url,
-            heading,
-            content,
-            action,
-            newEmail,
-            baseUrl: env.BASE_URL,
-            siteName: env.SITE_NAME,
-            locale,
-          }),
-        });
+        await sendAuthEmail(
+          {
+            to: user.email,
+            from: env.MAIL_DEFAULT_SENDER,
+            subject,
+            text: `${content}\n\n${action}: ${url}`,
+            react: EmailChange({
+              email: user.email,
+              url,
+              heading,
+              content,
+              action,
+              newEmail,
+              baseUrl: env.BASE_URL,
+              siteName: env.SITE_NAME,
+              locale,
+            }),
+          },
+          {
+            emailType: "emailChange",
+          }
+        );
       },
     },
   },
@@ -151,22 +150,27 @@ export const auth = betterAuth({
 
       const locale = user.locale || requestedLocale || defaultLocale;
       const { subject, heading, content, action } = getEmailTranslations("emailVerification", locale);
-      await sendEmail({
-        to: user.email,
-        from: env.MAIL_DEFAULT_SENDER,
-        subject,
-        text: `${content}\n\n${action}: ${url}`,
-        react: EmailVerification({
-          email: user.email,
-          url,
-          heading,
-          content,
-          action,
-          baseUrl: env.BASE_URL,
-          siteName: env.SITE_NAME,
-          locale,
-        }),
-      });
+      await sendAuthEmail(
+        {
+          to: user.email,
+          from: env.MAIL_DEFAULT_SENDER,
+          subject,
+          text: `${content}\n\n${action}: ${url}`,
+          react: EmailVerification({
+            email: user.email,
+            url,
+            heading,
+            content,
+            action,
+            baseUrl: env.BASE_URL,
+            siteName: env.SITE_NAME,
+            locale,
+          }),
+        },
+        {
+          emailType: "emailVerification",
+        }
+      );
     },
     autoSignInAfterVerification: false,
   },
@@ -181,22 +185,27 @@ export const auth = betterAuth({
       const requestedLocale = cookieHeader ? extractAppLocale(cookieHeader) : undefined;
       const locale = user.locale || requestedLocale || defaultLocale;
       const { subject, heading, content, action } = getEmailTranslations("passwordReset", locale);
-      await sendEmail({
-        to: user.email,
-        from: env.MAIL_DEFAULT_SENDER,
-        subject,
-        text: `${content}\n\n${action}: ${url}`,
-        react: PasswordReset({
-          email: user.email,
-          url,
-          heading,
-          content,
-          action,
-          baseUrl: env.BASE_URL,
-          siteName: env.SITE_NAME,
-          locale,
-        }),
-      });
+      await sendAuthEmail(
+        {
+          to: user.email,
+          from: env.MAIL_DEFAULT_SENDER,
+          subject,
+          text: `${content}\n\n${action}: ${url}`,
+          react: PasswordReset({
+            email: user.email,
+            url,
+            heading,
+            content,
+            action,
+            baseUrl: env.BASE_URL,
+            siteName: env.SITE_NAME,
+            locale,
+          }),
+        },
+        {
+          emailType: "passwordReset",
+        }
+      );
     },
   },
   plugins: [
@@ -229,23 +238,31 @@ export const auth = betterAuth({
         const { subject, heading, content, action } = getEmailTranslations("organizationInvite", locale, {
           organizationName: data.organization.name,
         });
-        await sendEmail({
-          to: data.invitation.email,
-          from: env.MAIL_DEFAULT_SENDER,
-          subject,
-          text: `${content}\n\n${action}: ${inviteLink}`,
-          react: OrganizationInvite({
-            email: data.invitation.email,
-            url: inviteLink,
-            heading,
-            content,
-            action,
-            organizationName: data.organization.name,
-            baseUrl: env.BASE_URL,
-            siteName: env.SITE_NAME,
-            locale,
-          }),
-        });
+        await sendAuthEmail(
+          {
+            to: data.invitation.email,
+            from: env.MAIL_DEFAULT_SENDER,
+            subject,
+            text: `${content}\n\n${action}: ${inviteLink}`,
+            react: OrganizationInvite({
+              email: data.invitation.email,
+              url: inviteLink,
+              heading,
+              content,
+              action,
+              organizationName: data.organization.name,
+              baseUrl: env.BASE_URL,
+              siteName: env.SITE_NAME,
+              locale,
+            }),
+          },
+          {
+            emailType: "organizationInvite",
+            organizationId: data.organization.id,
+            invitationId: data.invitation.id,
+            inviterId: data.invitation.inviterId,
+          }
+        );
       },
       allowUserToCreateOrganization: async () => {
         return false;

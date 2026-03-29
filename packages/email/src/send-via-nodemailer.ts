@@ -18,6 +18,9 @@ export async function sendViaNodeMailer({
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_SERVER_HOST || process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_SERVER_PORT || process.env.SMTP_PORT || "587", 10),
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000,
     auth: {
       user: process.env.SMTP_SERVER_USERNAME || process.env.SMTP_USER,
       pass: process.env.SMTP_SERVER_PASSWORD || process.env.SMTP_PASSWORD,
@@ -27,13 +30,6 @@ export async function sendViaNodeMailer({
       rejectUnauthorized: false,
     },
   });
-
-  try {
-    await transporter.verify();
-  } catch (error) {
-    console.error("SMTP connection failed:", error);
-    throw error;
-  }
 
   const html = await render(react);
 
