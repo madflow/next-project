@@ -131,7 +131,7 @@ test.describe("Email Translations", () => {
     await inviteUser(page, newUserEmail);
 
     const message = await getLatestEmail(newUserEmail);
-    expect(message?.Subject).toBe("You have been invited");
+    expect(message?.Subject).toBe("Invitation to join Next project");
 
     await logoutUser(page);
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${newUserEmail}"` });
@@ -153,7 +153,7 @@ test.describe("Email Translations", () => {
     await inviteUser(page, newUserEmail);
 
     const message = await getLatestEmail(newUserEmail);
-    expect(message?.Subject).toBe("Sie wurden eingeladen");
+    expect(message?.Subject).toBe("Einladung zum Beitritt zu Next project");
 
     await logoutUser(page);
     await smtpServerApi.deleteMessagesBySearch({ query: `to:"${newUserEmail}"` });
