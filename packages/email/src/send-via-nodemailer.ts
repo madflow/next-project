@@ -22,7 +22,7 @@ export async function sendViaNodeMailer({
       user: process.env.SMTP_SERVER_USERNAME || process.env.SMTP_USER,
       pass: process.env.SMTP_SERVER_PASSWORD || process.env.SMTP_PASSWORD,
     },
-    secure: false,
+    secure: process.env.NODE_ENV === "production", // Use TLS in production
     tls: {
       rejectUnauthorized: false,
     },
