@@ -2,8 +2,19 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
-test.describe("Admin users", () => {
+function getLocaleOptionName(currentLang: string) {
+  return currentLang === "de" ? "Englisch" : "German";
+}
 
+function getEmailVerificationStatus(currentLang: string, verified: boolean) {
+  if (currentLang === "de") {
+    return verified ? "Verifiziert" : "Nicht verifiziert";
+  }
+
+  return verified ? "Verified" : "Not verified";
+}
+
+test.describe("Admin users", () => {
   test("list", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
@@ -38,13 +49,30 @@ test.describe("Admin users", () => {
 
     // Update user details
     const updatedEmail = `updated-${testEmail}`;
+    const currentLang = (await page.locator("html").getAttribute("lang")) ?? "en";
+    const nextLocaleOptionName = getLocaleOptionName(currentLang);
+
+    await expect(page.getByTestId("admin.users.edit.form.email-verified")).toContainText(
+      getEmailVerificationStatus(currentLang, false)
+    );
+
     await page.getByTestId("admin.users.edit.form.name").fill("Updated Test User");
     await page.getByTestId("admin.users.edit.form.email").fill(updatedEmail);
+    await page.getByTestId("admin.users.edit.form.locale").click();
+    await page.getByRole("option", { name: nextLocaleOptionName }).click();
 
     await page.getByTestId("admin.users.edit.form.submit").click();
 
     await page.getByRole("textbox", { name: "Search" }).fill(updatedEmail);
     // Wait for the updated user to appear in the list
     await expect(page.getByTestId(`admin.users.list.edit-${updatedEmail}`)).toBeVisible({ timeout: 10000 });
+
+    await page.getByTestId(`admin.users.list.edit-${updatedEmail}`).click();
+    await expect(page.getByTestId("admin.users.edit.page")).toBeVisible();
+    await expect(page.getByTestId("admin.users.edit.form.locale")).toContainText(nextLocaleOptionName);
+    await expect(page.getByTestId("admin.users.edit.form.email-verified")).toContainText(
+      getEmailVerificationStatus(currentLang, false)
+    );
+    await expect(page.locator("html")).toHaveAttribute("lang", currentLang);
   });
 });
