@@ -25,14 +25,15 @@ export async function sendViaNodeMailer({
   text: string;
   react: ReactElement;
 }) {
-  const smtpServerSecure = parseBooleanEnv(process.env.SMTP_SERVER_SECURE || process.env.SMTP_SECURE);
+  const smtpServerSecure = parseBooleanEnv(process.env.SMTP_SERVER_SECURE!);
 
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_SERVER_HOST || process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_SERVER_PORT || process.env.SMTP_PORT || "587", 10),
+    debug: true,
+    host: process.env.SMTP_SERVER_HOST!,
+    port: parseInt(process.env.SMTP_SERVER_PORT!, 10),
     auth: {
-      user: process.env.SMTP_SERVER_USERNAME || process.env.SMTP_USER,
-      pass: process.env.SMTP_SERVER_PASSWORD || process.env.SMTP_PASSWORD,
+      user: process.env.SMTP_SERVER_USERNAME!,
+      pass: process.env.SMTP_SERVER_PASSWORD!,
     },
     secure: smtpServerSecure,
     tls: {
