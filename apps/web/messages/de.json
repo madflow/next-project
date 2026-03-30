@@ -549,12 +549,19 @@
       "update": "Aktualisieren",
       "updating": "Wird aktualisiert..."
     },
+    "emailVerification": {
+      "notVerified": "Nicht verifiziert",
+      "verified": "Verifiziert"
+    },
     "formLabels": {
       "email": "E-Mail",
+      "emailVerified": "E-Mail verifiziert",
+      "language": "Sprache",
       "name": "Name",
       "role": "Rolle"
     },
     "formPlaceholders": {
+      "selectLanguage": "Sprache auswählen",
       "selectRole": "Rolle auswählen"
     },
     "messages": {

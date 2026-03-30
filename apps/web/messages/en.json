@@ -549,12 +549,19 @@
       "update": "Update",
       "updating": "Updating..."
     },
+    "emailVerification": {
+      "notVerified": "Not verified",
+      "verified": "Verified"
+    },
     "formLabels": {
       "email": "Email",
+      "emailVerified": "Email verified",
+      "language": "Language",
       "name": "Name",
       "role": "Role"
     },
     "formPlaceholders": {
+      "selectLanguage": "Select language",
       "selectRole": "Select a role"
     },
     "messages": {
