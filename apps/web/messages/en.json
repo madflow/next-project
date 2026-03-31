@@ -633,6 +633,10 @@
   },
   "authAcceptInvitation": {
     "acceptButton": "Accept invitation",
+    "actions": {
+      "login": "Back to login",
+      "resetPassword": "Reset password"
+    },
     "alreadyMember": "You are already a member of this organization.",
     "description": "You have been invited to join an organization. Click the button below to accept.",
     "errorOccurred": "An error occurred while accepting the invitation",
@@ -640,7 +644,8 @@
     "invitationAccepted": "Invitation accepted successfully",
     "needToSignUp": "You need to sign up to accept this invitation.",
     "notAuthorized": "You do not have permission to accept this invitation.",
-    "notSignedIn": "You need to sign in to accept this invitation.",
+    "notSignedIn": "You need to login to accept this invitation.",
+    "notSignedInDescription": "Use the email address that received this invitation. If you no longer know your password, reset it first, then open the invitation link from the email again to accept the invitation.",
     "title": "Accept Invitation"
   },
   "chartMetricsCard": {
