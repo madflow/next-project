@@ -30,6 +30,7 @@ runs:
     - name: Create app bucket
       shell: bash
       run: |
+        sleep 10
         export AWS_ENDPOINT_URL=http://localhost:7070
         aws s3 mb s3://app --endpoint-url $AWS_ENDPOINT_URL
         echo "Bucket 'app' created successfully"
@@ -77,19 +78,7 @@ runs:
       shell: bash
       run: |
         pnpm run start | tee app.log 2>&1 &
-        sleep 10
-        for attempt in {1..10}; do
-          if [ $(curl -o /dev/null -s -w "%{http_code}" http://localhost:3000/api/health) -eq 200 ]; then
-            echo "Application is ready."
-            break
-          fi
-          if [ $attempt -eq 10 ]; then
-            echo "Application failed to start in time."
-            exit 1
-          fi
-          echo "Still waiting for the application to be ready..."
-          sleep 10
-        done
+        sleep 30
 
     - name: Seed
       shell: bash

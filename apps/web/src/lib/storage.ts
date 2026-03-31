@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { createHash, randomUUID } from "node:crypto";
 import { env } from "@/env";
 
@@ -20,20 +20,6 @@ export const getS3Client = () => {
   }
 
   return s3ClientInstance;
-};
-
-export const testS3BucketAccess = async () => {
-  try {
-    const headBucketCommand = new HeadBucketCommand({
-      Bucket: env.S3_BUCKET_NAME,
-    });
-
-    await getS3Client().send(headBucketCommand);
-
-    return true;
-  } catch (error) {
-    throw new Error(`S3 bucket access test failed: ${error}`);
-  }
 };
 
 export async function putDataset(file: File, contentType: string, organizationId: string, userId?: string) {

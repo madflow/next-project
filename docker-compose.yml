@@ -30,16 +30,14 @@ services:
   #   ports:
   #     - "${APP_PORT:-3001}:3000"
   #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  #     - postgres
 
   # drizzle:
   #   build:
   #     context: .
   #     dockerfile: ./packages/database/Dockerfile
   #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  #     - postgres
   #   environment:
   #     - DOCKER_RUN_MIGRATIONS=1
   #     - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
@@ -50,8 +48,7 @@ services:
   #     context: .
   #     dockerfile: ./packages/cli/Dockerfile
   #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  #     - postgres
   #   environment:
   #     - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}
   #
@@ -80,12 +77,6 @@ services:
   postgres:
     image: "postgres:18"
     command: "postgres -c log_statement=all"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
     volumes:
       - pg-data:/var/lib/postgresql/18/docker
     environment:
