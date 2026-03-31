@@ -248,7 +248,7 @@ async def get_dataset_metadata(
         raise HTTPException(status_code=404, detail="Dataset not found")
 
     try:
-        data, metadata = _read_sav_from_dataset(dataset)
+        data, metadata = await run_in_threadpool(_read_sav_from_dataset, dataset)
 
         return MetadataResponse(
             status="success",
@@ -280,7 +280,7 @@ async def get_dataset_stats(
         raise HTTPException(status_code=404, detail="Dataset not found")
 
     try:
-        df = _read_dataframe_from_dataset(dataset)
+        df = await run_in_threadpool(_read_dataframe_from_dataset, dataset)
         stats_service = StatisticsService()
         results = []
 
@@ -383,7 +383,7 @@ async def get_dataset_raw_data(
         raise HTTPException(status_code=404, detail="Dataset not found")
 
     try:
-        df = _read_dataframe_from_dataset(dataset)
+        df = await run_in_threadpool(_read_dataframe_from_dataset, dataset)
         raw_data_service = RawDataService()
 
         raw_data = raw_data_service.get_raw_values(
