@@ -47,8 +47,7 @@ services:
       - SMTP_SERVER_SECURE=${SMTP_SERVER_SECURE:-true}
       - SMTP_SERVER_USERNAME=${SMTP_SERVER_USERNAME}
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     logging: *default-logging
 
   analysis:
@@ -72,8 +71,7 @@ services:
       - ANALYSIS_PORT=3000
       - ANALYSIS_SENTRY_DSN=${ANALYSIS_SENTRY_DSN}
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     logging: *default-logging
 
   migrations:
@@ -83,8 +81,7 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       - SENTRY_DSN=${APP_SENTRY_DSN}
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     logging: *default-logging
 
   cli:
@@ -93,20 +90,13 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       - SENTRY_DSN=${APP_SENTRY_DSN}
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     logging: *default-logging
 
   postgres:
     restart: unless-stopped
     image: "postgres:18"
     command: "postgres -c log_statement=all"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
-      start_period: 20s
-      interval: 30s
-      retries: 5
-      timeout: 5s
     volumes:
       - pg-data:/var/lib/postgresql/18/docker
     environment:

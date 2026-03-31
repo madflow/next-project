@@ -14,7 +14,7 @@
     "lint:fix": "eslint --fix",
     "seed": "tsx --env-file .env ./scripts/seed.ts",
     "check-translations": "tsx ./scripts/check-translations.ts",
-    "check-types": "tsc --noEmit"
+    "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1005.0",

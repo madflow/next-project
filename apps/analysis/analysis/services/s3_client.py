@@ -2,10 +2,8 @@ import logging
 from typing import Optional
 
 import boto3
-from boto3.exceptions import Boto3Error
 from boto3.session import Session
 from botocore.client import BaseClient
-from botocore.exceptions import ClientError
 
 from analysis.settings import settings
 
@@ -56,20 +54,3 @@ class S3Client:
                 raise
 
         return cls._instance
-
-    @classmethod
-    def check_connection(cls) -> tuple[bool, str]:
-        """Check if the S3 connection is working.
-
-        Returns:
-            A tuple of (is_connected, message)
-        """
-        try:
-            client = cls.get_client()
-            # Try to list buckets to verify the connection
-            client.list_buckets()
-            return True, "Successfully connected to S3"
-        except (Boto3Error, ClientError) as e:
-            return False, f"Failed to connect to S3: {e!s}"
-        except Exception as e:
-            return False, f"Unexpected error while connecting to S3: {e!s}"

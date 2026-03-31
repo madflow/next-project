@@ -29,11 +29,6 @@ jobs:
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
       s3:
         image: versity/versitygw:latest
         env:
@@ -43,11 +38,6 @@ jobs:
           VGW_BACKEND_ARG: /tmp
         ports:
           - 7070:7070
-        options: >-
-          --health-cmd="curl -s -o /dev/null http://localhost:7070 || true"
-          --health-interval=5s
-          --health-timeout=3s
-          --health-retries=10
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
