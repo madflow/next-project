@@ -6,6 +6,10 @@ function getLocaleOptionName(currentLang: string) {
   return currentLang === "de" ? "Englisch" : "German";
 }
 
+function getCurrentLocaleOptionName(currentLang: string) {
+  return currentLang === "de" ? "Deutsch" : "English";
+}
+
 function getEmailVerificationStatus(currentLang: string, verified: boolean) {
   if (currentLang === "de") {
     return verified ? "Verifiziert" : "Nicht verifiziert";
@@ -36,6 +40,12 @@ test.describe("Admin users", () => {
     // Fill in the form
     await page.getByTestId("admin.users.new.form.name").fill("Test User");
     await page.getByTestId("admin.users.new.form.email").fill(testEmail);
+    const currentLang = (await page.locator("html").getAttribute("lang")) ?? "en";
+    const createdLocaleOptionName = getLocaleOptionName(currentLang);
+    const updatedLocaleOptionName = getCurrentLocaleOptionName(currentLang);
+
+    await page.getByTestId("admin.users.new.form.locale").click();
+    await page.getByRole("option", { name: createdLocaleOptionName }).click();
 
     await page.getByTestId("admin.users.new.form.submit").click();
 
@@ -49,17 +59,16 @@ test.describe("Admin users", () => {
 
     // Update user details
     const updatedEmail = `updated-${testEmail}`;
-    const currentLang = (await page.locator("html").getAttribute("lang")) ?? "en";
-    const nextLocaleOptionName = getLocaleOptionName(currentLang);
 
     await expect(page.getByTestId("admin.users.edit.form.email-verified")).toContainText(
       getEmailVerificationStatus(currentLang, false)
     );
+    await expect(page.getByTestId("admin.users.edit.form.locale")).toContainText(createdLocaleOptionName);
 
     await page.getByTestId("admin.users.edit.form.name").fill("Updated Test User");
     await page.getByTestId("admin.users.edit.form.email").fill(updatedEmail);
     await page.getByTestId("admin.users.edit.form.locale").click();
-    await page.getByRole("option", { name: nextLocaleOptionName }).click();
+    await page.getByRole("option", { name: updatedLocaleOptionName }).click();
 
     await page.getByTestId("admin.users.edit.form.submit").click();
 
@@ -69,7 +78,7 @@ test.describe("Admin users", () => {
 
     await page.getByTestId(`admin.users.list.edit-${updatedEmail}`).click();
     await expect(page.getByTestId("admin.users.edit.page")).toBeVisible();
-    await expect(page.getByTestId("admin.users.edit.form.locale")).toContainText(nextLocaleOptionName);
+    await expect(page.getByTestId("admin.users.edit.form.locale")).toContainText(updatedLocaleOptionName);
     await expect(page.getByTestId("admin.users.edit.form.email-verified")).toContainText(
       getEmailVerificationStatus(currentLang, false)
     );

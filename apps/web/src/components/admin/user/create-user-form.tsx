@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { locales } from "@/i18n/config";
 
 type CreateUserTranslations = {
   (key: `validation.${"nameRequired" | "validEmailRequired"}`): string;
@@ -27,6 +28,7 @@ const createFormSchema = (t: CreateUserTranslations) =>
       message: t("validation.validEmailRequired"),
     }),
     role: z.enum(["user", "admin"]).default("user"),
+    locale: z.enum(locales).optional(),
   });
 
 type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
@@ -44,6 +46,7 @@ const getRoles = (t: CreateUserTranslations): Role[] => [
 export function CreateUserForm() {
   const router = useRouter();
   const t = useTranslations("adminUserCreateForm");
+  const tLocale = useTranslations("localeSwitcher");
   const roles = getRoles(t as unknown as CreateUserTranslations);
 
   const form = useForm<FormValues>({
@@ -52,13 +55,17 @@ export function CreateUserForm() {
       name: "",
       email: "",
       role: "user" as const,
+      locale: undefined,
     },
   });
 
   const onSubmit = async (formData: FormValues) => {
     try {
+      const { locale, ...userData } = formData;
+
       await create({
-        ...formData,
+        ...userData,
+        ...(locale ? { locale } : {}),
         emailVerified: false,
         banned: false,
         createdAt: new Date(),
@@ -113,6 +120,34 @@ export function CreateUserForm() {
                   aria-invalid={fieldState.invalid}
                   data-testid="admin.users.new.form.email"
                 />
+              </FieldGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="locale"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>{tLocale("locale")}</FieldLabel>
+              <FieldGroup>
+                <Select value={field.value} onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger
+                    id={field.name}
+                    className="w-full sm:w-1/2 lg:w-1/3"
+                    aria-invalid={fieldState.invalid}
+                    data-testid="admin.users.new.form.locale">
+                    <SelectValue placeholder={tLocale("selectLanguage")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locales.map((locale) => (
+                      <SelectItem key={locale} value={locale}>
+                        {tLocale(`languages.${locale}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FieldGroup>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
