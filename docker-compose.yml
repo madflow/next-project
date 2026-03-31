@@ -77,6 +77,11 @@ services:
   postgres:
     image: "postgres:18"
     command: "postgres -c log_statement=all"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     volumes:
       - pg-data:/var/lib/postgresql/18/docker
     environment:
