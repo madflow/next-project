@@ -52,7 +52,7 @@ def test_stats_request_model_with_split_variables() -> None:
 
 
 @patch("analysis.web.api.datasets.routes._get_dataset_by_id")
-@patch("analysis.web.api.datasets.routes._read_dataframe_from_s3")
+@patch("analysis.web.api.datasets.routes._read_dataframe_from_dataset")
 @patch("analysis.web.api.datasets.routes._get_dataset_variable_by_name")
 @patch("analysis.web.api.datasets.routes.StatisticsService")
 def test_stats_endpoint_split_variable_logic(
@@ -64,6 +64,7 @@ def test_stats_endpoint_split_variable_logic(
     """Test the split variable logic in the stats endpoint directly."""
     # Mock setup
     mock_dataset = Mock()
+    mock_dataset.file_hash = "dataset-hash"
     mock_dataset.s3_key = "test/path.sav"
     mock_get_dataset.return_value = mock_dataset
 
@@ -188,7 +189,7 @@ def test_raw_data_request_model() -> None:
 
 @pytest.mark.anyio
 @patch("analysis.web.api.datasets.routes._get_dataset_by_id")
-@patch("analysis.web.api.datasets.routes._read_dataframe_from_s3")
+@patch("analysis.web.api.datasets.routes._read_dataframe_from_dataset")
 @patch("analysis.web.api.datasets.routes.RawDataService")
 async def test_raw_data_endpoint_logic(
     mock_raw_data_service_class: Mock,
@@ -198,6 +199,7 @@ async def test_raw_data_endpoint_logic(
     """Test the raw data endpoint logic directly."""
     # Mock setup
     mock_dataset = Mock()
+    mock_dataset.file_hash = "dataset-hash"
     mock_dataset.s3_key = "test/path.sav"
     mock_get_dataset.return_value = mock_dataset
 

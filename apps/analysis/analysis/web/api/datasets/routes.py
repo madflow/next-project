@@ -1,7 +1,4 @@
-import tempfile
-from contextlib import contextmanager, suppress
-from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,6 +14,7 @@ from sqlalchemy.future import select
 
 from analysis.db.dependencies import get_db_session
 from analysis.db.models.models import Dataset, DatasetVariable
+from analysis.services.dataset_cache import get_cached_dataset_path
 from analysis.services.excel_export import (
     XLSX_MEDIA_TYPE,
     build_workbook,
@@ -31,9 +29,7 @@ from analysis.services.powerpoint_export import (
 from analysis.services.powerpoint_export import (
     build_content_disposition as build_powerpoint_content_disposition,
 )
-from analysis.services.s3_client import S3Client
 from analysis.services.stats import RawDataService, StatisticsService
-from analysis.settings import settings
 from analysis.web.api.schemas.datasets import (
     DatasetResponse,
     ExcelExportRequest,
@@ -166,101 +162,68 @@ class MetadataResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = {}
 
 
-@contextmanager
-def _download_sav_from_s3(s3_key: str) -> Iterator[str]:
-    """
-    Context manager that downloads an SAV file from S3 to a temporary file.
-
-    Args:
-        s3_key: The S3 object key/path
-
-    Yields:
-        Path to the temporary file containing the downloaded SAV data
-
-    Raises:
-        HTTPException: If the file cannot be downloaded from S3
-    """
-    s3_client = S3Client.get_client()
-
-    with tempfile.NamedTemporaryFile(suffix=".sav", delete=False) as temp_file:
-        temp_file_path = temp_file.name
-
-    try:
-        # Download file from S3 to a temporary file
-        s3_client.download_file(
-            Bucket=settings.s3_bucket_name,
-            Key=s3_key,
-            Filename=temp_file_path,
-        )
-        yield temp_file_path
-    except Exception as e:
+def _get_cached_dataset_file_path(dataset: Dataset) -> str:
+    """Return the local cached file path for a dataset."""
+    if dataset.s3_key is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Error downloading SAV file from S3: {e!s}",
-        ) from e
-    finally:
-        # Clean up the temporary file
-        temp_path = Path(temp_file_path)
-        if temp_path.exists():
-            with suppress(OSError):
-                # Swallow removal errors to avoid masking original exceptions
-                temp_path.unlink()
+            detail="Dataset has no associated S3 key",
+        )
+
+    return str(get_cached_dataset_path(str(dataset.file_hash), str(dataset.s3_key)))
 
 
-def _read_sav_from_s3(s3_key: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+def _read_sav_from_dataset(dataset: Dataset) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
-    Read SAV file from S3 and return data and metadata.
+    Read a cached SAV file and return data and metadata.
 
     Args:
-        s3_key: The S3 object key/path
+        dataset: Dataset containing the file hash and S3 object key/path
 
     Returns:
         Tuple containing (data, metadata) from the SAV file
     """
-    with _download_sav_from_s3(s3_key) as temp_file_path:
-        try:
-            # Read the SAV file
-            df, meta = pyreadstat.read_sav(
-                temp_file_path,
-                metadataonly=True,
-                user_missing=True,
-            )
+    dataset_file_path = _get_cached_dataset_file_path(dataset)
 
-            # Convert to dict for JSON serialization
-            data = {
-                "records": df.to_dict(orient="records") if df is not None else [],
-                "columns": list(df.columns) if df is not None else [],
-            }
-            metadata = (
-                {k: v for k, v in meta.__dict__.items() if not k.startswith("_")}
-                if hasattr(meta, "__dict__")
-                else {}
-            )
+    try:
+        df, meta = pyreadstat.read_sav(
+            dataset_file_path,
+            metadataonly=True,
+            user_missing=True,
+        )
 
-            return data, metadata
+        data = {
+            "records": df.to_dict(orient="records") if df is not None else [],
+            "columns": list(df.columns) if df is not None else [],
+        }
+        metadata = (
+            {k: v for k, v in meta.__dict__.items() if not k.startswith("_")}
+            if hasattr(meta, "__dict__")
+            else {}
+        )
 
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Error reading SAV file: {e!s}",
-            ) from e
+        return data, metadata
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error reading SAV file: {e!s}",
+        ) from e
 
 
-def _read_dataframe_from_s3(s3_key: str) -> pd.DataFrame:
-    """Read SAV file from S3 and return a pandas DataFrame."""
-    with _download_sav_from_s3(s3_key) as temp_file_path:
-        try:
-            # Read the SAV file
-            df, _ = pyreadstat.read_sav(temp_file_path)
-            if df is None:
-                raise ValueError("No data found in SAV file.")
-            return df
+def _read_dataframe_from_dataset(dataset: Dataset) -> pd.DataFrame:
+    """Read a cached SAV file and return a pandas DataFrame."""
+    dataset_file_path = _get_cached_dataset_file_path(dataset)
 
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Error reading SAV file: {e!s}",
-            ) from e
+    try:
+        df, _ = pyreadstat.read_sav(dataset_file_path)
+        if df is None:
+            raise ValueError("No data found in SAV file.")
+        return df
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error reading SAV file: {e!s}",
+        ) from e
 
 
 @router.get("/datasets/{dataset_id}/metadata", response_model=MetadataResponse)
@@ -278,15 +241,8 @@ async def get_dataset_metadata(
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
 
-    if dataset.s3_key is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Dataset has no associated S3 key",
-        )
-
     try:
-        # Read the SAV file from S3
-        data, metadata = _read_sav_from_s3(str(dataset.s3_key))
+        data, metadata = _read_sav_from_dataset(dataset)
 
         return MetadataResponse(
             status="success",
@@ -306,7 +262,7 @@ async def get_dataset_metadata(
 
 
 @router.post("/datasets/{dataset_id}/stats")
-async def get_dataset_stats(  # noqa: C901
+async def get_dataset_stats(
     dataset_id: str,
     stats_request: StatsRequest,
     db: AsyncSession = Depends(get_db_session),
@@ -317,14 +273,8 @@ async def get_dataset_stats(  # noqa: C901
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
 
-    if dataset.s3_key is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Dataset has no associated S3 key",
-        )
-
     try:
-        df = _read_dataframe_from_s3(str(dataset.s3_key))
+        df = _read_dataframe_from_dataset(dataset)
         stats_service = StatisticsService()
         results = []
 
@@ -426,14 +376,8 @@ async def get_dataset_raw_data(
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
 
-    if dataset.s3_key is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Dataset has no associated S3 key",
-        )
-
     try:
-        df = _read_dataframe_from_s3(str(dataset.s3_key))
+        df = _read_dataframe_from_dataset(dataset)
         raw_data_service = RawDataService()
 
         raw_data = raw_data_service.get_raw_values(
