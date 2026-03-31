@@ -14,6 +14,14 @@ test.describe("User invitations", () => {
 
     await visitAcceptPageFromEmail(page, testUsers.inviteTarget.email);
     await expect(page.getByTestId("auth-accept-invitation-card-not-signed-in")).toBeVisible();
+    await expect(page.getByTestId("auth-accept-invitation-card-not-signed-in.login")).toHaveAttribute(
+      "href",
+      "/auth/login"
+    );
+    await expect(page.getByTestId("auth-accept-invitation-card-not-signed-in.forgot-password")).toHaveAttribute(
+      "href",
+      "/auth/forgot-password"
+    );
     const acceptUrl = "" + page.url();
     await page.goto("/auth/login");
     await loginUser(page, testUsers.inviteTarget.email, testUsers.inviteTarget.password);

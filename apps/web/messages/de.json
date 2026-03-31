@@ -633,6 +633,10 @@
   },
   "authAcceptInvitation": {
     "acceptButton": "Einladung annehmen",
+    "actions": {
+      "login": "Zurück zur Anmeldung",
+      "resetPassword": "Passwort zurücksetzen"
+    },
     "alreadyMember": "Sie sind bereits Mitglied dieser Organisation.",
     "description": "Sie wurden eingeladen, einer Organisation beizutreten. Klicken Sie auf die Schaltfläche unten, um die Einladung anzunehmen.",
     "errorOccurred": "Beim Annehmen der Einladung ist ein Fehler aufgetreten",
@@ -640,7 +644,8 @@
     "invitationAccepted": "Einladung erfolgreich angenommen",
     "needToSignUp": "Sie müssen sich registrieren, um diese Einladung anzunehmen.",
     "notAuthorized": "Sie haben keine Berechtigung, diese Einladung anzunehmen.",
-    "notSignedIn": "Sie sollten angemeldet sein, um diese Einladung anzunehmen.",
+    "notSignedIn": "Sie müssen sich anmelden, um diese Einladung anzunehmen.",
+    "notSignedInDescription": "Verwenden Sie die E-Mail-Adresse, mit der Sie diese Einladung erhalten haben. Wenn Sie Ihr Passwort nicht mehr kennen, setzen Sie es zunächst zurück und öffnen Sie dann erneut den Einladungslink aus der E-Mail, um die Einladung anzunehmen.",
     "title": "Einladung annehmen"
   },
   "chartMetricsCard": {

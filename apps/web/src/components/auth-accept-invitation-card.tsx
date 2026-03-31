@@ -1,8 +1,11 @@
 "use client";
 
+import { Terminal } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { organization, useSession } from "@/lib/auth-client";
@@ -41,12 +44,25 @@ export function AuthAcceptInvitationCard({ invitationId, userId }: { invitationI
 
   if (session.data === null) {
     return (
-      <Card className="w-full max-w-md shadow-xs" data-testid="auth-accept-invitation-card-not-signed-in">
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent>{t("notSignedIn")}</CardContent>
-      </Card>
+      <Alert className="mb-4" variant="default" data-testid="auth-accept-invitation-card-not-signed-in">
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>{t("notSignedIn")}</AlertTitle>
+        <AlertDescription>
+          <p>{t("notSignedInDescription")}</p>
+          <Link
+            href="/auth/login"
+            className="mt-2 inline-block text-sm underline"
+            data-testid="auth-accept-invitation-card-not-signed-in.login">
+            {t("actions.login")}
+          </Link>
+          <Link
+            href="/auth/forgot-password"
+            className="inline-block text-sm underline"
+            data-testid="auth-accept-invitation-card-not-signed-in.forgot-password">
+            {t("actions.resetPassword")}
+          </Link>
+        </AlertDescription>
+      </Alert>
     );
   }
 
