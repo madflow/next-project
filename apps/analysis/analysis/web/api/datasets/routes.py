@@ -170,6 +170,12 @@ def _get_cached_dataset_file_path(dataset: Dataset) -> str:
             detail="Dataset has no associated S3 key",
         )
 
+    if not dataset.file_hash:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Dataset has no file hash",
+        )
+
     return str(get_cached_dataset_path(str(dataset.file_hash), str(dataset.s3_key)))
 
 

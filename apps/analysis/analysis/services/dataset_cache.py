@@ -1,6 +1,7 @@
 import tempfile
 from pathlib import Path
 
+from botocore.exceptions import ClientError
 from fastapi import HTTPException, status
 
 from analysis.services.s3_client import S3Client
@@ -44,9 +45,21 @@ def _download_dataset_to_cache(cached_path: Path, s3_key: str) -> Path:
             temp_path.unlink(missing_ok=True)
 
         return cached_path
+    except ClientError as e:
+        temp_path.unlink(missing_ok=True)
+        http_status = e.response["ResponseMetadata"]["HTTPStatusCode"]
+        if 400 <= http_status < 500:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Error downloading SAV file from S3: {e!s}",
+            ) from e
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Error downloading SAV file from S3: {e!s}",
+        ) from e
     except Exception as e:
         temp_path.unlink(missing_ok=True)
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error downloading SAV file from S3: {e!s}",
         ) from e
