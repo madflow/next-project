@@ -22,6 +22,12 @@ services:
   app:
     image: ghcr.io/madflow/next-project-app:main
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/ready >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     environment:
       - ANALYSIS_API_KEY=${ANALYSIS_API_KEY}
       - ANALYSIS_API_URL=${ANALYSIS_API_URL}
@@ -47,6 +53,8 @@ services:
       - SMTP_SERVER_SECURE=${SMTP_SERVER_SECURE:-true}
       - SMTP_SERVER_USERNAME=${SMTP_SERVER_USERNAME}
     depends_on:
+      analysis:
+        condition: service_healthy
       postgres:
         condition: service_healthy
     logging: *default-logging
@@ -54,6 +62,16 @@ services:
   analysis:
     image: ghcr.io/madflow/next-project-analysis:main
     restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'python -c "import urllib.request; urllib.request.urlopen(''http://127.0.0.1:3000/api/ready'', timeout=5)" >/dev/null',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     environment:
       - ANALYSIS_DB_HOST=${POSTGRES_HOST}
       - ANALYSIS_DB_PORT=${POSTGRES_PORT}

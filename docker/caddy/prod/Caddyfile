@@ -1,8 +1,9 @@
 {$SITE_ADDRESS} {
 	reverse_proxy app:3000 {
-		health_uri /api/health
+		health_uri /api/ready
 		health_interval 10s
 		health_timeout 5s
+		health_fails 2
 	}
 
 	encode gzip

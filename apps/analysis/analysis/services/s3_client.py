@@ -1,15 +1,18 @@
 import logging
 from typing import Optional
 
-import boto3
 from boto3.exceptions import Boto3Error
 from boto3.session import Session
 from botocore.client import BaseClient
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
 from analysis.settings import settings
 
 logger = logging.getLogger(__name__)
+
+HEALTHCHECK_S3_CONNECT_TIMEOUT_SECONDS = 1
+HEALTHCHECK_S3_READ_TIMEOUT_SECONDS = 2
 
 
 class S3Client:
@@ -42,7 +45,7 @@ class S3Client:
 
                 client_config = {
                     "service_name": "s3",
-                    "config": boto3.session.Config(signature_version="s3v4"),
+                    "config": Config(signature_version="s3v4"),
                 }
 
                 client_config["endpoint_url"] = endpoint_url
@@ -58,6 +61,26 @@ class S3Client:
         return cls._instance
 
     @classmethod
+    def get_healthcheck_client(cls) -> BaseClient:
+        """Build a dedicated S3 client with short timeouts for health checks."""
+        session = Session(
+            aws_access_key_id=settings.s3_access_key_id,
+            aws_secret_access_key=settings.s3_secret_access_key,
+            region_name=settings.s3_region,
+        )
+
+        return session.client(
+            service_name="s3",
+            endpoint_url=settings.s3_endpoint,
+            config=Config(
+                signature_version="s3v4",
+                connect_timeout=HEALTHCHECK_S3_CONNECT_TIMEOUT_SECONDS,
+                read_timeout=HEALTHCHECK_S3_READ_TIMEOUT_SECONDS,
+                retries={"max_attempts": 1, "mode": "standard"},
+            ),
+        )
+
+    @classmethod
     def check_connection(cls) -> tuple[bool, str]:
         """Check if the S3 connection is working.
 
@@ -65,10 +88,11 @@ class S3Client:
             A tuple of (is_connected, message)
         """
         try:
-            client = cls.get_client()
-            # Try to list buckets to verify the connection
-            client.list_buckets()
-            return True, "Successfully connected to S3"
+            if not settings.s3_bucket_name.strip():
+                return False, "S3 bucket name is not configured"
+            client = cls.get_healthcheck_client()
+            client.head_bucket(Bucket=settings.s3_bucket_name)
+            return True, "Successfully connected to S3 bucket"
         except (Boto3Error, ClientError) as e:
             return False, f"Failed to connect to S3: {e!s}"
         except Exception as e:

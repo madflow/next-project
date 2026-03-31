@@ -1,15 +1,27 @@
-from datetime import datetime
+import asyncio
+import time
 from typing import Any, Dict, Tuple
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
+from loguru import logger
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from analysis.db.dependencies import get_db_session
 from analysis.services.s3_client import S3Client
-from analysis.settings import settings
 
 router = APIRouter(tags=["health"])
+
+
+def _build_service_result(
+    *,
+    connected: bool,
+    duration_ms: int,
+) -> dict[str, Any]:
+    return {
+        "connected": connected,
+        "duration_ms": duration_ms,
+    }
 
 
 async def check_database_health(db: AsyncSession) -> Tuple[bool, str]:
@@ -26,88 +38,63 @@ async def check_database_health(db: AsyncSession) -> Tuple[bool, str]:
         return False, f"Database connection error: {e!s}"
 
 
-def get_health_status() -> Tuple[Dict[str, Any], int]:
-    """
-    Check the health of all services and return status information.
+async def _check_s3_health() -> dict[str, Any]:
+    started_at = time.monotonic()
 
-    Returns:
-        Tuple containing (health_status_dict, status_code)
-    """
     try:
-        # Initialize services status
-        services = {}
-        all_healthy = True
-
-        # Test S3 connection
-        s3_connected, s3_message = S3Client.check_connection()
-        services["s3"] = {
-            "connected": s3_connected,
-            "message": s3_message,
-        }
-
+        s3_connected, s3_message = await asyncio.to_thread(S3Client.check_connection)
         if not s3_connected:
-            all_healthy = False
+            logger.error("S3 health check failed: {}", s3_message)
 
-        # Database check will be done in the endpoint handler
-        # since it requires an async context
+        return _build_service_result(
+            connected=s3_connected,
+            duration_ms=round((time.monotonic() - started_at) * 1000),
+        )
+    except Exception:
+        logger.exception("S3 health check failed")
+        return _build_service_result(
+            connected=False,
+            duration_ms=round((time.monotonic() - started_at) * 1000),
+        )
 
-        status_code = 200 if all_healthy else 503
 
-        health_status = {
-            "status": "healthy" if all_healthy else "unhealthy",
-            "services": services,
-        }
+async def _check_database_health(db: AsyncSession) -> dict[str, Any]:
+    started_at = time.monotonic()
+    db_connected, db_message = await check_database_health(db)
+    if not db_connected:
+        logger.error("Database health check failed: {}", db_message)
 
-        return health_status, status_code
-
-    except Exception as e:
-        error_status = {
-            "status": "error",
-            "error": str(e),
-            "services": {
-                "s3": {
-                    "connected": False,
-                    "message": f"Error: {e!s}",
-                    "endpoint": settings.s3_endpoint,
-                    "bucket": settings.s3_bucket_name,
-                    "region": settings.s3_region,
-                },
-                "database": {
-                    "connected": False,
-                    "message": f"Error during health check: {e!s}",
-                },
-            },
-        }
-        return error_status, 500
+    return _build_service_result(
+        connected=db_connected,
+        duration_ms=round((time.monotonic() - started_at) * 1000),
+    )
 
 
 @router.get("/health")
 async def health_check(
-    request: Request,
     db: AsyncSession = Depends(get_db_session),
 ) -> Dict[str, Any]:
     """
     Health check endpoint that verifies the status of all dependencies.
-    Returns 200 if all services are healthy, 503 if any service is down.
+    Always returns HTTP 200 and encodes the overall result in the JSON
+    ``status`` field (``healthy`` or ``unhealthy``) together with
+    per-service availability timings.
     """
-    # Get initial health status (without database check)
-    health_status, status_code = get_health_status()
+    started_at = time.monotonic()
+    database_result, s3_result = await asyncio.gather(
+        _check_database_health(db),
+        _check_s3_health(),
+    )
 
-    # Check database connection
-    db_connected, db_message = await check_database_health(db)
-
-    # Update health status with database info
-    health_status["services"]["database"] = {
-        "connected": db_connected,
-        "message": db_message,
+    services = {
+        "database": database_result,
+        "s3": s3_result,
     }
 
-    # Update overall status if database is not connected
-    if not db_connected and status_code == 200:
-        health_status["status"] = "unhealthy"
-        status_code = 503
+    all_healthy = all(service["connected"] for service in services.values())
 
-    # Add timestamp
-    health_status["timestamp"] = datetime.now()
-
-    return health_status
+    return {
+        "status": "healthy" if all_healthy else "unhealthy",
+        "services": services,
+        "duration_ms": round((time.monotonic() - started_at) * 1000),
+    }

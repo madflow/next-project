@@ -15,6 +15,7 @@ from analysis.web.api.datasets.routes import (
     get_dataset_raw_data,
     get_dataset_stats,
 )
+from analysis.web.api.health import health_check
 from analysis.web.api.schemas.datasets import (
     ExcelExportRequest,
     PowerPointExportRequest,
@@ -365,6 +366,34 @@ def test_excel_export_request_model() -> None:
 
     assert request.chart.kind == "bar"
     assert request.file_name.endswith(".xlsx")
+
+
+@pytest.mark.anyio
+@patch("analysis.web.api.health._check_database_health", new_callable=AsyncMock)
+@patch("analysis.web.api.health._check_s3_health", new_callable=AsyncMock)
+async def test_health_check_returns_structured_service_diagnostics(
+    mock_check_s3_health: AsyncMock,
+    mock_check_database_health: AsyncMock,
+) -> None:
+    """Test that the health endpoint returns detailed per-service results."""
+    mock_check_database_health.return_value = {
+        "connected": True,
+        "duration_ms": 3,
+    }
+    mock_check_s3_health.return_value = {
+        "connected": False,
+        "duration_ms": 12,
+        "error": "timeout",
+    }
+
+    result = await health_check(db=AsyncMock())
+
+    assert result["status"] == "unhealthy"
+    assert result["services"]["database"]["connected"] is True
+    assert result["services"]["s3"]["connected"] is False
+    assert result["services"]["s3"]["error"] == "timeout"
+    assert isinstance(result["duration_ms"], int)
+    assert "timestamp" not in result
 
 
 @pytest.mark.anyio

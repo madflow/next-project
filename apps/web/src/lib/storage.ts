@@ -22,17 +22,19 @@ export const getS3Client = () => {
   return s3ClientInstance;
 };
 
-export const testS3BucketAccess = async () => {
+export const testS3BucketAccess = async ({ timeoutMs = 2000 }: { timeoutMs?: number } = {}) => {
   try {
     const headBucketCommand = new HeadBucketCommand({
       Bucket: env.S3_BUCKET_NAME,
     });
 
-    await getS3Client().send(headBucketCommand);
+    await getS3Client().send(headBucketCommand, {
+      abortSignal: AbortSignal.timeout(timeoutMs),
+    });
 
     return true;
   } catch (error) {
-    throw new Error(`S3 bucket access test failed: ${error}`);
+    throw new Error(`S3 bucket access test failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
 

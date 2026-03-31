@@ -40,7 +40,7 @@ RUN pnpm turbo build
 FROM base AS runner
 
 RUN apk update
-RUN apk add --no-cache busybox-extras bash
+RUN apk add --no-cache busybox-extras bash wget
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TURBO_TELEMETRY_DISABLED=1
 WORKDIR /app
