@@ -9,7 +9,7 @@ minimumReleaseAgeExclude:
   - pnpm@10.28.2
   # Renovate security update: file-type@21.3.2
   - file-type@21.3.2
-  # Renovate security update: nodemailer@8.0.4
-  - nodemailer@8.0.4
+  # Renovate security update: nodemailer@8.0.4 || 8.0.5
+  - nodemailer@8.0.4 || 8.0.5
   # Renovate security update: next-intl@4.9.1
   - next-intl@4.9.1
