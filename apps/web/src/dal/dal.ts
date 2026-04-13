@@ -140,7 +140,7 @@ export function createList(table: AnyPgTable, schema: ZodType) {
       for (const filter of filters) {
         const column = getColumnByName(table, filter.column);
         if (!column) {
-          throw new DalValidationException(`Invalid filter column: ${filter.column}`);
+          continue;
         }
         if (filter.operator === "eq" || filter.operator === "=") {
           whereAndConditions.push(eq(column, filter.value));
@@ -179,7 +179,7 @@ export function createList(table: AnyPgTable, schema: ZodType) {
       for (const order of orderBy) {
         const column = getColumnByName(table, order.column);
         if (!column) {
-          throw new DalValidationException(`Invalid order column: ${order.column}`);
+          continue;
         }
         if (order.direction === "asc") {
           orderClauses.push(asc(column));

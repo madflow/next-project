@@ -73,7 +73,7 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         }
 
         if (!column) {
-          throw new DalValidationException(`Invalid filter column: ${filter.column}`);
+          continue;
         }
 
         if (filter.operator === "=" || filter.operator === "eq") {
@@ -153,11 +153,7 @@ export function createListWithJoins<TSchema extends ZodSchema>(
                 order.direction === "desc"
                   ? (query.orderBy(desc(column)) as DrizzleSelect)
                   : (query.orderBy(asc(column)) as DrizzleSelect);
-            } else {
-              throw new DalValidationException(`Invalid order column: ${order.column}`);
             }
-          } else {
-            throw new DalValidationException(`Invalid order column: ${order.column}`);
           }
         } else {
           const orderByColumn = getTableColumns(table)[order.column];
@@ -166,8 +162,6 @@ export function createListWithJoins<TSchema extends ZodSchema>(
               order.direction === "desc"
                 ? (query.orderBy(desc(orderByColumn)) as DrizzleSelect)
                 : (query.orderBy(asc(orderByColumn)) as DrizzleSelect);
-          } else {
-            throw new DalValidationException(`Invalid order column: ${order.column}`);
           }
         }
       }
