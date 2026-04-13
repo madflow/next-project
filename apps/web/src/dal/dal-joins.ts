@@ -1,8 +1,9 @@
 import { type SQL, and, asc, count, desc, eq, getTableColumns, getTableName, ilike, or } from "drizzle-orm";
 import type { AnyPgTable, PgColumn, PgSelect, PgTable } from "drizzle-orm/pg-core";
 import type { z } from "zod";
-import { defaultClient as db } from "@repo/database/clients";
-import { type ListOptions, listOptionsSchema } from "./dal";
+import { getDatabaseClient } from "@/dal/db";
+import { type ListOptions, listOptionsSchema } from "@/dal/list-options";
+import { DalValidationException } from "@/lib/exception";
 
 type ZodSchema = z.ZodType<unknown>;
 
@@ -29,9 +30,12 @@ export function createListWithJoins<TSchema extends ZodSchema>(
 ): (options?: ListOptions) => Promise<ListWithJoinsResult<TSchema>> {
   return async (options: ListOptions = {}): Promise<ListWithJoinsResult<TSchema>> => {
     const parsedOptions = await listOptionsSchema.safeParseAsync(options);
-    if (!parsedOptions.success) throw new Error("Invalid options");
+    if (!parsedOptions.success) {
+      throw new DalValidationException(parsedOptions.error.issues[0]?.message ?? "Invalid options");
+    }
 
     const { filters, search, searchColumns, orderBy } = parsedOptions.data;
+    const db = getDatabaseClient();
 
     // Create the base query with joins
     let query: DrizzleSelect = db.select().from(table).$dynamic();
@@ -69,7 +73,7 @@ export function createListWithJoins<TSchema extends ZodSchema>(
         }
 
         if (!column) {
-          continue;
+          throw new DalValidationException(`Invalid filter column: ${filter.column}`);
         }
 
         if (filter.operator === "=" || filter.operator === "eq") {
@@ -149,7 +153,11 @@ export function createListWithJoins<TSchema extends ZodSchema>(
                 order.direction === "desc"
                   ? (query.orderBy(desc(column)) as DrizzleSelect)
                   : (query.orderBy(asc(column)) as DrizzleSelect);
+            } else {
+              throw new DalValidationException(`Invalid order column: ${order.column}`);
             }
+          } else {
+            throw new DalValidationException(`Invalid order column: ${order.column}`);
           }
         } else {
           const orderByColumn = getTableColumns(table)[order.column];
@@ -158,6 +166,8 @@ export function createListWithJoins<TSchema extends ZodSchema>(
               order.direction === "desc"
                 ? (query.orderBy(desc(orderByColumn)) as DrizzleSelect)
                 : (query.orderBy(asc(orderByColumn)) as DrizzleSelect);
+          } else {
+            throw new DalValidationException(`Invalid order column: ${order.column}`);
           }
         }
       }

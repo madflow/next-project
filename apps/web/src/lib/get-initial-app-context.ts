@@ -2,8 +2,8 @@ import "server-only";
 import { Organization } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { defaultClient as db } from "@repo/database/clients";
 import { organization as organizationTable, project as projectTable } from "@repo/database/schema";
+import { getDatabaseClient } from "@/dal/db";
 import { type Project } from "@/types/project";
 import { auth } from "./auth";
 
@@ -19,6 +19,7 @@ export type InitialAppContext = {
  */
 export async function getInitialAppContext(projectSlug?: string): Promise<InitialAppContext> {
   try {
+    const db = getDatabaseClient();
     const session = await auth.api.getSession({
       headers: await headers(),
     });

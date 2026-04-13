@@ -26,6 +26,7 @@ export async function sendViaNodeMailer({
   react: ReactElement;
 }) {
   const smtpServerSecure = parseBooleanEnv(process.env.SMTP_SERVER_SECURE!);
+  const allowInsecureTls = process.env.NODE_ENV !== "production";
 
   const transporter = nodemailer.createTransport({
     debug: true,
@@ -37,7 +38,7 @@ export async function sendViaNodeMailer({
     },
     secure: smtpServerSecure,
     tls: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: !allowInsecureTls,
     },
   });
 

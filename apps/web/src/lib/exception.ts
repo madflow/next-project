@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 
 export type InfoStatusCode = 100 | 101 | 102 | 103;
 export type SuccessStatusCode = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 226;
@@ -147,6 +148,12 @@ export class DalNotFoundException extends DalException {
   }
 }
 
+export class DalValidationException extends DalException {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export class ServerActionException extends Error {
   constructor(message: string) {
     super(message);
@@ -172,16 +179,22 @@ export class ServerActionValidationException extends ServerActionException {
 }
 
 const toHttpException = (error: unknown): HttpException => {
-  if (error instanceof DalNotAuthorizedException) {
+  if (error instanceof HttpException) {
+    return error;
+  } else if (error instanceof DalNotAuthorizedException) {
     return new HttpException(401, { message: error.message });
   } else if (error instanceof DalNotFoundException) {
     return new HttpException(404, { message: error.message });
+  } else if (error instanceof DalValidationException) {
+    return new HttpException(400, { message: error.message });
   } else if (error instanceof ServerActionNotAuthorizedException) {
     return new HttpException(401, { message: error.message });
   } else if (error instanceof ServerActionFailureException) {
     return new HttpException(500, { message: error.message });
   } else if (error instanceof ServerActionValidationException) {
     return new HttpException(422, { message: error.message });
+  } else if (error instanceof ZodError) {
+    return new HttpException(422, { message: error.issues[0]?.message ?? "Validation failed" });
   }
   return new HttpException(500, { message: "An error occurred" });
 };

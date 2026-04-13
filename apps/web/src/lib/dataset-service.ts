@@ -1,5 +1,4 @@
 import { S3ServiceException } from "@aws-sdk/client-s3";
-import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariableData,
   DatasetVariableValueLabel,
@@ -7,6 +6,7 @@ import {
   datasetVariable,
   insertDatasetVariableSchema,
 } from "@repo/database/schema";
+import { getDatabaseClient } from "@/dal/db";
 import { env } from "@/env";
 import { ServerActionException, ServerActionValidationException } from "@/lib/exception";
 import { putDataset } from "@/lib/storage";
@@ -72,6 +72,7 @@ export async function createDataset({
   id,
 }: CreateDatasetParams): Promise<CreateDatasetResult> {
   try {
+    const db = getDatabaseClient();
     // Validate file exists and is not null
     if (!file) {
       throw new ServerActionValidationException(
@@ -178,8 +179,6 @@ export async function createDataset({
       key: s3Key,
     };
   } catch (error) {
-    console.error("Error creating dataset:", error);
-
     let errorMessage = "Failed to create dataset";
     if (error instanceof S3ServiceException) {
       errorMessage = `S3 Error: ${error.name} - ${error.message}`;

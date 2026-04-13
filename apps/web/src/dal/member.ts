@@ -1,9 +1,9 @@
 import "server-only";
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
 import { member as entity, selectMemberSchema, user } from "@repo/database/schema";
 import { createFind, createList, withAdminCheck } from "@/dal/dal";
 import { createListWithJoins } from "@/dal/dal-joins";
+import { getDatabaseClient } from "@/dal/db";
 
 export const find = withAdminCheck(createFind(entity, selectMemberSchema));
 
@@ -19,6 +19,7 @@ export const listWithUser = withAdminCheck(
 );
 
 export const create = async (data: { organizationId: string; userId: string; role: string }) => {
+  const db = getDatabaseClient();
   const [result] = await db
     .insert(entity)
     .values({

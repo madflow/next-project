@@ -4,33 +4,12 @@ import { AnyPgColumn, AnyPgTable } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { ZodType, z } from "zod";
-import { defaultClient as db } from "@repo/database/clients";
+import { type DatabaseClient, getDatabaseClient } from "@/dal/db";
+import { type ListOptions, listOptionsSchema, orderByDirectionSchema } from "@/dal/list-options";
 import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
-import { DalNotAuthorizedException } from "@/lib/exception";
+import { DalNotAuthorizedException, DalValidationException } from "@/lib/exception";
 
-export const orderByDirectionSchema = z.enum(["asc", "desc"]);
-
-export const orderBySchema = z.object({
-  column: z.string(),
-  direction: orderByDirectionSchema,
-});
-
-export const filterSchema = z.object({
-  column: z.string(),
-  operator: z.string(),
-  value: z.string(),
-});
-
-export const listOptionsSchema = z.object({
-  limit: z.number().optional(),
-  offset: z.number().optional(),
-  orderBy: z.array(orderBySchema).optional(),
-  search: z.string().optional(),
-  searchColumns: z.array(z.string()).optional(),
-  filters: z.array(filterSchema).optional(),
-});
-
-export type ListOptions = z.infer<typeof listOptionsSchema>;
+export type { ListOptions } from "@/dal/list-options";
 
 export function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema: ItemType) {
   return z.object({
@@ -43,8 +22,13 @@ export function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema
 }
 
 export async function getAuthenticatedClient() {
-  // TODO: maybe wrap this for rls
-  return db;
+  await assertUserHasSession();
+  return getDatabaseClient();
+}
+
+export async function getAdminClient(): Promise<DatabaseClient> {
+  await assertUserIsAdmin();
+  return getDatabaseClient();
 }
 
 export async function getSessionUser() {
@@ -76,6 +60,11 @@ export async function assertUserIsAdmin() {
   await assertUserHasRole(USER_ADMIN_ROLE);
 }
 
+function getColumnByName(table: AnyPgTable, columnName: string): AnyPgColumn | undefined {
+  const columns = getTableColumns(table);
+  return columns[columnName as keyof typeof columns];
+}
+
 export function withAdminCheck<T extends unknown[], R>(fn: (...args: T) => Promise<R>) {
   return cache(async (...args: T): Promise<R | null> => {
     try {
@@ -102,6 +91,7 @@ export function withSessionCheck<T extends unknown[], R>(fn: (...args: T) => Pro
 
 export function createFind<TSchema extends ZodType>(table: AnyPgTable & { id: AnyPgColumn }, schema: TSchema) {
   return async (id: string): Promise<z.infer<typeof schema> | null> => {
+    const db = getDatabaseClient();
     const [result] = await db.select().from(table).where(eq(table.id, id)).limit(1);
     if (!result) return null;
     const parsedResult = await schema.safeParseAsync(result);
@@ -111,6 +101,7 @@ export function createFind<TSchema extends ZodType>(table: AnyPgTable & { id: An
 
 export function createFindBySlug<TSchema extends ZodType>(table: AnyPgTable & { slug: AnyPgColumn }, schema: TSchema) {
   return async (slug: string): Promise<z.infer<typeof schema> | null> => {
+    const db = getDatabaseClient();
     const [result] = await db.select().from(table).where(eq(table.slug, slug)).limit(1);
     if (!result) return null;
     const parsedResult = await schema.safeParseAsync(result);
@@ -121,9 +112,13 @@ export function createFindBySlug<TSchema extends ZodType>(table: AnyPgTable & { 
 export function createList(table: AnyPgTable, schema: ZodType) {
   return async (options: ListOptions = {}): Promise<z.infer<typeof schema>> => {
     const parsedOptions = await listOptionsSchema.safeParseAsync(options);
-    if (!parsedOptions.success) throw new Error("Invalid options");
+    if (!parsedOptions.success) {
+      throw new DalValidationException(parsedOptions.error.issues[0]?.message ?? "Invalid options");
+    }
 
     const { filters, limit, offset, search, searchColumns, orderBy } = parsedOptions.data;
+
+    const db = getDatabaseClient();
 
     const query = db.select().from(table);
     const countQuery = db.select({ count: count() }).from(table);
@@ -132,13 +127,7 @@ export function createList(table: AnyPgTable, schema: ZodType) {
     const whereAndConditions: SQL<unknown>[] = [];
     if (search && searchColumns) {
       for (const searchColumn of searchColumns) {
-        let column: AnyPgColumn | undefined;
-        for (const [key, o] of Object.entries(getTableColumns(table))) {
-          if (key === searchColumn) {
-            column = o;
-            break;
-          }
-        }
+        const column = getColumnByName(table, searchColumn);
         if (!column) {
           continue;
         }
@@ -149,15 +138,9 @@ export function createList(table: AnyPgTable, schema: ZodType) {
 
     if (filters) {
       for (const filter of filters) {
-        let column: AnyPgColumn | undefined;
-        for (const [key, o] of Object.entries(getTableColumns(table))) {
-          if (key === filter.column) {
-            column = o;
-            break;
-          }
-        }
+        const column = getColumnByName(table, filter.column);
         if (!column) {
-          continue;
+          throw new DalValidationException(`Invalid filter column: ${filter.column}`);
         }
         if (filter.operator === "eq" || filter.operator === "=") {
           whereAndConditions.push(eq(column, filter.value));
@@ -194,15 +177,9 @@ export function createList(table: AnyPgTable, schema: ZodType) {
       const orderClauses: (ReturnType<typeof asc> | ReturnType<typeof desc>)[] = [];
 
       for (const order of orderBy) {
-        let column: AnyPgColumn | undefined;
-        for (const [key, o] of Object.entries(getTableColumns(table))) {
-          if (key === order.column) {
-            column = o;
-            break;
-          }
-        }
+        const column = getColumnByName(table, order.column);
         if (!column) {
-          continue;
+          throw new DalValidationException(`Invalid order column: ${order.column}`);
         }
         if (order.direction === "asc") {
           orderClauses.push(asc(column));

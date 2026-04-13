@@ -31,7 +31,9 @@ export async function GET(request: Request, { params }: RouteParams) {
       return NextResponse.json({ hierarchy });
     } else {
       // Return flat list with pagination
-      const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams);
+      const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams, {
+        reservedParams: ["hierarchical"],
+      });
 
       const result = await listByDataset(id, {
         filters,

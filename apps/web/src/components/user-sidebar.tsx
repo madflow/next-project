@@ -14,20 +14,17 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getNavData = (t: (t: any) => string) => ({
-  navMain: [
-    {
-      title: t("navItems.app"),
-      url: "/landing",
-      icon: HouseIcon,
-    },
-  ],
-});
-
 export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const t = useTranslations("adminSidebar");
-  const data = getNavData(t);
+  const data = {
+    navMain: [
+      {
+        title: t("navItems.app"),
+        url: "/landing",
+        icon: HouseIcon,
+      },
+    ],
+  };
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

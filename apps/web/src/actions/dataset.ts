@@ -1,8 +1,8 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
 import { UpdateDatasetData, dataset, datasetProject } from "@repo/database/schema";
+import { getAdminClient } from "@/dal/dal";
 import { deleteDataset } from "@/dal/dataset";
 import { CreateDatasetResult, createDataset } from "@/lib/dataset-service";
 import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
@@ -53,6 +53,7 @@ export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData
 });
 
 export const addToProject = withAdminAuth(async (datasetId: string, projectId: string) => {
+  const db = await getAdminClient();
   await db.insert(datasetProject).values({ projectId, datasetId });
 });
 
@@ -84,5 +85,6 @@ export async function remove(datasetId: string) {
 }
 
 export const update = withAdminAuth(async (datasetId: string, values: UpdateDatasetData) => {
+  const db = await getAdminClient();
   await db.update(dataset).set(values).where(eq(dataset.id, datasetId));
 });

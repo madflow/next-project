@@ -9,49 +9,46 @@ import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getNavData = (t: (t: any) => string) => ({
-  navMain: [
-    {
-      title: t("navItems.admin"),
-      url: "/admin",
-      icon: WrenchIcon,
-    },
-  ],
-  navSecondary: [
-    {
-      title: t("navItems.app"),
-      url: "/landing",
-      icon: HouseIcon,
-    },
-  ],
-  documents: [
-    {
-      name: t("navItems.organizations"),
-      url: "/admin/organizations",
-      icon: Building2,
-    },
-    {
-      name: t("navItems.users"),
-      url: "/admin/users",
-      icon: GanttChartIcon,
-    },
-    {
-      name: t("navItems.projects"),
-      url: "/admin/projects",
-      icon: Folder,
-    },
-    {
-      name: t("navItems.datasets"),
-      url: "/admin/datasets",
-      icon: FileIcon,
-    },
-  ],
-});
-
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const t = useTranslations("adminSidebar");
-  const data = getNavData(t);
+  const data = {
+    navMain: [
+      {
+        title: t("navItems.admin"),
+        url: "/admin",
+        icon: WrenchIcon,
+      },
+    ],
+    navSecondary: [
+      {
+        title: t("navItems.app"),
+        url: "/landing",
+        icon: HouseIcon,
+      },
+    ],
+    documents: [
+      {
+        name: t("navItems.organizations"),
+        url: "/admin/organizations",
+        icon: Building2,
+      },
+      {
+        name: t("navItems.users"),
+        url: "/admin/users",
+        icon: GanttChartIcon,
+      },
+      {
+        name: t("navItems.projects"),
+        url: "/admin/projects",
+        icon: Folder,
+      },
+      {
+        name: t("navItems.datasets"),
+        url: "/admin/datasets",
+        icon: FileIcon,
+      },
+    ],
+  };
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

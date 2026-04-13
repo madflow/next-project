@@ -9,7 +9,7 @@
     "dev": "next dev --turbopack --port 3000",
     "build": "next build",
     "start": "next start",
-    "test": "tsx --test src/**/*.test.ts",
+    "test": "tsx --test \"src/**/*.test.ts\"",
     "lint": "eslint --max-warnings=0",
     "lint:fix": "eslint --fix",
     "seed": "tsx --env-file .env ./scripts/seed.ts",

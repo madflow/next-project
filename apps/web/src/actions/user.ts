@@ -1,24 +1,21 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
 import {
   type CreateUserData as CreateData,
   type UpdateUserData as UpdateData,
   user as entity,
   invitation,
 } from "@repo/database/schema";
+import { getAdminClient } from "@/dal/dal";
+import { getDatabaseClient } from "@/dal/db";
 import { env } from "@/env";
 import { auth } from "@/lib/auth";
-import { ServerActionNotAuthorizedException } from "@/lib/exception";
+import { ServerActionNotAuthorizedException, ServerActionValidationException } from "@/lib/exception";
 import { withAdminAuth } from "@/lib/server-action-utils";
 
 function validateCallbackURL(callbackURL: string | undefined): void {
   if (!callbackURL) return;
-
-  if (!env.BASE_URL) {
-    throw new ServerActionNotAuthorizedException("Invalid redirect URL");
-  }
 
   const baseUrl = new URL(env.BASE_URL);
   const redirectUrl = new URL(callbackURL, env.BASE_URL);
@@ -29,6 +26,7 @@ function validateCallbackURL(callbackURL: string | undefined): void {
 }
 
 export const create = withAdminAuth(async (data: CreateData) => {
+  const db = await getAdminClient();
   await db.insert(entity).values(data).returning();
 });
 
@@ -37,14 +35,15 @@ export async function createWithInvitation(
   data: { name: string; email: string; password: string; callbackURL?: string; locale?: string }
 ) {
   validateCallbackURL(data.callbackURL);
+  const db = getDatabaseClient();
 
   const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, invitationId)).limit(1);
   if (!existingInvitation) {
-    throw new ServerActionNotAuthorizedException("Invitation not found");
+    throw new ServerActionValidationException("Invitation not found");
   }
 
   if (existingInvitation.email !== data.email) {
-    throw new ServerActionNotAuthorizedException("Invitation email does not match user email");
+    throw new ServerActionValidationException("Invitation email does not match user email");
   }
   const signUpResponse = await auth.api.signUpEmail({
     body: {
@@ -69,9 +68,11 @@ export async function createWithInvitation(
 }
 
 export const update = withAdminAuth(async (id: string, data: UpdateData) => {
+  const db = await getAdminClient();
   await db.update(entity).set(data).where(eq(entity.id, id)).returning();
 });
 
 export const remove = withAdminAuth(async (id: string) => {
+  const db = await getAdminClient();
   await db.delete(entity).where(eq(entity.id, id));
 });

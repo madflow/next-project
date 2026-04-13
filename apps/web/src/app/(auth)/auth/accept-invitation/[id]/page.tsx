@@ -1,15 +1,16 @@
 import { and, eq, ilike } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { defaultClient as db } from "@repo/database/clients";
 import { invitation, member, user } from "@repo/database/schema";
 import { AuthAcceptInvitationCard } from "@/components/auth-accept-invitation-card";
 import { SignUpFormWithInvitation } from "@/components/sign-up-form-with-invitation";
+import { getDatabaseClient } from "@/dal/db";
 import { env } from "@/env";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const t = await getTranslations("authAcceptInvitation");
+  const db = getDatabaseClient();
 
   const [existingInvitation] = await db.select().from(invitation).where(eq(invitation.id, id)).limit(1);
 

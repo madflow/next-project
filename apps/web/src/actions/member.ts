@@ -2,8 +2,9 @@
 
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { defaultClient as db } from "@repo/database/clients";
 import { type CreateMemberData, member as memberTable, organization as organizationTable } from "@repo/database/schema";
+import { getAdminClient } from "@/dal/dal";
+import { ServerActionValidationException } from "@/lib/exception";
 import { withAdminAuth } from "@/lib/server-action-utils";
 
 type AddMemberData = {
@@ -12,11 +13,11 @@ type AddMemberData = {
 };
 
 export const addMember = withAdminAuth(async (organizationId: string, data: AddMemberData) => {
-  // Check if the organization exists
+  const db = await getAdminClient();
   const [org] = await db.select().from(organizationTable).where(eq(organizationTable.id, organizationId)).limit(1);
 
   if (!org) {
-    throw new Error("Organization not found");
+    throw new ServerActionValidationException("Organization not found");
   }
 
   // Check if the user is already a member of the organization
@@ -27,7 +28,7 @@ export const addMember = withAdminAuth(async (organizationId: string, data: AddM
     .limit(1);
 
   if (existingMember) {
-    throw new Error("User is already a member of this organization");
+    throw new ServerActionValidationException("User is already a member of this organization");
   }
 
   // Create the member data
@@ -49,6 +50,7 @@ export const addMember = withAdminAuth(async (organizationId: string, data: AddM
 
 export const updateMemberRole = withAdminAuth(
   async (organizationId: string, userId: string, role: "admin" | "owner" | "member") => {
+    const db = await getAdminClient();
     await db
       .update(memberTable)
       .set({ role })
@@ -62,7 +64,7 @@ export const updateMemberRole = withAdminAuth(
 );
 
 export const removeMember = withAdminAuth(async (memberId: string) => {
-  // Get the member to find the organizationId for revalidation
+  const db = await getAdminClient();
   const [member] = await db.select().from(memberTable).where(eq(memberTable.id, memberId)).limit(1);
 
   await db.delete(memberTable).where(eq(memberTable.id, memberId));

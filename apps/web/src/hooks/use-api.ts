@@ -20,7 +20,7 @@ export const apiQueryHookParamsSchema = z.object({
   search: z.string().optional(),
   order: apiQueryOrderSchema.optional(),
   filters: z.array(apiQueryFilterSchema).optional(),
-  queryKey: z.array(z.any()).optional(),
+  queryKey: z.array(z.unknown()).optional(),
   enabled: z.boolean().optional(),
   keepPreviousData: z.boolean().optional(),
 });
@@ -62,8 +62,8 @@ export const useQueryApi = <T>(
     const response = await fetch(`${endpoint}?${params.toString()}`, { signal });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `Failed to fetch ${endpoint}`);
+      const error = (await response.json().catch(() => ({}))) as { error?: string; message?: string };
+      throw new Error(error.error || error.message || `Failed to fetch ${endpoint}`);
     }
     return await response.json();
   };

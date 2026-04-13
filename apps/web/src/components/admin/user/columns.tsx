@@ -30,8 +30,7 @@ export const columns: ColumnDef<AuthUser>[] = [
       const role = (row.original.role as string) || "user";
       const translationKey = `role.${role}` as const;
       const badgeVariant = role === "user" ? "secondary" : "default";
-      // @ts-expect-error Dynamic translation hack
-      return <Badge variant={badgeVariant}>{t(translationKey, { fallback: role })}</Badge>;
+      return <Badge variant={badgeVariant}>{t(translationKey as Parameters<typeof t>[0], { fallback: role })}</Badge>;
     },
   },
   {

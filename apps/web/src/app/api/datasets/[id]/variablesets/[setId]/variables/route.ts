@@ -28,7 +28,9 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     if (unassigned) {
       // Return variables not assigned to any set
-      const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams);
+      const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams, {
+        reservedParams: ["unassigned"],
+      });
       const result = await getUnassignedVariables(id, {
         filters,
         limit,

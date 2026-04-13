@@ -32,8 +32,7 @@ export function DataTableColumnHeader<TData, TValue>({
     }
   }
 
-  // @ts-expect-error Dynamic translation hack
-  const translatedTitle = t(title as string);
+  const translatedTitle = t(title as Parameters<typeof t>[0]);
 
   return (
     <div className={cn("flex items-center space-x-2 select-none", className)}>
