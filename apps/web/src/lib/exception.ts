@@ -194,7 +194,7 @@ const toHttpException = (error: unknown): HttpException => {
   } else if (error instanceof ServerActionValidationException) {
     return new HttpException(422, { message: error.message });
   } else if (error instanceof ZodError) {
-    return new HttpException(422, { message: error.issues[0]?.message ?? "Validation failed" });
+    return new HttpException(400, { message: error.issues[0]?.message ?? "Validation failed" });
   }
   return new HttpException(500, { message: "An error occurred" });
 };

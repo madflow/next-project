@@ -35,7 +35,7 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=builder /app/out/full/ .
 
-RUN pnpm turbo build
+RUN pnpm --filter @app/web env:copy && pnpm turbo build
 
 FROM base AS runner
 

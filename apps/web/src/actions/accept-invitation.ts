@@ -3,7 +3,6 @@
 import { and, eq } from "drizzle-orm";
 import { invitation, member } from "@repo/database/schema";
 import { getAuthenticatedClient } from "@/dal/dal";
-import { create as createMember } from "@/dal/member";
 import { ServerActionFailureException, ServerActionValidationException } from "@/lib/exception";
 import { getSessionOrThrow, withAuth } from "@/lib/server-action-utils";
 
@@ -31,11 +30,15 @@ export const acceptInvitationAfterSignup = withAuth(async (invitationId: string)
     return { success: true, message: "Already a member" };
   }
 
-  const createdMember = await createMember({
-    organizationId: existingInvitation.organizationId,
-    userId: session.user.id,
-    role: existingInvitation.role ?? "member",
-  });
+  const [createdMember] = await db
+    .insert(member)
+    .values({
+      organizationId: existingInvitation.organizationId,
+      userId: session.user.id,
+      role: existingInvitation.role ?? "member",
+      createdAt: new Date(),
+    })
+    .returning();
 
   if (!createdMember) {
     throw new ServerActionFailureException("Failed to create organization membership");

@@ -43,7 +43,9 @@ export async function GET(request: Request, { params }: RouteParams) {
       // Return variables in the specific set
       await assertVariablesetAccess(setId, id);
 
-      const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams);
+      const { limit, offset, search, orderBy, filters } = processUrlParams(url.searchParams, {
+        reservedParams: ["unassigned"],
+      });
       const result = await getVariablesInSet(setId, {
         filters,
         limit,

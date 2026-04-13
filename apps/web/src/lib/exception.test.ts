@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
+import { ZodError } from "zod";
 import {
   DalValidationException,
   HttpException,
@@ -27,5 +28,20 @@ describe("raiseExceptionResponse", () => {
 
     assert.equal(response.status, 422);
     assert.deepEqual(await response.json(), { error: "Invalid payload" });
+  });
+
+  test("maps Zod errors to bad request", async () => {
+    const response = raiseExceptionResponse(
+      new ZodError([
+        {
+          code: "custom",
+          path: ["limit"],
+          message: "Invalid limit",
+        },
+      ])
+    );
+
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { error: "Invalid limit" });
   });
 });
