@@ -14,7 +14,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { env } from "@/env";
 import { Locale, locales } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +31,7 @@ export function SignUpFormWithInvitation({ hasVerifyEmail, invitation }: SignUpF
   const locale = useLocale() as Locale;
   const t = useTranslations();
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? window.location.origin;
 
   const getBrowserLocale = (): Locale => {
     if (typeof window === "undefined") return locale;
@@ -67,7 +67,7 @@ export function SignUpFormWithInvitation({ hasVerifyEmail, invitation }: SignUpF
       email: values.email,
       name: values.name,
       password: values.password,
-      callbackURL: new URL("/auth/verify-email", env.NEXT_PUBLIC_BASE_URL).toString(),
+      callbackURL: new URL("/auth/verify-email", baseUrl).toString(),
       locale: values.locale,
     });
 

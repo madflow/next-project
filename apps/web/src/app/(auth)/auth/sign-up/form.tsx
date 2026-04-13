@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { env } from "@/env";
 import { Locale } from "@/i18n/config";
 import { signUp } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -20,6 +19,7 @@ import { type SignUpSchema, signUpSchema } from "./schema";
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   const locale = useLocale() as Locale;
   const t = useTranslations();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? window.location.origin;
 
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
@@ -36,7 +36,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       email: values.email,
       password: values.password,
       name: values.name,
-      callbackURL: new URL("/auth/verify-email", env.NEXT_PUBLIC_BASE_URL).toString(),
+      callbackURL: new URL("/auth/verify-email", baseUrl).toString(),
     });
 
     if (error && error.message) {
