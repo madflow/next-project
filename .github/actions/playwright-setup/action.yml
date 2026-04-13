@@ -17,7 +17,8 @@ runs:
 
     - uses: actions/setup-node@v6
       with:
-        node-version: lts/*
+        node-version: 24
+        cache: pnpm
 
     - name: Configure AWS CLI for local S3
       shell: bash
@@ -46,7 +47,7 @@ runs:
     - name: Enable signup (write .env.local)
       if: inputs.signup-enabled == 'true'
       shell: bash
-      run: echo "AUTH_DISABLE_SIGNUP=0" > apps/web/.env.local
+      run: printf "AUTH_DISABLE_SIGNUP=0\n" >> apps/web/.env.local
 
     - name: Set up Python
       uses: actions/setup-python@v6
