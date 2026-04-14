@@ -84,6 +84,36 @@ def test_build_workbook_for_distribution_preserves_point_colors() -> None:
     assert '<a:srgbClr val="00FF00"/>' in chart_xml
 
 
+def test_build_workbook_for_distribution_uses_whole_percent_axis_and_labels() -> None:
+    """Distribution bar exports should show whole-percent values in chart labels and axes."""
+    payload = {
+        "file_name": "bar-export-2026-03-17.xlsx",
+        "title": "Age group",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+        "labels": {
+            "label": "Label",
+            "value": "Value",
+            "value_percent": "Value (%)",
+            "color": "Color",
+            "metric": "Metric",
+        },
+        "palette": ["#ff0000", "#00ff00"],
+        "chart": {
+            "kind": "bar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+    }
+
+    chart_xml = _chart_xml(build_workbook(payload))
+
+    assert 'formatCode="0&quot;%&quot;" sourceLinked="0"' in chart_xml
+    assert 'formatCode="0&quot;%&quot;"' in chart_xml
+    assert 'formatCode="0.00&quot;%&quot;"' not in chart_xml
+
+
 def test_build_workbook_for_bar_chart_uses_light_gray_axis_and_plot_area_lines() -> (
     None
 ):
@@ -571,6 +601,41 @@ def test_build_workbook_for_stacked_chart_formats_source_cells_as_whole_percent(
     assert worksheet["B5"].value == 79.14
     assert worksheet["C5"].value == 14.12
     assert worksheet["D5"].value == 6.74
+
+
+def test_build_workbook_for_distribution_formats_source_cells_as_whole_percent() -> (
+    None
+):
+    """Distribution chart worksheet cells should use whole-percent formatting."""
+    payload = {
+        "file_name": "bar-export-2026-03-17.xlsx",
+        "title": "Age group",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+        "labels": {
+            "label": "Label",
+            "value": "Value",
+            "value_percent": "Value (%)",
+            "color": "Color",
+            "metric": "Metric",
+        },
+        "palette": ["#ff0000", "#00ff00"],
+        "chart": {
+            "kind": "bar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+    }
+
+    workbook = load_workbook(BytesIO(build_workbook(payload)))
+    worksheet = workbook.worksheets[0]
+
+    assert isinstance(workbook.active, Chartsheet)
+    assert worksheet["B5"].number_format == '0"%"'
+    assert worksheet["B6"].number_format == '0"%"'
+    assert worksheet["B5"].value == 55
+    assert worksheet["B6"].value == 45
 
 
 def test_build_workbook_for_metrics_creates_styled_table_without_chart() -> None:
