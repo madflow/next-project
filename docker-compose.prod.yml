@@ -110,6 +110,28 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     logging: *default-logging
 
+  backup:
+    build:
+      context: .
+      dockerfile: docker/backup/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 3 * * *}
+      - BACKUP_DIR=/backups
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-14}
+      - BACKUP_DB_HOST=${POSTGRES_HOST:-postgres}
+      - BACKUP_DB_PORT=${POSTGRES_PORT:-5432}
+      - BACKUP_DB_NAME=${POSTGRES_DB}
+      - BACKUP_DB_USER=${POSTGRES_USER}
+      - BACKUP_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - TZ=${TZ:-UTC}
+    volumes:
+      - ${BACKUP_PATH:-./backups}:/backups
+    logging: *default-logging
+
 volumes:
   pg-data:
     driver: local
