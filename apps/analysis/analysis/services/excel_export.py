@@ -43,7 +43,7 @@ TABLE_STYLE_NAME = "TableStyleMedium9"
 EXPORT_FONT_NAME = "Arial"
 SANS_SERIF_FONT_FAMILY = 2
 INVALID_SHEET_TITLE_CHARS = "[]:*?/\\"
-PERCENT_NUMBER_FORMAT = '0.00"%"'
+WHOLE_PERCENT_NUMBER_FORMAT = '0"%"'
 STACKED_CHART_NUMBER_FORMAT = '0"%"'
 PIE_PERCENT_NUMBER_FORMAT = "0%"
 MEAN_NUMBER_FORMAT = "0.0"
@@ -575,11 +575,11 @@ def _build_distribution_chart(
         _series_reference(worksheet, 2, 2, len(points)), titles_from_data=True
     )
     _set_string_categories(chart, worksheet, len(points))
-    _set_value_axis_range(chart, 0.0, 100.0, PERCENT_NUMBER_FORMAT)
+    _set_value_axis_range(chart, 0.0, 100.0, WHOLE_PERCENT_NUMBER_FORMAT)
     _configure_data_labels(
         chart,
         position="outEnd",
-        number_format=PERCENT_NUMBER_FORMAT,
+        number_format=WHOLE_PERCENT_NUMBER_FORMAT,
     )
     if horizontal:
         _reverse_horizontal_category_axis(chart)
@@ -703,7 +703,7 @@ def _build_distribution_table_spec(
     return WorksheetTableSpec(
         headers=[labels["label"], labels["value_percent"]],
         rows=rows,
-        number_formats={1: PERCENT_NUMBER_FORMAT},
+        number_formats={1: WHOLE_PERCENT_NUMBER_FORMAT},
         table_name=table_name,
     )
 
