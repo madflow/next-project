@@ -1,7 +1,6 @@
 FROM python:3.13.6-slim-bullseye AS prod
 
-
-RUN pip install poetry==1.8.2
+RUN pip install --no-cache-dir poetry==1.8.2
 
 # Configuring poetry
 RUN poetry config virtualenvs.create false
