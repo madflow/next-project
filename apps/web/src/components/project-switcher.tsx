@@ -2,7 +2,7 @@
 
 import { ChevronsUpDown, Folder, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,8 +26,18 @@ type ProjectSwitcherProps = {
 export function ProjectSwitcher({ activeProject, organizationId, onSelect }: ProjectSwitcherProps) {
   const isMobile = useIsMobile();
   const { data: projects = [], isLoading: isProjectsLoading } = useProjectsByOrg(organizationId);
+  const [isMounted, setIsMounted] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const t = useTranslations("appSidebar");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isTriggerDisabled = isMounted
+    ? !organizationId || isSwitching || (!isProjectsLoading && projects.length === 0)
+    : undefined;
+  const menuSide = isMounted && isMobile ? "bottom" : "right";
 
   const handleSelect = async (project: Project) => {
     if (project.id === activeProject?.id) return;
@@ -49,7 +59,7 @@ export function ProjectSwitcher({ activeProject, organizationId, onSelect }: Pro
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild disabled={projects.length === 0 || isProjectsLoading}>
+          <DropdownMenuTrigger asChild disabled={isTriggerDisabled}>
             <Button
               variant="ghost"
               data-testid="app.project-switcher"
@@ -66,7 +76,7 @@ export function ProjectSwitcher({ activeProject, organizationId, onSelect }: Pro
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             data-testid="app.project-switcher.menu"
             align="start"
-            side={isMobile ? "bottom" : "right"}
+            side={menuSide}
             sideOffset={4}>
             <div className="text-muted-foreground px-2 py-1.5 text-sm font-medium">{t("projectSwitcher.switch")}</div>
             {projects.length > 0 ? (

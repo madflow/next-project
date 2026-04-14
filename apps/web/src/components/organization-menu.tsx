@@ -5,7 +5,7 @@ import { Organization } from "better-auth/plugins";
 import { Building2, ChevronsUpDown, CirclePlusIcon, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,10 +32,15 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
   const isMobile = useIsMobile();
   const { data: organizations = [], isPending: isOrgsLoading } = useCurrentuserOrganizations();
 
+  const [isMounted, setIsMounted] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const [openInvitationModal, setOpenInvitationModal] = useState(false);
   const { setActiveOrganization } = useAppContext();
   const t = useTranslations("appSidebar");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const { data: canCreateInvitations } = useQuery({
     enabled: !!activeOrganization,
@@ -67,6 +72,8 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
   };
 
   const isLoading = isOrgsLoading || isSwitching;
+  const isTriggerDisabled = isMounted ? isSwitching : undefined;
+  const menuSide = isMounted && isMobile ? "bottom" : "right";
   const displayName = activeOrganization?.name || t("organizationSwitcher.label");
 
   return (
@@ -81,7 +88,7 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild disabled={isLoading || !organizations}>
+            <DropdownMenuTrigger asChild disabled={isTriggerDisabled}>
               <Button
                 variant="ghost"
                 size="sm"
@@ -98,7 +105,7 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
               className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
               data-testid="app.organization-switcher.menu"
               align="start"
-              side={isMobile ? "bottom" : "right"}
+              side={menuSide}
               sideOffset={4}>
               <div className="text-muted-foreground px-2 py-1.5 text-sm font-medium">
                 {t("organizationSwitcher.switch")}
