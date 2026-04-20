@@ -7,6 +7,7 @@ const nextConfig = {
   transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   typedRoutes: true,
   experimental: {
+    proxyClientMaxBodySize: "100mb",
     serverActions: {
       bodySizeLimit: "100mb",
     },
