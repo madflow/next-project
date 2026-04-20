@@ -4,6 +4,8 @@ import { DeleteObjectCommand, PutObjectCommand, S3ServiceException } from "@aws-
 import { randomUUID } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
 import { env } from "@/env";
+import { USER_ADMIN_ROLE } from "@/lib/auth";
+import { canDeleteAvatarForUser } from "@/lib/avatar-authorization";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { getSessionOrThrow, withAuth } from "@/lib/server-action-utils";
 import { getS3Client } from "@/lib/storage";
@@ -160,6 +162,18 @@ export const uploadAvatar = withAuth(async ({ file, userId }: UploadAvatarParams
 });
 
 export async function deleteAvatar(userId: string, filename: string) {
+  const session = await getSessionOrThrow();
+
+  if (
+    !canDeleteAvatarForUser({
+      sessionUserId: session.user.id,
+      targetUserId: userId,
+      isAdmin: session.user.role === USER_ADMIN_ROLE,
+    })
+  ) {
+    throw new ServerActionNotAuthorizedException("User ID mismatch");
+  }
+
   const s3Client = getS3Client();
   try {
     // Construct the full S3 key with the correct path
