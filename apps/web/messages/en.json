@@ -912,6 +912,7 @@
       "theme": {
         "add": "Add Theme",
         "addFirst": "Add First Theme",
+        "colorHelp": "Enter a 6-digit hex color like #3b82f6.",
         "empty": "No themes configured yet",
         "nameHelp": "Only letters, numbers, hyphens (-), and underscores (_) are allowed. Spaces will be converted to hyphens.",
         "namePlaceholder": "Enter theme name",

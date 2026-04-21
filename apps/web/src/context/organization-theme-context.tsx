@@ -2,6 +2,7 @@
 
 import { ReactNode, createContext, useContext, useMemo } from "react";
 import { useAppContext } from "@/context/app-context";
+import { sanitizeThemeChartColors } from "@/lib/organization-theme";
 import { type Organization, type ThemeItem } from "@/types/organization";
 
 // Default themes that are always available
@@ -142,6 +143,7 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
     const organizationThemes = organizationWithSettings?.settings?.themes || [];
     const sanitizedOrganizationThemes = organizationThemes.map((theme: ThemeItem) => ({
       ...theme,
+      chartColors: sanitizeThemeChartColors(theme.chartColors),
       name: theme.name
         .replace(/\s+/g, "-") // Replace spaces with hyphens
         .replace(/[^A-Za-z0-9\-_]/g, ""), // Remove any characters that aren't A-Za-z0-9, -, or _
@@ -176,6 +178,7 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
       return {
         theme: {
           ...orgTheme,
+          chartColors: sanitizeThemeChartColors(orgTheme.chartColors),
           name: orgTheme.name.replace(/\s+/g, "-").replace(/[^A-Za-z0-9\-_]/g, ""),
         },
         isOrganizationTheme: true,
@@ -264,10 +267,6 @@ ${cssVariables}
 }`;
 
   return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: cssContent,
-      }}
-    />
+    <style>{cssContent}</style>
   );
 }

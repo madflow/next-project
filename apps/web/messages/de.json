@@ -912,6 +912,7 @@
       "theme": {
         "add": "Thema hinzufügen",
         "addFirst": "Erstes Thema hinzufügen",
+        "colorHelp": "Geben Sie eine 6-stellige Hex-Farbe wie #3b82f6 ein.",
         "empty": "Noch keine Themen konfiguriert",
         "nameHelp": "Nur Buchstaben, Zahlen, Bindestriche (-) und Unterstriche (_) sind erlaubt. Leerzeichen werden in Bindestriche umgewandelt.",
         "namePlaceholder": "Themenname eingeben",

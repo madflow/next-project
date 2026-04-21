@@ -173,18 +173,38 @@ export const authSchema = {
 
 export type AuthUser = typeof user.$inferSelect;
 
-export const insertOrganizationSchema = createInsertSchema(organization);
-export const selectOrganizationSchema = createSelectSchema(organization);
-export const updateOrganizationSchema = createUpdateSchema(organization);
-
-export type CreateOrganizationData = z.infer<typeof insertOrganizationSchema>;
-export type Organization = z.infer<typeof selectOrganizationSchema>;
-export type UpdateOrganizationData = z.infer<typeof updateOrganizationSchema>;
-
 // Organization settings schemas
+export const organizationThemeColorKeys = [
+  "chart-1",
+  "chart-2",
+  "chart-3",
+  "chart-4",
+  "chart-5",
+  "chart-6",
+] as const;
+
+export const organizationThemeColorSchema = z
+  .string()
+  .trim()
+  .regex(/^#[0-9A-Fa-f]{6}$/, {
+    error: "Theme colors must be 6-digit hex values.",
+  })
+  .transform((value) => value.toLowerCase());
+
+export const themeChartColorsSchema = z
+  .object({
+    "chart-1": organizationThemeColorSchema.optional(),
+    "chart-2": organizationThemeColorSchema.optional(),
+    "chart-3": organizationThemeColorSchema.optional(),
+    "chart-4": organizationThemeColorSchema.optional(),
+    "chart-5": organizationThemeColorSchema.optional(),
+    "chart-6": organizationThemeColorSchema.optional(),
+  })
+  .strict();
+
 export const themeItemSchema = z.object({
   name: z.string(),
-  chartColors: z.record(z.string(), z.string()).optional(),
+  chartColors: themeChartColorsSchema.optional(),
 });
 
 export const organizationSettingsSchema = z
@@ -192,6 +212,20 @@ export const organizationSettingsSchema = z
     themes: z.array(themeItemSchema).optional(),
   })
   .optional();
+
+export const insertOrganizationSchema = createInsertSchema(organization).extend({
+  settings: organizationSettingsSchema.nullable().optional(),
+});
+export const selectOrganizationSchema = createSelectSchema(organization).extend({
+  settings: organizationSettingsSchema.nullable().optional(),
+});
+export const updateOrganizationSchema = createUpdateSchema(organization).extend({
+  settings: organizationSettingsSchema.nullable().optional(),
+});
+
+export type CreateOrganizationData = z.infer<typeof insertOrganizationSchema>;
+export type Organization = z.infer<typeof selectOrganizationSchema>;
+export type UpdateOrganizationData = z.infer<typeof updateOrganizationSchema>;
 
 export const insertMemberSchema = createInsertSchema(member);
 export const selectMemberSchema = createSelectSchema(member);
