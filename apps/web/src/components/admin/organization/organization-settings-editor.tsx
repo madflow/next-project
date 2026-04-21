@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { isValidThemeColor, normalizeThemeColorInput, organizationThemeColorKeys } from "@/lib/organization-theme";
 import { type OrganizationSettings, ThemeItem } from "@/types/organization";
 import { DEFAULT_THEME } from "./defaults";
 
@@ -23,6 +24,7 @@ export function OrganizationSettingsEditor({
 }: OrganizationSettingsEditorProps) {
   const t = useTranslations();
   const [themes, setThemes] = useState<ThemeItem[]>(initialSettings?.themes || [DEFAULT_THEME] || []);
+  const [invalidColorFields, setInvalidColorFields] = useState<Record<string, boolean>>({});
 
   const updateSettings = (newThemes: ThemeItem[]) => {
     setThemes(newThemes);
@@ -62,14 +64,48 @@ export function OrganizationSettingsEditor({
     const theme = themes[index];
     if (theme) {
       const currentColors = theme.chartColors || {};
-      updateTheme(index, {
+      const normalizedColor = normalizeThemeColorInput(color);
+      const fieldId = `${index}-${colorKey}`;
+      const isValid = isValidThemeColor(normalizedColor);
+      const nextColorValue = isValid ? normalizedColor : color;
+      const nextThemes = [...themes];
+      nextThemes[index] = {
         ...theme,
-        chartColors: { ...currentColors, [colorKey]: color },
+        chartColors: { ...currentColors, [colorKey]: nextColorValue },
+      };
+      setThemes(nextThemes);
+
+      setInvalidColorFields((current) => {
+        if (isValid) {
+          const next = { ...current };
+          delete next[fieldId];
+          return next;
+        }
+
+        return { ...current, [fieldId]: true };
+      });
+
+      if (!isValid) {
+        return;
+      }
+
+      onChangeAction({
+        themes: nextThemes.map((nextTheme, themeIndex) =>
+          themeIndex === index
+            ? {
+                ...nextTheme,
+                chartColors: {
+                  ...nextTheme.chartColors,
+                  [colorKey]: normalizedColor,
+                },
+              }
+            : nextTheme
+        ),
       });
     }
   };
 
-  const colorKeys = ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6"];
+  const colorKeys = organizationThemeColorKeys;
 
   return (
     <div className="space-y-6">
@@ -122,6 +158,11 @@ export function OrganizationSettingsEditor({
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {colorKeys.map((colorKey) => {
                   const currentColor = theme.chartColors?.[colorKey] || DEFAULT_THEME.chartColors?.[colorKey];
+                  const normalizedColor = normalizeThemeColorInput(currentColor ?? "");
+                  const safeColorValue = isValidThemeColor(normalizedColor)
+                    ? normalizedColor
+                    : (DEFAULT_THEME.chartColors?.[colorKey] ?? "#000000");
+                  const isInvalid = invalidColorFields[`${themeIndex}-${colorKey}`] === true;
                   return (
                     <div key={colorKey} className="space-y-2">
                       <Label htmlFor={`${themeIndex}-${colorKey}`} className="text-sm font-medium">
@@ -131,7 +172,7 @@ export function OrganizationSettingsEditor({
                         <input
                           id={`${themeIndex}-${colorKey}`}
                           type="color"
-                          value={currentColor}
+                          value={safeColorValue}
                           onChange={(e) => updateThemeColor(themeIndex, colorKey, e.target.value)}
                           disabled={readOnly}
                           className="border-input h-8 w-8 cursor-pointer rounded border disabled:cursor-not-allowed"
@@ -141,10 +182,15 @@ export function OrganizationSettingsEditor({
                           data-testid={`theme-color-${themeIndex}-${colorKey}`}
                           onChange={(e) => updateThemeColor(themeIndex, colorKey, e.target.value)}
                           placeholder="#000000"
+                          pattern="^#[0-9A-Fa-f]{6}$"
+                          aria-invalid={isInvalid}
                           className="flex-1 font-mono text-sm"
                           readOnly={readOnly}
                         />
                       </div>
+                      {isInvalid && (
+                        <p className="text-destructive text-xs">{t("organization.settings.theme.colorHelp")}</p>
+                      )}
                     </div>
                   );
                 })}

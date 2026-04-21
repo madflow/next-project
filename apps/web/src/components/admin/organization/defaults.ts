@@ -13,6 +13,8 @@ export const DEFAULT_THEME: ThemeItem = {
   },
 };
 
+const themeSettingsSchema = organizationSettingsSchema.nullable();
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFormSchema = (t: any) =>
   z.object({
@@ -31,5 +33,5 @@ export const createFormSchema = (t: any) =>
         error: t("organization.form.slug.errors.maxLength"),
       }),
     createdAt: z.date(),
-    settings: organizationSettingsSchema.nullable(),
+    settings: themeSettingsSchema,
   });
