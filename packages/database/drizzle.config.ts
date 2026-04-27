@@ -1,5 +1,5 @@
 import { defineConfig } from "drizzle-kit";
-import "./instrumentation.ts";
+import "./instrumentation.js";
 
 export default defineConfig({
   out: "./migrations",
