@@ -78,7 +78,7 @@ services:
     image: "postgres:18"
     command: "postgres -c log_statement=all"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-h", "localhost"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10
