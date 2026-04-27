@@ -2,7 +2,7 @@
 
 import { ChevronsUpDown, Folder, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,18 +26,11 @@ type ProjectSwitcherProps = {
 export function ProjectSwitcher({ activeProject, organizationId, onSelect }: ProjectSwitcherProps) {
   const isMobile = useIsMobile();
   const { data: projects = [], isLoading: isProjectsLoading } = useProjectsByOrg(organizationId);
-  const [isMounted, setIsMounted] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const t = useTranslations("appSidebar");
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const isTriggerDisabled = isMounted
-    ? !organizationId || isSwitching || (!isProjectsLoading && projects.length === 0)
-    : undefined;
-  const menuSide = isMounted && isMobile ? "bottom" : "right";
+  const isTriggerDisabled = !organizationId || isSwitching || (!isProjectsLoading && projects.length === 0);
+  const menuSide = isMobile ? "bottom" : "right";
 
   const handleSelect = async (project: Project) => {
     if (project.id === activeProject?.id) return;

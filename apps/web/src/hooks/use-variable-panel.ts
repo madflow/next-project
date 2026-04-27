@@ -2,25 +2,26 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "adhoc-variable-panel-open";
 
+function getInitialIsOpen(defaultOpen: boolean) {
+  if (typeof window === "undefined") {
+    return defaultOpen;
+  }
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === null ? defaultOpen : stored === "true";
+  } catch {
+    return defaultOpen;
+  }
+}
+
 export function useVariablePanel(defaultOpen = true) {
   const hydrated = useRef(false);
-  const [isOpen, setIsOpen] = useState<boolean>(defaultOpen);
+  const [isOpen, setIsOpen] = useState<boolean>(() => getInitialIsOpen(defaultOpen));
 
   useEffect(() => {
-    if (hydrated.current) return;
     hydrated.current = true;
-
-    // Read persisted value once on first client render
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored !== null && stored !== String(defaultOpen)) {
-        setIsOpen(stored === "true");
-      }
-    } catch {
-      // Ignore storage errors
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // intentionally runs once on mount
+  }, []);
 
   useEffect(() => {
     if (!hydrated.current) return;

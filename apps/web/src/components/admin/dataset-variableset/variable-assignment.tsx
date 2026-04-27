@@ -13,7 +13,7 @@ import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } 
 import { CSS } from "@dnd-kit/utilities";
 import { FolderOpen, GripVertical, Plus, Search, Unlink, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import type { DatasetVariableMeasure, DatasetVariableType, VariablesetContentAttributes } from "@repo/database/schema";
 import {
@@ -212,12 +212,17 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
     refetch: refetchContents,
   } = useVariablesetContents(selectedSetId);
 
-  const [localContents, setLocalContents] = useState<VariablesetContentEntry[]>(contents ?? []);
-
-  // Sync local state when contents change
-  useEffect(() => {
-    setLocalContents(contents ?? []);
-  }, [contents]);
+  const [optimisticContentsState, setOptimisticContentsState] = useState<{
+    selectedSetId: string | null;
+    contents: VariablesetContentEntry[] | null;
+  }>({
+    selectedSetId: null,
+    contents: null,
+  });
+  const localContents =
+    optimisticContentsState.selectedSetId === selectedSetId && optimisticContentsState.contents
+      ? optimisticContentsState.contents
+      : contents ?? [];
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -241,7 +246,10 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
     if (oldIndex === -1 || newIndex === -1) return;
 
     const reordered = arrayMove(localContents, oldIndex, newIndex);
-    setLocalContents(reordered);
+    setOptimisticContentsState({
+      selectedSetId,
+      contents: reordered,
+    });
 
     try {
       await reorderContentsAction(
@@ -249,10 +257,17 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
         reordered.map((c) => c.id)
       );
       await refetchContents();
+      setOptimisticContentsState({
+        selectedSetId,
+        contents: null,
+      });
     } catch (error) {
       console.error("Failed to reorder contents:", error);
       toast.error(t("reorder.failed"));
-      setLocalContents(contents ?? []);
+      setOptimisticContentsState({
+        selectedSetId,
+        contents: null,
+      });
     }
   };
 
