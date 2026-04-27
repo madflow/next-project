@@ -181,6 +181,8 @@ export const organizationThemeColorKeys = [
   "chart-4",
   "chart-5",
   "chart-6",
+  "chart-dichotome-1",
+  "chart-dichotome-2",
 ] as const;
 
 export const organizationThemeColorSchema = z
@@ -199,6 +201,8 @@ export const themeChartColorsSchema = z
     "chart-4": organizationThemeColorSchema.optional(),
     "chart-5": organizationThemeColorSchema.optional(),
     "chart-6": organizationThemeColorSchema.optional(),
+    "chart-dichotome-1": organizationThemeColorSchema.optional(),
+    "chart-dichotome-2": organizationThemeColorSchema.optional(),
   })
   .strict();
 

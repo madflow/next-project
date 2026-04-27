@@ -13,6 +13,7 @@ import {
   transformToRechartsStackedBarData,
   transformToSplitVariableStackedBarData,
 } from "@/lib/analysis-bridge";
+import { getChartColorValue } from "@/lib/chart-colors";
 import { METRICS_CARD_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
@@ -20,6 +21,7 @@ import { type ThemeItem } from "@/types/organization";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 
 const EXPORT_PALETTE_KEYS = ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6"] as const;
+const EXPORT_DICHOTOME_KEYS = ["chart-dichotome-1", "chart-dichotome-2"] as const;
 
 const DEFAULT_EXPORT_PALETTE = ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"] as const;
 
@@ -134,6 +136,7 @@ type MetricLabels = {
 
 type VariableChartExportOptions = {
   chartType: Exclude<AnalysisChartType, "textExplorer">;
+  chartColors?: ThemeItem["chartColors"];
   countedValue?: number;
   fileBaseName?: string;
   isMultiResponseIndividual?: boolean;
@@ -330,6 +333,48 @@ export function getExportPalette(chartColors?: ThemeItem["chartColors"] | null) 
   return EXPORT_PALETTE_KEYS.map((key, index) => chartColors?.[key] ?? DEFAULT_EXPORT_PALETTE[index]!);
 }
 
+export function getComputedThemeChartColors(
+  scopeElement: HTMLElement | null,
+  fallbackChartColors?: ThemeItem["chartColors"] | null,
+  domAdapter: PaletteDomAdapter | null = createPaletteDomAdapter()
+) {
+  if (!domAdapter) {
+    return fallbackChartColors;
+  }
+
+  const scope = domAdapter.resolveScope(scopeElement);
+  if (!scope) {
+    return fallbackChartColors;
+  }
+
+  const themeColorKeys = [...EXPORT_PALETTE_KEYS, ...EXPORT_DICHOTOME_KEYS];
+  const resolvedEntries = themeColorKeys.flatMap((key) => {
+    const probe = domAdapter.createProbe();
+    probe.style.color = `var(--${key})`;
+    probe.style.position = "absolute";
+    probe.style.visibility = "hidden";
+    probe.style.pointerEvents = "none";
+    scope.appendChild(probe);
+
+    try {
+      const color = domAdapter.getComputedColor(probe);
+      const resolvedColor = domAdapter.colorToHex?.(color) ?? cssColorToHex(color);
+      return resolvedColor ? ([[key, resolvedColor]] as const) : [];
+    } finally {
+      probe.remove();
+    }
+  });
+
+  if (resolvedEntries.length === 0) {
+    return fallbackChartColors;
+  }
+
+  return {
+    ...fallbackChartColors,
+    ...Object.fromEntries(resolvedEntries),
+  };
+}
+
 export function getComputedExportPalette(
   scopeElement: HTMLElement | null,
   fallbackChartColors?: ThemeItem["chartColors"] | null,
@@ -493,6 +538,7 @@ export async function exportExcelForDataset(datasetId: string, payload: AdhocExc
 
 export function createVariableChartExcelExportPayload({
   chartType,
+  chartColors,
   countedValue = 1,
   excelLabels,
   fileBaseName,
@@ -505,6 +551,7 @@ export function createVariableChartExcelExportPayload({
 }: VariableChartExcelExportOptions): AdhocExcelExportPayload {
   const powerpointPayload = createVariableChartPowerPointExportPayload({
     chartType,
+    chartColors,
     countedValue,
     fileBaseName,
     isMultiResponseIndividual,
@@ -551,6 +598,7 @@ export function createMultiResponseExcelExportPayload({
 
 export function createVariableChartPowerPointExportPayload({
   chartType,
+  chartColors,
   countedValue = 1,
   fileBaseName,
   isMultiResponseIndividual = false,
@@ -617,13 +665,14 @@ export function createVariableChartPowerPointExportPayload({
             segments: model.segments.map((segment, index) => ({
               label: segment.label,
               value: roundExportValue(Number(row[segment.key] ?? 0)),
-              color: palette[index] ?? DEFAULT_EXPORT_PALETTE[index % DEFAULT_EXPORT_PALETTE.length]!,
+              color: getChartColorValue(index, model.segments.length, chartColors),
             })),
           })),
         },
       };
     }
     case "pie": {
+      const piePoints = transformToRechartsPieData(variable, stats);
       return {
         file_name,
         title,
@@ -631,10 +680,10 @@ export function createVariableChartPowerPointExportPayload({
         palette,
         chart: {
           kind: "pie",
-          points: transformToRechartsPieData(variable, stats).map((point, index) => ({
+          points: piePoints.map((point, index) => ({
             label: String(point.label),
             value: roundExportValue(point.percentage),
-            color: palette[index] ?? DEFAULT_EXPORT_PALETTE[index % DEFAULT_EXPORT_PALETTE.length]!,
+            color: getChartColorValue(index, piePoints.length, chartColors),
           })),
         },
       };

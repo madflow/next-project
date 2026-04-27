@@ -17,6 +17,7 @@ import {
   transformToRechartsBarData,
   transformToRechartsPieData,
 } from "@/lib/analysis-bridge";
+import { getChartColorVariable } from "@/lib/chart-colors";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates, getPlotAreaVerticalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariable } from "@/types/dataset-variable";
@@ -169,11 +170,12 @@ export function PieChartContent({
 }) {
   const pieData = transformToRechartsPieData(variable, stats);
   const pieChartConfig: ChartConfig = {};
+  const categoryCount = pieData.length;
 
   pieData.forEach((item, index) => {
     pieChartConfig[item.label] = {
       label: item.label,
-      color: `var(--chart-${(index % 6) + 1})`,
+      color: item.fill || getChartColorVariable(index, categoryCount),
     };
   });
 

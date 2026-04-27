@@ -1,4 +1,5 @@
 import { matchesCountedValue } from "@/lib/multi-response-utils";
+import { getChartColorVariable } from "@/lib/chart-colors";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
@@ -123,6 +124,7 @@ export function transformToRechartsPieData(variableConfig: DatasetVariable, stat
   const valueLabels = variableConfig.valueLabels ?? {};
 
   const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
+  const categoryCount = sortedFrequencyTable.length;
   const rechartsData: RechartsPieDataItem[] = sortedFrequencyTable.map((item, index) => {
     const valueKey = item.value.toString() as keyof typeof valueLabels; // Convert to string to match valueLabels keys
     const label = valueLabels[valueKey] || item.value; // Fallback if label not found
@@ -132,7 +134,7 @@ export function transformToRechartsPieData(variableConfig: DatasetVariable, stat
       value: item.value,
       count: item.counts,
       percentage: item.percentages,
-      fill: `var(--chart-${(index % 6) + 1})`,
+      fill: getChartColorVariable(index, categoryCount),
     };
   });
 
@@ -142,6 +144,7 @@ export function transformToRechartsPieData(variableConfig: DatasetVariable, stat
 export function transformToRechartsStackedBarData(variableConfig: DatasetVariable, statsData: StatsResponse) {
   const valueLabels = variableConfig.valueLabels ?? {};
   const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
+  const categoryCount = sortedFrequencyTable.length;
 
   // For stacked bar, we create one entry per category with percentage as the stack
   const rechartsData: RechartsStackedBarDataItem[] = sortedFrequencyTable.map((item, index) => {
@@ -155,7 +158,7 @@ export function transformToRechartsStackedBarData(variableConfig: DatasetVariabl
       percentage: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
       // Add individual percentage for stacking
       stackValue: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
-      fill: `var(--chart-${(index % 6) + 1})`,
+      fill: getChartColorVariable(index, categoryCount),
     };
   });
 
@@ -182,6 +185,7 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
     .map((category, categoryIndex) => {
       const categoryStats = splitStats.categories[category];
       if (!categoryStats?.frequency_table) return null;
+      const categoryCount = categoryStats.frequency_table.length;
 
       const categoryData: StackedBarSegment[] = categoryStats.frequency_table.map((item, itemIndex) => {
         const valueKey = item.value.toString() as keyof typeof valueLabels;
@@ -192,7 +196,7 @@ export function transformToSplitVariableStackedBarData(variableConfig: DatasetVa
           value: Math.round(item.percentages * 100) / 100, // Round to 2 decimal places
           label,
           count: item.counts,
-          color: `var(--chart-${(itemIndex % 6) + 1})`,
+          color: getChartColorVariable(itemIndex, categoryCount),
         };
       });
 
