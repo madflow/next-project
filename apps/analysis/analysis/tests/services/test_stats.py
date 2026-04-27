@@ -688,6 +688,32 @@ def test_describe_var_with_split_variable_empty_after_filtering(stats_service) -
     assert categories == {}
 
 
+def test_describe_var_applies_missing_values_only_to_target_column(
+    stats_service: StatisticsService,
+) -> None:
+    """Avoid whole-DataFrame replacement when filtering numeric missing values."""
+    rows = 300
+    wide_data = {f"c{i}": [float(i % 3) for _ in range(rows)] for i in range(220)}
+    wide_data["text"] = ["A" if i % 2 == 0 else "B" for i in range(rows)]
+    wide_data["recv10_6"] = [(-999.0 if i % 17 == 0 else float(i % 2)) for i in range(rows)]
+    df = pd.DataFrame(wide_data)
+
+    result = stats_service.describe_var(
+        df,
+        "recv10_6",
+        include=["count", "frequencies"],
+        missing_values=["-999", "-998"],
+        decimal_places=2,
+    )
+
+    expected_count = rows - sum(1 for i in range(rows) if i % 17 == 0)
+    assert result["count"] == expected_count
+    assert result["frequency_table"] == [
+        {"value": "0.0", "counts": 141, "percentages": 50.0},
+        {"value": "1.0", "counts": 141, "percentages": 50.0},
+    ]
+
+
 def test_describe_var_with_split_variable_mixed_numeric_string_categories(
     stats_service: StatisticsService,
 ) -> None:
