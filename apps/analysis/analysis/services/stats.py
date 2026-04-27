@@ -186,10 +186,7 @@ class StatisticsService:
             )
 
         if missing_values is not None:
-            numeric_missing_values = self._convert_to_numeric_missing_values(
-                missing_values,
-            )
-            data = data.replace(numeric_missing_values, pd.NA)
+            data = self._apply_missing_values(data, variable_name, missing_values)
 
         # Apply missing ranges to mark values within ranges as missing
         if missing_ranges is not None:
@@ -204,6 +201,19 @@ class StatisticsService:
             value_labels,
             decimal_places,
         )
+
+    def _apply_missing_values(
+        self,
+        data: pd.DataFrame,
+        variable_name: str,
+        missing_values: list[str | int | float],
+    ) -> pd.DataFrame:
+        """Mark configured missing values as ``pd.NA`` for a single variable."""
+        numeric_missing_values = self._convert_to_numeric_missing_values(missing_values)
+        data = data.copy()
+        mask = data[variable_name].isin(numeric_missing_values)
+        data.loc[mask, variable_name] = pd.NA
+        return data
 
     def _apply_missing_ranges(
         self,
@@ -380,10 +390,7 @@ class StatisticsService:
             statistics for the main variable.
         """
         if missing_values is not None:
-            numeric_missing_values = self._convert_to_numeric_missing_values(
-                missing_values,
-            )
-            data = data.replace(numeric_missing_values, pd.NA)
+            data = self._apply_missing_values(data, variable_name, missing_values)
 
         # Apply missing ranges to main variable
         if missing_ranges is not None:
