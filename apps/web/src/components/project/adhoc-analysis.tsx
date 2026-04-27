@@ -98,13 +98,36 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const initialSelectedDataset = parsedUrlState.hasKnownState
     ? parsedUrlState.selectedDataset
     : restoredState?.selectedDataset || null;
-  const [selectedDataset, setSelectedDataset] = useState<string | null>(initialSelectedDataset);
-  const [selectedDatasetName, setSelectedDatasetName] = useState<string | null>(null);
+  const [localSelectedDataset, setLocalSelectedDataset] = useState<string | null>(initialSelectedDataset);
+  const [selectedDatasetNameState, setSelectedDatasetNameState] = useState<{
+    datasetId: string | null;
+    name: string | null;
+  }>({ datasetId: initialSelectedDataset, name: null });
   const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
   const [baseStatsData, setBaseStatsData] = useState<Record<string, StatsResponse>>({});
   const [splitStatsData, setSplitStatsData] = useState<Record<string, StatsResponse>>({});
   const syncedStoredDatasetRef = useRef(false);
   const pendingUrlQueryRef = useRef<string | null>(null);
+  const clearedUrlSelectionRef = useRef<string | null>(null);
+  const selectedDataset = parsedUrlState.hasKnownState ? parsedUrlState.selectedDataset : localSelectedDataset;
+  const selectedDatasetName = selectedDatasetNameState.datasetId === selectedDataset ? selectedDatasetNameState.name : null;
+  const effectiveCurrentSelection = useMemo(() => {
+    if (!parsedUrlState.hasKnownState || parsedUrlState.selectedDataset !== selectedDataset) {
+      return currentSelection;
+    }
+
+    if (!parsedUrlState.selection) {
+      return null;
+    }
+
+    return matchesAdhocUrlSelection(currentSelection, parsedUrlState.selection) ? currentSelection : null;
+  }, [
+    currentSelection,
+    parsedUrlState.hasKnownState,
+    parsedUrlState.selectedDataset,
+    parsedUrlState.selection,
+    selectedDataset,
+  ]);
   const { data: variablesets = [], isLoading: isVariablesetsLoading } = useDatasetVariablesets(selectedDataset);
 
   const clearStatsData = useCallback(() => {
@@ -251,24 +274,12 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       return;
     }
 
-    if (parsedUrlState.selectedDataset === selectedDataset) {
-      return;
-    }
-
-    setSelectedDataset(parsedUrlState.selectedDataset);
-    setSelectedDatasetName(null);
-    setCurrentSelection(null);
-    clearStatsData();
     saveDataset(parsedUrlState.selectedDataset);
-    saveCurrentSelection(null);
   }, [
-    clearStatsData,
     isSearchParamsReady,
     parsedUrlState.hasKnownState,
     parsedUrlState.selectedDataset,
-    saveCurrentSelection,
     saveDataset,
-    selectedDataset,
   ]);
 
   useEffect(() => {
@@ -281,6 +292,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     }
 
     if (!parsedUrlState.hasKnownState || parsedUrlState.selectedDataset !== selectedDataset) {
+      clearedUrlSelectionRef.current = null;
       return;
     }
 
@@ -290,14 +302,21 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       }
 
       if (!currentSelection) {
+        clearedUrlSelectionRef.current = null;
         return;
       }
 
-      setCurrentSelection(null);
+      if (clearedUrlSelectionRef.current === selectedDataset) {
+        return;
+      }
+
+      clearedUrlSelectionRef.current = selectedDataset;
       clearStatsData();
       saveCurrentSelection(null);
       return;
     }
+
+    clearedUrlSelectionRef.current = null;
 
     if (matchesAdhocUrlSelection(currentSelection, parsedUrlState.selection)) {
       return;
@@ -369,11 +388,11 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   ]);
 
   useEffect(() => {
-    if (currentSelection) {
+    if (effectiveCurrentSelection) {
       const variables =
-        currentSelection.type === "variable" && currentSelection.variable
-          ? [currentSelection.variable]
-          : currentSelection.variables || [];
+        effectiveCurrentSelection.type === "variable" && effectiveCurrentSelection.variable
+          ? [effectiveCurrentSelection.variable]
+          : effectiveCurrentSelection.variables || [];
 
       if (variables.length > 0) {
         const request: StatsRequest = {
@@ -395,14 +414,12 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         });
       }
     }
-  }, [currentSelection, mutate]);
+  }, [effectiveCurrentSelection, mutate]);
 
   const handleDatasetChange = useCallback(
     (value: string | null) => {
-      setSelectedDataset(value);
-      if (!value) {
-        setSelectedDatasetName(null);
-      }
+      setLocalSelectedDataset(value);
+      setSelectedDatasetNameState({ datasetId: value, name: null });
       setCurrentSelection(null);
       clearStatsData();
       saveDataset(value);
@@ -423,6 +440,13 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       setIsOverlayOpen(false);
     },
     [clearStatsData, saveCurrentSelection, selectedDataset, syncUrlState]
+  );
+
+  const handleDatasetLabelChange = useCallback(
+    (label: string | null) => {
+      setSelectedDatasetNameState({ datasetId: selectedDataset, name: label });
+    },
+    [selectedDataset]
   );
 
   const handleStatsRequest = (variableName: string, splitVariable?: string) => {
@@ -455,9 +479,9 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   };
 
   const selectedVariables =
-    currentSelection?.type === "variable" && currentSelection.variable
-      ? [currentSelection.variable]
-      : currentSelection?.variables || [];
+    effectiveCurrentSelection?.type === "variable" && effectiveCurrentSelection.variable
+      ? [effectiveCurrentSelection.variable]
+      : effectiveCurrentSelection?.variables || [];
 
   return (
     <div className="theme-container flex flex-col gap-4 lg:flex-row">
@@ -479,7 +503,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             selectedDataset={selectedDataset}
             project={project}
             onDatasetChange={handleDatasetChange}
-            onDatasetLabelChange={setSelectedDatasetName}
+            onDatasetLabelChange={handleDatasetLabelChange}
             onSelectionChange={handleSelectionChange}
           />
         </div>
@@ -522,7 +546,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
               selectedDataset={selectedDataset}
               project={project}
               onDatasetChange={handleDatasetChange}
-              onDatasetLabelChange={setSelectedDatasetName}
+              onDatasetLabelChange={handleDatasetLabelChange}
               onSelectionChange={handleSelectionChange}
             />
           </div>
@@ -542,7 +566,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
               selectedDataset={selectedDataset}
               project={project}
               onDatasetChange={handleDatasetChange}
-              onDatasetLabelChange={setSelectedDatasetName}
+              onDatasetLabelChange={handleDatasetLabelChange}
               onSelectionChange={handleSelectionChange}
             />
           </div>
@@ -567,14 +591,16 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           WORKSPACE: Charts area -- takes all remaining space
           ============================================================ */}
       <div className="min-w-0 flex-1">
-        {selectedDataset && currentSelection && selectedVariables.length > 0 && (
+        {selectedDataset && effectiveCurrentSelection && selectedVariables.length > 0 && (
           <Suspense fallback={<BarSkeleton />}>
             <MultiVariableCharts
               variables={selectedVariables}
               baseStatsData={baseStatsData}
               splitStatsData={splitStatsData}
               variableset={
-                currentSelection?.type === "set" ? currentSelection.variableset : currentSelection?.parentVariableset
+                effectiveCurrentSelection?.type === "set"
+                  ? effectiveCurrentSelection.variableset
+                  : effectiveCurrentSelection?.parentVariableset
               }
               datasetId={selectedDataset}
               datasetName={selectedDatasetName ?? ""}
@@ -582,7 +608,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             />
           </Suspense>
         )}
-        {selectedDataset && !currentSelection && (
+        {selectedDataset && !effectiveCurrentSelection && (
           <Empty className="flex max-w-lg flex-col gap-4">
             <EmptyHeader>
               <EmptyMedia variant="icon">

@@ -29,32 +29,20 @@ export function DatasetSelect({
   defaultValue,
   triggerProps,
 }: DatasetSelectProps) {
-  const [selectedValue, setSelectedValue] = React.useState(defaultValue || "");
   const { data, isLoading, isError } = useDatasetsByProject(projectId);
   const t = useTranslations("formDatasetSelect");
 
-  // Update selectedValue when defaultValue changes and validate it exists
-  React.useEffect(() => {
+  const selectedValue = React.useMemo(() => {
     if (!defaultValue) {
-      setSelectedValue("");
-      return;
+      return "";
     }
 
-    // If data is loaded, check if the defaultValue exists in available datasets
-    if (data?.rows) {
-      const datasetExists = data.rows.some((item) => item.datasets.id === defaultValue);
-      if (datasetExists) {
-        setSelectedValue(defaultValue);
-      } else {
-        // Dataset no longer exists, clear the selection and notify parent
-        setSelectedValue("");
-        onValueChange("");
-      }
-    } else {
-      // Data not loaded yet, set the value optimistically
-      setSelectedValue(defaultValue);
+    if (!data?.rows) {
+      return defaultValue;
     }
-  }, [defaultValue, data?.rows, onDatasetLabelChange, onValueChange]);
+
+    return data.rows.some((item) => item.datasets.id === defaultValue) ? defaultValue : "";
+  }, [data?.rows, defaultValue]);
 
   React.useEffect(() => {
     if (!data?.rows) {
@@ -103,7 +91,6 @@ export function DatasetSelect({
   return (
     <Select
       onValueChange={(value) => {
-        setSelectedValue(value);
         onValueChange(value);
       }}
       value={selectedValue}>

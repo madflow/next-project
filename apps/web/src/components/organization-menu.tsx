@@ -5,7 +5,7 @@ import { Organization } from "better-auth/plugins";
 import { Building2, ChevronsUpDown, CirclePlusIcon, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,15 +32,10 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
   const isMobile = useIsMobile();
   const { data: organizations = [], isPending: isOrgsLoading } = useCurrentuserOrganizations();
 
-  const [isMounted, setIsMounted] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
   const [openInvitationModal, setOpenInvitationModal] = useState(false);
   const { setActiveOrganization } = useAppContext();
   const t = useTranslations("appSidebar");
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const { data: canCreateInvitations } = useQuery({
     enabled: !!activeOrganization,
@@ -72,8 +67,8 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
   };
 
   const isLoading = isOrgsLoading || isSwitching;
-  const isTriggerDisabled = isMounted ? isSwitching : undefined;
-  const menuSide = isMounted && isMobile ? "bottom" : "right";
+  const isTriggerDisabled = isSwitching;
+  const menuSide = isMobile ? "bottom" : "right";
   const displayName = activeOrganization?.name || t("organizationSwitcher.label");
 
   return (
