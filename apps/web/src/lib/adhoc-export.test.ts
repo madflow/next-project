@@ -11,6 +11,7 @@ import {
   createVariableChartExcelExportPayload,
   createVariableChartPowerPointExportPayload,
   getComputedExportPalette,
+  getComputedThemeChartColors,
   getExportPalette,
 } from "./adhoc-export";
 
@@ -172,6 +173,43 @@ describe("adhoc export helpers", () => {
     assert.deepStrictEqual(result, ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666"]);
   });
 
+  test("getComputedThemeChartColors resolves dichotome chart CSS colors", () => {
+    const paletteByVariable: Record<string, string> = {
+      "var(--chart-1)": "rgb(59, 130, 246)",
+      "var(--chart-2)": "rgb(29, 78, 216)",
+      "var(--chart-3)": "rgb(96, 165, 250)",
+      "var(--chart-4)": "rgb(147, 197, 253)",
+      "var(--chart-5)": "rgb(219, 234, 254)",
+      "var(--chart-6)": "rgb(239, 246, 255)",
+      "var(--chart-dichotome-1)": "rgb(16, 185, 129)",
+      "var(--chart-dichotome-2)": "rgb(239, 68, 68)",
+    };
+
+    const result = getComputedThemeChartColors(null, undefined, {
+      createProbe: () =>
+        ({
+          style: { color: "", pointerEvents: "", position: "", visibility: "" },
+          remove() {},
+        }) as unknown as HTMLElement,
+      getComputedColor: (probe) => paletteByVariable[probe.style.color] ?? "",
+      resolveScope: () =>
+        ({
+          appendChild() {},
+        }) as unknown as HTMLElement,
+    });
+
+    assert.deepStrictEqual(result, {
+      "chart-1": "#3b82f6",
+      "chart-2": "#1d4ed8",
+      "chart-3": "#60a5fa",
+      "chart-4": "#93c5fd",
+      "chart-5": "#dbeafe",
+      "chart-6": "#eff6ff",
+      "chart-dichotome-1": "#10b981",
+      "chart-dichotome-2": "#ef4444",
+    });
+  });
+
   test("createVariableChartPowerPointExportPayload maps bar chart data", () => {
     const payload = createVariableChartPowerPointExportPayload({
       chartType: "bar",
@@ -239,6 +277,68 @@ describe("adhoc export helpers", () => {
       { label: "18-29", value: 55, color: "#123456" },
       { label: "30-44", value: 45, color: "#123456" },
     ]);
+  });
+
+  test("createVariableChartPowerPointExportPayload uses dichotome colors for binary pie charts", () => {
+    const payload = createVariableChartPowerPointExportPayload({
+      chartType: "pie",
+      chartColors: {
+        "chart-1": "#123456",
+        "chart-2": "#654321",
+        "chart-dichotome-1": "#111111",
+        "chart-dichotome-2": "#222222",
+      },
+      metaLine: "Dataset: Survey",
+      metricsLabels: {
+        count: "Count",
+        max: "Max",
+        mean: "Mean",
+        median: "Median",
+        min: "Min",
+        stdev: "Stdev",
+      },
+      palette: ["#123456", "#654321"],
+      stats: createStatsResponse(),
+      variable: createVariable(),
+    });
+
+    assert.strictEqual(payload.chart.kind, "pie");
+    if (payload.chart.kind !== "pie") {
+      throw new Error("Expected pie chart kind");
+    }
+
+    assert.deepStrictEqual(payload.chart.points.map((point) => point.color), ["#111111", "#222222"]);
+  });
+
+  test("createVariableChartPowerPointExportPayload uses dichotome colors for binary stacked bars", () => {
+    const payload = createVariableChartPowerPointExportPayload({
+      chartType: "horizontalStackedBar",
+      chartColors: {
+        "chart-1": "#123456",
+        "chart-2": "#654321",
+        "chart-dichotome-1": "#111111",
+        "chart-dichotome-2": "#222222",
+      },
+      metaLine: "Dataset: Survey",
+      metricsLabels: {
+        count: "Count",
+        max: "Max",
+        mean: "Mean",
+        median: "Median",
+        min: "Min",
+        stdev: "Stdev",
+      },
+      palette: ["#123456", "#654321"],
+      stats: createStatsResponse(),
+      variable: createVariable(),
+    });
+
+    assert.strictEqual(payload.chart.kind, "horizontalStackedBar");
+    if (payload.chart.kind !== "horizontalStackedBar") {
+      throw new Error("Expected horizontal stacked bar chart kind");
+    }
+
+    assert.deepStrictEqual(payload.chart.rows[0]?.segments.map((segment) => segment.color), ["#111111", "#222222"]);
   });
 
   test("createMultiResponsePowerPointExportPayload maps aggregate chart data", () => {

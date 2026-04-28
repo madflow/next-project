@@ -12,6 +12,7 @@ describe("organization theme validation", () => {
           chartColors: {
             "chart-1": "#3B82F6",
             "chart-2": "#ef4444",
+            "chart-dichotome-1": "#10B981",
           },
         },
       ],
@@ -20,6 +21,7 @@ describe("organization theme validation", () => {
     assert.deepStrictEqual(result?.themes?.[0]?.chartColors, {
       "chart-1": "#3b82f6",
       "chart-2": "#ef4444",
+      "chart-dichotome-1": "#10b981",
     });
   });
 
@@ -43,9 +45,11 @@ describe("organization theme validation", () => {
       sanitizeThemeChartColors({
         "chart-1": "#3B82F6",
         "chart-2": "red;}</style><script>alert(1)</script><style>",
+        "chart-dichotome-2": "#EF4444",
       }),
       {
         "chart-1": "#3b82f6",
+        "chart-dichotome-2": "#ef4444",
       }
     );
   });

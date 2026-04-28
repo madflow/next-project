@@ -3,6 +3,8 @@ import { describe, test } from "node:test";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { StatsResponse } from "@/types/stats";
 import {
+  transformToRechartsPieData,
+  transformToRechartsStackedBarData,
   transformToMultiResponseData,
   transformToMultiResponseIndividualBarData,
   transformToSplitVariableStackedBarData,
@@ -107,6 +109,35 @@ describe("analysis-bridge transforms", () => {
     );
     assert.deepStrictEqual(result[0]?.segments.map((segment) => segment.label) ?? [], ["No", "Yes"]);
     assert.strictEqual(result[0]?.segments[1]?.value, 66.67);
+    assert.deepStrictEqual(result[0]?.segments.map((segment) => segment.color) ?? [], [
+      "var(--chart-dichotome-1)",
+      "var(--chart-dichotome-2)",
+    ]);
+  });
+
+  test("binary pie and stacked bar data use dichotome colors", () => {
+    const variable = createVariable({
+      valueLabels: {
+        0: "No",
+        1: "Yes",
+      },
+    });
+    const stats = createBaseStats("q1", [
+      { value: 0, counts: 40, percentages: 40 },
+      { value: 1, counts: 60, percentages: 60 },
+    ]);
+
+    const pieData = transformToRechartsPieData(variable, stats);
+    const stackedData = transformToRechartsStackedBarData(variable, stats);
+
+    assert.deepStrictEqual(
+      pieData.map((item) => item.fill),
+      ["var(--chart-dichotome-1)", "var(--chart-dichotome-2)"]
+    );
+    assert.deepStrictEqual(
+      stackedData.map((item) => item.fill),
+      ["var(--chart-dichotome-1)", "var(--chart-dichotome-2)"]
+    );
   });
 
   test("transformToMultiResponseData uses counted value and sorts by order index", () => {

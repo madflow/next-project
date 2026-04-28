@@ -15,6 +15,7 @@ import {
   exportExcelForDataset,
   exportPowerPointForDataset,
   getComputedExportPalette,
+  getComputedThemeChartColors,
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
 import { hasSplitVariableStatsForVariable } from "@/lib/analysis-bridge";
@@ -184,9 +185,11 @@ export function AdhocChart({
 
     try {
       const palette = getComputedExportPalette(displayRef.current ?? exportRef.current, fallbackChartColors);
+      const chartColors = getComputedThemeChartColors(displayRef.current ?? exportRef.current, fallbackChartColors) ?? undefined;
 
       const payload = createVariableChartPowerPointExportPayload({
         chartType: actualSelectedChartType,
+        chartColors,
         countedValue,
         fileBaseName: exportBaseName,
         isMultiResponseIndividual,
@@ -232,9 +235,11 @@ export function AdhocChart({
 
     try {
       const palette = getComputedExportPalette(displayRef.current ?? exportRef.current, fallbackChartColors);
+      const chartColors = getComputedThemeChartColors(displayRef.current ?? exportRef.current, fallbackChartColors) ?? undefined;
 
       const payload = createVariableChartExcelExportPayload({
         chartType: actualSelectedChartType,
+        chartColors,
         countedValue,
         excelLabels: {
           color: t("export.excelHeaders.color"),

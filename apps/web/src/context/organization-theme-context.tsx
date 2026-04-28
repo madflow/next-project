@@ -16,6 +16,8 @@ const DEFAULT_THEMES: ThemeItem[] = [
       "chart-4": "#f59e0b",
       "chart-5": "#8b5cf6",
       "chart-6": "#ec4899",
+      "chart-dichotome-1": "#3b82f6",
+      "chart-dichotome-2": "#ef4444",
     },
   },
   {
@@ -27,6 +29,8 @@ const DEFAULT_THEMES: ThemeItem[] = [
       "chart-4": "#d97706",
       "chart-5": "#7c3aed",
       "chart-6": "#db2777",
+      "chart-dichotome-1": "#2563eb",
+      "chart-dichotome-2": "#dc2626",
     },
   },
   {
@@ -38,6 +42,8 @@ const DEFAULT_THEMES: ThemeItem[] = [
       "chart-4": "#d1d5db",
       "chart-5": "#e5e7eb",
       "chart-6": "#f3f4f6",
+      "chart-dichotome-1": "#374151",
+      "chart-dichotome-2": "#e5e7eb",
     },
   },
 ];
@@ -53,6 +59,8 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
       "chart-4": "#93c5fd",
       "chart-5": "#dbeafe",
       "chart-6": "#eff6ff",
+      "chart-dichotome-1": "#60a5fa",
+      "chart-dichotome-2": "#1e3a8a",
     },
   },
   green: {
@@ -64,6 +72,8 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
       "chart-4": "#6ee7b7",
       "chart-5": "#a7f3d0",
       "chart-6": "#d1fae5",
+      "chart-dichotome-1": "#34d399",
+      "chart-dichotome-2": "#065f46",
     },
   },
   amber: {
@@ -75,6 +85,8 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
       "chart-4": "#fcd34d",
       "chart-5": "#fde68a",
       "chart-6": "#fef3c7",
+      "chart-dichotome-1": "#fbbf24",
+      "chart-dichotome-2": "#92400e",
     },
   },
   rose: {
@@ -86,6 +98,8 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
       "chart-4": "#fda4af",
       "chart-5": "#fecdd3",
       "chart-6": "#fef2f2",
+      "chart-dichotome-1": "#fb7185",
+      "chart-dichotome-2": "#9f1239",
     },
   },
   purple: {
@@ -97,6 +111,8 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
       "chart-4": "#c4b5fd",
       "chart-5": "#ddd6fe",
       "chart-6": "#f3f4f6",
+      "chart-dichotome-1": "#a78bfa",
+      "chart-dichotome-2": "#5b21b6",
     },
   },
   orange: {
@@ -108,6 +124,8 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
       "chart-4": "#fdba74",
       "chart-5": "#fed7aa",
       "chart-6": "#fff7ed",
+      "chart-dichotome-1": "#fb923c",
+      "chart-dichotome-2": "#9a3412",
     },
   },
   teal: {
@@ -119,6 +137,8 @@ const COLOR_THEME_MAPPINGS: Record<string, ThemeItem> = {
       "chart-4": "#5eead4",
       "chart-5": "#99f6e4",
       "chart-6": "#ccfbf1",
+      "chart-dichotome-1": "#2dd4bf",
+      "chart-dichotome-2": "#115e59",
     },
   },
 };
@@ -233,7 +253,7 @@ export function useOrganizationTheme() {
  * Component that injects organization theme chart colors as CSS custom properties.
  *
  * When an organization custom theme is active, this component renders a <style> tag
- * that sets --chart-1 through --chart-6 CSS variables on the .theme-container element.
+ * that sets theme chart CSS variables on the .theme-container element.
  *
  * This is necessary because organization themes are dynamically defined (stored in the database),
  * unlike predefined themes which have static CSS in themes.css.

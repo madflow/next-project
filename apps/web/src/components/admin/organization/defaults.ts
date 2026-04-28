@@ -10,6 +10,8 @@ export const DEFAULT_THEME: ThemeItem = {
     "chart-4": "#f59e0b",
     "chart-5": "#8b5cf6",
     "chart-6": "#ec4899",
+    "chart-dichotome-1": "#3b82f6",
+    "chart-dichotome-2": "#ef4444",
   },
 };
 
