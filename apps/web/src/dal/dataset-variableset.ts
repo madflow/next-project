@@ -274,63 +274,6 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
   };
 }
 
-async function addVariableToSetFn(variablesetId: string, variableId: string, orderIndex?: number) {
-  // Check if variable is already in the set
-  const existing = await db
-    .select()
-    .from(datasetVariablesetContent)
-    .where(
-      and(
-        eq(datasetVariablesetContent.variablesetId, variablesetId),
-        eq(datasetVariablesetContent.variableId, variableId),
-        eq(datasetVariablesetContent.contentType, "variable")
-      )
-    )
-    .limit(1);
-
-  if (existing.length > 0) {
-    throw new DalException("Variable is already assigned to this set");
-  }
-
-  // If no order index provided, append to end (after all existing content)
-  let position: number;
-  if (orderIndex !== undefined) {
-    position = orderIndex;
-  } else {
-    const maxPosition = await db
-      .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
-      .from(datasetVariablesetContent)
-      .where(eq(datasetVariablesetContent.variablesetId, variablesetId));
-
-    position = (maxPosition[0]?.maxPos ?? -100) + 100;
-  }
-
-  await db.insert(datasetVariablesetContent).values({
-    variablesetId,
-    variableId,
-    position,
-    contentType: "variable",
-    attributes: {
-      allowedStatistics: {
-        distribution: true,
-        mean: false,
-      },
-    },
-  });
-}
-
-async function removeVariableFromSetFn(variablesetId: string, variableId: string) {
-  await db
-    .delete(datasetVariablesetContent)
-    .where(
-      and(
-        eq(datasetVariablesetContent.variablesetId, variablesetId),
-        eq(datasetVariablesetContent.variableId, variableId),
-        eq(datasetVariablesetContent.contentType, "variable")
-      )
-    );
-}
-
 async function updateContentAttributesFn(
   variablesetId: string,
   variableId: string,
@@ -381,46 +324,6 @@ async function reorderVariablesetsFn(datasetId: string, parentId: string | null,
           updatedAt: new Date(),
         })
         .where(eq(entity.id, id));
-    }
-  });
-
-  return { success: true };
-}
-
-async function reorderVariableContentsOrderFn(variablesetId: string, reorderedVariableIds: string[]) {
-  // Verify all variable IDs are in the variableset (as variable-type content entries)
-  const items = await db
-    .select()
-    .from(datasetVariablesetContent)
-    .where(
-      and(
-        eq(datasetVariablesetContent.variablesetId, variablesetId),
-        eq(datasetVariablesetContent.contentType, "variable")
-      )
-    );
-
-  const existingIds = new Set(items.map((item) => item.variableId));
-  const invalidIds = reorderedVariableIds.filter((id) => !existingIds.has(id));
-
-  if (invalidIds.length > 0) {
-    throw new DalException("Some variables do not belong to the specified variableset");
-  }
-
-  // Update positions in a transaction
-  await db.transaction(async (tx) => {
-    for (let i = 0; i < reorderedVariableIds.length; i++) {
-      const variableId = reorderedVariableIds[i];
-      if (!variableId) continue;
-      await tx
-        .update(datasetVariablesetContent)
-        .set({ position: i * 100, updatedAt: new Date() })
-        .where(
-          and(
-            eq(datasetVariablesetContent.variablesetId, variablesetId),
-            eq(datasetVariablesetContent.variableId, variableId),
-            eq(datasetVariablesetContent.contentType, "variable")
-          )
-        );
     }
   });
 
@@ -583,18 +486,14 @@ async function reorderContentsFn(variablesetId: string, reorderedContentIds: str
 // Exported functions with appropriate auth checks
 export const listByDataset = withSessionCheck(listByDatasetFn);
 export const getHierarchy = withSessionCheck(getHierarchyFn);
-export const find = withSessionCheck(findFn);
 export const assertVariablesetAccess = withSessionCheck(assertVariablesetAccessFn);
 export const create = withAdminCheck(createFn);
 export const update = withAdminCheck(updateFn);
 export const remove = withAdminCheck(removeFn);
 export const getVariablesInSet = withSessionCheck(getVariablesInSetFn);
 export const getUnassignedVariables = withSessionCheck(getUnassignedVariablesFn);
-export const addVariableToSet = withAdminCheck(addVariableToSetFn);
-export const removeVariableFromSet = withAdminCheck(removeVariableFromSetFn);
 export const updateContentAttributes = withAdminCheck(updateContentAttributesFn);
 export const reorderVariablesets = withAdminCheck(reorderVariablesetsFn);
-export const reorderVariableContentsOrder = withAdminCheck(reorderVariableContentsOrderFn);
 // New unified contents exports
 export const getContents = withSessionCheck(getContentsFn);
 export const addContentToVariableset = withAdminCheck(addContentToVariablesetFn);

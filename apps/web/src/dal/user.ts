@@ -15,13 +15,13 @@ export const find = withAdminCheck(createFind(entity, selectUserSchema));
 export const list = withAdminCheck(createList(entity, selectUserSchema));
 
 // Schema for dataset in the tree
-export const datasetSchema = z.object({
+const datasetSchema = z.object({
   id: z.uuid({ version: "v7" }),
   name: z.string(),
 });
 
 // Schema for project in the tree
-export const projectSchema = z.object({
+const projectSchema = z.object({
   id: z.uuid({ version: "v7" }),
   name: z.string(),
   slug: z.string(),
@@ -29,7 +29,7 @@ export const projectSchema = z.object({
 });
 
 // Schema for organization in the tree
-export const organizationSchema = z.object({
+const organizationSchema = z.object({
   id: z.uuid({ version: "v7" }),
   name: z.string(),
   slug: z.string(),
@@ -37,7 +37,7 @@ export const organizationSchema = z.object({
 });
 
 // Schema for user details
-export const userDetailsSchema = z.object({
+const userDetailsSchema = z.object({
   id: z.uuid({ version: "v7" }),
   name: z.string(),
   email: z.email(),
@@ -48,17 +48,13 @@ export const userDetailsSchema = z.object({
 });
 
 // Main result schema
-export const userContextSchema = z.object({
+const userContextSchema = z.object({
   user: userDetailsSchema,
   isAdmin: z.boolean(),
   organizationCount: z.number().int().nonnegative(),
   organizations: z.array(organizationSchema),
 });
 
-// Type exports
-export type Dataset = z.infer<typeof datasetSchema>;
-export type Project = z.infer<typeof projectSchema>;
-export type Organization = z.infer<typeof organizationSchema>;
 export type UserDetails = z.infer<typeof userDetailsSchema>;
 export type UserContext = z.infer<typeof userContextSchema>;
 

@@ -8,12 +8,9 @@ import type { auth } from "./auth";
 export const {
   admin,
   useActiveOrganization,
-  useListOrganizations,
   changePassword,
   requestPasswordReset,
-  getSession,
   resetPassword,
-  sendVerificationEmail,
   signIn,
   signOut,
   signUp,

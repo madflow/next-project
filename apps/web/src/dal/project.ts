@@ -24,8 +24,6 @@ export const findAccessible = withSessionCheck(async (projectId: string) => {
 
 export const findBySlug = withSessionCheck(createFindBySlug(entity, selectProjectSchema));
 
-export const list = withAdminCheck(createList(entity, selectProjectSchema));
-
 export const listAuthenticated = withSessionCheck(createList(entity, selectProjectSchema));
 
 export const listWithOrganization = withAdminCheck(

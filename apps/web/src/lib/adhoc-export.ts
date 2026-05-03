@@ -413,13 +413,13 @@ export function buildExcelFileName(value: string, date: Date = new Date()) {
   return `${sanitizeExportBaseName(value)}-${exportDate}.xlsx`;
 }
 
-export function getDownloadFilename(response: Response, fallbackFilename: string) {
+function getDownloadFilename(response: Response, fallbackFilename: string) {
   const contentDisposition = response.headers.get("Content-Disposition");
   const filenameMatch = contentDisposition?.match(/filename="?([^";]+)"?/i);
   return filenameMatch?.[1] ?? fallbackFilename;
 }
 
-export async function downloadResponseFile(response: Response, fallbackFilename: string) {
+async function downloadResponseFile(response: Response, fallbackFilename: string) {
   const filename = getDownloadFilename(response, fallbackFilename);
   const blob = await response.blob();
   const url = window.URL.createObjectURL(blob);

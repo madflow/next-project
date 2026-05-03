@@ -22,7 +22,7 @@ export const findAccessible = withSessionCheck(async (organizationId: string) =>
 
 export const list = withAdminCheck(createList(entity, selectOrganizationSchema));
 
-export async function assertAccess(organizationId: string) {
+async function assertAccess(organizationId: string) {
   const canAccess = await hasAccess(organizationId);
   if (!canAccess) {
     throw new DalNotAuthorizedException("You do not have access to this organization");

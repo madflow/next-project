@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-export const ValueRangeExportSchema = z
+const ValueRangeExportSchema = z
   .object({
     min: z.number(),
     max: z.number(),
   })
   .optional();
 
-export const VariableItemAttributesExportSchema = z.object({
+const VariableItemAttributesExportSchema = z.object({
   allowedStatistics: z.object({
     distribution: z.boolean(),
     mean: z.boolean(),
@@ -15,7 +15,7 @@ export const VariableItemAttributesExportSchema = z.object({
   valueRange: ValueRangeExportSchema,
 });
 
-export const VariableItemExportSchema = z.object({
+const VariableItemExportSchema = z.object({
   name: z.string(),
   orderIndex: z.number(),
   attributes: VariableItemAttributesExportSchema.optional(),
@@ -35,12 +35,12 @@ const ContentItemSubsetVariant = z.object({
   subsetName: z.string(),
 });
 
-export const ContentItemExportSchema = z.discriminatedUnion("contentType", [
+const ContentItemExportSchema = z.discriminatedUnion("contentType", [
   ContentItemVariableVariant,
   ContentItemSubsetVariant,
 ]);
 
-export const VariableSetExportSchema = z.object({
+const VariableSetExportSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   parentName: z.string().nullable(),
@@ -76,32 +76,26 @@ export const VariableSetImportOptionsSchema = z.object({
   conflictResolution: z.enum(["skip", "overwrite", "rename"]).default("skip"),
 });
 
-export const VariableSetImportResultSchema = z.object({
-  success: z.boolean(),
-  summary: z.object({
-    totalSets: z.number(),
-    createdSets: z.number(),
-    skippedSets: z.number(),
-    updatedSets: z.number(),
-    failedSets: z.number(),
-  }),
-  errors: z.array(z.string()),
-  warnings: z.array(z.string()),
-  details: z.array(
-    z.object({
-      setName: z.string(),
-      status: z.enum(["created", "skipped", "updated", "failed"]),
-      message: z.string().optional(),
-      unmatchedVariables: z.array(z.string()).optional(),
-    })
-  ),
-});
-
-export type ValueRangeExport = z.infer<typeof ValueRangeExportSchema>;
-export type VariableItemAttributesExport = z.infer<typeof VariableItemAttributesExportSchema>;
 export type VariableItemExport = z.infer<typeof VariableItemExportSchema>;
 export type ContentItemExport = z.infer<typeof ContentItemExportSchema>;
 export type VariableSetExport = z.infer<typeof VariableSetExportSchema>;
 export type VariableSetExportFile = z.infer<typeof VariableSetExportFileSchema>;
 export type VariableSetImportOptions = z.infer<typeof VariableSetImportOptionsSchema>;
-export type VariableSetImportResult = z.infer<typeof VariableSetImportResultSchema>;
+export type VariableSetImportResult = {
+  success: boolean;
+  summary: {
+    totalSets: number;
+    createdSets: number;
+    skippedSets: number;
+    updatedSets: number;
+    failedSets: number;
+  };
+  errors: string[];
+  warnings: string[];
+  details: {
+    setName: string;
+    status: "created" | "skipped" | "updated" | "failed";
+    message?: string;
+    unmatchedVariables?: string[];
+  }[];
+};

@@ -312,19 +312,3 @@ export function determineChartSelection(criteria: ChartSelectionCriteria): Chart
     unsupportedReason,
   };
 }
-
-/**
- * Helper function to check if a specific chart type is valid for the given criteria
- */
-export function isChartTypeValid(criteria: ChartSelectionCriteria, chartType: AnalysisChartType): boolean {
-  const result = determineChartSelection(criteria);
-  return result.availableChartTypes.includes(chartType);
-}
-
-/**
- * Helper function to get the default chart type for given criteria
- */
-export function getDefaultChartType(criteria: ChartSelectionCriteria): AnalysisChartType {
-  const result = determineChartSelection(criteria);
-  return result.defaultChartType;
-}

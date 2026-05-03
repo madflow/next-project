@@ -1285,27 +1285,9 @@ function FileUploadClear(props: FileUploadClearProps) {
 export {
   FileUploadRoot as FileUpload,
   FileUploadDropzone,
-  FileUploadTrigger,
   FileUploadList,
   FileUploadItem,
   FileUploadItemPreview,
   FileUploadItemMetadata,
-  FileUploadItemProgress,
   FileUploadItemDelete,
-  FileUploadClear,
-  //
-  FileUploadRoot as Root,
-  FileUploadDropzone as Dropzone,
-  FileUploadTrigger as Trigger,
-  FileUploadList as List,
-  FileUploadItem as Item,
-  FileUploadItemPreview as ItemPreview,
-  FileUploadItemMetadata as ItemMetadata,
-  FileUploadItemProgress as ItemProgress,
-  FileUploadItemDelete as ItemDelete,
-  FileUploadClear as Clear,
-  //
-  useStore as useFileUpload,
-  //
-  type FileUploadRootProps as FileUploadProps,
 };

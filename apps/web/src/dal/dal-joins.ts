@@ -15,6 +15,132 @@ type JoinConfig = {
   condition: SQL<unknown>;
 };
 
+function applyJoins(query: DrizzleSelect, joins: JoinConfig[]) {
+  return joins.reduce((currentQuery, join) => currentQuery.innerJoin(join.table, join.condition) as DrizzleSelect, query);
+}
+
+function getTableColumn(table: PgTable | AnyPgTable, columnName: string): PgColumn | undefined {
+  return (getTableColumns(table) as Record<string, PgColumn>)[columnName];
+}
+
+function resolveColumn(table: AnyPgTable, joins: JoinConfig[], reference: string): PgColumn | undefined {
+  const [tableName, columnName] = reference.split(":");
+
+  if (reference.includes(":") && tableName && columnName) {
+    const joinTable = joins.find((join) => getTableName(join.table) === tableName)?.table;
+    return joinTable ? getTableColumn(joinTable, columnName) : undefined;
+  }
+
+  return getTableColumn(table, reference);
+}
+
+function buildFilterConditions(table: AnyPgTable, joins: JoinConfig[], filters?: ListOptions["filters"]) {
+  if (!filters?.length) {
+    return [];
+  }
+
+  return filters.flatMap((filter) => {
+    const column = resolveColumn(table, joins, filter.column);
+    if (!column) {
+      return [];
+    }
+
+    if (filter.operator === "=" || filter.operator === "eq") {
+      return [eq(column, filter.value)];
+    }
+
+    return [];
+  });
+}
+
+function collectSearchColumns(table: AnyPgTable, joins: JoinConfig[], searchColumn: string) {
+  const columns: PgColumn[] = [];
+
+  const mainColumn = getTableColumn(table, searchColumn);
+  if (mainColumn) {
+    columns.push(mainColumn);
+  }
+
+  for (const join of joins) {
+    const joinedColumn = getTableColumn(join.table, searchColumn);
+    if (joinedColumn) {
+      columns.push(joinedColumn);
+    }
+  }
+
+  return columns;
+}
+
+function buildSearchConditions(
+  table: AnyPgTable,
+  joins: JoinConfig[],
+  search?: string,
+  searchColumns?: string[]
+) {
+  if (!search || !searchColumns?.length) {
+    return [];
+  }
+
+  return searchColumns.flatMap((searchColumn) =>
+    collectSearchColumns(table, joins, searchColumn).map((column) => ilike(column, `%${search}%`))
+  );
+}
+
+function buildWhereCondition(searchConditions: SQL<unknown>[], filterConditions: SQL<unknown>[]) {
+  const conditions: SQL<unknown>[] = [];
+
+  const searchCondition = searchConditions.length > 0 ? or(...searchConditions) : undefined;
+  if (searchCondition) {
+    conditions.push(searchCondition);
+  }
+
+  if (filterConditions.length > 0) {
+    conditions.push(...filterConditions);
+  }
+
+  if (conditions.length === 0) {
+    return undefined;
+  }
+
+  return conditions.length === 1 ? conditions[0] : and(...conditions);
+}
+
+function applyOrderBy(query: DrizzleSelect, table: AnyPgTable, joins: JoinConfig[], orderBy?: ListOptions["orderBy"]) {
+  if (!orderBy?.length) {
+    return query;
+  }
+
+  let orderedQuery = query;
+
+  for (const order of orderBy) {
+    const column = resolveColumn(table, joins, order.column);
+    if (!column) {
+      continue;
+    }
+
+    orderedQuery =
+      order.direction === "desc"
+        ? (orderedQuery.orderBy(desc(column)) as DrizzleSelect)
+        : (orderedQuery.orderBy(asc(column)) as DrizzleSelect);
+  }
+
+  return orderedQuery;
+}
+
+function transformJoinedRow(row: Record<string, unknown>) {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(row)) {
+    if (value === undefined) {
+      continue;
+    }
+
+    result[key] = value && typeof value === "object" ? { ...(value as Record<string, unknown>) } : value;
+  }
+
+  return result;
+}
+
 type ListWithJoinsResult<TSchema extends ZodSchema> = {
   rows: z.infer<TSchema>[];
   count: number;
@@ -31,180 +157,50 @@ export function createListWithJoins<TSchema extends ZodSchema>(
     const parsedOptions = await listOptionsSchema.safeParseAsync(options);
     if (!parsedOptions.success) throw new Error("Invalid options");
 
-    const { filters, search, searchColumns, orderBy } = parsedOptions.data;
+    const { filters, limit, offset, search, searchColumns, orderBy } = parsedOptions.data;
 
     // Create the base query with joins
-    let query: DrizzleSelect = db.select().from(table).$dynamic();
-
-    // Apply joins
-    for (const join of joins) {
-      query = query.innerJoin(join.table, join.condition) as DrizzleSelect;
-    }
+    let query: DrizzleSelect = applyJoins(db.select().from(table).$dynamic() as DrizzleSelect, joins);
 
     // Create a count query for pagination
-    let countQuery: DrizzleSelect = db.select({ count: count() }).from(table).$dynamic();
+    let countQuery: DrizzleSelect = applyJoins(
+      db.select({ count: count() }).from(table).$dynamic() as DrizzleSelect,
+      joins
+    );
 
-    // Apply the same joins to the count query
-    for (const join of joins) {
-      countQuery = countQuery.innerJoin(join.table, join.condition) as DrizzleSelect;
-    }
+    const finalCondition = buildWhereCondition(
+      buildSearchConditions(table, joins, search, searchColumns),
+      buildFilterConditions(table, joins, filters)
+    );
 
-    // Apply filters if provided
-    const filterConditions: SQL<unknown>[] = [];
-    if (filters) {
-      for (const filter of filters) {
-        const filterColumnParts = filter.column.split(":");
-        const [filterTable, filterColumn] = filterColumnParts;
-        let column: PgColumn | undefined;
-
-        if (filterColumnParts.length > 1 && filterTable && filterColumn) {
-          // Filter on joined table (e.g., "organizations:name")
-          const join = joins.find((j) => getTableName(j.table) === filterTable);
-          if (join) {
-            column = getTableColumns(join.table)[filterColumn];
-          }
-        } else {
-          // Filter on main table
-          column = getTableColumns(table)[filter.column];
-        }
-
-        if (!column) {
-          continue;
-        }
-
-        if (filter.operator === "=" || filter.operator === "eq") {
-          filterConditions.push(eq(column, filter.value));
-        }
-      }
-    }
-
-    // Apply search filters if provided
-    const searchConditions: SQL<unknown>[] = [];
-    if (search && searchColumns) {
-      for (const searchColumn of searchColumns) {
-        const columns: PgColumn[] = [];
-
-        // Check main table
-        const mainTableColumns = getTableColumns(table);
-        if (searchColumn in mainTableColumns) {
-          const column = mainTableColumns[searchColumn as keyof typeof mainTableColumns];
-          if (column) {
-            columns.push(column);
-          }
-        }
-
-        // Check joined tables
-        for (const join of joins) {
-          const joinTableColumns = getTableColumns(join.table);
-          if (searchColumn in joinTableColumns) {
-            const column = joinTableColumns[searchColumn as keyof typeof joinTableColumns];
-            if (column) {
-              columns.push(column);
-            }
-          }
-        }
-
-        // Add search condition for each matching column
-        for (const column of columns) {
-          const searchCondition = ilike(column, `%${search}%`);
-          searchConditions.push(searchCondition);
-        }
-      }
-    }
-
-    // Combine search and filter conditions
-    const allConditions: SQL<unknown>[] = [];
-
-    // Add search conditions (OR logic for search)
-    if (searchConditions.length > 0) {
-      const searchCondition = or(...searchConditions);
-      if (searchCondition) {
-        allConditions.push(searchCondition);
-      }
-    }
-
-    // Add filter conditions (AND logic for filters)
-    if (filterConditions.length > 0) {
-      allConditions.push(...filterConditions);
-    }
-
-    // Apply all conditions
-    if (allConditions.length > 0) {
-      const finalCondition = allConditions.length === 1 ? allConditions[0] : and(...allConditions);
+    if (finalCondition) {
       query = query.where(finalCondition) as DrizzleSelect;
       countQuery = countQuery.where(finalCondition) as DrizzleSelect;
     }
 
-    // Apply order by if provided
-    if (orderBy && orderBy.length > 0) {
-      for (const order of orderBy) {
-        const orderColumnParts = order.column.split(":");
-        const [orderTable, orderColumn] = orderColumnParts;
-        if (orderColumnParts.length > 1 && orderTable && orderColumn) {
-          const join = joins.find((j) => getTableName(j.table) === orderTable);
-          if (join) {
-            const column = getTableColumns(join.table)[orderColumn];
-            if (column) {
-              query =
-                order.direction === "desc"
-                  ? (query.orderBy(desc(column)) as DrizzleSelect)
-                  : (query.orderBy(asc(column)) as DrizzleSelect);
-            }
-          }
-        } else {
-          const orderByColumn = getTableColumns(table)[order.column];
-          if (orderByColumn) {
-            query =
-              order.direction === "desc"
-                ? (query.orderBy(desc(orderByColumn)) as DrizzleSelect)
-                : (query.orderBy(asc(orderByColumn)) as DrizzleSelect);
-          }
-        }
-      }
-    }
+    query = applyOrderBy(query, table, joins, orderBy);
 
     // Apply pagination
-    if (options.limit) {
-      query = query.limit(options.limit) as DrizzleSelect;
+    if (limit) {
+      query = query.limit(limit) as DrizzleSelect;
     }
 
-    if (options.offset) {
-      query = query.offset(options.offset) as DrizzleSelect;
+    if (offset) {
+      query = query.offset(offset) as DrizzleSelect;
     }
 
     const [rows, countResult] = await Promise.all([query, countQuery]);
 
     // Transform the result to properly embed joined table data
-    const transformedRows = rows.map((row) => {
-      const result: Record<string, unknown> = {};
-      const joinedData: Record<string, Record<string, unknown>> = {};
-
-      // Process each property in the row
-      for (const [key, value] of Object.entries(row)) {
-        if (value && typeof value === "object" && value !== null) {
-          // If the value is an object (from a joined table), collect it
-          joinedData[key] = { ...value };
-        } else if (value !== undefined) {
-          // If it's a direct property, add it to the main result
-          result[key] = value;
-        }
-      }
-
-      // Add joined data to the result - keep all as nested objects
-      for (const [joinKey, joinValue] of Object.entries(joinedData)) {
-        result[joinKey] = joinValue;
-      }
-
-      return result;
-    });
+    const transformedRows = rows.map((row) => transformJoinedRow(row as Record<string, unknown>));
 
     // Ensure we always return a valid result, even if there was an error
     const countValue = countResult[0] ? Number((countResult[0] as { count: number }).count) : 0;
     const result: ListWithJoinsResult<TSchema> = {
       rows: transformedRows as z.infer<TSchema>[],
       count: countValue,
-      limit: options.limit,
-      offset: options.offset,
+      limit,
+      offset,
     };
 
     return result;

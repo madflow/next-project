@@ -19,7 +19,6 @@
   "bin": "./dist/index.mjs",
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "eslint": "^9.39.4",
     "typescript": "^6.0.0",
     "unbuild": "^3.6.1"

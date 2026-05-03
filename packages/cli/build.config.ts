@@ -1,3 +1,4 @@
+// fallow-ignore-file unused-file
 import { defineBuildConfig } from "unbuild";
 
 export default defineBuildConfig({

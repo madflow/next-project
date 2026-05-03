@@ -47,20 +47,6 @@ export const addMember = withAdminAuth(async (organizationId: string, data: AddM
   return { success: true };
 });
 
-export const updateMemberRole = withAdminAuth(
-  async (organizationId: string, userId: string, role: "admin" | "owner" | "member") => {
-    await db
-      .update(memberTable)
-      .set({ role })
-      .where(and(eq(memberTable.organizationId, organizationId), eq(memberTable.userId, userId)));
-
-    // Revalidate the members list page
-    revalidatePath(`/admin/organizations/${organizationId}/members`);
-
-    return { success: true };
-  }
-);
-
 export const removeMember = withAdminAuth(async (memberId: string) => {
   // Get the member to find the organizationId for revalidation
   const [member] = await db.select().from(memberTable).where(eq(memberTable.id, memberId)).limit(1);

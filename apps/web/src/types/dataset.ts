@@ -1,21 +1,13 @@
 import { z } from "zod";
 import {
-  type CreateDatasetData,
   type Dataset,
   type Organization,
-  type UpdateDatasetData,
-  insertDatasetSchema,
-  selectDatasetSchema,
   updateDatasetSchema,
 } from "@repo/database/schema";
 
 export {
-  insertDatasetSchema,
-  selectDatasetSchema,
   updateDatasetSchema,
   type Dataset,
-  type CreateDatasetData,
-  type UpdateDatasetData,
 };
 
 export type DatasetWithOrganization = {
@@ -23,7 +15,7 @@ export type DatasetWithOrganization = {
   organizations: Organization;
 };
 
-export const datasetReadMetadataSchema = z.object({
+const datasetReadMetadataSchema = z.object({
   column_names: z.array(z.string()),
   column_labels: z.array(z.string().nullish()),
   column_names_to_labels: z.record(z.string(), z.string().nullish()),
@@ -50,9 +42,7 @@ export const datasetReadMetadataSchema = z.object({
   file_format: z.string(),
 });
 
-export type DatasetReadMetadata = z.infer<typeof datasetReadMetadataSchema>;
-
-export const datasetReadDataSchema = z.object({
+const datasetReadDataSchema = z.object({
   records: z.array(z.unknown()),
   columns: z.array(z.string()),
 });
@@ -64,6 +54,3 @@ export const datasetReadResponseSchema = z.object({
   data: datasetReadDataSchema,
   metadata: datasetReadMetadataSchema,
 });
-
-export type DatasetReadData = z.infer<typeof datasetReadDataSchema>;
-export type DatasetReadResponse = z.infer<typeof datasetReadResponseSchema>;

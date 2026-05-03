@@ -8,7 +8,7 @@ import { defaultClient as db } from "@repo/database/clients";
 import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 import { DalNotAuthorizedException } from "@/lib/exception";
 
-export const orderByDirectionSchema = z.enum(["asc", "desc"]);
+const orderByDirectionSchema = z.enum(["asc", "desc"]);
 
 export const orderBySchema = z.object({
   column: z.string(),
@@ -32,13 +32,94 @@ export const listOptionsSchema = z.object({
 
 export type ListOptions = z.infer<typeof listOptionsSchema>;
 
-export function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema: ItemType) {
+type ListResult<TSchema extends z.ZodTypeAny> = {
+  rows: z.infer<TSchema>[];
+  count: number;
+  limit?: number;
+  offset?: number;
+  orderBy?: z.infer<typeof orderBySchema>[];
+};
+
+type OrderClause = ReturnType<typeof asc> | ReturnType<typeof desc>;
+
+function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema: ItemType) {
   return z.object({
     rows: z.array(itemSchema),
     count: z.number(),
     limit: z.number(),
     offset: z.number(),
     orderBy: z.array(z.object({ column: z.string(), direction: orderByDirectionSchema })).optional(),
+  });
+}
+
+function getTableColumn(table: AnyPgTable, columnName: string): AnyPgColumn | undefined {
+  return (getTableColumns(table) as Record<string, AnyPgColumn>)[columnName];
+}
+
+function buildSearchConditions(table: AnyPgTable, search?: string, searchColumns?: string[]) {
+  if (!search || !searchColumns?.length) {
+    return [];
+  }
+
+  const escapedSearch = search.replace(/[%_]/g, "\\$&");
+
+  return searchColumns.flatMap((searchColumn) => {
+    const column = getTableColumn(table, searchColumn);
+    return column ? [ilike(column, `%${escapedSearch}%`)] : [];
+  });
+}
+
+function buildFilterConditions(table: AnyPgTable, filters?: ListOptions["filters"]) {
+  if (!filters?.length) {
+    return [];
+  }
+
+  return filters.flatMap((filter) => {
+    const column = getTableColumn(table, filter.column);
+    if (!column) {
+      return [];
+    }
+
+    if (filter.operator === "eq" || filter.operator === "=") {
+      return [eq(column, filter.value)];
+    }
+
+    return [];
+  });
+}
+
+function combineWhereConditions(searchConditions: SQL<unknown>[], filterConditions: SQL<unknown>[]) {
+  const conditions: SQL<unknown>[] = [];
+
+  const searchCondition = searchConditions.length > 0 ? or(...searchConditions) : undefined;
+  if (searchCondition) {
+    conditions.push(searchCondition);
+  }
+
+  const filterCondition = filterConditions.length > 0 ? and(...filterConditions) : undefined;
+  if (filterCondition) {
+    conditions.push(filterCondition);
+  }
+
+  if (conditions.length === 0) {
+    return undefined;
+  }
+
+  return conditions.length === 1 ? conditions[0] : and(...conditions);
+}
+
+function buildOrderClauses(table: AnyPgTable, orderBy?: ListOptions["orderBy"]): OrderClause[] {
+  if (!orderBy?.length) {
+    return [];
+  }
+
+  return orderBy.flatMap((order) => {
+    const column = getTableColumn(table, order.column);
+    if (!column) {
+      return [];
+    }
+
+    return [order.direction === "asc" ? asc(column) : desc(column)];
   });
 }
 
@@ -54,7 +135,7 @@ export async function getSessionUser() {
   return session?.user;
 }
 
-export async function assertUserHasRole(role: string) {
+async function assertUserHasRole(role: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -63,7 +144,7 @@ export async function assertUserHasRole(role: string) {
   }
 }
 
-export async function assertUserHasSession() {
+async function assertUserHasSession() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -118,8 +199,8 @@ export function createFindBySlug<TSchema extends ZodType>(table: AnyPgTable & { 
   };
 }
 
-export function createList(table: AnyPgTable, schema: ZodType) {
-  return async (options: ListOptions = {}): Promise<z.infer<typeof schema>> => {
+export function createList<TSchema extends z.ZodTypeAny>(table: AnyPgTable, schema: TSchema) {
+  return async (options: ListOptions = {}): Promise<ListResult<TSchema>> => {
     const parsedOptions = await listOptionsSchema.safeParseAsync(options);
     if (!parsedOptions.success) throw new Error("Invalid options");
 
@@ -128,92 +209,19 @@ export function createList(table: AnyPgTable, schema: ZodType) {
     const query = db.select().from(table);
     const countQuery = db.select({ count: count() }).from(table);
 
-    const whereOrConditions: SQL<unknown>[] = [];
-    const whereAndConditions: SQL<unknown>[] = [];
-    if (search && searchColumns) {
-      for (const searchColumn of searchColumns) {
-        let column: AnyPgColumn | undefined;
-        for (const [key, o] of Object.entries(getTableColumns(table))) {
-          if (key === searchColumn) {
-            column = o;
-            break;
-          }
-        }
-        if (!column) {
-          continue;
-        }
-        const escapedSearch = search.replace(/[%_]/g, "\\$&");
-        whereOrConditions.push(ilike(column, `%${escapedSearch}%`));
-      }
-    }
+    const finalWhere = combineWhereConditions(
+      buildSearchConditions(table, search, searchColumns),
+      buildFilterConditions(table, filters)
+    );
 
-    if (filters) {
-      for (const filter of filters) {
-        let column: AnyPgColumn | undefined;
-        for (const [key, o] of Object.entries(getTableColumns(table))) {
-          if (key === filter.column) {
-            column = o;
-            break;
-          }
-        }
-        if (!column) {
-          continue;
-        }
-        if (filter.operator === "eq" || filter.operator === "=") {
-          whereAndConditions.push(eq(column, filter.value));
-        }
-      }
-    }
-    const whereConditions: SQL<unknown>[] = [];
-
-    // Add OR conditions (search)
-    if (whereOrConditions.length > 0) {
-      const orCondition = or(...whereOrConditions);
-      if (orCondition) {
-        whereConditions.push(orCondition);
-      }
-    }
-
-    // Add AND conditions (filters)
-    if (whereAndConditions.length > 0) {
-      const andCondition = and(...whereAndConditions);
-      if (andCondition) {
-        whereConditions.push(andCondition);
-      }
-    }
-
-    // Apply all conditions at once
-    if (whereConditions.length > 0) {
-      const finalWhere = whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions);
-
+    if (finalWhere) {
       query.where(finalWhere);
       countQuery.where(finalWhere);
     }
 
-    if (orderBy) {
-      const orderClauses: (ReturnType<typeof asc> | ReturnType<typeof desc>)[] = [];
-
-      for (const order of orderBy) {
-        let column: AnyPgColumn | undefined;
-        for (const [key, o] of Object.entries(getTableColumns(table))) {
-          if (key === order.column) {
-            column = o;
-            break;
-          }
-        }
-        if (!column) {
-          continue;
-        }
-        if (order.direction === "asc") {
-          orderClauses.push(asc(column));
-        } else {
-          orderClauses.push(desc(column));
-        }
-      }
-
-      if (orderClauses.length > 0) {
-        query.orderBy(...orderClauses);
-      }
+    const orderClauses = buildOrderClauses(table, orderBy);
+    if (orderClauses.length > 0) {
+      query.orderBy(...orderClauses);
     }
 
     if (limit !== undefined) {

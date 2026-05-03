@@ -10,7 +10,7 @@ export type RechartsBarDataItem = {
   percentage: number;
 };
 
-export type RechartsPieDataItem = RechartsBarDataItem & {
+type RechartsPieDataItem = RechartsBarDataItem & {
   fill: string;
 };
 
@@ -88,7 +88,7 @@ export function extractVariableStats(variableConfig: DatasetVariable, statsData:
   return targetVariable.stats as VariableStats;
 }
 
-export function getSortedFrequencyTable(variableConfig: DatasetVariable, statsData: StatsResponse) {
+function getSortedFrequencyTable(variableConfig: DatasetVariable, statsData: StatsResponse) {
   const stats = extractVariableStats(variableConfig, statsData);
   if (!stats || !stats.frequency_table) return [];
   const copiedFrequencyTable = [...stats.frequency_table];

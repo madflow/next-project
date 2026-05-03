@@ -1,40 +1,10 @@
 import {
-  type CreateDatasetVariablesetContentData,
-  type CreateDatasetVariablesetData,
   type DatasetVariableset,
-  type DatasetVariablesetCategory,
-  type DatasetVariablesetContent,
-  type DatasetVariablesetContentType,
-  type UpdateDatasetVariablesetData,
-  type ValueRange,
-  type VariablesetContentAttributes,
-  insertDatasetVariablesetContentSchema,
-  insertDatasetVariablesetSchema,
-  selectDatasetVariablesetContentSchema,
-  selectDatasetVariablesetSchema,
-  updateDatasetVariablesetSchema,
 } from "@repo/database/schema";
 
 export {
-  // Variable set schemas
-  insertDatasetVariablesetSchema,
-  selectDatasetVariablesetSchema,
-  updateDatasetVariablesetSchema,
   // Variable set types
   type DatasetVariableset,
-  type DatasetVariablesetCategory,
-  type CreateDatasetVariablesetData,
-  type UpdateDatasetVariablesetData,
-  // Variable set content schemas
-  insertDatasetVariablesetContentSchema,
-  selectDatasetVariablesetContentSchema,
-  // Variable set content types
-  type DatasetVariablesetContent,
-  type CreateDatasetVariablesetContentData,
-  type DatasetVariablesetContentType,
-  type VariablesetContentAttributes,
-  // Value range type
-  type ValueRange,
 };
 
 // Extended types for UI components

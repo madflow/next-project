@@ -4,7 +4,7 @@ import { locales } from "@/i18n/config";
 import messages from "../messages/en.json";
 
 declare module "@tanstack/react-table" {
-  // eslint-disable-next-line
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     className: string;
   }

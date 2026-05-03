@@ -1,10 +1,6 @@
-import {
-  organizationThemeColorKeys,
-  organizationThemeColorSchema,
-  themeChartColorsSchema,
-} from "@repo/database/schema";
+import { organizationThemeColorKeys, organizationThemeColorSchema } from "@repo/database/schema";
 
-export { organizationThemeColorKeys, organizationThemeColorSchema, themeChartColorsSchema };
+export { organizationThemeColorKeys };
 
 export function normalizeThemeColorInput(value: string) {
   return value.trim().toLowerCase();
