@@ -144,6 +144,7 @@ export function DatasetUploadForm() {
               <FieldLabel>{t("formLabels.name")}</FieldLabel>
               <FieldGroup>
                 <FileUpload
+                  data-testid="file-upload-input"
                   maxFiles={1}
                   maxSize={100 * 1024 * 1024}
                   accept=".sav"

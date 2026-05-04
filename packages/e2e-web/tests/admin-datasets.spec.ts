@@ -10,7 +10,7 @@ test.describe("Admin Datasets", () => {
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
     await page.getByTestId("admin.datasets.create.upload").click();
-    const uploadFile = page.getByTestId("file-upload-input");
+    const uploadFile = page.getByTestId("file-upload-input").locator('input[type="file"]');
     await uploadFile.setInputFiles("testdata/spss/demo.sav");
     await page.getByTestId("app.admin.dataset.selected-file").waitFor({ timeout: 5000 });
     await page.getByTestId("app.admin.dataset.name-input").fill(datasetName);
