@@ -246,9 +246,6 @@ importers:
         specifier: ^1.7.2
         version: 1.9.1(react@19.2.5)
     devDependencies:
-      '@eslint/js':
-        specifier: ^9.39.3
-        version: 9.39.4
       '@playwright/test':
         specifier: ^1.58.2
         version: 1.59.1
@@ -264,12 +261,6 @@ importers:
       eslint-plugin-playwright:
         specifier: ^2.9.0
         version: 2.10.2(eslint@9.39.4(jiti@2.6.1))
-      globals:
-        specifier: ^17.4.0
-        version: 17.6.0
-      typescript-eslint:
-        specifier: ^8.56.1
-        version: 8.59.1(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.3)
 
   packages/email:
     dependencies:
