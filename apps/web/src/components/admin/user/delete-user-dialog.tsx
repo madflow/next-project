@@ -4,15 +4,18 @@ import { Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   userId: string;
@@ -41,47 +44,50 @@ export function DeleteUserDialog({ userId, userName, onDelete }: Props) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setIsOpen(true)}
-        data-testid={`admin.users.list.delete-${userName?.toLowerCase().replace(/\s+/g, "-")}`}
-        title={t("deleteDialog.deleteButton.title")}
-        className="cursor-pointer"
-        type="button">
-        <Trash className="h-4 w-4" />
-        <span className="sr-only">{t("deleteDialog.deleteButton.srText")}</span>
-      </Button>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{t("deleteDialog.title")}</DialogTitle>
-          <DialogDescription>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          data-testid={`admin.users.list.delete-${userName?.toLowerCase().replace(/\s+/g, "-")}`}
+          title={t("deleteDialog.deleteButton.title")}
+          className="cursor-pointer"
+          type="button">
+          <Trash className="h-4 w-4" />
+          <span className="sr-only">{t("deleteDialog.deleteButton.srText")}</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="sm:max-w-[425px]">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+          <AlertDialogDescription>
             {t.rich("deleteDialog.description", {
               name: userName,
               strong: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>,
             })}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="gap-2 sm:gap-0">
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="gap-2 sm:gap-0">
           <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button
-              variant="outline"
+            <AlertDialogCancel
               onClick={() => setIsOpen(false)}
               disabled={isDeleting}
               className="w-full cursor-pointer sm:w-auto">
               {t("deleteDialog.cancel")}
-            </Button>
-            <Button
+            </AlertDialogCancel>
+            <AlertDialogAction
               variant="destructive"
-              onClick={handleDelete}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleDelete();
+              }}
               disabled={isDeleting}
               className="w-full cursor-pointer sm:w-auto">
               {isDeleting ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
-            </Button>
+            </AlertDialogAction>
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
