@@ -17,10 +17,16 @@ import {
   getComputedExportPalette,
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
-import { hasSplitVariableStatsForVariable } from "@/lib/analysis-bridge";
+import {
+  getStackedBarSegmentCount,
+  hasSplitVariableStatsForVariable,
+  transformToRechartsPieData,
+} from "@/lib/analysis-bridge";
 import { determineChartSelection } from "@/lib/chart-selection";
+import { resolveSingleSeriesThemeChartColors, resolveThemePaletteForCount } from "@/lib/organization-theme";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
+import { type ThemeChartColors } from "@/types/organization";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { ChartExportSurface } from "./chart-export-surface";
@@ -55,6 +61,7 @@ function ChartContent({
   stats,
   chartRef,
   percentageChartConfig,
+  chartColors,
   datasetId,
   isMultiResponseIndividual,
   countedValue,
@@ -64,6 +71,7 @@ function ChartContent({
   stats: StatsResponse;
   chartRef?: React.Ref<HTMLDivElement>;
   percentageChartConfig: ReturnType<typeof createPercentageChartConfig>;
+  chartColors?: ThemeChartColors;
   datasetId?: string;
   isMultiResponseIndividual: boolean;
   countedValue: number;
@@ -71,7 +79,13 @@ function ChartContent({
   switch (chartType) {
     case "bar":
       return (
-        <BarChartContent variable={variable} stats={stats} chartRef={chartRef} chartConfig={percentageChartConfig} />
+        <BarChartContent
+          variable={variable}
+          stats={stats}
+          chartRef={chartRef}
+          chartConfig={percentageChartConfig}
+          chartColors={chartColors}
+        />
       );
     case "horizontalBar":
       return (
@@ -80,6 +94,7 @@ function ChartContent({
           stats={stats}
           chartRef={chartRef}
           chartConfig={percentageChartConfig}
+          chartColors={chartColors}
           isMultiResponseIndividual={isMultiResponseIndividual}
           countedValue={countedValue}
         />
@@ -90,16 +105,17 @@ function ChartContent({
           variable={variable}
           stats={stats}
           ref={chartRef}
+          chartColors={chartColors}
           isMultiResponseIndividual={isMultiResponseIndividual}
           countedValue={countedValue}
         />
       );
     case "pie":
-      return <PieChartContent variable={variable} stats={stats} chartRef={chartRef} />;
+      return <PieChartContent variable={variable} stats={stats} chartRef={chartRef} chartColors={chartColors} />;
     case "metrics":
       return <MetricsCards variable={variable} stats={stats} />;
     case "meanBar":
-      return <MeanBarAdhoc variable={variable} stats={stats} ref={chartRef} />;
+      return <MeanBarAdhoc variable={variable} stats={stats} ref={chartRef} chartColors={chartColors} />;
     case "textExplorer":
       return <TextExplorerAdhoc variable={variable} datasetId={datasetId} />;
     default:
@@ -174,8 +190,27 @@ export function AdhocChart({
       }),
     [datasetId, datasetName, locale, splitVariableLabel, t]
   );
-  const fallbackChartColors = useMemo(() => resolveTheme(activeTheme).theme.chartColors, [activeTheme, resolveTheme]);
+  const resolvedTheme = useMemo(() => resolveTheme(activeTheme).theme, [activeTheme, resolveTheme]);
+  const fallbackChartColors = resolvedTheme.chartColors;
   const exportBaseName = useMemo(() => sanitizeExportBaseName(variable.name), [variable.name]);
+  const chartColors = useMemo(() => {
+    switch (actualSelectedChartType) {
+      case "bar":
+      case "horizontalBar":
+      case "meanBar":
+        return resolveSingleSeriesThemeChartColors(resolvedTheme);
+      case "pie": {
+        const categoryCount = Math.max(1, Math.min(6, transformToRechartsPieData(variable, stats).length));
+        return resolveThemePaletteForCount(resolvedTheme, categoryCount);
+      }
+      case "horizontalStackedBar": {
+        const segmentCount = Math.max(1, Math.min(6, getStackedBarSegmentCount(variable, stats)));
+        return resolveThemePaletteForCount(resolvedTheme, segmentCount);
+      }
+      default:
+        return undefined;
+    }
+  }, [actualSelectedChartType, resolvedTheme, stats, variable]);
 
   const handlePowerPointExport = useCallback(async () => {
     if (!datasetId || actualSelectedChartType === "textExplorer") {
@@ -287,6 +322,7 @@ export function AdhocChart({
       stats={stats}
       chartRef={displayRef}
       percentageChartConfig={percentageChartConfig}
+      chartColors={chartColors}
       datasetId={datasetId}
       isMultiResponseIndividual={isMultiResponseIndividual}
       countedValue={countedValue}
@@ -299,6 +335,7 @@ export function AdhocChart({
       variable={variable}
       stats={stats}
       percentageChartConfig={percentageChartConfig}
+      chartColors={chartColors}
       datasetId={datasetId}
       isMultiResponseIndividual={isMultiResponseIndividual}
       countedValue={countedValue}

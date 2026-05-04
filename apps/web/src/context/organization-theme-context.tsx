@@ -2,7 +2,7 @@
 
 import { ReactNode, createContext, useContext, useMemo } from "react";
 import { useAppContext } from "@/context/app-context";
-import { sanitizeThemeChartColors } from "@/lib/organization-theme";
+import { withResolvedThemePalettes } from "@/lib/organization-theme";
 import { type Organization, type ThemeItem } from "@/types/organization";
 
 // Default themes that are always available
@@ -142,13 +142,12 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
   const availableThemes = useMemo(() => {
     const organizationThemes = organizationWithSettings?.settings?.themes || [];
     const sanitizedOrganizationThemes = organizationThemes.map((theme: ThemeItem) => ({
-      ...theme,
-      chartColors: sanitizeThemeChartColors(theme.chartColors),
+      ...withResolvedThemePalettes(theme),
       name: theme.name
         .replace(/\s+/g, "-") // Replace spaces with hyphens
         .replace(/[^A-Za-z0-9\-_]/g, ""), // Remove any characters that aren't A-Za-z0-9, -, or _
     }));
-    return [...DEFAULT_THEMES, ...sanitizedOrganizationThemes];
+    return [...DEFAULT_THEMES.map(withResolvedThemePalettes), ...sanitizedOrganizationThemes];
   }, [organizationWithSettings?.settings?.themes]);
 
   const getThemeByName = (name: string): ThemeItem | null => {
@@ -156,12 +155,15 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
     if (foundTheme) return foundTheme;
 
     const colorTheme = COLOR_THEME_MAPPINGS[name];
-    return colorTheme !== undefined ? colorTheme : null;
+    return colorTheme !== undefined ? withResolvedThemePalettes(colorTheme) : null;
   };
 
-  const getDefaultThemes = () => DEFAULT_THEMES;
+  const getDefaultThemes = () => DEFAULT_THEMES.map(withResolvedThemePalettes);
 
-  const getColorThemes = () => COLOR_THEME_MAPPINGS;
+  const getColorThemes = () =>
+    Object.fromEntries(
+      Object.entries(COLOR_THEME_MAPPINGS).map(([key, theme]) => [key, withResolvedThemePalettes(theme)])
+    );
 
   const resolveTheme = (activeThemeName: string) => {
     const sanitizedActiveThemeName = activeThemeName
@@ -177,8 +179,7 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
     if (orgTheme) {
       return {
         theme: {
-          ...orgTheme,
-          chartColors: sanitizeThemeChartColors(orgTheme.chartColors),
+          ...withResolvedThemePalettes(orgTheme),
           name: orgTheme.name.replace(/\s+/g, "-").replace(/[^A-Za-z0-9\-_]/g, ""),
         },
         isOrganizationTheme: true,
@@ -191,18 +192,18 @@ export function OrganizationThemeProvider({ children }: { children: ReactNode })
     );
 
     if (defaultTheme) {
-      return { theme: defaultTheme, isOrganizationTheme: false };
+      return { theme: withResolvedThemePalettes(defaultTheme), isOrganizationTheme: false };
     }
 
     // Check color theme mappings
     const colorTheme = COLOR_THEME_MAPPINGS[sanitizedActiveThemeName.toLowerCase()];
     if (colorTheme) {
-      return { theme: colorTheme, isOrganizationTheme: false };
+      return { theme: withResolvedThemePalettes(colorTheme), isOrganizationTheme: false };
     }
 
     // Fallback to default theme
     return {
-      theme: DEFAULT_THEMES[0]!,
+      theme: withResolvedThemePalettes(DEFAULT_THEMES[0]!),
       isOrganizationTheme: false,
     };
   };

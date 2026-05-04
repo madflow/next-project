@@ -912,7 +912,19 @@
       "theme": {
         "add": "Add Theme",
         "addFirst": "Add First Theme",
+        "basePalette": {
+          "description": "Base fallback colors for charts. Count-specific palettes inherit from these unless overridden.",
+          "title": "Base Palette"
+        },
         "colorHelp": "Enter a 6-digit hex color like #3b82f6.",
+        "countPalettes": {
+          "derivedHelp": "Uses the current base palette until you override this color.",
+          "description": "Override chart colors by the number of visible values or segments in the chart.",
+          "multiSeriesDescription": "Used when a chart renders {count} visible categories or segments.",
+          "paletteTitle": "Palette for {count}",
+          "singleSeriesDescription": "Used for single-series charts like bar, horizontal bar, multi-response, and mean/median charts.",
+          "title": "Count-Specific Palettes"
+        },
         "empty": "No themes configured yet",
         "nameHelp": "Only letters, numbers, hyphens (-), and underscores (_) are allowed. Spaces will be converted to hyphens.",
         "namePlaceholder": "Enter theme name",

@@ -912,7 +912,19 @@
       "theme": {
         "add": "Thema hinzufügen",
         "addFirst": "Erstes Thema hinzufügen",
+        "basePalette": {
+          "description": "Grundlegende Fallback-Farben für Diagramme. Anzahl-spezifische Paletten erben diese Farben, sofern sie nicht überschrieben werden.",
+          "title": "Basispalette"
+        },
         "colorHelp": "Geben Sie eine 6-stellige Hex-Farbe wie #3b82f6 ein.",
+        "countPalettes": {
+          "derivedHelp": "Verwendet die aktuelle Basispalette, bis Sie diese Farbe überschreiben.",
+          "description": "Überschreiben Sie Diagrammfarben abhängig von der Anzahl sichtbarer Werte oder Segmente im Diagramm.",
+          "multiSeriesDescription": "Wird verwendet, wenn ein Diagramm {count} sichtbare Kategorien oder Segmente rendert.",
+          "paletteTitle": "Palette für {count}",
+          "singleSeriesDescription": "Wird für Einzelserien-Diagramme wie Balken-, horizontale Balken-, Multi-Response- und Mittelwert/Median-Diagramme verwendet.",
+          "title": "Anzahl-spezifische Paletten"
+        },
         "empty": "Noch keine Themen konfiguriert",
         "nameHelp": "Nur Buchstaben, Zahlen, Bindestriche (-) und Unterstriche (_) sind erlaubt. Leerzeichen werden in Bindestriche umgewandelt.",
         "namePlaceholder": "Themenname eingeben",

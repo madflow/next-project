@@ -162,6 +162,20 @@ export function transformToRechartsStackedBarData(variableConfig: DatasetVariabl
   return rechartsData;
 }
 
+export function getStackedBarSegmentCount(variableConfig: DatasetVariable, statsData: StatsResponse) {
+  if (hasSplitVariableStatsForVariable(statsData, variableConfig.name)) {
+    const targetVariable = getStatsResponseItem(statsData, variableConfig.name);
+    if (!targetVariable || !isSplitVariableStats(targetVariable.stats)) {
+      return 0;
+    }
+
+    const firstCategory = Object.values(targetVariable.stats.categories)[0];
+    return firstCategory?.frequency_table.length ?? 0;
+  }
+
+  return transformToRechartsStackedBarData(variableConfig, statsData).length;
+}
+
 // New function for split variable stacked bar data
 export function transformToSplitVariableStackedBarData(variableConfig: DatasetVariable, statsData: StatsResponse) {
   const targetVariable = getStatsResponseItem(statsData, variableConfig.name);
