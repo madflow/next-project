@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Search, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -8,9 +8,9 @@ import { addSplitVariableAction, removeSplitVariableAction } from "@/actions/dat
 import { AdminVariableRow } from "@/components/admin/variable-row";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { ItemGroup } from "@/components/ui/item";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { SearchInput } from "@/components/ui/search-input";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariable } from "@/types/dataset-variable";
 
@@ -98,15 +98,13 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
         <Card className="rounded-md shadow-xs lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle>{t("assignment.available")}</CardTitle>
-            <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                placeholder={t("assignment.search")}
-                value={availableSearch}
-                onChange={(e) => setAvailableSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
+            <SearchInput
+              placeholder={t("assignment.search")}
+              value={availableSearch}
+              onChange={(e) => setAvailableSearch(e.target.value)}
+              onClear={() => setAvailableSearch("")}
+              aria-label={t("assignment.search")}
+            />
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.available.section">
@@ -152,15 +150,13 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
         <Card className="rounded-md shadow-xs lg:col-span-2">
           <CardHeader className="pb-3">
             <CardTitle>{t("assignment.assigned")}</CardTitle>
-            <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                placeholder={t("assignment.search")}
-                value={assignedSearch}
-                onChange={(e) => setAssignedSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
+            <SearchInput
+              placeholder={t("assignment.search")}
+              value={assignedSearch}
+              onChange={(e) => setAssignedSearch(e.target.value)}
+              onClear={() => setAssignedSearch("")}
+              aria-label={t("assignment.search")}
+            />
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.assigned.section">

@@ -14,8 +14,8 @@ import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
-import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
+import { SearchInput } from "../ui/search-input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator } from "../ui/select";
 import { Spinner } from "../ui/spinner";
 
@@ -280,7 +280,13 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
   return (
     <Card className="shadow-xs">
       <CardHeader className="px-3">
-        <Input type="text" placeholder={t("search")} onChange={(e) => setSearch(e.target.value)} value={search} />
+        <SearchInput
+          placeholder={t("search")}
+          onChange={(e) => setSearch(e.target.value)}
+          onClear={() => setSearch("")}
+          value={search}
+          aria-label={t("search")}
+        />
       </CardHeader>
       <CardContent className="px-3">
         <ScrollArea className="flex max-h-[500px] min-h-[300px] flex-col gap-2">

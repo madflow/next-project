@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { env } from "@/env";
 import { Locale, locales } from "@/i18n/config";
@@ -144,9 +145,8 @@ export function SignUpFormWithInvitation({ hasVerifyEmail, invitation }: SignUpF
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="password">{t("signUp.form.password")}</FieldLabel>
                       <FieldGroup>
-                        <Input
+                        <PasswordInput
                           id="password"
-                          type="password"
                           aria-invalid={fieldState.invalid}
                           {...field}
                           data-testid="auth.sign-up.form.password"
@@ -165,9 +165,8 @@ export function SignUpFormWithInvitation({ hasVerifyEmail, invitation }: SignUpF
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="confirmPassword">{t("signUp.form.confirmPassword")}</FieldLabel>
                       <FieldGroup>
-                        <Input
+                        <PasswordInput
                           id="confirmPassword"
-                          type="password"
                           aria-invalid={fieldState.invalid}
                           {...field}
                           data-testid="auth.sign-up.form.confirm-password"

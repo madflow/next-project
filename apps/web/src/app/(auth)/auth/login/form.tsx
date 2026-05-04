@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Locale } from "@/i18n/config";
 import { signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -83,9 +84,8 @@ export function LoginForm(props: LoginFormProps) {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="login-password">{t("login.form.password")}</FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="login-password"
-                      type="password"
                       aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.login.form.password"
