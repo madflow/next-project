@@ -3,7 +3,7 @@ import "./instrumentation.js";
 
 export default defineConfig({
   out: "./migrations",
-  schema: "./dist/schema/index.mjs",
+  schema: "./src/schema/index.ts",
   dialect: "postgresql",
   verbose: true,
   dbCredentials: {
