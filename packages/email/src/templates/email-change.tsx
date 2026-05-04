@@ -1,4 +1,4 @@
-import { Body, Container, Head, Heading, Html, Link, Preview, Section, Tailwind, Text } from "@react-email/components";
+import { Body, Container, Head, Heading, Html, Link, Preview, Section, Tailwind, Text } from "react-email";
 import { Footer } from "../components/footer";
 import { getEmailTranslations } from "../translations";
 import type { EmailChangeProps } from "../types";
