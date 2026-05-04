@@ -4,15 +4,18 @@ import { Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 interface DeleteDatasetDialogProps {
   datasetId: string;
@@ -41,44 +44,44 @@ export function DeleteDatasetDialog({ datasetId, datasetName, onDelete }: Delete
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Button
-        variant="outline"
-        size="icon"
-        title={t("tableActions.delete")}
-        onClick={(e) => {
-          e.preventDefault();
-          setOpen(true);
-        }}
-        className="cursor-pointer"
-        type="button">
-        <Trash className="h-4 w-4" />
-        <span className="sr-only">{t("tableActions.delete")}</span>
-      </Button>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{t("deleteDialog.title")}</DialogTitle>
-          <DialogDescription>{t("deleteDialog.description", { name: datasetName })}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="gap-2 sm:gap-0">
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          title={t("tableActions.delete")}
+          className="cursor-pointer"
+          type="button">
+          <Trash className="h-4 w-4" />
+          <span className="sr-only">{t("tableActions.delete")}</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="sm:max-w-[425px]">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+          <AlertDialogDescription>{t("deleteDialog.description", { name: datasetName })}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="gap-2 sm:gap-0">
           <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button
-              variant="outline"
+            <AlertDialogCancel
               onClick={() => setOpen(false)}
               disabled={isDeleting}
               className="w-full cursor-pointer sm:w-auto">
               {t("deleteDialog.cancel")}
-            </Button>
-            <Button
+            </AlertDialogCancel>
+            <AlertDialogAction
               variant="destructive"
-              onClick={handleDelete}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleDelete();
+              }}
               disabled={isDeleting}
               className="w-full cursor-pointer sm:w-auto">
               {isDeleting ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
-            </Button>
+            </AlertDialogAction>
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

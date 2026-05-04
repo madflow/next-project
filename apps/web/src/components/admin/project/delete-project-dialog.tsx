@@ -4,15 +4,18 @@ import { Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   projectId: string;
@@ -41,35 +44,45 @@ export function DeleteProjectDialog({ projectId, projectName, onDelete }: Props)
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setIsOpen(true)}
-        data-testid={`admin.projects.list.delete-${projectName?.toLowerCase().replace(/\s+/g, "-")}`}
-        title={t("deleteDialog.deleteButton.title")}
-        className="cursor-pointer">
-        <Trash className="h-4 w-4" />
-      </Button>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("deleteDialog.title")}</DialogTitle>
-          <DialogDescription>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          data-testid={`admin.projects.list.delete-${projectName?.toLowerCase().replace(/\s+/g, "-")}`}
+          title={t("deleteDialog.deleteButton.title")}
+          className="cursor-pointer"
+          type="button">
+          <Trash className="h-4 w-4" />
+          <span className="sr-only">{t("deleteDialog.deleteButton.title")}</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+          <AlertDialogDescription>
             {t.rich("deleteDialog.description", {
               name: projectName,
               strong: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>,
             })}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isDeleting}>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setIsOpen(false)} disabled={isDeleting}>
             {t("deleteDialog.cancel")}
-          </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="cursor-pointer">
+          </AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={(event) => {
+              event.preventDefault();
+              void handleDelete();
+            }}
+            disabled={isDeleting}
+            className="cursor-pointer">
             {isDeleting ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
