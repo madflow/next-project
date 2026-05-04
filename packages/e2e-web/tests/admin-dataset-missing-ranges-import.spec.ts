@@ -16,7 +16,7 @@ test.describe("Admin Dataset Missing Ranges Import", () => {
 
     // Upload the demo.sav file which has missing ranges for the "internet" variable
     await page.getByTestId("admin.datasets.create.upload").click();
-    const uploadFile = page.getByTestId("file-upload-input");
+    const uploadFile = page.getByTestId("file-upload-input").locator('input[type="file"]');
     await uploadFile.setInputFiles("testdata/spss/demo.sav");
     await expect(page.getByTestId("app.admin.dataset.selected-file")).toBeVisible();
     await page.getByTestId("app.admin.dataset.name-input").fill(datasetName);
