@@ -191,7 +191,6 @@ export function AdhocChart({
     [datasetId, datasetName, locale, splitVariableLabel, t]
   );
   const resolvedTheme = useMemo(() => resolveTheme(activeTheme).theme, [activeTheme, resolveTheme]);
-  const fallbackChartColors = resolvedTheme.chartColors;
   const exportBaseName = useMemo(() => sanitizeExportBaseName(variable.name), [variable.name]);
   const chartColors = useMemo(() => {
     switch (actualSelectedChartType) {
@@ -211,6 +210,7 @@ export function AdhocChart({
         return undefined;
     }
   }, [actualSelectedChartType, resolvedTheme, stats, variable]);
+  const fallbackChartColors = chartColors ?? resolvedTheme.chartColors;
 
   const handlePowerPointExport = useCallback(async () => {
     if (!datasetId || actualSelectedChartType === "textExplorer") {

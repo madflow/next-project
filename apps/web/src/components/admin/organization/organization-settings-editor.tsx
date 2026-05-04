@@ -13,6 +13,7 @@ import {
   normalizeThemeColorInput,
   organizationThemeColorKeys,
   organizationThemePaletteCountKeys,
+  sanitizeThemesPayload,
   resolveThemePaletteForCount,
 } from "@/lib/organization-theme";
 import { type OrganizationSettings, type ThemeChartColors, ThemeItem } from "@/types/organization";
@@ -151,7 +152,8 @@ export function OrganizationSettingsEditor({
       return;
     }
 
-    onChangeAction({ themes: nextThemes });
+    const sanitizedThemes = sanitizeThemesPayload(nextThemes, themes);
+    onChangeAction({ themes: sanitizedThemes });
   };
 
   const colorKeys = organizationThemeColorKeys;

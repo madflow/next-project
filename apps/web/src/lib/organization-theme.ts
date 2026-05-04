@@ -70,6 +70,45 @@ export function sanitizeThemeChartColorPalettes(chartColorPalettes?: ThemeChartC
   return Object.fromEntries(sanitizedEntries) as ThemeChartColorPalettes;
 }
 
+function sanitizeThemePaletteColorValue(value?: string | null) {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const normalizedValue = normalizeThemeColorInput(value);
+  return isValidThemeColor(normalizedValue) ? normalizedValue : undefined;
+}
+
+export function sanitizeThemesPayload(themes: ThemeItem[], previousThemes?: ThemeItem[]) {
+  return themes.map((theme, index) => {
+    const previousTheme = previousThemes?.[index];
+    const sanitizedPalettes = organizationThemePaletteCountKeys.flatMap((countKey) => {
+      const currentPalette = theme.chartColorPalettes?.[countKey];
+      if (!currentPalette) {
+        return [];
+      }
+
+      const previousPalette = previousTheme?.chartColorPalettes?.[countKey];
+      const sanitizedPaletteEntries = organizationThemeColorKeys.flatMap((colorKey) => {
+        const sanitizedCurrentValue = sanitizeThemePaletteColorValue(currentPalette[colorKey]);
+        if (sanitizedCurrentValue) {
+          return [[colorKey, sanitizedCurrentValue] as const];
+        }
+
+        const sanitizedPreviousValue = sanitizeThemePaletteColorValue(previousPalette?.[colorKey]);
+        return sanitizedPreviousValue ? [[colorKey, sanitizedPreviousValue] as const] : [];
+      });
+
+      return sanitizedPaletteEntries.length > 0 ? [[countKey, Object.fromEntries(sanitizedPaletteEntries) as ThemeChartColors] as const] : [];
+    });
+
+    return {
+      ...theme,
+      chartColorPalettes: sanitizedPalettes.length > 0 ? (Object.fromEntries(sanitizedPalettes) as ThemeChartColorPalettes) : undefined,
+    };
+  });
+}
+
 export function createPaletteFromChartColors(chartColors?: ThemeChartColors | null, count: number = MAX_THEME_COLOR_COUNT) {
   return getThemeColorKeysForCount(count).reduce<ThemeChartColors>((palette, colorKey) => {
     const color = chartColors?.[colorKey];

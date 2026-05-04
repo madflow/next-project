@@ -259,7 +259,8 @@ function createPaletteDomAdapter(): PaletteDomAdapter | null {
     createProbe: () => document.createElement("span"),
     getComputedColor: (probe) => getComputedStyle(probe).color,
     resolveScope: (scopeElement) =>
-      (scopeElement?.matches("[data-slot='chart']") ? scopeElement : scopeElement?.querySelector<HTMLElement>("[data-slot='chart']")) ??
+      (scopeElement?.matches("[data-slot='chart']") ? scopeElement : scopeElement?.closest<HTMLElement>("[data-slot='chart']")) ??
+      scopeElement?.querySelector<HTMLElement>("[data-slot='chart']") ??
       scopeElement?.closest<HTMLElement>(".theme-container") ??
       document.querySelector<HTMLElement>(".theme-container"),
     colorToHex: (color) => {

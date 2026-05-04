@@ -310,6 +310,40 @@ describe("adhoc export helpers", () => {
     assert.deepStrictEqual(result, ["#abcdef", "#abcdef", "#abcdef", "#abcdef", "#abcdef", "#abcdef"]);
   });
 
+  test("getComputedExportPalette resolves the nearest chart ancestor for descendant nodes", () => {
+    const paletteByVariable: Record<string, string> = {
+      "var(--chart-1)": "rgb(171, 205, 239)",
+      "var(--chart-2)": "rgb(171, 205, 239)",
+      "var(--chart-3)": "rgb(171, 205, 239)",
+      "var(--chart-4)": "rgb(171, 205, 239)",
+      "var(--chart-5)": "rgb(171, 205, 239)",
+      "var(--chart-6)": "rgb(171, 205, 239)",
+    };
+    const nearestChart = {
+      matches: (selector: string) => selector === "[data-slot='chart']",
+      querySelector: () => null,
+      appendChild() {},
+    } as unknown as HTMLElement;
+    const descendant = {
+      matches: () => false,
+      closest: (selector: string) => (selector === "[data-slot='chart']" ? nearestChart : null),
+      querySelector: () => null,
+      appendChild() {},
+    } as unknown as HTMLElement;
+
+    const result = getComputedExportPalette(descendant, undefined, {
+      createProbe: () =>
+        ({
+          style: { color: "", pointerEvents: "", position: "", visibility: "" },
+          remove() {},
+        }) as unknown as HTMLElement,
+      getComputedColor: (probe) => paletteByVariable[probe.style.color] ?? "",
+      resolveScope: (scopeElement) => scopeElement,
+    });
+
+    assert.deepStrictEqual(result, ["#abcdef", "#abcdef", "#abcdef", "#abcdef", "#abcdef", "#abcdef"]);
+  });
+
   test("createMultiResponseExcelExportPayload maps aggregate chart data", () => {
     const payload = createMultiResponseExcelExportPayload({
       excelLabels: {
