@@ -20,6 +20,7 @@ import {
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates, getPlotAreaVerticalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariable } from "@/types/dataset-variable";
+import { type ThemeChartColors } from "@/types/organization";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 
 type PercentageChartConfigTranslations = {
@@ -61,15 +62,19 @@ export function BarChartContent({
   stats,
   chartRef,
   chartConfig,
+  chartColors,
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
   chartRef?: React.Ref<HTMLDivElement>;
   chartConfig: ChartConfig;
+  chartColors?: ThemeChartColors;
 }) {
+  const chartData = transformToRechartsBarData(variable, stats);
+
   return (
-    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={variable.name}>
-      <BarChart accessibilityLayer data={transformToRechartsBarData(variable, stats)}>
+    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
+      <BarChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical verticalCoordinatesGenerator={getPlotAreaVerticalBorderCoordinates} />
         <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={12} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
@@ -83,10 +88,14 @@ export function BarChartContent({
           tickFormatter={(value) => `${value}%`}
         />
         <Bar dataKey="percentage" fill="var(--color-percentage)">
+          {chartData.map((entry, index) => (
+            <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
+          ))}
           <LabelList
             dataKey="percentage"
             position="top"
             fontSize={12}
+            fill="#808080"
             formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
           />
         </Bar>
@@ -100,6 +109,7 @@ export function HorizontalBarChartContent({
   stats,
   chartRef,
   chartConfig,
+  chartColors,
   isMultiResponseIndividual = false,
   countedValue = 1,
 }: {
@@ -107,6 +117,7 @@ export function HorizontalBarChartContent({
   stats: StatsResponse;
   chartRef?: React.Ref<HTMLDivElement>;
   chartConfig: ChartConfig;
+  chartColors?: ThemeChartColors;
   isMultiResponseIndividual?: boolean;
   countedValue?: number;
 }) {
@@ -120,7 +131,7 @@ export function HorizontalBarChartContent({
     : transformToRechartsBarData(variable, stats);
 
   return (
-    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={variable.name}>
+    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
       <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={1} accessibilityLayer data={chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis
@@ -145,10 +156,14 @@ export function HorizontalBarChartContent({
           hide={isMultiResponseIndividual}
         />
         <Bar dataKey="percentage" fill="var(--color-percentage)">
+          {chartData.map((entry, index) => (
+            <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
+          ))}
           <LabelList
             dataKey="percentage"
             position="right"
             fontSize={12}
+            fill="#808080"
             formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
           />
         </Bar>
@@ -162,10 +177,12 @@ export function PieChartContent({
   variable,
   stats,
   chartRef,
+  chartColors,
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
   chartRef?: React.Ref<HTMLDivElement>;
+  chartColors?: ThemeChartColors;
 }) {
   const pieData = transformToRechartsPieData(variable, stats);
   const pieChartConfig: ChartConfig = {};
@@ -189,7 +206,7 @@ export function PieChartContent({
   );
 
   return (
-    <ChartContainer config={pieChartConfig} ref={chartRef} data-export-filename={variable.name}>
+    <ChartContainer config={pieChartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
       <PieChart>
         <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
         <Pie data={pieData} dataKey="percentage" nameKey="label" startAngle={90} endAngle={-270}>

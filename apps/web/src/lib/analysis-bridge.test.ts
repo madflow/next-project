@@ -3,6 +3,7 @@ import { describe, test } from "node:test";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { StatsResponse } from "@/types/stats";
 import {
+  getStackedBarSegmentCount,
   transformToMultiResponseData,
   transformToMultiResponseIndividualBarData,
   transformToSplitVariableStackedBarData,
@@ -107,6 +108,17 @@ describe("analysis-bridge transforms", () => {
     );
     assert.deepStrictEqual(result[0]?.segments.map((segment) => segment.label) ?? [], ["No", "Yes"]);
     assert.strictEqual(result[0]?.segments[1]?.value, 66.67);
+  });
+
+  test("getStackedBarSegmentCount returns the number of visible segments", () => {
+    const variable = createVariable();
+    const baseStats = createBaseStats("q1", [
+      { value: 0, counts: 10, percentages: 10 },
+      { value: 1, counts: 30, percentages: 30 },
+      { value: 2, counts: 60, percentages: 60 },
+    ]);
+
+    assert.strictEqual(getStackedBarSegmentCount(variable, baseStats), 3);
   });
 
   test("transformToMultiResponseData uses counted value and sorts by order index", () => {

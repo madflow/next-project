@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { useThemeConfig } from "@/components/active-theme";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,9 +18,11 @@ import {
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
+import { resolveSingleSeriesThemeChartColors } from "@/lib/organization-theme";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
+import { type ThemeChartColors } from "@/types/organization";
 import { type StatsResponse } from "@/types/stats";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 import { ChartExportMenu } from "./chart-export-menu";
@@ -38,17 +40,19 @@ type MultiResponseChartProps = {
 
 function MultiResponseChartContent({
   chartConfig,
+  chartColors,
   chartData,
   chartRef,
   fileName,
 }: {
   chartConfig: ChartConfig;
+  chartColors?: ThemeChartColors;
   chartData: ReturnType<typeof transformToMultiResponseData>;
   chartRef?: React.Ref<HTMLDivElement>;
   fileName: string;
 }) {
   return (
-    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={fileName}>
+    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={fileName}>
       <BarChart
         layout="vertical"
         margin={{
@@ -79,10 +83,14 @@ function MultiResponseChartContent({
           width={CHART_Y_AXIS_WIDTH}
         />
         <Bar dataKey="percentage" fill="var(--color-percentage)">
+          {chartData.map((entry, index) => (
+            <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
+          ))}
           <LabelList
             dataKey="percentage"
             position="right"
             fontSize={12}
+            fill="#808080"
             formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
           />
         </Bar>
@@ -137,7 +145,9 @@ export function MultiResponseChart({
       }),
     [datasetName, locale, tAdhoc]
   );
-  const fallbackChartColors = useMemo(() => resolveTheme(activeTheme).theme.chartColors, [activeTheme, resolveTheme]);
+  const resolvedTheme = useMemo(() => resolveTheme(activeTheme).theme, [activeTheme, resolveTheme]);
+  const fallbackChartColors = resolvedTheme.chartColors;
+  const chartColors = useMemo(() => resolveSingleSeriesThemeChartColors(resolvedTheme), [resolvedTheme]);
 
   const handlePowerPointExport = useCallback(async () => {
     try {
@@ -215,7 +225,12 @@ export function MultiResponseChart({
   return (
     <Card className="shadow-xs" data-testid="multi-response-chart" {...props}>
       <ChartExportSurface exportRef={exportRef} fileName={exportBaseName} isRendering={isExportRendering}>
-        <MultiResponseChartContent chartConfig={chartConfig} chartData={chartData} fileName={exportBaseName} />
+        <MultiResponseChartContent
+          chartConfig={chartConfig}
+          chartColors={chartColors}
+          chartData={chartData}
+          fileName={exportBaseName}
+        />
       </ChartExportSurface>
       <CardHeader>
         <CardTitle>{variablesetName}</CardTitle>
@@ -224,6 +239,7 @@ export function MultiResponseChart({
       <CardContent>
         <MultiResponseChartContent
           chartConfig={chartConfig}
+          chartColors={chartColors}
           chartData={chartData}
           chartRef={displayRef}
           fileName={exportBaseName}

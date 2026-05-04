@@ -52,11 +52,11 @@ async function selectTheme(page: Page, themeName: string) {
   await expect.poll(() => page.evaluate(() => document.body.className)).toContain(`theme-${themeName.toLowerCase()}`);
 }
 
-async function readThemePalette(page: Page) {
+async function readChartPalette(page: Page) {
   return page.evaluate(() => {
-    const themeContainer = document.querySelector(".theme-container");
-    if (!(themeContainer instanceof HTMLElement)) {
-      throw new Error("Theme container not found");
+    const chartContainer = document.querySelector("[data-testid='chart-content-horizontalBar'] [data-slot='chart']");
+    if (!(chartContainer instanceof HTMLElement)) {
+      throw new Error("Chart container not found");
     }
 
     const canvas = document.createElement("canvas");
@@ -84,7 +84,7 @@ async function readThemePalette(page: Page) {
       probe.style.position = "absolute";
       probe.style.visibility = "hidden";
       probe.style.pointerEvents = "none";
-      themeContainer.appendChild(probe);
+      chartContainer.appendChild(probe);
 
       try {
         return toHex(getComputedStyle(probe).color);
@@ -168,10 +168,10 @@ test.describe("Adhoc Analysis - Export Theme Colors", () => {
     await selectDegreeVariable(page);
     await selectTheme(page, THEME_NAME);
 
-    const expectedPalette = await readThemePalette(page);
+    const expectedPalette = await readChartPalette(page);
     const expectedBarColor = await readRenderedBarColor(page);
 
-    expect(expectedPalette[0]).toBe(expectedBarColor);
+    expect(new Set(expectedPalette)).toEqual(new Set([expectedBarColor]));
     expect(colorChannelToHex(Number.parseInt(expectedBarColor.slice(1, 3), 16))).toBe(expectedBarColor.slice(1, 3));
 
     const excelPayload = await captureExportPayload(page, EXCEL_EXPORT_ROUTE, "Export as Excel");

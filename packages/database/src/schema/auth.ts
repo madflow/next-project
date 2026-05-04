@@ -16,9 +16,26 @@ import {
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const organizationThemeColorKeys = [
+  "chart-1",
+  "chart-2",
+  "chart-3",
+  "chart-4",
+  "chart-5",
+  "chart-6",
+] as const;
+
+export const organizationThemePaletteCountKeys = ["1", "2", "3", "4", "5", "6"] as const;
+
+export type ThemeChartColors = Partial<Record<(typeof organizationThemeColorKeys)[number], string>>;
+export type ThemeChartColorPalettes = Partial<
+  Record<(typeof organizationThemePaletteCountKeys)[number], ThemeChartColors>
+>;
+
 export type ThemeItem = {
   name: string;
-  chartColors?: Record<string, string>;
+  chartColors?: ThemeChartColors;
+  chartColorPalettes?: ThemeChartColorPalettes;
 };
 
 export type OrganizationSettings = {
@@ -173,16 +190,6 @@ export const authSchema = {
 
 export type AuthUser = typeof user.$inferSelect;
 
-// Organization settings schemas
-export const organizationThemeColorKeys = [
-  "chart-1",
-  "chart-2",
-  "chart-3",
-  "chart-4",
-  "chart-5",
-  "chart-6",
-] as const;
-
 export const organizationThemeColorSchema = z
   .string()
   .trim()
@@ -202,9 +209,21 @@ export const themeChartColorsSchema = z
   })
   .strict();
 
+export const themeChartColorPalettesSchema = z
+  .object({
+    "1": themeChartColorsSchema.optional(),
+    "2": themeChartColorsSchema.optional(),
+    "3": themeChartColorsSchema.optional(),
+    "4": themeChartColorsSchema.optional(),
+    "5": themeChartColorsSchema.optional(),
+    "6": themeChartColorsSchema.optional(),
+  })
+  .strict();
+
 export const themeItemSchema = z.object({
   name: z.string(),
   chartColors: themeChartColorsSchema.optional(),
+  chartColorPalettes: themeChartColorPalettesSchema.optional(),
 });
 
 export const organizationSettingsSchema = z

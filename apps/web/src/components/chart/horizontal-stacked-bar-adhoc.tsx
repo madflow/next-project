@@ -19,6 +19,7 @@ import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constan
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
+import { type ThemeChartColors } from "@/types/organization";
 import { type StatsResponse } from "@/types/stats";
 import {
   type HorizontalStackedBarModel,
@@ -29,6 +30,7 @@ import {
 type HorizontalStackedBarAdhocProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
+  chartColors?: ThemeChartColors;
   isMultiResponseIndividual?: boolean;
   countedValue?: number;
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -75,16 +77,18 @@ function HorizontalStackedBarChart({
   chartRef,
   exportFilename,
   hideLegend = false,
+  chartColors,
   tooltipContent,
 }: {
   model: HorizontalStackedBarModel;
   chartRef?: React.Ref<HTMLDivElement>;
   exportFilename: string;
   hideLegend?: boolean;
+  chartColors?: ThemeChartColors;
   tooltipContent?: React.ReactElement;
 }) {
   return (
-    <ChartContainer config={model.chartConfig} ref={chartRef} data-export-filename={exportFilename}>
+    <ChartContainer config={model.chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={exportFilename}>
       <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={model.chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis
@@ -124,7 +128,7 @@ function HorizontalStackedBarChart({
 }
 
 export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalStackedBarAdhocProps>(
-  ({ variable, stats, isMultiResponseIndividual = false, countedValue = 1 }, ref) => {
+  ({ variable, stats, chartColors, isMultiResponseIndividual = false, countedValue = 1 }, ref) => {
     const hasSplitVariable = hasSplitVariableStatsForVariable(stats, variable.name);
 
     if (hasSplitVariable) {
@@ -137,6 +141,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
       return (
         <HorizontalStackedBarChart
           model={model}
+          chartColors={chartColors}
           chartRef={ref}
           exportFilename={variable.name}
           hideLegend={isMultiResponseIndividual}
@@ -148,7 +153,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
     const stackedData = transformToRechartsStackedBarData(variable, stats);
     const model = createSingleHorizontalStackedBarModel(getVariableLabel(variable), stackedData);
 
-    return <HorizontalStackedBarChart model={model} chartRef={ref} exportFilename={variable.name} />;
+    return <HorizontalStackedBarChart model={model} chartColors={chartColors} chartRef={ref} exportFilename={variable.name} />;
   }
 );
 

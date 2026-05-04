@@ -259,7 +259,9 @@ function createPaletteDomAdapter(): PaletteDomAdapter | null {
     createProbe: () => document.createElement("span"),
     getComputedColor: (probe) => getComputedStyle(probe).color,
     resolveScope: (scopeElement) =>
-      scopeElement?.closest<HTMLElement>(".theme-container") ?? document.querySelector<HTMLElement>(".theme-container"),
+      (scopeElement?.matches("[data-slot='chart']") ? scopeElement : scopeElement?.querySelector<HTMLElement>("[data-slot='chart']")) ??
+      scopeElement?.closest<HTMLElement>(".theme-container") ??
+      document.querySelector<HTMLElement>(".theme-container"),
     colorToHex: (color) => {
       const normalizedHexColor = cssColorToHex(color);
       if (normalizedHexColor) {
@@ -316,13 +318,14 @@ function formatMetricValue(value?: number, decimals?: number) {
 function mapDistributionPoints(
   points: Array<{ label: string | number; percentage: number }>,
   palette: string[],
-  colorIndex: number = 0
+  uniformColor: boolean = true
 ) {
-  const color = palette[colorIndex] ?? DEFAULT_EXPORT_PALETTE[0];
-  return points.map((point) => ({
+  return points.map((point, index) => ({
     label: String(point.label),
     value: roundExportValue(point.percentage),
-    color,
+    color: uniformColor
+      ? (palette[0] ?? DEFAULT_EXPORT_PALETTE[0])
+      : (palette[index] ?? DEFAULT_EXPORT_PALETTE[index % DEFAULT_EXPORT_PALETTE.length]!),
   }));
 }
 
@@ -572,7 +575,7 @@ export function createVariableChartPowerPointExportPayload({
         palette,
         chart: {
           kind: "bar",
-          points: mapDistributionPoints(transformToRechartsBarData(variable, stats), palette),
+          points: mapDistributionPoints(transformToRechartsBarData(variable, stats), palette, true),
         },
       };
     }
@@ -588,7 +591,7 @@ export function createVariableChartPowerPointExportPayload({
         palette,
         chart: {
           kind: "horizontalBar",
-          points: mapDistributionPoints(points, palette),
+          points: mapDistributionPoints(points, palette, true),
         },
       };
     }
@@ -713,7 +716,7 @@ export function createMultiResponsePowerPointExportPayload({
     palette,
     chart: {
       kind: "multiResponse",
-      points: mapDistributionPoints(points, palette),
+      points: mapDistributionPoints(points, palette, true),
     },
   };
 }

@@ -105,7 +105,8 @@ describe("adhoc export helpers", () => {
           remove() {},
         }) as unknown as HTMLElement,
       getComputedColor: (probe) => paletteByVariable[probe.style.color] ?? "",
-      resolveScope: () =>
+      resolveScope: (scopeElement) =>
+        scopeElement ??
         ({
           appendChild() {},
         }) as unknown as HTMLElement,
@@ -136,7 +137,8 @@ describe("adhoc export helpers", () => {
           remove() {},
         }) as unknown as HTMLElement,
       getComputedColor: (probe) => paletteByVariable[probe.style.color] ?? "",
-      resolveScope: () =>
+      resolveScope: (scopeElement) =>
+        scopeElement ??
         ({
           appendChild() {},
         }) as unknown as HTMLElement,
@@ -163,7 +165,8 @@ describe("adhoc export helpers", () => {
           remove() {},
         }) as unknown as HTMLElement,
       getComputedColor: () => "not-a-color",
-      resolveScope: () =>
+      resolveScope: (scopeElement) =>
+        scopeElement ??
         ({
           appendChild() {},
         }) as unknown as HTMLElement,
@@ -277,6 +280,34 @@ describe("adhoc export helpers", () => {
       throw new Error("Expected multiResponse chart kind");
     }
     assert.deepStrictEqual(payload.chart.points, [{ label: "Awareness", value: 60, color: "#123456" }]);
+  });
+
+  test("getComputedExportPalette prefers chart-local CSS variables over theme container colors", () => {
+    const paletteByVariable: Record<string, string> = {
+      "var(--chart-1)": "rgb(171, 205, 239)",
+      "var(--chart-2)": "rgb(171, 205, 239)",
+      "var(--chart-3)": "rgb(171, 205, 239)",
+      "var(--chart-4)": "rgb(171, 205, 239)",
+      "var(--chart-5)": "rgb(171, 205, 239)",
+      "var(--chart-6)": "rgb(171, 205, 239)",
+    };
+    const scope = {
+      matches: (selector: string) => selector === "[data-slot='chart']",
+      querySelector: () => null,
+      appendChild() {},
+    } as unknown as HTMLElement;
+
+    const result = getComputedExportPalette(scope, undefined, {
+      createProbe: () =>
+        ({
+          style: { color: "", pointerEvents: "", position: "", visibility: "" },
+          remove() {},
+        }) as unknown as HTMLElement,
+      getComputedColor: (probe) => paletteByVariable[probe.style.color] ?? "",
+      resolveScope: (scopeElement) => scopeElement,
+    });
+
+    assert.deepStrictEqual(result, ["#abcdef", "#abcdef", "#abcdef", "#abcdef", "#abcdef", "#abcdef"]);
   });
 
   test("createMultiResponseExcelExportPayload maps aggregate chart data", () => {
