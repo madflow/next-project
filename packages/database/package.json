@@ -5,8 +5,8 @@
   "scripts": {
     "clean": "git clean -xdf .cache dist .turbo node_modules",
     "env:copy": "cp -n .env.dist .env || true",
-    "build": "unbuild --clean",
-    "stub": "unbuild --stub",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "db:generate": "drizzle-kit generate",
     "db:generate:custom": "drizzle-kit generate --custom",
     "db:migrate": "drizzle-kit migrate",
@@ -17,24 +17,12 @@
   },
   "exports": {
     "./clients": {
-      "import": {
-        "default": "./dist/clients/index.mjs",
-        "type": "./dist/clients/index.d.ts"
-      },
-      "require": {
-        "default": "./dist/clients/index.cjs",
-        "type": "./dist/clients/index.mjs"
-      }
+      "types": "./dist/clients/index.d.mts",
+      "default": "./dist/clients/index.mjs"
     },
     "./schema": {
-      "import": {
-        "default": "./dist/schema/index.mjs",
-        "type": "./dist/schema/index.d.ts"
-      },
-      "require": {
-        "default": "./dist/schema/index.cjs",
-        "type": "./dist/schema/index.mjs"
-      }
+      "types": "./dist/schema/index.d.mts",
+      "default": "./dist/schema/index.mjs"
     }
   },
   "files": [
@@ -43,6 +31,7 @@
   "type": "module",
   "dependencies": {
     "@sentry/node": "^10.46.0",
+    "drizzle-zod": "^0.8.3",
     "drizzle-orm": "^0.45.1",
     "pg": "^8.20.0"
   },
@@ -54,10 +43,9 @@
     "@repo/typescript-config": "workspace:*",
     "@types/pg": "^8.18.0",
     "drizzle-kit": "^0.31.9",
-    "drizzle-zod": "^0.8.3",
     "eslint": "^9.39.4",
+    "tsdown": "^0.21.10",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.0",
-    "unbuild": "^3.6.1"
+    "typescript": "^6.0.0"
   }
 }

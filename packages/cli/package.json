@@ -5,8 +5,8 @@
   "main": "./dist/index.mjs",
   "scripts": {
     "clean": "git clean -xdf .cache dist .turbo node_modules",
-    "build": "unbuild",
-    "stub": "unbuild --stub",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings=0 ."
   },
@@ -21,8 +21,8 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "eslint": "^9.39.4",
-    "typescript": "^6.0.0",
-    "unbuild": "^3.6.1"
+    "tsdown": "^0.21.10",
+    "typescript": "^6.0.0"
   },
   "files": [
     "dist"

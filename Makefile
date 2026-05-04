@@ -128,11 +128,6 @@ prod-dump-in:
 seed:
 	pnpm run seed
 
-## Create TypeScript stubs
-.PHONY: stubs
-stubs:
-	pnpm run stub
-
 ## Run all checks (tests, types, lint, translations)
 .PHONY: check
 check:

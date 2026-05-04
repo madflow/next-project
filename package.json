@@ -20,7 +20,6 @@
     "e2e:deps": "turbo run e2e:deps",
     "env:copy": "turbo run env:copy",
     "seed": "turbo run seed",
-    "stub": "turbo run stub",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "check-types": "turbo run check-types",
