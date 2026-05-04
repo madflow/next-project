@@ -1,6 +1,6 @@
-import { render } from "@react-email/components";
 import nodemailer from "nodemailer";
 import { ReactElement } from "react";
+import { render } from "react-email";
 
 function parseBooleanEnv(value: string | undefined) {
   if (!value) {

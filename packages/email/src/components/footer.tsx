@@ -1,4 +1,4 @@
-import { Hr, Link, Tailwind, Text } from "@react-email/components";
+import { Hr, Link, Tailwind, Text } from "react-email";
 import { getFooterTranslations } from "../translations";
 
 export function Footer({
