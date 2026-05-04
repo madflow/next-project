@@ -5,10 +5,11 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { addSplitVariableAction, removeSplitVariableAction } from "@/actions/dataset-splitvariable";
-import { Badge } from "@/components/ui/badge";
+import { AdminVariableRow } from "@/components/admin/variable-row";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ItemGroup } from "@/components/ui/item";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { DatasetVariable } from "@/types/dataset-variable";
@@ -118,36 +119,30 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
                   {t("assignment.noAvailable")}
                 </div>
               ) : (
-                <div className="space-y-1 p-2" data-testid="admin.dataset.splitvariables.available.variables.list">
+                <ItemGroup className="gap-1 p-2" data-testid="admin.dataset.splitvariables.available.variables.list">
                   {availableResponse?.rows.map((variable) => (
-                    <div
+                    <AdminVariableRow
                       key={variable.id}
-                      className="hover:bg-muted flex items-start gap-2 rounded-md p-2"
+                      actions={
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAssignVariable(variable.id)}
+                          disabled={isAssigning === variable.id}
+                          className="mt-0.5 h-6 w-6 shrink-0 p-0"
+                          data-testid="admin.dataset.splitvariables.assignment.add">
+                          {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
+                        </Button>
+                      }
+                      className="hover:bg-muted items-start gap-2 p-2"
+                      label={variable.label}
+                      measure={variable.measure}
+                      variableName={variable.name}
+                      variableType={variable.type}
                       data-testid={`admin.dataset.splitvariables.available.variable.${variable.id}`}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleAssignVariable(variable.id)}
-                        disabled={isAssigning === variable.id}
-                        className="mt-0.5 h-6 w-6 shrink-0 p-0"
-                        data-testid="admin.dataset.splitvariables.assignment.add">
-                        {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
-                      </Button>
-                      <div className="min-w-0 flex-1 overflow-hidden">
-                        {variable.label && <p className="mb-1 text-sm font-medium break-words">{variable.label}</p>}
-                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.name}</p>
-                        <div className="flex flex-wrap gap-1">
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            {variable.measure}
-                          </Badge>
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            {variable.type}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
+                    </AdminVariableRow>
                   ))}
-                </div>
+                </ItemGroup>
               )}
             </ScrollArea>
           </CardContent>
@@ -178,36 +173,30 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
                   {t("assignment.noAssigned")}
                 </div>
               ) : (
-                <div className="space-y-1 p-2" data-testid="admin.dataset.splitvariables.assigned.variables.list">
+                <ItemGroup className="gap-1 p-2" data-testid="admin.dataset.splitvariables.assigned.variables.list">
                   {assignedResponse?.rows.map((variable) => (
-                    <div
+                    <AdminVariableRow
                       key={variable.id}
-                      className="hover:bg-muted flex items-start gap-2 rounded-md p-2"
+                      actions={
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleRemoveVariable(variable.id)}
+                          disabled={isRemoving === variable.id}
+                          className="mt-0.5 h-6 w-6 shrink-0 p-0"
+                          data-testid="admin.dataset.splitvariables.assignment.remove">
+                          {isRemoving === variable.id ? "..." : <X className="h-3 w-3" />}
+                        </Button>
+                      }
+                      className="hover:bg-muted items-start gap-2 p-2"
+                      label={variable.label}
+                      measure={variable.measure}
+                      variableName={variable.name}
+                      variableType={variable.type}
                       data-testid={`admin.dataset.splitvariables.assigned.variable.${variable.id}`}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleRemoveVariable(variable.id)}
-                        disabled={isRemoving === variable.id}
-                        className="mt-0.5 h-6 w-6 shrink-0 p-0"
-                        data-testid="admin.dataset.splitvariables.assignment.remove">
-                        {isRemoving === variable.id ? "..." : <X className="h-3 w-3" />}
-                      </Button>
-                      <div className="min-w-0 flex-1 overflow-hidden">
-                        {variable.label && <p className="mb-1 text-sm font-medium break-words">{variable.label}</p>}
-                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.name}</p>
-                        <div className="flex flex-wrap gap-1">
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            {variable.measure}
-                          </Badge>
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            {variable.type}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
+                    </AdminVariableRow>
                   ))}
-                </div>
+                </ItemGroup>
               )}
             </ScrollArea>
           </CardContent>

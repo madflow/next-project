@@ -22,10 +22,12 @@ import {
   removeContentFromVariablesetAction,
   reorderContentsAction,
 } from "@/actions/dataset-variableset";
+import { AdminVariableRow } from "@/components/admin/variable-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -75,41 +77,35 @@ function SortableVariableItem({ entry, selectedSetId, onRemove, onRefresh, isRem
     <div
       ref={setNodeRef}
       style={style}
-      className="hover:bg-muted group flex items-start gap-2 rounded-md p-2"
+      className="group"
       data-testid={`admin.dataset.variableset.assigned.variable.${entry.variableId}`}>
-      <div
-        {...attributes}
-        {...listeners}
-        className="text-muted-foreground mt-0.5 flex h-6 w-4 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100 active:cursor-grabbing"
-        onClick={(e) => e.stopPropagation()}
-        data-testid="admin.dataset.variableset.variable.drag-handle">
-        <GripVertical className="h-3 w-3" />
-      </div>
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => onRemove(entry.id)}
-        disabled={isRemoving}
-        className="mt-0.5 h-6 w-6 shrink-0 p-0"
-        data-testid="admin.dataset.variableset.assignment.remove">
-        {isRemoving ? "..." : <X className="h-3 w-3" />}
-      </Button>
-      <div className="min-w-0 flex-1 overflow-hidden">
-        {entry.variableLabel && <p className="mb-1 text-sm font-medium break-words">{entry.variableLabel}</p>}
-        <p className="text-muted-foreground mb-1 truncate text-xs">{entry.variableName}</p>
-        <div className="flex flex-wrap gap-1">
-          {entry.variableMeasure && (
-            <Badge variant="outline" className="shrink-0 text-xs">
-              {entry.variableMeasure}
-            </Badge>
-          )}
-          {entry.variableType && (
-            <Badge variant="outline" className="shrink-0 text-xs">
-              {entry.variableType}
-            </Badge>
-          )}
-        </div>
-        {entry.variableId && entry.variableMeasure && entry.variableType && (
+      <AdminVariableRow
+        actions={
+          <>
+            <div
+              {...attributes}
+              {...listeners}
+              className="text-muted-foreground mt-0.5 flex h-6 w-4 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100 active:cursor-grabbing"
+              data-testid="admin.dataset.variableset.variable.drag-handle">
+              <GripVertical className="h-3 w-3" />
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onRemove(entry.id)}
+              disabled={isRemoving}
+              className="mt-0.5 h-6 w-6 shrink-0 p-0"
+              data-testid="admin.dataset.variableset.assignment.remove">
+              {isRemoving ? "..." : <X className="h-3 w-3" />}
+            </Button>
+          </>
+        }
+        className="hover:bg-muted items-start gap-2 p-2"
+        label={entry.variableLabel}
+        measure={entry.variableMeasure}
+        variableName={entry.variableName}
+        variableType={entry.variableType}>
+        {entry.variableId && entry.variableMeasure && entry.variableType ? (
           <div className="mt-2">
             <AllowedStatisticsSelector
               variablesetId={selectedSetId}
@@ -120,8 +116,8 @@ function SortableVariableItem({ entry, selectedSetId, onRemove, onRefresh, isRem
               variableType={entry.variableType as DatasetVariableType}
             />
           </div>
-        )}
-      </div>
+        ) : null}
+      </AdminVariableRow>
     </div>
   );
 }
@@ -148,34 +144,44 @@ function SortableSubsetItem({ entry, onDetach, isDetaching, detachTooltip }: Sor
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-muted/40 group hover:bg-muted flex items-center gap-2 rounded-md border-l-2 border-l-blue-300 p-2 dark:border-l-blue-600"
+      className="group"
       data-testid={`admin.dataset.variableset.assigned.subset.${entry.subsetId}`}>
-      <div
-        {...attributes}
-        {...listeners}
-        className="text-muted-foreground flex h-6 w-4 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100 active:cursor-grabbing"
-        onClick={(e) => e.stopPropagation()}
-        data-testid="admin.dataset.variableset.subset.drag-handle">
-        <GripVertical className="h-3 w-3" />
-      </div>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => entry.subsetId && onDetach(entry.subsetId)}
-              disabled={isDetaching}
-              className="h-6 w-6 shrink-0 p-0"
-              data-testid="admin.dataset.variableset.assignment.detach-subset">
-              {isDetaching ? "..." : <Unlink className="h-3 w-3" />}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top">{detachTooltip}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <FolderOpen className="h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
-      <span className="min-w-0 flex-1 truncate text-sm font-medium">{entry.subsetName}</span>
+      <Item
+        role="listitem"
+        size="sm"
+        className="bg-muted/40 hover:bg-muted items-center gap-2 border-l-2 border-l-blue-300 p-2 dark:border-l-blue-600">
+        <ItemActions>
+          <div
+            {...attributes}
+            {...listeners}
+            className="text-muted-foreground flex h-6 w-4 cursor-grab items-center justify-center opacity-0 group-hover:opacity-100 active:cursor-grabbing"
+            data-testid="admin.dataset.variableset.subset.drag-handle">
+            <GripVertical className="h-3 w-3" />
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => entry.subsetId && onDetach(entry.subsetId)}
+                  disabled={isDetaching}
+                  className="h-6 w-6 shrink-0 p-0"
+                  data-testid="admin.dataset.variableset.assignment.detach-subset">
+                  {isDetaching ? "..." : <Unlink className="h-3 w-3" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">{detachTooltip}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </ItemActions>
+        <ItemActions className="text-blue-500 dark:text-blue-400">
+          <FolderOpen className="h-4 w-4 shrink-0" />
+        </ItemActions>
+        <ItemContent className="min-w-0 justify-center">
+          <ItemTitle className="truncate">{entry.subsetName}</ItemTitle>
+        </ItemContent>
+      </Item>
     </div>
   );
 }
@@ -379,36 +385,30 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
               ) : unassignedResponse?.rows.length === 0 ? (
                 <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noVariables")}</div>
               ) : (
-                <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.available.variables.list">
+                <ItemGroup className="gap-1 p-2" data-testid="admin.dataset.variableset.available.variables.list">
                   {unassignedResponse?.rows.map((variable) => (
-                    <div
+                    <AdminVariableRow
                       key={variable.id}
-                      className="hover:bg-muted flex items-start gap-2 rounded-md p-2"
+                      actions={
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAssignVariable(variable.id)}
+                          disabled={isAssigning === variable.id}
+                          className="mt-0.5 h-6 w-6 shrink-0 p-0"
+                          data-testid="admin.dataset.variableset.assignment.add">
+                          {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
+                        </Button>
+                      }
+                      className="hover:bg-muted items-start gap-2 p-2"
+                      label={variable.label}
+                      measure={variable.measure}
+                      variableName={variable.name}
+                      variableType={variable.type}
                       data-testid={`admin.dataset.variableset.available.variable.${variable.id}`}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleAssignVariable(variable.id)}
-                        disabled={isAssigning === variable.id}
-                        className="mt-0.5 h-6 w-6 shrink-0 p-0"
-                        data-testid="admin.dataset.variableset.assignment.add">
-                        {isAssigning === variable.id ? "..." : <Plus className="h-3 w-3" />}
-                      </Button>
-                      <div className="min-w-0 flex-1 overflow-hidden">
-                        {variable.label && <p className="mb-1 text-sm font-medium break-words">{variable.label}</p>}
-                        <p className="text-muted-foreground mb-1 truncate text-xs">{variable.name}</p>
-                        <div className="flex flex-wrap gap-1">
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            {variable.measure}
-                          </Badge>
-                          <Badge variant="outline" className="shrink-0 text-xs">
-                            {variable.type}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
+                    </AdminVariableRow>
                   ))}
-                </div>
+                </ItemGroup>
               )}
             </ScrollArea>
           </CardContent>
@@ -444,7 +444,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                 <div className="text-muted-foreground p-4 text-center text-sm">{t("assignment.noAssigned")}</div>
               ) : (
                 <SortableContext items={filteredContents.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-                  <div className="space-y-1 p-2" data-testid="admin.dataset.variableset.assigned.variables.list">
+                  <ItemGroup className="gap-1 p-2" data-testid="admin.dataset.variableset.assigned.variables.list">
                     {filteredContents.map((entry) =>
                       entry.contentType === "variable" ? (
                         <SortableVariableItem
@@ -465,7 +465,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                         />
                       )
                     )}
-                  </div>
+                  </ItemGroup>
                 </SortableContext>
               )}
             </ScrollArea>
