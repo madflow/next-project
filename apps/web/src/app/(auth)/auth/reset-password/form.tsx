@@ -11,7 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Locale } from "@/i18n/config";
 import { resetPassword } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -84,9 +84,8 @@ export function ResetPasswordForm({ className, ...props }: React.ComponentPropsW
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="reset-password-new-password">{t("resetPassword.form.newPassword")}</FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="reset-password-new-password"
-                      type="password"
                       autoComplete="new-password"
                       aria-invalid={fieldState.invalid}
                       {...field}

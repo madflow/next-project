@@ -216,7 +216,9 @@
       "type": "Type"
     },
     "common": {
+      "add": "Add",
       "cancel": "Cancel",
+      "remove": "Remove",
       "saveChanges": "Save changes",
       "saving": "Saving..."
     },
@@ -1218,6 +1220,15 @@
     "light": "Light",
     "system": "System",
     "toggleTheme": "Toggle theme"
+  },
+  "ui": {
+    "passwordInput": {
+      "hide": "Hide password",
+      "show": "Show password"
+    },
+    "searchInput": {
+      "clear": "Clear search"
+    }
   },
   "user": {
     "actions": {

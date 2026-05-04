@@ -16,9 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PasswordInput } from "@/components/ui/password-input";
 import { deleteUser } from "@/lib/auth-client";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { Input } from "../ui/input";
 
 export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const t = useTranslations("accountDeleteDialog");
@@ -80,7 +80,7 @@ export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onO
                     <FormItem>
                       <FormLabel>{t("formLabels.currentPassword")}</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} data-testid="app.user.account.delete.password" />
+                        <PasswordInput {...field} data-testid="app.user.account.delete.password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

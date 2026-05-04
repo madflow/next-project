@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { env } from "@/env";
 import { Locale } from "@/i18n/config";
 import { signUp } from "@/lib/auth-client";
@@ -104,9 +105,8 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="sign-up-password">{t("signUp.form.password")}</FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="sign-up-password"
-                      type="password"
                       aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.sign-up.form.password"
@@ -122,9 +122,8 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="sign-up-confirm-password">{t("signUp.form.confirmPassword")}</FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="sign-up-confirm-password"
-                      type="password"
                       aria-invalid={fieldState.invalid}
                       {...field}
                       data-testid="auth.sign-up.form.confirm-password"

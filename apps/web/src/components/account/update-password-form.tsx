@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { changePassword } from "@/lib/auth-client";
 
 const passwordFormSchema = z
@@ -68,10 +68,9 @@ export function UpdatePasswordForm() {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>{t("account.password.fields.currentPassword")}</FieldLabel>
               <FieldGroup>
-                <Input
+                <PasswordInput
                   {...field}
                   id={field.name}
-                  type="password"
                   autoComplete="current-password"
                   aria-invalid={fieldState.invalid}
                   data-testid="app.user.account.password.current"
@@ -89,10 +88,9 @@ export function UpdatePasswordForm() {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>{t("account.password.fields.newPassword")}</FieldLabel>
               <FieldGroup>
-                <Input
+                <PasswordInput
                   {...field}
                   id={field.name}
-                  type="password"
                   autoComplete="new-password"
                   aria-invalid={fieldState.invalid}
                   data-testid="app.user.account.password.new"
@@ -110,10 +108,9 @@ export function UpdatePasswordForm() {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={field.name}>{t("account.password.fields.confirmPassword")}</FieldLabel>
               <FieldGroup>
-                <Input
+                <PasswordInput
                   {...field}
                   id={field.name}
-                  type="password"
                   autoComplete="new-password"
                   aria-invalid={fieldState.invalid}
                   data-testid="app.user.account.password.confirm"

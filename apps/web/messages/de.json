@@ -216,7 +216,9 @@
       "type": "Typ"
     },
     "common": {
+      "add": "Hinzufugen",
       "cancel": "Abbrechen",
+      "remove": "Entfernen",
       "saveChanges": "Änderungen speichern",
       "saving": "Wird gespeichert..."
     },
@@ -1218,6 +1220,15 @@
     "light": "Hell",
     "system": "System",
     "toggleTheme": "Design umschalten"
+  },
+  "ui": {
+    "passwordInput": {
+      "hide": "Passwort verbergen",
+      "show": "Passwort anzeigen"
+    },
+    "searchInput": {
+      "clear": "Suche loschen"
+    }
   },
   "user": {
     "actions": {

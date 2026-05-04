@@ -26,9 +26,9 @@ import { AdminVariableRow } from "@/components/admin/variable-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { SearchInput } from "@/components/ui/search-input";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQueryApi } from "@/hooks/use-query-api";
@@ -367,15 +367,13 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
         <Card className="rounded-md shadow-xs">
           <CardHeader className="pb-3">
             <CardTitle>{t("assignment.available")}</CardTitle>
-            <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                placeholder={t("assignment.search")}
-                value={availableSearch}
-                onChange={(e) => setAvailableSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
+            <SearchInput
+              placeholder={t("assignment.search")}
+              value={availableSearch}
+              onChange={(e) => setAvailableSearch(e.target.value)}
+              onClear={() => setAvailableSearch("")}
+              aria-label={t("assignment.search")}
+            />
           </CardHeader>
           <Separator />
           <CardContent className="p-0">
@@ -425,15 +423,13 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                 </Badge>
               )}
             </div>
-            <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                placeholder={t("assignment.search")}
-                value={assignedSearch}
-                onChange={(e) => setAssignedSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
+            <SearchInput
+              placeholder={t("assignment.search")}
+              value={assignedSearch}
+              onChange={(e) => setAssignedSearch(e.target.value)}
+              onClear={() => setAssignedSearch("")}
+              aria-label={t("assignment.search")}
+            />
           </CardHeader>
           <Separator />
           <CardContent className="p-0">

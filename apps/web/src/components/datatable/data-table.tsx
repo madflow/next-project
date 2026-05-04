@@ -1,8 +1,7 @@
 "use client";
 
 import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
-import { SearchIcon, XIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/ui/search-input";
 import { Table } from "@/components/ui/table";
 import type { PaginationState, SortingState } from "@/types";
 import { ErrorDisplay } from "./components/error-display";
@@ -82,28 +81,14 @@ export function DataTable<TData>({
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 items-center">
           {showSearch && (
-            <div className="relative w-full max-w-xs sm:w-64">
-              {searchValue ? (
-                <button
-                  type="button"
-                  data-testid="app.datatable.search-clear-button"
-                  aria-label="Clear search"
-                  onClick={() => onSearchChange("")}
-                  className="text-muted-foreground hover:text-foreground absolute top-1/2 left-2 -translate-y-1/2 transition-colors">
-                  <XIcon className="size-4" />
-                </button>
-              ) : (
-                <span className="text-muted-foreground absolute top-1/2 left-2 -translate-y-1/2">
-                  <SearchIcon className="size-4" />
-                </span>
-              )}
-              <Input
-                type="text"
+            <div className="w-full max-w-xs sm:w-64">
+              <SearchInput
                 data-testid="app.datatable.search-input"
                 value={searchValue}
                 onChange={(e) => onSearchChange(e.target.value)}
+                onClear={() => onSearchChange("")}
+                clearButtonTestId="app.datatable.search-clear-button"
                 placeholder={searchPlaceholder}
-                className="pl-8"
                 aria-label="Search"
               />
             </div>
