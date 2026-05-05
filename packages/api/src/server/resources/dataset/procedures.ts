@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { and, eq, getTableColumns, notExists, sql } from "drizzle-orm";
+import { deleteDataset as deleteDatasetObject } from "@repo/storage";
 import {
   type CreateDatasetProjectData,
   type CreateDatasetSplitVariableData,
@@ -11,6 +12,7 @@ import {
   type Organization,
   type Project as ProjectRecord,
   type UpdateDatasetData,
+  datasetMetadataFile,
   datasetProject as datasetProjectTable,
   datasetSplitVariable as datasetSplitVariableTable,
   dataset as datasetTable,
@@ -30,6 +32,7 @@ import { datasetSplitVariableQueryDefinition } from "../dataset-split-variable/q
 import { datasetVariableQueryDefinition } from "../dataset-variable/query-definition";
 import { datasetVariablesetQueryDefinition } from "../dataset-variableset/query-definition";
 import { requireDatasetAccess } from "./access";
+import { deleteDatasetMetadataFile } from "./storage";
 import { datasetQueryDefinition } from "./query-definition";
 
 const ds = adminApi.dataset;
@@ -254,6 +257,11 @@ const update = ds.update.handler(async ({ context, input }) => {
 });
 
 const remove = ds.delete.handler(async ({ context, input }) => {
+  const metadataFiles = await context.db
+    .select({ storageKey: datasetMetadataFile.storageKey })
+    .from(datasetMetadataFile)
+    .where(eq(datasetMetadataFile.datasetId, input.id));
+
   let deletedDataset: DatasetRecord | undefined;
 
   try {
@@ -274,6 +282,11 @@ const remove = ds.delete.handler(async ({ context, input }) => {
       status: 404,
     });
   }
+
+  void Promise.allSettled([
+    deleteDatasetObject(deletedDataset.storageKey),
+    ...metadataFiles.map((metadataFile) => deleteDatasetMetadataFile(metadataFile.storageKey)),
+  ]);
 
   return deletedDataset;
 });

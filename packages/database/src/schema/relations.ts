@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   dataset,
+  datasetMetadataFile,
   datasetProject,
   datasetSplitVariable,
   datasetVariable,
@@ -40,6 +41,7 @@ export const organizationRelations = relations(organization, ({ many }) => ({
   invitations: many(invitation),
   projects: many(project),
   datasets: many(dataset),
+  datasetMetadataFiles: many(datasetMetadataFile),
 }));
 
 // Member relations
@@ -81,10 +83,26 @@ export const datasetRelations = relations(dataset, ({ one, many }) => ({
     fields: [dataset.organizationId],
     references: [organization.id],
   }),
+  metadataFiles: many(datasetMetadataFile),
   variables: many(datasetVariable),
   variablesets: many(datasetVariableset),
   datasetProjects: many(datasetProject),
   splitVariables: many(datasetSplitVariable),
+}));
+
+export const datasetMetadataFileRelations = relations(datasetMetadataFile, ({ one }) => ({
+  dataset: one(dataset, {
+    fields: [datasetMetadataFile.datasetId],
+    references: [dataset.id],
+  }),
+  organization: one(organization, {
+    fields: [datasetMetadataFile.organizationId],
+    references: [organization.id],
+  }),
+  uploadedByUser: one(user, {
+    fields: [datasetMetadataFile.uploadedBy],
+    references: [user.id],
+  }),
 }));
 
 // DatasetVariable relations
