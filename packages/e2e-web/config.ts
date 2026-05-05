@@ -85,13 +85,3 @@ export const testIds = {
   },
   nonExistent: "00000000-0000-0000-0000-000000000000",
 } as const;
-
-export const baseUrl = process.env.E2E_BASE_URL || "http://localhost:3000";
-
-export const resolvedBaseUrl = process.env.BASE_URL || baseUrl;
-
-export const timeouts = {
-  navigation: 10000, // 10 seconds
-  action: 5000, // 5 seconds
-  assertion: 5000, // 5 seconds
-} as const;
