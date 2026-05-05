@@ -1,14 +1,14 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "tags": ["-lintignore"],
-  "workspaces": {
-    ".": {},
-  },
   "ignore": [
     "apps/web/src/components/ui/**",
     "apps/web/src/global.ts",
     "apps/web/src/types/**",
     "packages/database/**",
-    "packages/typescript-config/nextjs.json",
+    "packages/typescript-config/nextjs.json"
   ],
+  "tags": ["-lintignore"],
+  "workspaces": {
+    ".": {}
+  }
 }
