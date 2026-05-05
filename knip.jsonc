@@ -1,7 +1,4 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "rules": {
-    "duplicates": "off",
-    "types": "off"
-  }
+  "ignore": ["apps/web/src/types/**"],
 }

@@ -7,7 +7,7 @@ import { deleteDataset } from "@/dal/dataset";
 import { CreateDatasetResult, createDataset } from "@/lib/dataset-service";
 import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
 
-export type UploadDatasetResult = CreateDatasetResult;
+type UploadDatasetResult = CreateDatasetResult;
 
 type UploadDatasetParams = {
   file: File;
