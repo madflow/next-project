@@ -206,7 +206,11 @@ export function PieChartContent({
   );
 
   return (
-    <ChartContainer config={pieChartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
+    <ChartContainer
+      config={pieChartConfig}
+      chartColors={chartColors}
+      ref={chartRef}
+      data-export-filename={variable.name}>
       <PieChart>
         <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
         <Pie data={pieData} dataKey="percentage" nameKey="label" startAngle={90} endAngle={-270}>

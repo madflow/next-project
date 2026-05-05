@@ -18,9 +18,9 @@ import {
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
-import { resolveSingleSeriesThemeChartColors } from "@/lib/organization-theme";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
+import { resolveSingleSeriesThemeChartColors } from "@/lib/organization-theme";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type ThemeChartColors } from "@/types/organization";
 import { type StatsResponse } from "@/types/stats";

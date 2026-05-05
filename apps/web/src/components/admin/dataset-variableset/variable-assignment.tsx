@@ -228,7 +228,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
   const localContents =
     optimisticContentsState.selectedSetId === selectedSetId && optimisticContentsState.contents
       ? optimisticContentsState.contents
-      : contents ?? [];
+      : (contents ?? []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -403,8 +403,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
                       measure={variable.measure}
                       variableName={variable.name}
                       variableType={variable.type}
-                      data-testid={`admin.dataset.variableset.available.variable.${variable.id}`}>
-                    </AdminVariableRow>
+                      data-testid={`admin.dataset.variableset.available.variable.${variable.id}`}></AdminVariableRow>
                   ))}
                 </ItemGroup>
               )}

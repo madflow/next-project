@@ -267,7 +267,5 @@ export function OrganizationThemeStyleInjector({ activeTheme }: { activeTheme: s
 ${cssVariables}
 }`;
 
-  return (
-    <style>{cssContent}</style>
-  );
+  return <style>{cssContent}</style>;
 }

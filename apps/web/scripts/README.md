@@ -21,27 +21,27 @@ This document outlines the data created by the `seed.ts` script, which populates
 
 ## Datasets
 
-| Name                | Filename             | Organization      | Project      | UUID                                 |
-| ------------------- | -------------------- | ----------------- | ------------ | ------------------------------------ |
-| Test Dataset        | demo.sav             | Test Organization | Test Project | 0198e639-3e96-734b-b0db-af0c4350a2c4 |
+| Name                 | Filename             | Organization      | Project      | UUID                                 |
+| -------------------- | -------------------- | ----------------- | ------------ | ------------------------------------ |
+| Test Dataset         | demo.sav             | Test Organization | Test Project | 0198e639-3e96-734b-b0db-af0c4350a2c4 |
 | SPSS Beispielumfrage | survey_sample_de.sav | Test Organization | Test Project | 0198e639-3e96-734b-b0db-af0c4350a2c5 |
 
 ## Variable Sets
 
 The `SPSS Beispielumfrage` dataset gets the following variable sets during seeding:
 
-| Name                        | Parent           | Category       | UUID                                 |
-| --------------------------- | ---------------- | -------------- | ------------------------------------ |
-| Demografische Daten         | -                | standard       | generated at seed time               |
-| Bildung und Beruf           | -                | standard       | generated at seed time               |
-| Einkommen                   | -                | standard       | generated at seed time               |
-| Herkunft                    | -                | standard       | generated at seed time               |
-| Politische Einstellungen    | -                | standard       | generated at seed time               |
-| Vertrauen in Institutionen  | -                | standard       | generated at seed time               |
-| Lebensstil                  | -                | standard       | generated at seed time               |
-| Fahrzeuge                   | -                | standard       | generated at seed time               |
-| Mediennutzung               | -                | standard       | 0198e639-3e96-734b-b0db-af0c4350a2d1 |
-| Informationsquellen         | Mediennutzung    | multi_response | 0198e639-3e96-734b-b0db-af0c4350a2d2 |
+| Name                       | Parent        | Category       | UUID                                 |
+| -------------------------- | ------------- | -------------- | ------------------------------------ |
+| Demografische Daten        | -             | standard       | generated at seed time               |
+| Bildung und Beruf          | -             | standard       | generated at seed time               |
+| Einkommen                  | -             | standard       | generated at seed time               |
+| Herkunft                   | -             | standard       | generated at seed time               |
+| Politische Einstellungen   | -             | standard       | generated at seed time               |
+| Vertrauen in Institutionen | -             | standard       | generated at seed time               |
+| Lebensstil                 | -             | standard       | generated at seed time               |
+| Fahrzeuge                  | -             | standard       | generated at seed time               |
+| Mediennutzung              | -             | standard       | 0198e639-3e96-734b-b0db-af0c4350a2d1 |
+| Informationsquellen        | Mediennutzung | multi_response | 0198e639-3e96-734b-b0db-af0c4350a2d2 |
 
 ## Split Variables
 

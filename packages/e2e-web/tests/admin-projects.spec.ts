@@ -3,7 +3,6 @@ import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 test.describe("Admin Projects", () => {
-
   test("list projects", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);

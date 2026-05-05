@@ -24,7 +24,6 @@ async function getLatestEmail(email: string) {
   return null;
 }
 
-
 test.describe("Email Translations", () => {
   test(
     "email verification email should be sent in English when locale is English",

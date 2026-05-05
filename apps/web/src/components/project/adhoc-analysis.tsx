@@ -110,7 +110,8 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   const pendingUrlQueryRef = useRef<string | null>(null);
   const clearedUrlSelectionRef = useRef<string | null>(null);
   const selectedDataset = parsedUrlState.hasKnownState ? parsedUrlState.selectedDataset : localSelectedDataset;
-  const selectedDatasetName = selectedDatasetNameState.datasetId === selectedDataset ? selectedDatasetNameState.name : null;
+  const selectedDatasetName =
+    selectedDatasetNameState.datasetId === selectedDataset ? selectedDatasetNameState.name : null;
   const effectiveCurrentSelection = useMemo(() => {
     if (!parsedUrlState.hasKnownState || parsedUrlState.selectedDataset !== selectedDataset) {
       return currentSelection;
@@ -275,12 +276,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     }
 
     saveDataset(parsedUrlState.selectedDataset);
-  }, [
-    isSearchParamsReady,
-    parsedUrlState.hasKnownState,
-    parsedUrlState.selectedDataset,
-    saveDataset,
-  ]);
+  }, [isSearchParamsReady, parsedUrlState.hasKnownState, parsedUrlState.selectedDataset, saveDataset]);
 
   useEffect(() => {
     if (!isSearchParamsReady) {

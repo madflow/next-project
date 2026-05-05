@@ -88,7 +88,11 @@ function HorizontalStackedBarChart({
   tooltipContent?: React.ReactElement;
 }) {
   return (
-    <ChartContainer config={model.chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={exportFilename}>
+    <ChartContainer
+      config={model.chartConfig}
+      chartColors={chartColors}
+      ref={chartRef}
+      data-export-filename={exportFilename}>
       <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={model.chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis
@@ -153,7 +157,14 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
     const stackedData = transformToRechartsStackedBarData(variable, stats);
     const model = createSingleHorizontalStackedBarModel(getVariableLabel(variable), stackedData);
 
-    return <HorizontalStackedBarChart model={model} chartColors={chartColors} chartRef={ref} exportFilename={variable.name} />;
+    return (
+      <HorizontalStackedBarChart
+        model={model}
+        chartColors={chartColors}
+        chartRef={ref}
+        exportFilename={variable.name}
+      />
+    );
   }
 );
 

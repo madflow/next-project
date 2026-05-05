@@ -13,8 +13,8 @@ import {
   normalizeThemeColorInput,
   organizationThemeColorKeys,
   organizationThemePaletteCountKeys,
-  sanitizeThemesPayload,
   resolveThemePaletteForCount,
+  sanitizeThemesPayload,
 } from "@/lib/organization-theme";
 import { type OrganizationSettings, type ThemeChartColors, ThemeItem } from "@/types/organization";
 import { DEFAULT_THEME } from "./defaults";
@@ -124,7 +124,8 @@ export function OrganizationSettingsEditor({
     const fieldId = `${index}-${paletteCountKey}-${colorKey}`;
     const isValid = isValidThemeColor(normalizedColor);
     const nextColorValue = isValid ? normalizedColor : color;
-    const currentPalette = theme.chartColorPalettes?.[paletteCountKey as keyof NonNullable<ThemeItem["chartColorPalettes"]>] || {};
+    const currentPalette =
+      theme.chartColorPalettes?.[paletteCountKey as keyof NonNullable<ThemeItem["chartColorPalettes"]>] || {};
     const nextThemes = [...themes];
     nextThemes[index] = {
       ...theme,
@@ -178,7 +179,8 @@ export function OrganizationSettingsEditor({
     const explicitPalette = theme.chartColorPalettes?.[
       paletteCountKey as keyof NonNullable<ThemeItem["chartColorPalettes"]>
     ] as ThemeChartColors | undefined;
-    const currentColor = explicitPalette?.[colorKey] ?? resolvedPalette[colorKey] ?? DEFAULT_THEME.chartColors?.[colorKey];
+    const currentColor =
+      explicitPalette?.[colorKey] ?? resolvedPalette[colorKey] ?? DEFAULT_THEME.chartColors?.[colorKey];
     const normalizedColor = normalizeThemeColorInput(currentColor ?? "");
     const safeColorValue = isValidThemeColor(normalizedColor)
       ? normalizedColor
@@ -243,7 +245,9 @@ export function OrganizationSettingsEditor({
                 <div className="space-y-3">
                   <div>
                     <h4 className="text-sm font-medium">{t("organization.settings.theme.basePalette.title")}</h4>
-                    <p className="text-muted-foreground text-xs">{t("organization.settings.theme.basePalette.description")}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {t("organization.settings.theme.basePalette.description")}
+                    </p>
                   </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {colorKeys.map((colorKey) => {
@@ -317,11 +321,14 @@ export function OrganizationSettingsEditor({
                               paletteCountKey,
                               colorKey
                             );
-                            const isInvalid = invalidColorFields[`${themeIndex}-${paletteCountKey}-${colorKey}`] === true;
+                            const isInvalid =
+                              invalidColorFields[`${themeIndex}-${paletteCountKey}-${colorKey}`] === true;
 
                             return (
                               <div key={`${paletteCountKey}-${colorKey}`} className="space-y-2">
-                                <Label htmlFor={`${themeIndex}-${paletteCountKey}-${colorKey}`} className="text-sm font-medium">
+                                <Label
+                                  htmlFor={`${themeIndex}-${paletteCountKey}-${colorKey}`}
+                                  className="text-sm font-medium">
                                   {colorKey}
                                 </Label>
                                 <div className="flex items-center space-x-2">
@@ -354,7 +361,9 @@ export function OrganizationSettingsEditor({
                                   </p>
                                 )}
                                 {isInvalid && (
-                                  <p className="text-destructive text-xs">{t("organization.settings.theme.colorHelp")}</p>
+                                  <p className="text-destructive text-xs">
+                                    {t("organization.settings.theme.colorHelp")}
+                                  </p>
                                 )}
                               </div>
                             );

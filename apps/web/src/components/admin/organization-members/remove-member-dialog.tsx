@@ -58,7 +58,9 @@ export function RemoveMemberDialog({ memberId, username, onRemove }: RemoveMembe
       <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle>{t("organizationMembers.removeDialog.title")}</AlertDialogTitle>
-          <AlertDialogDescription>{t("organizationMembers.removeDialog.description", { name: username })}</AlertDialogDescription>
+          <AlertDialogDescription>
+            {t("organizationMembers.removeDialog.description", { name: username })}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2 sm:gap-0">
           <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">

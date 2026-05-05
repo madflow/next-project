@@ -5,8 +5,8 @@ import { defaultClient as db } from "@repo/database/clients";
 import {
   type CreateOrganizationData as CreateData,
   type UpdateOrganizationData as UpdateData,
-  insertOrganizationSchema,
   organization as entity,
+  insertOrganizationSchema,
   member,
   updateOrganizationSchema,
 } from "@repo/database/schema";

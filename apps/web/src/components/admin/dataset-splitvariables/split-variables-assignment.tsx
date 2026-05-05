@@ -137,8 +137,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
                       measure={variable.measure}
                       variableName={variable.name}
                       variableType={variable.type}
-                      data-testid={`admin.dataset.splitvariables.available.variable.${variable.id}`}>
-                    </AdminVariableRow>
+                      data-testid={`admin.dataset.splitvariables.available.variable.${variable.id}`}></AdminVariableRow>
                   ))}
                 </ItemGroup>
               )}
@@ -189,8 +188,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
                       measure={variable.measure}
                       variableName={variable.name}
                       variableType={variable.type}
-                      data-testid={`admin.dataset.splitvariables.assigned.variable.${variable.id}`}>
-                    </AdminVariableRow>
+                      data-testid={`admin.dataset.splitvariables.assigned.variable.${variable.id}`}></AdminVariableRow>
                   ))}
                 </ItemGroup>
               )}

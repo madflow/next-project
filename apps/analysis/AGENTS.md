@@ -22,16 +22,16 @@
 ## Project Structure
 
 - `analysis/` - Main application package
-  - `web/` - FastAPI application and API routes
-    - `api/` - API endpoints and schemas
-    - `application.py` - FastAPI app factory
-    - `lifespan.py` - Application lifecycle management
-  - `db/` - Database models and utilities
-    - `models/` - SQLAlchemy ORM models
-    - `dependencies.py` - Database session management
-  - `services/` - Business logic and data processing
-  - `settings.py` - Application configuration
-  - `tests/` - Unit and integration tests
+    - `web/` - FastAPI application and API routes
+        - `api/` - API endpoints and schemas
+        - `application.py` - FastAPI app factory
+        - `lifespan.py` - Application lifecycle management
+    - `db/` - Database models and utilities
+        - `models/` - SQLAlchemy ORM models
+        - `dependencies.py` - Database session management
+    - `services/` - Business logic and data processing
+    - `settings.py` - Application configuration
+    - `tests/` - Unit and integration tests
 - `scripts/` - Utility scripts
 - `sandbox/` - Development and testing sandbox
 
