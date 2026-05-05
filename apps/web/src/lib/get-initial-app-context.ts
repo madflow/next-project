@@ -7,7 +7,7 @@ import { organization as organizationTable, project as projectTable } from "@rep
 import { type Project } from "@/types/project";
 import { auth } from "./auth";
 
-export type InitialAppContext = {
+type InitialAppContext = {
   organization: Organization | null;
   project: Project | null;
 };

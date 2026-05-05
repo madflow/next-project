@@ -3,14 +3,14 @@ import { getVariableLabel } from "@/lib/variable-helpers";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
 
-export type RechartsBarDataItem = {
+type RechartsBarDataItem = {
   label: string | number;
   value: string | number;
   count: number;
   percentage: number;
 };
 
-export type RechartsPieDataItem = RechartsBarDataItem & {
+type RechartsPieDataItem = RechartsBarDataItem & {
   fill: string;
 };
 
@@ -19,7 +19,7 @@ export type RechartsStackedBarDataItem = RechartsBarDataItem & {
   fill: string;
 };
 
-export type StackedBarSegment = {
+type StackedBarSegment = {
   segment: string;
   value: number;
   label: string;

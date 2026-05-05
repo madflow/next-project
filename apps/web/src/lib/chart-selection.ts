@@ -13,7 +13,7 @@ import { extractVariableStats, isSplitVariableStats } from "./analysis-bridge";
  * 4. When to show unsupported chart placeholder
  */
 
-export interface ChartSelectionCriteria {
+interface ChartSelectionCriteria {
   /** The dataset variable being analyzed */
   variable: DatasetVariable;
   /** The stats response data */
@@ -26,7 +26,7 @@ export interface ChartSelectionCriteria {
   isMultiResponseIndividual?: boolean;
 }
 
-export interface ChartSelectionResult {
+interface ChartSelectionResult {
   /** Available chart types for this variable/data combination */
   availableChartTypes: AnalysisChartType[];
   /** The recommended default chart type */

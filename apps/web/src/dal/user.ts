@@ -55,12 +55,8 @@ export const userContextSchema = z.object({
   organizations: z.array(organizationSchema),
 });
 
-// Type exports
-export type Dataset = z.infer<typeof datasetSchema>;
-export type Project = z.infer<typeof projectSchema>;
-export type Organization = z.infer<typeof organizationSchema>;
-export type UserDetails = z.infer<typeof userDetailsSchema>;
-export type UserContext = z.infer<typeof userContextSchema>;
+type UserDetails = z.infer<typeof userDetailsSchema>;
+type UserContext = z.infer<typeof userContextSchema>;
 
 export const getUserWithContext = async (): Promise<
   { success: true; data: UserContext } | { success: false; error: z.ZodError }
