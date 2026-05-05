@@ -20,7 +20,7 @@ type ParsedSetSelection = {
 
 export type ParsedAdhocUrlSelection = ParsedVariableSelection | ParsedSetSelection;
 
-export type ParsedAdhocUrlState = {
+type ParsedAdhocUrlState = {
   selectedDataset: string | null;
   selection: ParsedAdhocUrlSelection | null;
   hasKnownState: boolean;

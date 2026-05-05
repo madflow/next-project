@@ -1,4 +1,4 @@
-export type RawDataVariableResponse = {
+type RawDataVariableResponse = {
   values: string[];
   total_count: number;
   non_empty_count: number;
@@ -8,14 +8,14 @@ export type RawDataVariableResponse = {
   error?: string;
 };
 
-export type RawDataResponse = {
+type RawDataResponse = {
   status: string;
   message: string;
   dataset_id: string;
   data: Record<string, RawDataVariableResponse>;
 };
 
-export type RawDataOptions = {
+type RawDataOptions = {
   excludeEmpty?: boolean;
   maxValues?: number;
   page?: number;

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
-export type InfoStatusCode = 100 | 101 | 102 | 103;
-export type SuccessStatusCode = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 226;
-export type DeprecatedStatusCode = 305 | 306;
-export type RedirectStatusCode = 300 | 301 | 302 | 303 | 304 | DeprecatedStatusCode | 307 | 308;
-export type ClientErrorStatusCode =
+type InfoStatusCode = 100 | 101 | 102 | 103;
+type SuccessStatusCode = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 226;
+type DeprecatedStatusCode = 305 | 306;
+type RedirectStatusCode = 300 | 301 | 302 | 303 | 304 | DeprecatedStatusCode | 307 | 308;
+type ClientErrorStatusCode =
   | 400
   | 401
   | 402
@@ -36,17 +36,17 @@ export type ClientErrorStatusCode =
   | 429
   | 431
   | 451;
-export type ServerErrorStatusCode = 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 508 | 510 | 511;
+type ServerErrorStatusCode = 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 508 | 510 | 511;
 
-export type StatusCode =
+type StatusCode =
   | InfoStatusCode
   | SuccessStatusCode
   | RedirectStatusCode
   | ClientErrorStatusCode
   | ServerErrorStatusCode;
 
-export type ContentlessStatusCode = 101 | 204 | 205 | 304;
-export type ContentfulStatusCode = Exclude<StatusCode, ContentlessStatusCode>;
+type ContentlessStatusCode = 101 | 204 | 205 | 304;
+type ContentfulStatusCode = Exclude<StatusCode, ContentlessStatusCode>;
 
 export const statusCodeToReasonPhrase: Record<StatusCode, string> = {
   100: "Continue",

@@ -83,16 +83,16 @@ type MetricsChartSpec = {
   metrics: ExportMetric[];
 };
 
-export type AdhocPowerPointChartSpec =
+type AdhocPowerPointChartSpec =
   | DistributionChartSpec
   | HorizontalStackedBarChartSpec
   | PieChartSpec
   | MeanBarChartSpec
   | MetricsChartSpec;
 
-export type AdhocExcelChartSpec = AdhocPowerPointChartSpec;
+type AdhocExcelChartSpec = AdhocPowerPointChartSpec;
 
-export type AdhocPowerPointExportPayload = {
+type AdhocPowerPointExportPayload = {
   file_name: string;
   title: string;
   meta_line: string;
@@ -100,7 +100,7 @@ export type AdhocPowerPointExportPayload = {
   chart: AdhocPowerPointChartSpec;
 };
 
-export type AdhocExcelExportPayload = {
+type AdhocExcelExportPayload = {
   file_name: string;
   title: string;
   meta_line: string;

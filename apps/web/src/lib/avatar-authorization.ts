@@ -1,4 +1,4 @@
-export type AvatarDeletionAuthorizationParams = {
+type AvatarDeletionAuthorizationParams = {
   sessionUserId: string;
   targetUserId: string;
   isAdmin: boolean;

@@ -1,13 +1,13 @@
 import { type ChartConfig } from "@/components/ui/chart";
 import type { RechartsStackedBarDataItem, SplitVariableStackedBarDataItem } from "@/lib/analysis-bridge";
 
-export type HorizontalStackedBarSegment = {
+type HorizontalStackedBarSegment = {
   key: string;
   label: string;
   color: string;
 };
 
-export type HorizontalStackedBarChartRow = {
+type HorizontalStackedBarChartRow = {
   label: string;
   [key: string]: string | number;
 };
