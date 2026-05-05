@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import { z } from "zod";
 import { adminClient, adminPool } from "@repo/database/clients";
 import {
   account,
@@ -12,6 +13,7 @@ import {
   datasetSplitVariable,
   datasetVariable,
   datasetVariableset,
+  datasetVariablesetAttributes,
   datasetVariablesetContent,
   invitation,
   member,
@@ -20,6 +22,7 @@ import {
   rateLimit,
   session,
   user,
+  variablesetContentAttributes,
 } from "@repo/database/schema";
 import { createDataset as createDatasetService } from "@/lib/dataset-service";
 import { deleteDataset } from "@/lib/storage";
@@ -48,8 +51,58 @@ const PROJECT_TEST_4_UID = "0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59";
 
 const DATASET_TEST_UID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
 const DATASET_TEST_2_UID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
-const VARIABLESET_MEDIENNUTZUNG_UID = "0198e639-3e96-734b-b0db-af0c4350a2d1";
-const VARIABLESET_INFORMATIONSQUELLEN_UID = "0198e639-3e96-734b-b0db-af0c4350a2d2";
+
+const datasetVariablesetCategorySchema = z.enum(["general", "multi_response"]);
+
+const datasetVariablesetFixtureContentSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("variable"),
+    variable: z.string().min(1),
+    attributes: variablesetContentAttributes.optional(),
+  }),
+  z.object({
+    type: z.literal("subset"),
+    subsetId: z.string().uuid(),
+  }),
+]);
+
+const datasetVariablesetFixtureSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  parentId: z.string().uuid().optional(),
+  category: datasetVariablesetCategorySchema.optional(),
+  attributes: datasetVariablesetAttributes.optional(),
+  contents: z.array(datasetVariablesetFixtureContentSchema),
+});
+
+const datasetSeedFixtureSchema = z.object({
+  variableSets: z.array(datasetVariablesetFixtureSchema),
+  splitVariables: z.array(z.string().min(1)),
+});
+
+type DatasetSeedFixture = z.infer<typeof datasetSeedFixtureSchema>;
+type ResolvedDatasetVariablesetFixture = z.infer<typeof datasetVariablesetFixtureSchema> & {
+  resolvedId: string;
+};
+type DatasetVariablesetContentInsert = typeof datasetVariablesetContent.$inferInsert;
+
+const DEFAULT_VARIABLESET_CONTENT_ATTRIBUTES = {
+  allowedStatistics: {
+    distribution: true,
+    mean: false,
+  },
+};
+
+function getFixturePath(fileName: string) {
+  return join(__dirname, "./fixtures/", fileName);
+}
+
+async function readDatasetSeedFixture(fixtureFile: string): Promise<DatasetSeedFixture> {
+  const fixtureContent = await readFile(getFixturePath(fixtureFile), { encoding: "utf8" });
+
+  return datasetSeedFixtureSchema.parse(JSON.parse(fixtureContent));
+}
 
 interface CreateUserParams {
   id: string;
@@ -158,7 +211,7 @@ async function createDataset(
   datasetFile: string,
   description?: string
 ) {
-  const datasetBuffer = await readFile(join(__dirname, "./fixtures/", datasetFile));
+  const datasetBuffer = await readFile(getFixturePath(datasetFile));
   const file = new File([new Uint8Array(datasetBuffer)], datasetFile);
   const contentType = "application/octet-stream";
 
@@ -182,7 +235,7 @@ async function createDataset(
   });
 }
 
-async function createDatasetVariableSets(datasetId: string) {
+async function createDatasetVariableSets(datasetId: string, fixtureFile: string) {
   console.log(`Creating variable sets for dataset: ${datasetId}`);
 
   // Fetch existing variables for the dataset
@@ -195,196 +248,104 @@ async function createDatasetVariableSets(datasetId: string) {
 
   console.log(`Found ${variables.length} variables`);
 
-  // Create a map of variable names to IDs for easy lookup
-  // eslint-disable-next-line
-  const variableMap = new Map(variables.map((v: any) => [v.name, v.id]));
+  const variableMap = new Map(variables.map((variable) => [variable.name, variable.id]));
+  const fixture = await readDatasetSeedFixture(fixtureFile);
+  const resolvedVariableSets: ResolvedDatasetVariablesetFixture[] = [];
 
-  // Define news variables once for reuse
-  const newsVariables = ["news1", "news2", "news3", "news4", "news5"];
-
-  // Define variable sets with their variables
-  // Note: "Mediennutzung" and "Informationsquellen" are handled separately below
-  // to establish a parent-child relationship with fixed UUIDs
-  const variableSets = [
-    {
-      name: "Demografische Daten",
-      description: "Grundlegende demografische Informationen der Befragten",
-      variables: ["id", "age", "agecat", "sex", "marital", "childs", "childcat"],
-    },
-    {
-      name: "Bildung und Beruf",
-      description: "Bildungsstand und berufliche Situation",
-      variables: ["educ", "degree", "wrkstat", "paeduc", "maeduc", "speduc", "howpaid"],
-    },
-    {
-      name: "Einkommen",
-      description: "Einkommensinformationen",
-      variables: ["income", "rincome"],
-    },
-    {
-      name: "Herkunft",
-      description: "Herkunft und ethnischer Hintergrund",
-      variables: ["race", "born", "parborn", "granborn", "ethnic", "eth1", "eth2", "eth3"],
-    },
-    {
-      name: "Politische Einstellungen",
-      description: "Politische Ansichten und Meinungen",
-      variables: ["polviews", "cappun"],
-    },
-    {
-      name: "Vertrauen in Institutionen",
-      description: "Vertrauen in verschiedene gesellschaftliche Institutionen",
-      variables: ["confinan", "conbus", "coneduc", "conpress", "conmedic", "contv"],
-    },
-    {
-      name: "Lebensstil",
-      description: "Lebensstil und persönliche Einstellungen",
-      variables: ["happy", "hapmar", "postlife", "owngun"],
-    },
-    {
-      name: "Fahrzeuge",
-      description: "Fahrzeugbesitz und Präferenzen",
-      variables: ["car1", "car2", "car3"],
-    },
-  ];
-
-  // Create variable sets
-  for (let i = 0; i < variableSets.length; i++) {
-    const variableSet = variableSets[i];
+  // Insert all variable sets before adding contents so subset references can target any later fixture entry.
+  for (let i = 0; i < fixture.variableSets.length; i++) {
+    const variableSet = fixture.variableSets[i];
     if (!variableSet) continue;
 
-    // Create the variable set
     const createdVariableSet = await adminClient
       .insert(datasetVariableset)
       .values({
+        ...(variableSet.id ? { id: variableSet.id } : {}),
+        ...(variableSet.description ? { description: variableSet.description } : {}),
+        ...(variableSet.category ? { category: variableSet.category } : {}),
+        ...(variableSet.attributes ? { attributes: variableSet.attributes } : {}),
         name: variableSet.name,
-        description: variableSet.description,
         datasetId: datasetId,
         orderIndex: i,
       })
-      .returning();
+      .returning({ id: datasetVariableset.id });
 
     const variableSetId = createdVariableSet[0]?.id;
     if (!variableSetId) {
-      console.error(`Failed to create variable set: ${variableSet.name}`);
+      throw new Error(`Failed to create variable set: ${variableSet.name}`);
+    }
+
+    resolvedVariableSets.push({ ...variableSet, resolvedId: variableSetId });
+    console.log(`Created variable set: ${variableSet.name}`);
+  }
+
+  const resolvedVariableSetIds = new Set(resolvedVariableSets.map((variableSet) => variableSet.resolvedId));
+
+  for (const variableSet of resolvedVariableSets) {
+    if (!variableSet.parentId) {
       continue;
     }
 
-    console.log(`Created variable set: ${variableSet.name}`);
+    if (!resolvedVariableSetIds.has(variableSet.parentId)) {
+      throw new Error(`Parent variable set not found for ${variableSet.name}: ${variableSet.parentId}`);
+    }
 
-    // Add variables to the set
-    const variableSetContents = [];
-    for (let j = 0; j < variableSet.variables.length; j++) {
-      const variableName = variableSet.variables[j];
-      if (!variableName) continue;
+    await adminClient
+      .update(datasetVariableset)
+      .set({ parentId: variableSet.parentId })
+      .where(eq(datasetVariableset.id, variableSet.resolvedId));
+  }
 
-      const variableId = variableMap.get(variableName);
+  for (const variableSet of resolvedVariableSets) {
+    const variableSetContents: DatasetVariablesetContentInsert[] = [];
+    let variableCount = 0;
+    let subsetCount = 0;
 
-      if (variableId) {
+    for (let j = 0; j < variableSet.contents.length; j++) {
+      const content = variableSet.contents[j];
+      if (!content) continue;
+
+      if (content.type === "variable") {
+        const variableId = variableMap.get(content.variable);
+
+        if (!variableId) {
+          console.warn(`Variable not found: ${content.variable}`);
+          continue;
+        }
+
         variableSetContents.push({
-          variablesetId: variableSetId,
-          variableId: variableId,
-          contentType: "variable" as const,
+          variablesetId: variableSet.resolvedId,
+          variableId,
+          contentType: "variable",
           position: j * 100,
-          attributes: { allowedStatistics: { distribution: true, mean: false } },
+          attributes: content.attributes ?? DEFAULT_VARIABLESET_CONTENT_ATTRIBUTES,
         });
-      } else {
-        console.warn(`Variable not found: ${variableName}`);
+        variableCount += 1;
+        continue;
       }
-    }
 
-    if (variableSetContents.length > 0) {
-      await adminClient.insert(datasetVariablesetContent).values(variableSetContents);
-      console.log(`Added ${variableSetContents.length} variables to ${variableSet.name}`);
-    }
-  }
+      if (!resolvedVariableSetIds.has(content.subsetId)) {
+        throw new Error(`Subset variable set not found for ${variableSet.name}: ${content.subsetId}`);
+      }
 
-  // Create "Mediennutzung" with a fixed UUID — must be inserted before "Informationsquellen"
-  // because Informationsquellen has a parentId FK referencing Mediennutzung
-  await adminClient.insert(datasetVariableset).values({
-    id: VARIABLESET_MEDIENNUTZUNG_UID,
-    name: "Mediennutzung",
-    description: "Medienkonsum und Informationsquellen",
-    datasetId: datasetId,
-    orderIndex: variableSets.length,
-  });
-  console.log("Created variable set: Mediennutzung");
-
-  // Create "Informationsquellen" with a fixed UUID as a child of "Mediennutzung"
-  await adminClient.insert(datasetVariableset).values({
-    id: VARIABLESET_INFORMATIONSQUELLEN_UID,
-    name: "Informationsquellen",
-    description: "Informationsquellen für Nachrichten",
-    datasetId: datasetId,
-    orderIndex: variableSets.length + 1,
-    category: "multi_response",
-    parentId: VARIABLESET_MEDIENNUTZUNG_UID,
-  });
-  console.log("Created variable set: Informationsquellen");
-
-  // Add variables to "Informationsquellen"
-  const informationsquellenVariables = [...newsVariables].reverse();
-  const informationsquellenContents = [];
-  for (let j = 0; j < informationsquellenVariables.length; j++) {
-    const variableName = informationsquellenVariables[j];
-    if (!variableName) continue;
-    const variableId = variableMap.get(variableName);
-    if (variableId) {
-      informationsquellenContents.push({
-        variablesetId: VARIABLESET_INFORMATIONSQUELLEN_UID,
-        variableId: variableId,
-        contentType: "variable" as const,
+      variableSetContents.push({
+        variablesetId: variableSet.resolvedId,
+        subsetId: content.subsetId,
+        contentType: "subset",
         position: j * 100,
-        attributes: { allowedStatistics: { distribution: true, mean: false } },
       });
-    } else {
-      console.warn(`Variable not found: ${variableName}`);
+      subsetCount += 1;
     }
-  }
-  if (informationsquellenContents.length > 0) {
-    await adminClient.insert(datasetVariablesetContent).values(informationsquellenContents);
-    console.log(`Added ${informationsquellenContents.length} variables to Informationsquellen`);
+
+    if (variableSetContents.length === 0) {
+      continue;
+    }
+
+    await adminClient.insert(datasetVariablesetContent).values(variableSetContents);
+    console.log(`Added ${variableCount} variables and ${subsetCount} subsets to ${variableSet.name}`);
   }
 
-  // Add variables to "Mediennutzung" and link "Informationsquellen" as a subset content entry
-  const mediennutzungVariableNames = ["news", "tvhours"];
-  const mediennutzungContents: Array<{
-    variablesetId: string;
-    contentType: "variable" | "subset";
-    position: number;
-    variableId?: string;
-    subsetId?: string;
-    attributes?: { allowedStatistics: { distribution: boolean; mean: boolean } };
-  }> = [];
-  for (let j = 0; j < mediennutzungVariableNames.length; j++) {
-    const variableName = mediennutzungVariableNames[j];
-    if (!variableName) continue;
-    const variableId = variableMap.get(variableName);
-    if (variableId) {
-      mediennutzungContents.push({
-        variablesetId: VARIABLESET_MEDIENNUTZUNG_UID,
-        variableId: variableId,
-        contentType: "variable",
-        position: j * 100,
-        attributes: { allowedStatistics: { distribution: true, mean: false } },
-      });
-    } else {
-      console.warn(`Variable not found: ${variableName}`);
-    }
-  }
-  // Add "Informationsquellen" as a subset content entry at the end
-  mediennutzungContents.push({
-    variablesetId: VARIABLESET_MEDIENNUTZUNG_UID,
-    subsetId: VARIABLESET_INFORMATIONSQUELLEN_UID,
-    contentType: "subset",
-    position: 200,
-  });
-  await adminClient.insert(datasetVariablesetContent).values(mediennutzungContents);
-  console.log(`Added ${mediennutzungContents.length - 1} variables and 1 subset to Mediennutzung`);
-
-  // Create split variables for agecat, marital, and sex
-  const splitVariableNames = ["agecat", "marital", "sex"];
-  for (const variableName of splitVariableNames) {
+  for (const variableName of fixture.splitVariables) {
     const variableId = variableMap.get(variableName);
     if (variableId) {
       await adminClient.insert(datasetSplitVariable).values({
@@ -619,8 +580,10 @@ try {
     "Diese Datei enthält Umfragedaten, einschließlich demografischer Daten und verschiedener Einstellungsmessungen."
   );
 
+  await createDatasetVariableSets(DATASET_TEST_UID, "demo.json");
+
   // Create variable sets for the SPSS Beispielumfrage dataset
-  await createDatasetVariableSets(DATASET_TEST_2_UID);
+  await createDatasetVariableSets(DATASET_TEST_2_UID, "survey_sample_de.json");
 
   await adminPool.end();
 

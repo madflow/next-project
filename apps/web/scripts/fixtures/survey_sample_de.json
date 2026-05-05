@@ -1,0 +1,116 @@
+{
+  "variableSets": [
+    {
+      "name": "Demografische Daten",
+      "description": "Grundlegende demografische Informationen der Befragten",
+      "contents": [
+        { "type": "variable", "variable": "id" },
+        { "type": "variable", "variable": "age" },
+        { "type": "variable", "variable": "agecat" },
+        { "type": "variable", "variable": "sex" },
+        { "type": "variable", "variable": "marital" },
+        { "type": "variable", "variable": "childs" },
+        { "type": "variable", "variable": "childcat" }
+      ]
+    },
+    {
+      "name": "Bildung und Beruf",
+      "description": "Bildungsstand und berufliche Situation",
+      "contents": [
+        { "type": "variable", "variable": "educ" },
+        { "type": "variable", "variable": "degree" },
+        { "type": "variable", "variable": "wrkstat" },
+        { "type": "variable", "variable": "paeduc" },
+        { "type": "variable", "variable": "maeduc" },
+        { "type": "variable", "variable": "speduc" },
+        { "type": "variable", "variable": "howpaid" }
+      ]
+    },
+    {
+      "name": "Einkommen",
+      "description": "Einkommensinformationen",
+      "contents": [
+        { "type": "variable", "variable": "income" },
+        { "type": "variable", "variable": "rincome" }
+      ]
+    },
+    {
+      "name": "Herkunft",
+      "description": "Herkunft und ethnischer Hintergrund",
+      "contents": [
+        { "type": "variable", "variable": "race" },
+        { "type": "variable", "variable": "born" },
+        { "type": "variable", "variable": "parborn" },
+        { "type": "variable", "variable": "granborn" },
+        { "type": "variable", "variable": "ethnic" },
+        { "type": "variable", "variable": "eth1" },
+        { "type": "variable", "variable": "eth2" },
+        { "type": "variable", "variable": "eth3" }
+      ]
+    },
+    {
+      "name": "Politische Einstellungen",
+      "description": "Politische Ansichten und Meinungen",
+      "contents": [
+        { "type": "variable", "variable": "polviews" },
+        { "type": "variable", "variable": "cappun" }
+      ]
+    },
+    {
+      "name": "Vertrauen in Institutionen",
+      "description": "Vertrauen in verschiedene gesellschaftliche Institutionen",
+      "contents": [
+        { "type": "variable", "variable": "confinan" },
+        { "type": "variable", "variable": "conbus" },
+        { "type": "variable", "variable": "coneduc" },
+        { "type": "variable", "variable": "conpress" },
+        { "type": "variable", "variable": "conmedic" },
+        { "type": "variable", "variable": "contv" }
+      ]
+    },
+    {
+      "name": "Lebensstil",
+      "description": "Lebensstil und persönliche Einstellungen",
+      "contents": [
+        { "type": "variable", "variable": "happy" },
+        { "type": "variable", "variable": "hapmar" },
+        { "type": "variable", "variable": "postlife" },
+        { "type": "variable", "variable": "owngun" }
+      ]
+    },
+    {
+      "name": "Fahrzeuge",
+      "description": "Fahrzeugbesitz und Präferenzen",
+      "contents": [
+        { "type": "variable", "variable": "car1" },
+        { "type": "variable", "variable": "car2" },
+        { "type": "variable", "variable": "car3" }
+      ]
+    },
+    {
+      "id": "0198e639-3e96-734b-b0db-af0c4350a2d1",
+      "name": "Mediennutzung",
+      "description": "Medienkonsum und Informationsquellen",
+      "contents": [
+        { "type": "variable", "variable": "news" },
+        { "type": "variable", "variable": "tvhours" },
+        { "type": "subset", "subsetId": "0198e639-3e96-734b-b0db-af0c4350a2d2" }
+      ]
+    },
+    {
+      "id": "0198e639-3e96-734b-b0db-af0c4350a2d2",
+      "name": "Informationsquellen",
+      "description": "Informationsquellen für Nachrichten",
+      "parentId": "0198e639-3e96-734b-b0db-af0c4350a2d1",
+      "category": "multi_response",
+      "contents": [
+        { "type": "variable", "variable": "news5" },
+        { "type": "variable", "variable": "news4" },
+        { "type": "variable", "variable": "news3" },
+        { "type": "variable", "variable": "news2" },
+        { "type": "variable", "variable": "news1" }
+      ]
+    }
+  ],
+  "splitVariables": ["agecat", "marital", "sex"]
+}
