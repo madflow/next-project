@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
 import surveyResults from "../analysis/fixtures/survey_sample_de_descriptives.json";
+import surveyFrequencies from "../analysis/fixtures/survey_sample_de_frequencies.json";
 
 const DATASET_TEST_ID = testIds.datasets.withVariablesets;
 
@@ -16,6 +17,55 @@ interface VariableStats {
     min: number;
     std: number;
   };
+}
+
+type SplitVariableStats = {
+  split_variable: string;
+  categories: Record<string, { count: number }>;
+  split_variable_labels?: Record<string, string>;
+};
+
+type StatsResponseItem = {
+  variable: string;
+  stats: VariableStats["stats"] | SplitVariableStats;
+  error?: string;
+};
+
+type FrequencyExpectation = {
+  value: string;
+  counts: number;
+};
+
+function getSplitStats(data: StatsResponseItem[], variable: string): SplitVariableStats {
+  const stat = data.find((item) => item.variable === variable);
+  expect(stat).toBeDefined();
+  expect(stat?.error).toBeUndefined();
+
+  const stats = stat!.stats;
+  if (!("split_variable" in stats) || !("categories" in stats)) {
+    throw new Error(`Expected split statistics for variable ${variable}`);
+  }
+
+  return stats;
+}
+
+function expectSplitCategoryCounts(stats: SplitVariableStats, expectedFrequencies: FrequencyExpectation[]) {
+  expect(Object.keys(stats.categories)).toEqual(expectedFrequencies.map((item) => item.value));
+
+  for (const expectedCategory of expectedFrequencies) {
+    expect(stats.categories[expectedCategory.value]?.count).toBe(expectedCategory.counts);
+  }
+
+  const totalCount = Object.values(stats.categories).reduce((sum, category) => sum + category.count, 0);
+  expect(totalCount).toBe(expectedFrequencies.reduce((sum, category) => sum + category.counts, 0));
+}
+
+function expectSplitLabelsForCategories(stats: SplitVariableStats, expectedFrequencies: FrequencyExpectation[]) {
+  const labels = stats.split_variable_labels ?? {};
+
+  for (const expectedCategory of expectedFrequencies) {
+    expect(labels[expectedCategory.value]).toBeDefined();
+  }
 }
 
 test.describe("API Stats Endpoint @api", () => {
@@ -271,6 +321,53 @@ test.describe("API Stats Endpoint @api", () => {
       expect(wrkstatStats.stats.count).toBe(expectedWrkstat!.valid);
       expect(maritalStats.stats.count).toBe(expectedMarital!.valid);
       expect(childsStats.stats.count).toBe(expectedChilds!.valid);
+    });
+  });
+
+  test.describe("Split Variable Statistics", () => {
+    test("returns split statistics when split_variable is provided per variable", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+      const response = await page.request.post(`/api/datasets/${DATASET_TEST_ID}/stats`, {
+        data: JSON.stringify({
+          variables: [{ variable: "id", split_variable: "marital" }],
+          decimal_places: 3,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(response.status()).toBe(200);
+      const data = (await response.json()) as StatsResponseItem[];
+
+      const idStats = getSplitStats(data, "id");
+      expect(idStats.split_variable).toBe("marital");
+
+      expectSplitCategoryCounts(idStats, surveyFrequencies.marital.frequency_table);
+      expectSplitLabelsForCategories(idStats, surveyFrequencies.marital.frequency_table);
+    });
+
+    test("falls back to the global split_variable request field", async ({ page }) => {
+      await page.goto("/");
+      await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+      const response = await page.request.post(`/api/datasets/${DATASET_TEST_ID}/stats`, {
+        data: JSON.stringify({
+          variables: [{ variable: "id" }],
+          split_variable: "sex",
+          decimal_places: 3,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(response.status()).toBe(200);
+      const data = (await response.json()) as StatsResponseItem[];
+
+      const idStats = getSplitStats(data, "id");
+      expect(idStats.split_variable).toBe("sex");
+
+      expectSplitCategoryCounts(idStats, surveyFrequencies.sex.frequency_table);
+      expectSplitLabelsForCategories(idStats, surveyFrequencies.sex.frequency_table);
     });
   });
 
