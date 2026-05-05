@@ -1,5 +1,6 @@
 import "server-only";
 import { headers } from "next/headers";
+import { hasAccess } from "@/dal/dataset";
 import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 
@@ -41,6 +42,24 @@ export function withAdminAuth<TArgs extends unknown[], TReturn>(fn: (...args: TA
 export function withAuth<TArgs extends unknown[], TReturn>(fn: (...args: TArgs) => Promise<TReturn>) {
   return async (...args: TArgs): Promise<TReturn> => {
     await getSessionOrThrow();
+    return fn(...args);
+  };
+}
+
+export function withDatasetAccess<TArgs extends [datasetId: string, ...unknown[]], TReturn>(
+  fn: (...args: TArgs) => Promise<TReturn>
+) {
+  return async (...args: TArgs): Promise<TReturn> => {
+    const session = await getSessionOrThrow();
+    const [datasetId] = args;
+
+    if (session.user.role !== USER_ADMIN_ROLE) {
+      const canAccess = await hasAccess(datasetId);
+      if (!canAccess) {
+        throw new ServerActionNotAuthorizedException("You do not have access to this dataset");
+      }
+    }
+
     return fn(...args);
   };
 }

@@ -64,3 +64,57 @@ export async function deleteDataset(storageKey: string) {
 
   await getS3Client().send(new DeleteObjectCommand(deleteParams));
 }
+
+type PutDatasetMetadataFileParams = {
+  buffer: Buffer;
+  contentType: string;
+  datasetId: string;
+  extension: string;
+  originalFilename: string;
+  organizationId: string;
+  userId: string;
+  fileHash: string;
+};
+
+export async function putDatasetMetadataFile({
+  buffer,
+  contentType,
+  datasetId,
+  extension,
+  originalFilename,
+  organizationId,
+  userId,
+  fileHash,
+}: PutDatasetMetadataFileParams) {
+  const safeExtension = extension.toLowerCase();
+  const fileKey = `${randomUUID()}.${safeExtension}`;
+  const s3Key = `datasets/${datasetId}/metadata/${fileKey}`;
+
+  await getS3Client().send(
+    new PutObjectCommand({
+      Bucket: env.S3_BUCKET_NAME,
+      Key: s3Key,
+      Body: buffer,
+      ContentType: contentType,
+      Metadata: {
+        "original-filename": originalFilename,
+        "uploaded-by": userId,
+        "dataset-id": datasetId,
+        "organization-id": organizationId,
+        "content-type": contentType,
+        "file-hash": fileHash,
+      },
+    })
+  );
+
+  return { s3Key };
+}
+
+export async function deleteDatasetMetadataFile(storageKey: string) {
+  await getS3Client().send(
+    new DeleteObjectCommand({
+      Bucket: env.S3_BUCKET_NAME,
+      Key: storageKey,
+    })
+  );
+}

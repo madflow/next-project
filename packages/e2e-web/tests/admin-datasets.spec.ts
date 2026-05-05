@@ -30,6 +30,43 @@ test.describe("Admin Datasets", () => {
     await page.getByRole("button", { name: "Add to project" }).click();
   });
 
+  test("should upload and delete a metadata file from the dataset editor", async ({ page }) => {
+    const datasetName = `Metadata Dataset ${Date.now().toLocaleString()}`;
+
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    await page.getByTestId("admin.datasets.create.upload").click();
+    const uploadFile = page.getByTestId("file-upload-input").locator('input[type="file"]');
+    await uploadFile.setInputFiles("testdata/spss/demo.sav");
+    await page.getByTestId("app.admin.dataset.selected-file").waitFor({ timeout: 5000 });
+    await page.getByTestId("app.admin.dataset.name-input").fill(datasetName);
+    await page.getByTestId("app.admin.dataset.organization-trigger").click();
+    await page.getByTestId("org-option-test-organization").click();
+    await page.getByTestId("app.admin.dataset.upload-button").click();
+
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+    await page.getByTestId("app.datatable.search-input").fill(datasetName);
+    await page.getByRole("link", { name: datasetName }).click();
+
+    await page.getByTestId("app.admin.editor.metadata.tab").click();
+    const metadataUpload = page.getByTestId("admin.dataset.metadata-file.upload.input").locator('input[type="file"]');
+    await metadataUpload.setInputFiles("testdata/avatar.png");
+    await page.getByTestId("admin.dataset.metadata-file.selected-file").waitFor({ timeout: 5000 });
+    await page.getByTestId("admin.dataset.metadata-file.name-input").fill("Questionnaire image");
+    await page.getByTestId("admin.dataset.metadata-file.upload.submit").click();
+
+    const row = page.locator('[data-testid^="admin.dataset.metadata-file.row."]').first();
+    await expect(row).toBeVisible();
+    await expect(row).toContainText("Questionnaire image");
+
+    await row.locator('[data-testid^="admin.dataset.metadata-file.delete."]').click();
+    await page.locator('[data-testid^="admin.dataset.metadata-file.delete-confirm."]').click();
+    await expect(page.locator('[data-testid^="admin.dataset.metadata-file.row."]')).toHaveCount(0);
+  });
+
   test("should display organization column in datasets grid", async ({ page }) => {
     await page.goto("/");
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
