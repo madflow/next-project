@@ -1,6 +1,7 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import {
+  datasetMetadataFile,
   datasetProject,
   dataset as entity,
   member,
@@ -11,7 +12,10 @@ import {
 import { getAuthenticatedClient, getSessionUser, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { createListWithJoins } from "@/dal/dal-joins";
 import { DalException, DalNotAuthorizedException } from "@/lib/exception";
-import { deleteDataset as s3DeleteDataset } from "@/lib/storage";
+import {
+  deleteDataset as s3DeleteDataset,
+  deleteDatasetMetadataFile as s3DeleteDatasetMetadataFile,
+} from "@/lib/storage";
 
 const findFn = async (id: string) => {
   const db = await getAuthenticatedClient();
@@ -53,9 +57,18 @@ export const deleteDataset = withAdminCheck(async (datasetId: string) => {
   }
 
   try {
+    const metadataFiles = await db
+      .select()
+      .from(datasetMetadataFile)
+      .where(eq(datasetMetadataFile.datasetId, datasetId));
+
     // Delete the file from S3 if it exists
     if (dataset.storageKey) {
       await s3DeleteDataset(dataset.storageKey);
+    }
+
+    for (const metadataFileEntry of metadataFiles) {
+      await s3DeleteDatasetMetadataFile(metadataFileEntry.storageKey);
     }
 
     // Delete from database
@@ -97,3 +110,5 @@ async function hasAccess(datasetId: string) {
     .where(and(eq(member.userId, user.id), eq(entity.id, datasetId)));
   return rows.length > 0;
 }
+
+export { hasAccess };

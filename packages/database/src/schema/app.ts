@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
-import { organization } from "./auth.js";
+import { organization, user } from "./auth.js";
 
 export const project = pgTable(
   "projects",
@@ -75,6 +75,55 @@ export const updateDatasetSchema = createUpdateSchema(dataset);
 export type CreateDatasetData = z.infer<typeof insertDatasetSchema>;
 export type Dataset = z.infer<typeof selectDatasetSchema>;
 export type UpdateDatasetData = z.infer<typeof updateDatasetSchema>;
+
+export const datasetMetadataFileTypeEnum = pgEnum("dataset_metadata_file_type", [
+  "questionnaire",
+  "variable_descriptions",
+  "documentation",
+  "other",
+] as const);
+
+export type DatasetMetadataFileType = (typeof datasetMetadataFileTypeEnum.enumValues)[number];
+
+export const datasetMetadataFile = pgTable(
+  "dataset_metadata_files",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`uuidv7()`),
+    datasetId: uuid("dataset_id")
+      .notNull()
+      .references(() => dataset.id, { onDelete: "cascade" }),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    uploadedBy: uuid("uploaded_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    fileType: text("file_type").notNull(),
+    fileSize: bigint("file_size", { mode: "number" }).notNull(),
+    fileHash: text("file_hash").notNull(),
+    storageKey: text("s3_key").notNull(),
+    metadataType: datasetMetadataFileTypeEnum("metadata_type").notNull().default("other"),
+    uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("dataset_metadata_files_dataset_id_idx").on(table.datasetId),
+    index("dataset_metadata_files_org_id_idx").on(table.organizationId),
+  ]
+);
+
+export const insertDatasetMetadataFileSchema = createInsertSchema(datasetMetadataFile);
+export const selectDatasetMetadataFileSchema = createSelectSchema(datasetMetadataFile);
+export const updateDatasetMetadataFileSchema = createUpdateSchema(datasetMetadataFile);
+
+export type CreateDatasetMetadataFileData = z.infer<typeof insertDatasetMetadataFileSchema>;
+export type DatasetMetadataFile = z.infer<typeof selectDatasetMetadataFileSchema>;
+export type UpdateDatasetMetadataFileData = z.infer<typeof updateDatasetMetadataFileSchema>;
 
 export const datasetVariableLabelSchema = z.object({
   default: z.string().min(1), // Required, non-empty

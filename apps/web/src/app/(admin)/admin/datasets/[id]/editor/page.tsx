@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { DatasetVariablesDataTable } from "@/components/admin/dataset-editor/data-table";
 import { DatasetProjects } from "@/components/admin/dataset-editor/dataset-projects";
+import { MetadataFilesTab } from "@/components/admin/dataset-editor/metadata-files-tab";
 import { SplitVariablesTab } from "@/components/admin/dataset-editor/splitvariables-tab";
 import { VariablesetTab } from "@/components/admin/dataset-editor/variableset-tab";
 import { PageLayout } from "@/components/page/page-layout";
@@ -46,6 +47,9 @@ export default async function Page({ params }: PageProps) {
           <TabsTrigger value="projects" data-testid="app.admin.editor.projects.tab">
             {t("editor.projects")}
           </TabsTrigger>
+          <TabsTrigger value="metadata" data-testid="app.admin.editor.metadata.tab">
+            {t("editor.metadata")}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="variables">
           <DatasetVariablesDataTable datasetId={id} />
@@ -58,6 +62,9 @@ export default async function Page({ params }: PageProps) {
         </TabsContent>
         <TabsContent value="projects">
           <DatasetProjects datasetId={id} organizationId={organization.id} />
+        </TabsContent>
+        <TabsContent value="metadata">
+          <MetadataFilesTab datasetId={id} />
         </TabsContent>
       </Tabs>
     </PageLayout>

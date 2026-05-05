@@ -294,6 +294,7 @@
       "title": "Edit Variable"
     },
     "editor": {
+      "metadata": "Metadata Files",
       "projects": "Projects",
       "splitvariables": "Split Variables",
       "title": "Dataset Editor for {name}",
@@ -303,6 +304,68 @@
     "error": "Error",
     "fetchProjectsError": "Failed to fetch projects.",
     "name": "Name",
+    "metadata": {
+      "deleteDialog": {
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting...",
+        "description": "Are you sure you want to delete the file {name}? This action cannot be undone.",
+        "error": "Failed to delete metadata file.",
+        "title": "Delete metadata file"
+      },
+      "description": "Upload questionnaires, variable descriptions, and supporting documentation for this dataset.",
+      "files": {
+        "columns": {
+          "actions": "Actions",
+          "name": "Name",
+          "size": "Size",
+          "type": "Type",
+          "uploadedAt": "Uploaded"
+        },
+        "description": "All metadata files linked to this dataset.",
+        "download": "Download file",
+        "emptyDescription": "Upload documentation to help users understand this dataset.",
+        "emptyTitle": "No metadata files yet",
+        "loading": "Loading metadata files...",
+        "title": "Files"
+      },
+      "messages": {
+        "deleteError": "Failed to delete metadata file.",
+        "deleteSuccess": "Metadata file deleted successfully.",
+        "fetchError": "Failed to load metadata files.",
+        "uploadError": "Failed to upload metadata file.",
+        "uploadSuccess": "Metadata file uploaded successfully."
+      },
+      "title": "Metadata Files",
+      "types": {
+        "documentation": "Documentation",
+        "other": "Other",
+        "questionnaire": "Questionnaire",
+        "variable_descriptions": "Variable descriptions"
+      },
+      "upload": {
+        "clickToUpload": "Click to upload",
+        "description": "Accepted formats: PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, WEBP, PNG, JPEG. Maximum 10 MB.",
+        "descriptionLabel": "Description",
+        "fileLabel": "File",
+        "nameLabel": "Display Name",
+        "orDragAndDrop": "or drag and drop",
+        "submit": "Upload metadata file",
+        "supportedFormats": "Supported formats: PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, WEBP, PNG, JPEG (max 10 MB)",
+        "title": "Upload",
+        "typeLabel": "Category",
+        "uploading": "Uploading..."
+      },
+      "validation": {
+        "file": {
+          "required": "Please select exactly one file",
+          "sizeLimit": "File size must be less than {size}MB"
+        },
+        "name": {
+          "required": "Name is required"
+        }
+      }
+    },
     "projects": "Projects",
     "projectsExplanation": "A dataset can be added to one or more projects.",
     "searchPlaceholder": "Search variables",

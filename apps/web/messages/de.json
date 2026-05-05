@@ -294,6 +294,7 @@
       "title": "Variable bearbeiten"
     },
     "editor": {
+      "metadata": "Metadateien",
       "projects": "Projekte",
       "splitvariables": "Split-Variablen",
       "title": "Datensatz-Editor für {name}",
@@ -303,6 +304,68 @@
     "error": "Fehler",
     "fetchProjectsError": "Fehler beim Abrufen der Projekte.",
     "name": "Name",
+    "metadata": {
+      "deleteDialog": {
+        "cancel": "Abbrechen",
+        "confirm": "Löschen",
+        "deleting": "Wird gelöscht...",
+        "description": "Möchten Sie die Datei {name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "error": "Fehler beim Löschen der Metadatendatei.",
+        "title": "Metadatendatei löschen"
+      },
+      "description": "Laden Sie Fragebögen, Variablenbeschreibungen und ergänzende Dokumentation für diesen Datensatz hoch.",
+      "files": {
+        "columns": {
+          "actions": "Aktionen",
+          "name": "Name",
+          "size": "Größe",
+          "type": "Typ",
+          "uploadedAt": "Hochgeladen"
+        },
+        "description": "Alle Metadatendateien, die mit diesem Datensatz verknüpft sind.",
+        "download": "Datei herunterladen",
+        "emptyDescription": "Laden Sie Dokumentation hoch, damit Nutzer diesen Datensatz besser verstehen.",
+        "emptyTitle": "Noch keine Metadateien",
+        "loading": "Metadateien werden geladen...",
+        "title": "Dateien"
+      },
+      "messages": {
+        "deleteError": "Fehler beim Löschen der Metadatendatei.",
+        "deleteSuccess": "Metadatendatei erfolgreich gelöscht.",
+        "fetchError": "Metadateien konnten nicht geladen werden.",
+        "uploadError": "Metadatendatei konnte nicht hochgeladen werden.",
+        "uploadSuccess": "Metadatendatei erfolgreich hochgeladen."
+      },
+      "title": "Metadateien",
+      "types": {
+        "documentation": "Dokumentation",
+        "other": "Sonstiges",
+        "questionnaire": "Fragebogen",
+        "variable_descriptions": "Variablenbeschreibungen"
+      },
+      "upload": {
+        "clickToUpload": "Zum Hochladen klicken",
+        "description": "Akzeptierte Formate: PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, WEBP, PNG, JPEG. Maximal 10 MB.",
+        "descriptionLabel": "Beschreibung",
+        "fileLabel": "Datei",
+        "nameLabel": "Anzeigename",
+        "orDragAndDrop": "oder per Drag & Drop ablegen",
+        "submit": "Metadatendatei hochladen",
+        "supportedFormats": "Unterstützte Formate: PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, WEBP, PNG, JPEG (max. 10 MB)",
+        "title": "Hochladen",
+        "typeLabel": "Kategorie",
+        "uploading": "Wird hochgeladen..."
+      },
+      "validation": {
+        "file": {
+          "required": "Bitte wählen Sie genau eine Datei aus",
+          "sizeLimit": "Die Dateigröße muss kleiner als {size} MB sein"
+        },
+        "name": {
+          "required": "Name ist erforderlich"
+        }
+      }
+    },
     "projects": "Projekte",
     "projectsExplanation": "Ein Datensatz kann einem oder mehreren Projekten hinzugefügt werden.",
     "searchPlaceholder": "Variablen durchsuchen",
