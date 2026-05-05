@@ -15,7 +15,7 @@ type UploadAvatarParams = {
   userId: string;
 };
 
-export type UploadAvatarResult = {
+type UploadAvatarResult = {
   success: boolean;
   url?: string;
   key?: string;
