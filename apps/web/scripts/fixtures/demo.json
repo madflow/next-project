@@ -1,0 +1,200 @@
+{
+  "variableSets": [
+    {
+      "name": "Household Profile",
+      "description": "Demographic and household composition variables",
+      "contents": [
+        {
+          "type": "variable",
+          "variable": "age",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": true } }
+        },
+        {
+          "type": "variable",
+          "variable": "gender",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "marital",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "address",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": true } }
+        },
+        {
+          "type": "variable",
+          "variable": "reside",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": true } }
+        }
+      ]
+    },
+    {
+      "name": "Education and Employment",
+      "description": "Education, employment tenure, retirement, and job satisfaction",
+      "contents": [
+        {
+          "type": "variable",
+          "variable": "ed",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "employ",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": true } }
+        },
+        {
+          "type": "variable",
+          "variable": "empcat",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "retire",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "jobsat",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        }
+      ]
+    },
+    {
+      "name": "Income and Vehicle Spending",
+      "description": "Income measures and primary vehicle price bands",
+      "contents": [
+        {
+          "type": "variable",
+          "variable": "income",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": true } }
+        },
+        {
+          "type": "variable",
+          "variable": "inccat",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "car",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": true } }
+        },
+        {
+          "type": "variable",
+          "variable": "carcat",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        }
+      ]
+    },
+    {
+      "name": "Communication Services",
+      "description": "Adoption of telecom services and calling features",
+      "category": "multi_response",
+      "attributes": {
+        "multiResponse": {
+          "type": "dichotomies",
+          "countedValue": 1
+        }
+      },
+      "contents": [
+        {
+          "type": "variable",
+          "variable": "wireless",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "multline",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "voice",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "pager",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "internet",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "callid",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "callwait",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        }
+      ]
+    },
+    {
+      "name": "Home Technology Ownership",
+      "description": "Ownership of home electronics and computing devices",
+      "category": "multi_response",
+      "attributes": {
+        "multiResponse": {
+          "type": "dichotomies",
+          "countedValue": 1
+        }
+      },
+      "contents": [
+        {
+          "type": "variable",
+          "variable": "owntv",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "ownvcr",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "owncd",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "ownpda",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "ownpc",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "ownfax",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        }
+      ]
+    },
+    {
+      "name": "Marketing Indicators",
+      "description": "Newspaper subscription and campaign response variables",
+      "contents": [
+        {
+          "type": "variable",
+          "variable": "news",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        },
+        {
+          "type": "variable",
+          "variable": "response",
+          "attributes": { "allowedStatistics": { "distribution": true, "mean": false } }
+        }
+      ]
+    }
+  ],
+  "splitVariables": ["gender", "marital", "inccat"]
+}
