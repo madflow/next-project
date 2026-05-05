@@ -46,12 +46,7 @@ export function DeleteDatasetDialog({ datasetId, datasetName, onDelete }: Delete
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          title={t("tableActions.delete")}
-          className="cursor-pointer"
-          type="button">
+        <Button variant="outline" size="icon" title={t("tableActions.delete")} className="cursor-pointer" type="button">
           <Trash className="h-4 w-4" />
           <span className="sr-only">{t("tableActions.delete")}</span>
         </Button>

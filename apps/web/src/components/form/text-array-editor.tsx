@@ -41,8 +41,7 @@ export function TextArrayEditor({ value, onChange }: TextArrayEditorProps) {
             onClick={handleAdd}
             size="icon-sm"
             variant="ghost"
-            aria-label={t("common.add")}
-          >
+            aria-label={t("common.add")}>
             <Plus className="h-4 w-4" />
           </InputGroupButton>
         </InputGroupAddon>
@@ -57,8 +56,7 @@ export function TextArrayEditor({ value, onChange }: TextArrayEditorProps) {
                 onClick={() => handleRemove(index)}
                 size="icon-sm"
                 variant="ghost"
-                aria-label={t("common.remove")}
-              >
+                aria-label={t("common.remove")}>
                 <X className="h-4 w-4" />
               </InputGroupButton>
             </InputGroupAddon>

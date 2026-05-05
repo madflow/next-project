@@ -64,7 +64,9 @@ export function DeleteDatasetVariableDialog({
       <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
-          <AlertDialogDescription>{t("deleteDialog.description", { name: datasetVariableName })}</AlertDialogDescription>
+          <AlertDialogDescription>
+            {t("deleteDialog.description", { name: datasetVariableName })}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2 sm:gap-0">
           <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end">

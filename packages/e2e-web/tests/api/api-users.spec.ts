@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import { testUsers } from "../../config";
 import { loginUser } from "../../utils";
 
-
 test.describe("API Users @api", () => {
   test.describe("Authentication", () => {
     test("denies access when not logged in", async ({ page }) => {

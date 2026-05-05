@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-
 test.describe("Locale Switcher on Login Page", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");

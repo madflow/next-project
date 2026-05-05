@@ -109,7 +109,7 @@ describe("adhoc export helpers", () => {
         scopeElement ??
         ({
           appendChild() {},
-        }) as unknown as HTMLElement,
+        } as unknown as HTMLElement),
     });
 
     assert.deepStrictEqual(result, ["#3b82f6", "#1d4ed8", "#60a5fa", "#93c5fd", "#dbeafe", "#eff6ff"]);
@@ -141,7 +141,7 @@ describe("adhoc export helpers", () => {
         scopeElement ??
         ({
           appendChild() {},
-        }) as unknown as HTMLElement,
+        } as unknown as HTMLElement),
       colorToHex: (color) => convertedColors[color] ?? null,
     });
 
@@ -169,7 +169,7 @@ describe("adhoc export helpers", () => {
         scopeElement ??
         ({
           appendChild() {},
-        }) as unknown as HTMLElement,
+        } as unknown as HTMLElement),
     });
 
     assert.deepStrictEqual(result, ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666"]);

@@ -16,14 +16,7 @@ import {
 import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const organizationThemeColorKeys = [
-  "chart-1",
-  "chart-2",
-  "chart-3",
-  "chart-4",
-  "chart-5",
-  "chart-6",
-] as const;
+export const organizationThemeColorKeys = ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6"] as const;
 
 export const organizationThemePaletteCountKeys = ["1", "2", "3", "4", "5", "6"] as const;
 
