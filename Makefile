@@ -128,13 +128,14 @@ prod-dump-in:
 seed:
 	pnpm run seed
 
-## Run all checks (tests, types, lint, translations)
+## Run all checks (tests, types, lint, translations, knip)
 .PHONY: check
 check:
 	pnpm run test
 	pnpm run check-translations
 	pnpm run check-types
 	pnpm run lint
+	pnpm run knip
 
 ## Initialize development environment
 .PHONY: dev-init

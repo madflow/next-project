@@ -44,3 +44,5 @@ jobs:
         run: pnpm run check-types
       - name: Check translations
         run: pnpm run check-translations
+      - name: Knip
+        run: pnpm run knip
