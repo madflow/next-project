@@ -136,6 +136,7 @@ check:
 	pnpm run check-types
 	pnpm run lint
 	pnpm run knip
+	pnpm run format:check
 
 ## Initialize development environment
 .PHONY: dev-init
