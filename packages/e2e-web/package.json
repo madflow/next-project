@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "dotenv": "^17.3.1",
-    "mailpit-api": "^1.7.2"
+    "mailpit-api": "^2.0.0"
   }
 }
