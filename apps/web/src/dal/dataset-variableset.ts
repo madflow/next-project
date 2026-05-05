@@ -224,8 +224,10 @@ async function getVariablesInSetFn(variablesetId: string, options: ListOptions =
 async function getUnassignedVariablesFn(datasetId: string, options: ListOptions = {}) {
   const { search } = options;
 
+  // Build where conditions — variables not in any variableset contents
   const whereConditions = [eq(datasetVariable.datasetId, datasetId), isNull(datasetVariablesetContent.variableId)];
 
+  // Add search if provided
   if (search) {
     const searchConditions = [ilike(datasetVariable.name, `%${search}%`), ilike(datasetVariable.label, `%${search}%`)];
     const searchOr = or(...searchConditions);
@@ -236,8 +238,21 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
 
   const whereCondition = whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions);
 
+  // Get variables that are not assigned to any variableset
   const query = db
-    .select()
+    .select({
+      id: datasetVariable.id,
+      name: datasetVariable.name,
+      label: datasetVariable.label,
+      type: datasetVariable.type,
+      measure: datasetVariable.measure,
+      datasetId: datasetVariable.datasetId,
+      createdAt: datasetVariable.createdAt,
+      variableLabels: datasetVariable.variableLabels,
+      valueLabels: datasetVariable.valueLabels,
+      missingValues: datasetVariable.missingValues,
+      missingRanges: datasetVariable.missingRanges,
+    })
     .from(datasetVariable)
     .leftJoin(
       datasetVariablesetContent,
@@ -258,6 +273,7 @@ async function getUnassignedVariablesFn(datasetId: string, options: ListOptions 
     offset: options.offset || 0,
   };
 }
+
 async function updateContentAttributesFn(
   variablesetId: string,
   variableId: string,
