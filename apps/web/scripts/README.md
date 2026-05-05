@@ -21,10 +21,35 @@ This document outlines the data created by the `seed.ts` script, which populates
 
 ## Datasets
 
-| Name           | Organization        | Project        | UUID                                 |
-| -------------- | ------------------- | -------------- | ------------------------------------ |
-| Test Dataset   | Test Organization   | Test Project   | 0198e639-3e96-734b-b0db-af0c4350a2c4 |
-| Test Dataset 2 | Test Organization 3 | Test Project 4 | 0198e639-3e96-734b-b0db-af0c4350a2c5 |
+| Name                | Filename             | Organization      | Project      | UUID                                 |
+| ------------------- | -------------------- | ----------------- | ------------ | ------------------------------------ |
+| Test Dataset        | demo.sav             | Test Organization | Test Project | 0198e639-3e96-734b-b0db-af0c4350a2c4 |
+| SPSS Beispielumfrage | survey_sample_de.sav | Test Organization | Test Project | 0198e639-3e96-734b-b0db-af0c4350a2c5 |
+
+## Variable Sets
+
+The `SPSS Beispielumfrage` dataset gets the following variable sets during seeding:
+
+| Name                        | Parent           | Category       | UUID                                 |
+| --------------------------- | ---------------- | -------------- | ------------------------------------ |
+| Demografische Daten         | -                | standard       | generated at seed time               |
+| Bildung und Beruf           | -                | standard       | generated at seed time               |
+| Einkommen                   | -                | standard       | generated at seed time               |
+| Herkunft                    | -                | standard       | generated at seed time               |
+| Politische Einstellungen    | -                | standard       | generated at seed time               |
+| Vertrauen in Institutionen  | -                | standard       | generated at seed time               |
+| Lebensstil                  | -                | standard       | generated at seed time               |
+| Fahrzeuge                   | -                | standard       | generated at seed time               |
+| Mediennutzung               | -                | standard       | 0198e639-3e96-734b-b0db-af0c4350a2d1 |
+| Informationsquellen         | Mediennutzung    | multi_response | 0198e639-3e96-734b-b0db-af0c4350a2d2 |
+
+## Split Variables
+
+The `SPSS Beispielumfrage` dataset also gets these split variables:
+
+- `agecat`
+- `marital`
+- `sex`
 
 ## Users and Memberships
 
@@ -39,6 +64,7 @@ This document outlines the data created by the `seed.ts` script, which populates
 | Account Multiple Orgs | accountmultipleorgs@example.com | user  | 0198e5a0-66da-7e75-9dad-25c85825821a | Admin in Test Organization, Member in Test Organization 2, Owner in Test Organization 3 |
 | Account In No Org     | account-in-no-org@example.com   | user  | 0198e5a5-3095-7924-8da5-2b8b4562f759 | No memberships                                                                          |
 | Admin In No Org       | admin-in-no-org@example.com     | admin | 0198e5a6-66eb-7351-b25b-df1a50bc53fa | No memberships                                                                          |
+| Invite Target         | invite-target@example.com       | user  | 0198e5a7-9bcd-7abc-8ef0-1234567890ab | No memberships                                                                          |
 
 ## Default Credentials
 
@@ -55,17 +81,22 @@ Please update the README.md documentation for the seed script based on the curre
 The documentation should include:
 1. All organizations with their slugs
 2. All projects with their slugs and parent organizations
-3. All users with their emails, roles, and organization memberships
-4. Any default credentials
-5. Any important notes about the seed data
+3. All datasets with their filenames, parent organizations, and projects
+4. Seeded variable sets and split variables
+5. All users with their emails, roles, and organization memberships
+6. Any default credentials
+7. Any important notes about the seed data
 
 Format the information in clear markdown tables similar to the existing documentation.
 ```
 
 ## Notes
 
-- The script first truncates all existing data in the relevant tables before creating new seed data.
+- The script first deletes all existing records in the relevant tables and removes stored dataset files before creating new seed data.
 - All users have their email verified by default.
 - The script includes users with various roles and organization memberships to test different access levels.
-- Some users are specifically created for testing specific features (profile changes, email changes, etc.).
-- The UUIDs for users, organizations, and projects are hardcoded for testing purposes.
+- Some users are specifically created for testing specific features, including profile changes, email changes, account deletion, avatars, and invitations.
+- `SPSS Beispielumfrage` is seeded into `Test Organization` and linked to `Test Project`.
+- `SPSS Beispielumfrage` receives 10 seeded variable sets, including the fixed-UUID sets `Mediennutzung` and `Informationsquellen`.
+- The split variables for `SPSS Beispielumfrage` are `agecat`, `marital`, and `sex`.
+- The UUIDs for users, organizations, projects, datasets, and the fixed variable sets are hardcoded for testing purposes.
