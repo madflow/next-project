@@ -17,7 +17,7 @@ import { env } from "@/env";
 import { defaultLocale, extractAppLocale } from "@/i18n/config";
 
 export const USER_ADMIN_ROLE = "admin";
-export const USER_ROLE = "user";
+const USER_ROLE = "user";
 
 export const auth = betterAuth({
   telemetry: { enabled: false },

@@ -14,7 +14,7 @@ export function parseCountedValue(attributes?: DatasetVariablesetAttributes | nu
  * @param value - Value to parse (can be number or string)
  * @returns Numeric value
  */
-export function parseNumericValue(value: number | string): number {
+function parseNumericValue(value: number | string): number {
   return typeof value === "number" ? value : parseFloat(value.toString());
 }
 

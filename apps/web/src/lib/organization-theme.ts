@@ -2,21 +2,13 @@ import {
   organizationThemeColorKeys,
   organizationThemeColorSchema,
   organizationThemePaletteCountKeys,
-  themeChartColorPalettesSchema,
   themeChartColorsSchema,
 } from "@repo/database/schema";
-
 import type { ThemeChartColorPalettes, ThemeChartColors, ThemeItem } from "@/types/organization";
 
-export {
-  organizationThemeColorKeys,
-  organizationThemeColorSchema,
-  organizationThemePaletteCountKeys,
-  themeChartColorPalettesSchema,
-  themeChartColorsSchema,
-};
+export { organizationThemeColorKeys, organizationThemePaletteCountKeys };
 
-export const MAX_THEME_COLOR_COUNT = organizationThemeColorKeys.length;
+const MAX_THEME_COLOR_COUNT = organizationThemeColorKeys.length;
 
 export function normalizeThemeColorInput(value: string) {
   return value.trim().toLowerCase();
@@ -42,10 +34,6 @@ export function sanitizeThemeChartColors(chartColors?: Record<string, string> | 
   }
 
   return Object.fromEntries(sanitizedEntries);
-}
-
-export function getThemeColorKey(index: number) {
-  return organizationThemeColorKeys[index - 1];
 }
 
 export function getThemeColorKeysForCount(count: number) {
@@ -99,17 +87,20 @@ export function sanitizeThemesPayload(themes: ThemeItem[], previousThemes?: Them
         return sanitizedPreviousValue ? [[colorKey, sanitizedPreviousValue] as const] : [];
       });
 
-      return sanitizedPaletteEntries.length > 0 ? [[countKey, Object.fromEntries(sanitizedPaletteEntries) as ThemeChartColors] as const] : [];
+      return sanitizedPaletteEntries.length > 0
+        ? [[countKey, Object.fromEntries(sanitizedPaletteEntries) as ThemeChartColors] as const]
+        : [];
     });
 
     return {
       ...theme,
-      chartColorPalettes: sanitizedPalettes.length > 0 ? (Object.fromEntries(sanitizedPalettes) as ThemeChartColorPalettes) : undefined,
+      chartColorPalettes:
+        sanitizedPalettes.length > 0 ? (Object.fromEntries(sanitizedPalettes) as ThemeChartColorPalettes) : undefined,
     };
   });
 }
 
-export function createPaletteFromChartColors(chartColors?: ThemeChartColors | null, count: number = MAX_THEME_COLOR_COUNT) {
+function createPaletteFromChartColors(chartColors?: ThemeChartColors | null, count: number = MAX_THEME_COLOR_COUNT) {
   return getThemeColorKeysForCount(count).reduce<ThemeChartColors>((palette, colorKey) => {
     const color = chartColors?.[colorKey];
     if (color) {
@@ -119,7 +110,7 @@ export function createPaletteFromChartColors(chartColors?: ThemeChartColors | nu
   }, {});
 }
 
-export function repeatThemeColorAcrossPalette(color?: string | null) {
+function repeatThemeColorAcrossPalette(color?: string | null) {
   if (!color) {
     return {};
   }
@@ -130,7 +121,7 @@ export function repeatThemeColorAcrossPalette(color?: string | null) {
   }, {});
 }
 
-export function getThemePaletteCountKey(count: number) {
+function getThemePaletteCountKey(count: number) {
   if (!Number.isFinite(count)) {
     return undefined;
   }
@@ -143,7 +134,10 @@ export function getThemePaletteCountKey(count: number) {
   return String(safeCount) as (typeof organizationThemePaletteCountKeys)[number];
 }
 
-export function resolveThemePaletteForCount(theme: Pick<ThemeItem, "chartColors" | "chartColorPalettes">, count: number) {
+export function resolveThemePaletteForCount(
+  theme: Pick<ThemeItem, "chartColors" | "chartColorPalettes">,
+  count: number
+) {
   const countKey = getThemePaletteCountKey(count);
   const paletteKeys = getThemeColorKeysForCount(count);
   const configuredPalette = countKey ? sanitizeThemeChartColors(theme.chartColorPalettes?.[countKey]) : undefined;
@@ -168,7 +162,10 @@ export function withResolvedThemePalettes(theme: ThemeItem): ThemeItem {
   const configuredPalettes = sanitizeThemeChartColorPalettes(theme.chartColorPalettes);
 
   const chartColorPalettes = organizationThemePaletteCountKeys.reduce<ThemeChartColorPalettes>((palettes, countKey) => {
-    const palette = resolveThemePaletteForCount({ chartColors, chartColorPalettes: configuredPalettes }, Number(countKey));
+    const palette = resolveThemePaletteForCount(
+      { chartColors, chartColorPalettes: configuredPalettes },
+      Number(countKey)
+    );
     if (Object.keys(palette).length > 0) {
       palettes[countKey] = palette;
     }

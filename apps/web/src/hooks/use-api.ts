@@ -8,13 +8,13 @@ import {
 import * as React from "react";
 import { z } from "zod";
 
-export const apiQueryOrderSchema = z.array(
+const apiQueryOrderSchema = z.array(
   z.object({ column: z.string(), direction: z.enum(["asc", "desc"]), nullsFirst: z.boolean().optional() })
 );
 
-export const apiQueryFilterSchema = z.object({ column: z.string(), value: z.string(), operator: z.enum(["eq", "="]) });
+const apiQueryFilterSchema = z.object({ column: z.string(), value: z.string(), operator: z.enum(["eq", "="]) });
 
-export const apiQueryHookParamsSchema = z.object({
+const apiQueryHookParamsSchema = z.object({
   limit: z.number().optional(),
   offset: z.number().optional(),
   search: z.string().optional(),
