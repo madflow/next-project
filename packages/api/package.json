@@ -38,7 +38,9 @@
     "@orpc/tanstack-query": "^1.14.4",
     "@repo/auth": "workspace:*",
     "@repo/database": "workspace:*",
+    "@repo/storage": "workspace:*",
     "drizzle-orm": "^0.45.2",
+    "file-type": "^22.0.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
