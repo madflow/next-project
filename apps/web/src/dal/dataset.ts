@@ -8,7 +8,7 @@ import {
   project,
   selectDatasetSchema,
 } from "@repo/database/schema";
-import { createList, getAuthenticatedClient, getSessionUser, withAdminCheck, withSessionCheck } from "@/dal/dal";
+import { getAuthenticatedClient, getSessionUser, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { createListWithJoins } from "@/dal/dal-joins";
 import { DalException, DalNotAuthorizedException } from "@/lib/exception";
 import { deleteDataset as s3DeleteDataset } from "@/lib/storage";
@@ -41,8 +41,6 @@ export const list = withAdminCheck(
     },
   ])
 );
-
-export const listAuthenticated = withSessionCheck(createList(entity, selectDatasetSchema));
 
 export const deleteDataset = withAdminCheck(async (datasetId: string) => {
   const db = await getAuthenticatedClient();
@@ -77,7 +75,7 @@ export async function assertAccess(datasetId: string) {
   }
 }
 
-export async function hasAccess(datasetId: string) {
+async function hasAccess(datasetId: string) {
   const user = await getSessionUser();
   if (!user) {
     return false;

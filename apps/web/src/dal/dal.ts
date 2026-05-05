@@ -8,7 +8,7 @@ import { defaultClient as db } from "@repo/database/clients";
 import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 import { DalNotAuthorizedException } from "@/lib/exception";
 
-export const orderByDirectionSchema = z.enum(["asc", "desc"]);
+const orderByDirectionSchema = z.enum(["asc", "desc"]);
 
 export const orderBySchema = z.object({
   column: z.string(),
@@ -32,7 +32,7 @@ export const listOptionsSchema = z.object({
 
 export type ListOptions = z.infer<typeof listOptionsSchema>;
 
-export function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema: ItemType) {
+function createListResultSchema<ItemType extends z.ZodTypeAny>(itemSchema: ItemType) {
   return z.object({
     rows: z.array(itemSchema),
     count: z.number(),
@@ -54,7 +54,7 @@ export async function getSessionUser() {
   return session?.user;
 }
 
-export async function assertUserHasRole(role: string) {
+async function assertUserHasRole(role: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -63,7 +63,7 @@ export async function assertUserHasRole(role: string) {
   }
 }
 
-export async function assertUserHasSession() {
+async function assertUserHasSession() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });

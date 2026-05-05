@@ -9,22 +9,12 @@ import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
 
 type UploadDatasetResult = CreateDatasetResult;
 
-type UploadDatasetParams = {
-  file: File;
-  name: string;
-  organizationId: string;
-  description?: string;
-  contentType: string;
-  missingValues: string[] | null;
-};
-
 /**
  * Upload dataset using FormData to properly handle file uploads
  */
 export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData): Promise<UploadDatasetResult> => {
   const session = await getSessionOrThrow();
 
-  // Extract data from FormData
   const file = formData.get("file") as File | null;
   const name = formData.get("name") as string;
   const organizationId = formData.get("organizationId") as string;
@@ -55,29 +45,6 @@ export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData
 export const addToProject = withAdminAuth(async (datasetId: string, projectId: string) => {
   await db.insert(datasetProject).values({ projectId, datasetId });
 });
-
-export const uploadDataset = withAdminAuth(
-  async ({
-    file,
-    name,
-    organizationId,
-    description,
-    contentType,
-    missingValues,
-  }: UploadDatasetParams): Promise<UploadDatasetResult> => {
-    const session = await getSessionOrThrow();
-
-    return await createDataset({
-      file,
-      name,
-      organizationId,
-      description,
-      contentType,
-      missingValues,
-      userId: session.user.id,
-    });
-  }
-);
 
 export async function remove(datasetId: string) {
   await deleteDataset(datasetId);

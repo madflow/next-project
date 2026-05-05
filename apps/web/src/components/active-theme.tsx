@@ -13,7 +13,7 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Export the chart theme context for use in chart components
-export const ChartThemeContext = createContext<string>("default");
+const ChartThemeContext = createContext<string>("default");
 
 export function ActiveThemeProvider({
   children,
