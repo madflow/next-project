@@ -1,0 +1,1 @@
+ALTER TABLE "datasets" RENAME COLUMN "s3_key" TO "storage_key";
