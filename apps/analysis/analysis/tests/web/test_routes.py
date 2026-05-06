@@ -65,7 +65,7 @@ def test_stats_endpoint_split_variable_logic(
     # Mock setup
     mock_dataset = Mock()
     mock_dataset.file_hash = "dataset-hash"
-    mock_dataset.s3_key = "test/path.sav"
+    mock_dataset.storage_key = "test/path.sav"
     mock_get_dataset.return_value = mock_dataset
 
     mock_dataframe = pd.DataFrame({"test_var": [1, 2, 3], "split_var": ["A", "B", "A"]})
@@ -200,7 +200,7 @@ async def test_raw_data_endpoint_logic(
     # Mock setup
     mock_dataset = Mock()
     mock_dataset.file_hash = "dataset-hash"
-    mock_dataset.s3_key = "test/path.sav"
+    mock_dataset.storage_key = "test/path.sav"
     mock_get_dataset.return_value = mock_dataset
 
     mock_dataframe = pd.DataFrame(

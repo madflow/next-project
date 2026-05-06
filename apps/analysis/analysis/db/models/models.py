@@ -36,7 +36,7 @@ class Dataset(Base):
     file_type = Column(Text, nullable=False)
     file_size = Column(BigInteger, nullable=False)
     file_hash = Column(Text, nullable=False)
-    s3_key = Column(Text, nullable=False)
+    storage_key = Column(Text, nullable=False)
     uploaded_at = Column(
         DateTime(timezone=True),
         nullable=False,
