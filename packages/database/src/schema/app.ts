@@ -57,7 +57,7 @@ export const dataset = pgTable("datasets", {
   fileType: text("file_type").notNull(), // sav, xlsx, csv, parquet, ods
   fileSize: bigint("file_size", { mode: "number" }).notNull(), // Size in bytes
   fileHash: text("file_hash").notNull(), // SHA-256 hash for integrity and deduplication
-  storageKey: text("s3_key").notNull(), // S3 object key/path
+  storageKey: text("storage_key").notNull(), // S3/Storage object key/path
   uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().defaultNow(),
 
   organizationId: uuid("organization_id")
