@@ -16,7 +16,7 @@ class DatasetBase(BaseModel):
     file_type: str
     file_size: int
     file_hash: str
-    s3_key: str
+    storage_key: str
     uploaded_at: datetime
     organization_id: UUID
 
@@ -34,7 +34,7 @@ class DatasetUpdate(BaseModel):
     file_type: Optional[str] = None
     file_size: Optional[int] = None
     file_hash: Optional[str] = None
-    s3_key: Optional[str] = None
+    storage_key: Optional[str] = None
 
 
 class DatasetInDB(DatasetBase):
