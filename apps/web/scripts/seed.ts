@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { z } from "zod";
-import { adminClient, adminPool } from "@repo/database/clients";
+import { createAdminClient } from "@repo/database/clients";
 import {
   account,
   dataset,
@@ -26,6 +26,9 @@ import {
 } from "@repo/database/schema";
 import { createDataset as createDatasetService } from "@/lib/dataset-service";
 import { deleteDataset } from "@/lib/storage";
+
+const adminClient = createAdminClient();
+const adminPool = adminClient.$client;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -591,5 +594,6 @@ try {
   process.exit(0);
 } catch (error) {
   console.error("Error during seed:", error);
+  await adminPool.end();
   process.exit(1);
 }

@@ -9,6 +9,10 @@
   ],
   "tags": ["-lintignore"],
   "workspaces": {
-    ".": {}
+    ".": {},
+    "packages/worker": {
+      "entry": ["src/runner.ts"],
+      "project": ["src/**/*.ts"]
+    }
   }
 }

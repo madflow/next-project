@@ -1,11 +1,13 @@
 import { and, eq, ilike } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { invitation, member, user } from "@repo/database/schema";
 import { AuthAcceptInvitationCard } from "@/components/auth-accept-invitation-card";
 import { SignUpFormWithInvitation } from "@/components/sign-up-form-with-invitation";
 import { env } from "@/env";
+
+const db = getDefaultClient();
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

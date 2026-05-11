@@ -1,9 +1,11 @@
 import "server-only";
 import { and, eq, ilike, notInArray, or } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { CreateDatasetSplitVariableData, datasetVariable, datasetSplitVariable as entity } from "@repo/database/schema";
 import { ListOptions, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { DalException } from "@/lib/exception";
+
+const db = getDefaultClient();
 
 async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
   const { search } = options;

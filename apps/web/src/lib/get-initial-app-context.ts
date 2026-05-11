@@ -2,10 +2,12 @@ import "server-only";
 import { Organization } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { organization as organizationTable, project as projectTable } from "@repo/database/schema";
 import { type Project } from "@/types/project";
 import { auth } from "./auth";
+
+const db = getDefaultClient();
 
 type InitialAppContext = {
   organization: Organization | null;

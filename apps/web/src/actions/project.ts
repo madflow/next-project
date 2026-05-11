@@ -1,13 +1,15 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import {
   type CreateProjectData as CreateData,
   type UpdateProjectData as UpdateData,
   project as entity,
 } from "@repo/database/schema";
 import { withAdminAuth } from "@/lib/server-action-utils";
+
+const db = getDefaultClient();
 
 export const create = withAdminAuth(async (data: CreateData) => {
   await db.insert(entity).values(data).returning();

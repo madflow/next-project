@@ -1,7 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import {
   type CreateUserData as CreateData,
   type UpdateUserData as UpdateData,
@@ -12,6 +12,8 @@ import { env } from "@/env";
 import { auth } from "@/lib/auth";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { withAdminAuth } from "@/lib/server-action-utils";
+
+const db = getDefaultClient();
 
 function validateCallbackURL(callbackURL: string | undefined): void {
   if (!callbackURL) return;

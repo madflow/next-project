@@ -1,11 +1,13 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { UpdateDatasetData, dataset, datasetProject } from "@repo/database/schema";
 import { deleteDataset } from "@/dal/dataset";
 import { CreateDatasetResult, createDataset } from "@/lib/dataset-service";
 import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
+
+const db = getDefaultClient();
 
 type UploadDatasetResult = CreateDatasetResult;
 

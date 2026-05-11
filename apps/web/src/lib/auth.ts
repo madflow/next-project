@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, organization as organizationPlugin } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
 import {
   EmailChange,
@@ -15,6 +15,8 @@ import {
 } from "@repo/email";
 import { env } from "@/env";
 import { defaultLocale, extractAppLocale } from "@/i18n/config";
+
+const db = getDefaultClient();
 
 export const USER_ADMIN_ROLE = "admin";
 const USER_ROLE = "user";

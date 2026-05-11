@@ -1,7 +1,7 @@
 "use server";
 
 import { eq, sql } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import {
   type CreateOrganizationData as CreateData,
   type UpdateOrganizationData as UpdateData,
@@ -11,6 +11,8 @@ import {
   updateOrganizationSchema,
 } from "@repo/database/schema";
 import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
+
+const db = getDefaultClient();
 
 export const create = withAdminAuth(async (data: CreateData) => {
   const parsedData = insertOrganizationSchema.parse(data);

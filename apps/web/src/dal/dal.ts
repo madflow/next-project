@@ -4,9 +4,11 @@ import { AnyPgColumn, AnyPgTable } from "drizzle-orm/pg-core";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { ZodType, z } from "zod";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 import { DalNotAuthorizedException } from "@/lib/exception";
+
+const db = getDefaultClient();
 
 const orderByDirectionSchema = z.enum(["asc", "desc"]);
 

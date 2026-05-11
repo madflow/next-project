@@ -1,6 +1,6 @@
 import "server-only";
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import {
   UpdateDatasetVariableData,
   datasetVariable as entity,
@@ -9,6 +9,8 @@ import {
 } from "@repo/database/schema";
 import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { DalException } from "@/lib/exception";
+
+const db = getDefaultClient();
 
 const baseList = createList(entity, selectDatasetVariableSchema);
 

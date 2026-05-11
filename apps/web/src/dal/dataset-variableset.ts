@@ -1,7 +1,7 @@
 import "server-only";
 import { and, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import {
   CreateDatasetVariablesetData,
   DatasetVariablesetContentType,
@@ -18,6 +18,8 @@ import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/dal
 import { assertAccess } from "@/dal/dataset";
 import { DalException, DalNotFoundException } from "@/lib/exception";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
+
+const db = getDefaultClient();
 
 const baseList = createList(entity, selectDatasetVariablesetSchema);
 

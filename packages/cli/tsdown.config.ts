@@ -7,6 +7,7 @@ export default defineConfig(({ watch }) => ({
   format: ["esm"],
   outDir: "dist",
   platform: "node",
+  dts: false,
   clean: !watch,
   treeshake: true,
   outExtensions: () => ({

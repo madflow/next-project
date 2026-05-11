@@ -1,6 +1,6 @@
 import "server-only";
 import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { dataset, datasetVariable, datasetVariableset, datasetVariablesetContent } from "@repo/database/schema";
 import type { VariablesetContentAttributes } from "@repo/database/schema";
 import type {
@@ -11,6 +11,8 @@ import type {
   VariableSetImportOptions,
   VariableSetImportResult,
 } from "@/types/dataset-variableset-export";
+
+const db = getDefaultClient();
 
 export async function exportVariableSets(datasetId: string): Promise<VariableSetExportFile> {
   // Get dataset info

@@ -1,8 +1,10 @@
 import { type SQL, and, asc, count, desc, eq, getTableColumns, getTableName, ilike, or } from "drizzle-orm";
 import type { AnyPgTable, PgColumn, PgSelect, PgTable } from "drizzle-orm/pg-core";
 import type { z } from "zod";
-import { defaultClient as db } from "@repo/database/clients";
+import { getDefaultClient } from "@repo/database/clients";
 import { type ListOptions, listOptionsSchema } from "./dal";
+
+const db = getDefaultClient();
 
 type ZodSchema = z.ZodType<unknown>;
 

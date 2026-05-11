@@ -1,21 +1,21 @@
+import { config } from "dotenv";
 import { run } from "graphile-worker";
-import { adminPool } from "@repo/database/clients";
+import { createAdminClient } from "@repo/database/clients";
+import "./instrument.js";
+import { helloWorldTask } from "./tasks/hello-world.js";
+
+config({ quiet: true });
 
 async function main() {
+  const db = createAdminClient();
+
   const runner = await run({
-    pgPool: adminPool,
+    pgPool: db.$client,
     concurrency: 5,
     noHandleSignals: false,
     pollInterval: 1000,
     taskList: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      hello: async (payload: any, helpers) => {
-        if (!payload.name) {
-          throw new Error("Missing name");
-        }
-        const { name } = payload;
-        helpers.logger.info(`Hello, ${name}`);
-      },
+      helloWorldTask,
     },
   });
   await runner.promise;

@@ -1,7 +1,6 @@
 import { defineConfig } from "tsdown";
 
 const entry = {
-  "tasks/index": "src/tasks/index.ts",
   runner: "src/runner.ts",
 };
 
