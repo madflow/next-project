@@ -33,5 +33,5 @@ RUN adduser --system --uid 1001 --ingroup appuser appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-ENTRYPOINT ["node", "dist/runner.js"]
+ENTRYPOINT ["node", "dist/runner.mjs"]
 CMD ["/bin/sh"]

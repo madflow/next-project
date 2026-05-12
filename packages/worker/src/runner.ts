@@ -7,7 +7,9 @@ config({ quiet: true });
 
 async function main() {
   console.log("Starting worker...");
-  console.log(process.env.DATABASE_URL);
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set");
+  }
   const runner = await run({
     connectionString: process.env.DATABASE_URL,
     concurrency: 5,

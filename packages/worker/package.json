@@ -12,8 +12,8 @@
   },
   "exports": {
     "./runner": {
-      "types": "./dist/runner/runner.d.mts",
-      "default": "./dist/runner/runner.mjs"
+      "types": "./dist/runner.d.mts",
+      "default": "./dist/runner.mjs"
     }
   },
   "files": [
