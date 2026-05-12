@@ -113,6 +113,20 @@
       "when": 1778047951859,
       "tag": "0015_numerous_vision",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1778605833726,
+      "tag": "0016_black_sentinels",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1778605848879,
+      "tag": "0017_green_spencer_smythe",
+      "breakpoints": true
     }
   ]
 }

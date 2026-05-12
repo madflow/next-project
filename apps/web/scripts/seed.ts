@@ -16,6 +16,8 @@ import {
   datasetVariablesetAttributes,
   datasetVariablesetContent,
   invitation,
+  job,
+  jobStateEnum,
   member,
   organization,
   project,
@@ -62,15 +64,15 @@ const datasetVariablesetFixtureContentSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("subset"),
-    subsetId: z.string().uuid(),
+    subsetId: z.uuid(),
   }),
 ]);
 
 const datasetVariablesetFixtureSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
   name: z.string().min(1),
   description: z.string().optional(),
-  parentId: z.string().uuid().optional(),
+  parentId: z.uuid().optional(),
   category: datasetVariablesetCategorySchema.optional(),
   attributes: datasetVariablesetAttributes.optional(),
   contents: z.array(datasetVariablesetFixtureContentSchema),
@@ -370,6 +372,7 @@ await adminClient.delete(organization).execute();
 await adminClient.delete(account).execute();
 await adminClient.delete(user).execute();
 await adminClient.delete(rateLimit).execute();
+await adminClient.delete(job).execute();
 const datasets = await adminClient.select().from(dataset);
 for (const dataset of datasets) {
   await deleteDataset(dataset.storageKey);
@@ -379,6 +382,10 @@ console.log("Tables truncated successfully\n");
 
 // Create seed data
 try {
+  // create a job
+  await adminClient.$client.query(
+    "insert into jobs (queue_name,run_at,task_identifier,payload) values ('default',now(),'hello', json_build_object('name', 'foo'))"
+  );
   // Create organization
   const org = await createOrganization(ORG_TEST_UID, "Test Organization", "test-organization");
 
