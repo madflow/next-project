@@ -1,0 +1,35 @@
+{
+  "name": "@repo/worker",
+  "version": "0.0.1",
+  "description": "Worker package",
+  "scripts": {
+    "env:copy": "cp -n .env.dist .env || true",
+    "clean": "git clean -xdf .cache dist .turbo node_modules",
+    "build": "tsdown",
+    "dev": "node ./dist/runner.mjs",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "exports": {
+    "./runner": {
+      "types": "./dist/runner/runner.d.mts",
+      "default": "./dist/runner/runner.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "dependencies": {
+    "@sentry/node": "^10.46.0",
+    "dotenv": "^17.4.2",
+    "graphile-worker": "^0.16.6"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "eslint": "^9.39.4",
+    "tsdown": "^0.22.0",
+    "typescript": "^6.0.0"
+  }
+}

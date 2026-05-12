@@ -9,6 +9,13 @@
   ],
   "tags": ["-lintignore"],
   "workspaces": {
-    ".": {}
+    ".": {},
+    "apps/web": {
+      "ignoreDependencies": ["webpack"]
+    },
+    "packages/worker": {
+      "entry": ["src/runner.ts"],
+      "project": ["src/**/*.ts"]
+    }
   }
 }
