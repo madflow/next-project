@@ -382,9 +382,12 @@ console.log("Tables truncated successfully\n");
 // Create seed data
 try {
   // create a job
-  await adminClient.$client.query(
-    "insert into jobs (queue_name,run_at,task_identifier,payload) values ('default',now(),'hello', json_build_object('name', 'foo'))"
-  );
+  await adminClient.insert(job).values({
+    queueName: "default",
+    runAt: new Date(),
+    taskIdentifier: "hello",
+    payload: { name: "foo" },
+  });
   // Create organization
   const org = await createOrganization(ORG_TEST_UID, "Test Organization", "test-organization");
 

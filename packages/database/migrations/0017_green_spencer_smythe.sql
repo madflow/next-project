@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION create_worker_job() RETURNS TRIGGER AS $$
     BEGIN
         IF EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = 'graphile_worker') IS False THEN
             RAISE NOTICE 'graphile_worker schema does not exist';
-        UPDATE public.jobs SET status='cancelled'::job_status, last_error = 'graphile_worker schema does not exist' WHERE job_id=NEW.job_id;
+        UPDATE public.jobs SET status='cancelled'::job_status, last_error = 'graphile_worker schema does not exist' WHERE id=NEW.id;
         RETURN NEW;
         END IF;
 
