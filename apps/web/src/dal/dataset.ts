@@ -8,10 +8,10 @@ import {
   project,
   selectDatasetSchema,
 } from "@repo/database/schema";
+import { deleteDataset as s3DeleteDataset } from "@repo/storage";
 import { getAuthenticatedClient, getSessionUser, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { createListWithJoins } from "@/dal/dal-joins";
 import { DalException, DalNotAuthorizedException } from "@/lib/exception";
-import { deleteDataset as s3DeleteDataset } from "@/lib/storage";
 
 const findFn = async (id: string) => {
   const db = await getAuthenticatedClient();

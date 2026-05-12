@@ -1,14 +1,14 @@
 "use server";
 
-import { DeleteObjectCommand, PutObjectCommand, S3ServiceException } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
+import { S3ServiceException } from "@repo/storage";
+import { deleteObject, putObject } from "@repo/storage";
 import { env } from "@/env";
 import { USER_ADMIN_ROLE } from "@/lib/auth";
 import { canDeleteAvatarForUser } from "@/lib/avatar-authorization";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { getSessionOrThrow, withAuth } from "@/lib/server-action-utils";
-import { getS3Client } from "@/lib/storage";
 
 type UploadAvatarParams = {
   file: File;
@@ -34,8 +34,6 @@ export const uploadAvatar = withAuth(async ({ file, userId }: UploadAvatarParams
   if (session.user.id !== userId) {
     throw new ServerActionNotAuthorizedException("User ID mismatch");
   }
-
-  const s3Client = getS3Client();
 
   try {
     if (!file || !file.size) {
@@ -105,8 +103,7 @@ export const uploadAvatar = withAuth(async ({ file, userId }: UploadAvatarParams
       },
     };
 
-    const command = new PutObjectCommand(params);
-    const response = await s3Client.send(command);
+    const response = await putObject(params);
 
     // Extract just the filename from the key
     const filename = key.split("/").pop() || key;
@@ -174,17 +171,14 @@ export async function deleteAvatar(userId: string, filename: string) {
     throw new ServerActionNotAuthorizedException("User ID mismatch");
   }
 
-  const s3Client = getS3Client();
   try {
     // Construct the full S3 key with the correct path
     const key = `avatars/${userId}/${filename}`;
 
-    const command = new DeleteObjectCommand({
+    await deleteObject({
       Bucket: env.S3_BUCKET_NAME,
       Key: key,
     });
-
-    await s3Client.send(command);
     return { success: true };
   } catch (error) {
     console.error("Error deleting avatar from S3:", error);
