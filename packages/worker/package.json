@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Worker package",
   "scripts": {
+    "env:copy": "cp -n .env.dist .env || true",
     "clean": "git clean -xdf .cache dist .turbo node_modules",
     "build": "tsdown",
     "dev": "node ./dist/runner.mjs",
