@@ -1,17 +1,10 @@
+autoInstallPeers: false
+allowedDeprecatedVersions:
+  "@esbuild-kit/core-utils": "*"
+  "@esbuild-kit/esm-loader": "*"
 minimumReleaseAge: 1440
+ignoredOptionalDependencies:
+  - unrun
 packages:
   - "apps/*"
   - "packages/*"
-minimumReleaseAgeExclude:
-  # Renovate security update: next@16.1.5 || 16.1.7 || 16.2.3
-  - next@16.1.5 || 16.1.7 || 16.2.3
-  # Renovate security update: pnpm@10.28.2
-  - pnpm@10.28.2
-  # Renovate security update: file-type@21.3.2
-  - file-type@21.3.2
-  # Renovate security update: nodemailer@8.0.4 || 8.0.5
-  - nodemailer@8.0.4 || 8.0.5
-  # Renovate security update: next-intl@4.9.1
-  - next-intl@4.9.1
-  # Renovate security update: drizzle-orm@0.45.2
-  - drizzle-orm@0.45.2

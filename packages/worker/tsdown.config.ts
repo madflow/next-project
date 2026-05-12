@@ -1,13 +1,16 @@
 import { defineConfig } from "tsdown";
 
+const entry = {
+  runner: "src/runner.ts",
+};
+
 export default defineConfig(({ watch }) => ({
-  entry: {
-    index: "src/index.ts",
-  },
+  entry,
   format: ["esm"],
   outDir: "dist",
   platform: "node",
-  dts: false,
+  dts: true,
+  sourcemap: true,
   clean: !watch,
   treeshake: true,
   outExtensions: () => ({
