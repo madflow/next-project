@@ -1,13 +1,10 @@
-import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
+import { bodyToBuffer, getObject } from "@repo/storage";
 import { assertAccess, find } from "@/dal/dataset";
 import { env } from "@/env";
 import { raiseExceptionResponse } from "@/lib/exception";
-import { getS3Client } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
-
-const s3Client = getS3Client();
 
 type RouteParams = {
   params: Promise<{
@@ -35,29 +32,22 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     try {
       // Get the file from S3
-      const command = new GetObjectCommand({
+      const response = await getObject({
         Bucket: bucket,
         Key: storageKey,
         ResponseContentDisposition: `attachment; filename="${filename}"`,
       });
-
-      const response = await s3Client.send(command);
 
       if (!response.Body) {
         console.error("No file content received from S3");
         return new NextResponse("File not found", { status: 404 });
       }
 
-      // Convert the stream to a buffer
-      const chunks: Uint8Array[] = [];
-      // eslint-disable-next-line
-      for await (const chunk of response.Body as any) {
-        chunks.push(chunk);
-      }
-      const buffer = Buffer.concat(chunks);
+      const buffer = await bodyToBuffer(response.Body);
+      const body = new Uint8Array(buffer);
 
       // Return the file with appropriate headers
-      return new NextResponse(buffer, {
+      return new NextResponse(body, {
         headers: {
           "Content-Type": fileType || "application/octet-stream",
           "Content-Disposition": `attachment; filename="${filename}"`,
