@@ -12,7 +12,7 @@ FROM builder-base AS builder
 
 RUN npm install --ignore-scripts -g corepack@latest 
 RUN corepack enable
-RUN corepack prepare pnpm@10.17.0 --activate
+RUN corepack prepare pnpm@10.32.1 --activate
 
 
 COPY . .
