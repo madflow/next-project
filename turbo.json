@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": ["S3_DISABLE_TLS"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

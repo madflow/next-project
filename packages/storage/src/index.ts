@@ -16,6 +16,12 @@ let s3ClientInstance: S3Client | null = null;
 
 export const getS3Client = () => {
   if (!s3ClientInstance) {
+    const isTlsExplicitlyDisabled = ["1", "true", "yes"].includes(process.env.S3_DISABLE_TLS?.toLowerCase() ?? "");
+
+    if (process.env.NODE_ENV === "production" && isTlsExplicitlyDisabled) {
+      throw new Error("S3_DISABLE_TLS must not be enabled in production");
+    }
+
     const credentials =
       process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY
         ? { accessKeyId: process.env.S3_ACCESS_KEY_ID, secretAccessKey: process.env.S3_SECRET_ACCESS_KEY }
@@ -25,7 +31,8 @@ export const getS3Client = () => {
       region: process.env.S3_REGION,
       endpoint: process.env.S3_ENDPOINT,
       forcePathStyle: true,
-      tls: false,
+      // Only disable TLS for local MinIO/LocalStack via S3_DISABLE_TLS; production must always use TLS.
+      tls: !isTlsExplicitlyDisabled,
     });
   }
 
