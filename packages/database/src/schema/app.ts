@@ -341,3 +341,28 @@ export const updateDatasetSplitVariableSchema = createUpdateSchema(datasetSplitV
 export type CreateDatasetSplitVariableData = z.infer<typeof insertDatasetSplitVariableSchema>;
 export type DatasetSplitVariable = z.infer<typeof selectDatasetSplitVariableSchema>;
 export type UpdateDatasetSplitVariableData = z.infer<typeof updateDatasetSplitVariableSchema>;
+
+export const jobStateEnum = pgEnum("job_status", [
+  "created",
+  "retried",
+  "running",
+  "completed",
+  "expired",
+  "cancelled",
+  "failed",
+] as const);
+
+export const job = pgTable("jobs", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`uuidv7()`),
+  queueName: text("queue_name").notNull(),
+  taskIdentifier: text("task_identifier").notNull(),
+  payload: jsonb("payload").notNull(),
+  runAt: timestamp("run_at", { withTimezone: true }).notNull(),
+  maxAttempts: integer("max_attempts").notNull().default(25),
+  lastError: text("last_error"),
+  status: jobStateEnum("status").notNull().default("created"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }),
+});
