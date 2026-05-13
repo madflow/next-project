@@ -1,2 +1,3 @@
 apps/web/src/components/ui/**
 .agents
+apps/analysis/.venv/**
