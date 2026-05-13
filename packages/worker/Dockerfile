@@ -25,13 +25,13 @@ RUN corepack enable pnpm
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
-RUN pnpm run build
+RUN pnpm --filter @repo/worker run build
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 appuser
 RUN adduser --system --uid 1001 --ingroup appuser appuser
 RUN chown -R appuser:appuser /app
+WORKDIR /app/packages/worker
 USER appuser
 
 ENTRYPOINT ["node", "dist/runner.mjs"]
-CMD ["/bin/sh"]

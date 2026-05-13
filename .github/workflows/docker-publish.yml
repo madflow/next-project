@@ -37,6 +37,10 @@ jobs:
             suffix: cli
             dockerfile: ./packages/cli/Dockerfile
             context: .
+          - app: worker
+            suffix: worker
+            dockerfile: ./packages/worker/Dockerfile
+            context: .
           - app: db
             suffix: db
             dockerfile: ./packages/database/Dockerfile
