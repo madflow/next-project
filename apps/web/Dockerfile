@@ -11,7 +11,7 @@ WORKDIR /app
 
 RUN npm install --ignore-scripts -g corepack@latest 
 RUN corepack enable
-RUN corepack prepare pnpm@10.17.0 --activate
+RUN corepack prepare pnpm@11.1.1 --activate
 
 COPY . .
 RUN pnpm install --frozen-lockfile
