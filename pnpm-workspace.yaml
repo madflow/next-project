@@ -2,9 +2,14 @@ autoInstallPeers: false
 allowedDeprecatedVersions:
   "@esbuild-kit/core-utils": "*"
   "@esbuild-kit/esm-loader": "*"
-minimumReleaseAge: 1440
 ignoredOptionalDependencies:
   - unrun
 packages:
   - "apps/*"
   - "packages/*"
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry/cli': true
+  '@swc/core': true
+  esbuild: true
+  sharp: true
