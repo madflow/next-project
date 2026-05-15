@@ -15,7 +15,7 @@ test.describe("API Datasets @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
       const response = await page.request.get("/api/datasets");
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for admin user", async ({ page }) => {
@@ -78,7 +78,7 @@ test.describe("API Datasets @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].datasets.name.toLowerCase()).toContain("test");
+      expect(data.rows[0].name.toLowerCase()).toContain("test");
     });
   });
 
@@ -92,7 +92,7 @@ test.describe("API Datasets @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].datasets.name <= data.rows[1].datasets.name).toBe(true);
+      expect(data.rows[0].name <= data.rows[1].name).toBe(true);
     });
 
     test("orders by dataset name descending", async ({ page }) => {
@@ -104,7 +104,7 @@ test.describe("API Datasets @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].datasets.name >= data.rows[1].datasets.name).toBe(true);
+      expect(data.rows[0].name >= data.rows[1].name).toBe(true);
     });
 
     test("orders by dataset filename", async ({ page }) => {
@@ -116,7 +116,7 @@ test.describe("API Datasets @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].datasets.filename <= data.rows[1].datasets.filename).toBe(true);
+      expect(data.rows[0].filename <= data.rows[1].filename).toBe(true);
     });
 
     test("orders by creation date", async ({ page }) => {
@@ -128,8 +128,8 @@ test.describe("API Datasets @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      const firstDate = new Date(data.rows[0].datasets.createdAt);
-      const secondDate = new Date(data.rows[1].datasets.createdAt);
+      const firstDate = new Date(data.rows[0].createdAt);
+      const secondDate = new Date(data.rows[1].createdAt);
       expect(firstDate >= secondDate).toBe(true);
     });
 
@@ -137,22 +137,22 @@ test.describe("API Datasets @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/datasets?order=name.asc,slug.desc");
+      const response = await page.request.get("/api/datasets?order=name.asc,filename.desc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(0);
     });
 
-    test("ignores invalid order parameters", async ({ page }) => {
+    test("rejects invalid order parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       const response = await page.request.get("/api/datasets?order=invalidcolumn.asc");
-      expect(response.status()).toBe(200);
+      expect(response.status()).toBe(422);
 
       const data = await response.json();
-      expect(Array.isArray(data.rows)).toBe(true);
+      expect(data.code).toBe("INPUT_VALIDATION_FAILED");
     });
   });
 
@@ -165,7 +165,7 @@ test.describe("API Datasets @api", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].datasets.name).toContain("Test Dataset");
+      expect(data.rows[0].name).toContain("Test Dataset");
     });
 
     test("filters by dataset filename", async ({ page }) => {
@@ -177,7 +177,7 @@ test.describe("API Datasets @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].datasets.filename).toBe("demo.sav");
+      expect(data.rows[0].filename).toBe("demo.sav");
     });
 
     test("applies multiple filters with AND logic", async ({ page }) => {
@@ -188,7 +188,7 @@ test.describe("API Datasets @api", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].datasets.filename).toBe("demo.sav");
+      expect(data.rows[0].filename).toBe("demo.sav");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
@@ -203,15 +203,15 @@ test.describe("API Datasets @api", () => {
       expect(data.count).toBe(0);
     });
 
-    test("ignores invalid filter parameters", async ({ page }) => {
+    test("rejects invalid filter parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       const response = await page.request.get("/api/datasets?invalidcolumn=value");
-      expect(response.status()).toBe(200);
+      expect(response.status()).toBe(422);
 
       const data = await response.json();
-      expect(Array.isArray(data.rows)).toBe(true);
+      expect(data.code).toBe("INPUT_VALIDATION_FAILED");
     });
   });
 
@@ -239,7 +239,7 @@ test.describe("API Datasets @api", () => {
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0].datasets.filename).toBe("demo.sav");
+      expect(data.rows[0].filename).toBe("demo.sav");
     });
   });
 
@@ -266,19 +266,21 @@ test.describe("API Datasets @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/datasets");
+      const response = await page.request.get("/api/datasets?embed=organization");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
       const dataset = data.rows[0];
-      expect(dataset).toHaveProperty("datasets");
-      expect(dataset).toHaveProperty("organizations");
-      expect(dataset.datasets).toHaveProperty("id");
-      expect(dataset.datasets).toHaveProperty("name");
-      expect(dataset.datasets).toHaveProperty("filename");
-      expect(dataset.datasets).toHaveProperty("createdAt");
-      expect(dataset.datasets).toHaveProperty("updatedAt");
+      expect(dataset).toHaveProperty("id");
+      expect(dataset).toHaveProperty("name");
+      expect(dataset).toHaveProperty("filename");
+      expect(dataset).toHaveProperty("createdAt");
+      expect(dataset).toHaveProperty("updatedAt");
+      expect(dataset).toHaveProperty("organization");
+      expect(dataset.organization).toHaveProperty("id");
+      expect(dataset.organization).toHaveProperty("name");
+      expect(dataset.organization).toHaveProperty("slug");
     });
 
     test("count accuracy with filters", async ({ page }) => {
@@ -315,7 +317,7 @@ test.describe("API Datasets @api", () => {
       await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);
 
       const response = await page.request.get(`/api/projects/${TEST_PROJECT_ID}/datasets`);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("list project datasets as authorized regular user", async ({ page }) => {

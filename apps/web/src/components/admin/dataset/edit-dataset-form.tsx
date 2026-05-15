@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { type DatasetWithOrganization, updateDatasetSchema } from "@/types/dataset";
+import { type DatasetWithOrganizationJoin, updateDatasetSchema } from "@/types/dataset";
 
 // Function to create schema with translations
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,7 +34,7 @@ type FormValues = {
 };
 
 type EditDatasetFormProps = {
-  dataset: DatasetWithOrganization;
+  dataset: DatasetWithOrganizationJoin;
 };
 
 export function EditDatasetForm({ dataset }: EditDatasetFormProps) {

@@ -1,23 +1,18 @@
 "use client";
 
+import { keepPreviousData as keepPreviousQueryData, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useQueryApi } from "@/hooks/use-query-api";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import type { PaginationState, SortingState } from "@/types";
-import type { DatasetWithOrganization } from "@/types/dataset";
+import type { DatasetWithEmbeddedOrganization } from "@/types/dataset";
 
 interface Props {
-  columns: ColumnDef<DatasetWithOrganization, unknown>[];
-}
-
-interface ApiResponse {
-  rows: DatasetWithOrganization[];
-  count: number;
-  limit: number;
-  offset: number;
+  columns: ColumnDef<DatasetWithEmbeddedOrganization, unknown>[];
 }
 
 export function DatasetsDataTable({ columns }: Props) {
@@ -27,24 +22,27 @@ export function DatasetsDataTable({ columns }: Props) {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
 
+  const input = useMemo(
+    () => buildCollectionQueryInput({ input: { embed: "organization" }, pagination, search: debouncedSearch, sorting }),
+    [debouncedSearch, pagination, sorting]
+  );
+
   const {
     data: apiResponse,
     isLoading,
     error: queryError,
     refetch,
-  } = useQueryApi<ApiResponse>({
-    endpoint: "/api/datasets",
-    pagination,
-    sorting,
-    search: debouncedSearch,
-    queryKey: ["datasets", "list"],
-    keepPreviousData: true,
+  } = useQuery({
+    placeholderData: keepPreviousQueryData,
+    ...apiQuery.dataset.list.queryOptions({
+      input,
+    }),
   });
 
   const error = queryError ? queryError.message : null;
 
   return (
-    <DataTable<DatasetWithOrganization>
+    <DataTable<DatasetWithEmbeddedOrganization>
       columns={columns}
       data={apiResponse?.rows ?? []}
       count={apiResponse?.count ?? 0}

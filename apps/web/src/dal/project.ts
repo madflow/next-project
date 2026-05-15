@@ -1,46 +1,13 @@
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { project as entity, member, organization, selectProjectSchema } from "@repo/database/schema";
-import {
-  createFind,
-  createFindBySlug,
-  createList,
-  getAuthenticatedClient,
-  getSessionUser,
-  withAdminCheck,
-  withSessionCheck,
-} from "@/dal/dal";
-import { createListWithJoins } from "@/dal/dal-joins";
-import { DalNotAuthorizedException } from "@/lib/exception";
+import { createFind, createFindBySlug, getAuthenticatedClient, getSessionUser, withSessionCheck } from "@/dal/dal";
 
 const findFn = createFind(entity, selectProjectSchema);
 
 export const find = withSessionCheck(findFn);
 
-export const findAccessible = withSessionCheck(async (projectId: string) => {
-  await assertAccess(projectId);
-  return await findFn(projectId);
-});
-
 export const findBySlug = withSessionCheck(createFindBySlug(entity, selectProjectSchema));
-
-export const listAuthenticated = withSessionCheck(createList(entity, selectProjectSchema));
-
-export const listWithOrganization = withAdminCheck(
-  createListWithJoins(entity, selectProjectSchema, [
-    {
-      table: organization,
-      condition: eq(entity.organizationId, organization.id),
-    },
-  ])
-);
-
-export async function assertAccess(projectId: string) {
-  const canAccess = await hasAccess(projectId);
-  if (!canAccess) {
-    throw new DalNotAuthorizedException("You do not have access to this project");
-  }
-}
 
 export async function hasAccess(projectId: string) {
   const user = await getSessionUser();

@@ -1,25 +1,22 @@
 "use client";
 
+import { keepPreviousData as keepPreviousQueryData, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import type { RouterOutput } from "@repo/api/client";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useQueryApi } from "@/hooks/use-query-api";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import type { ListFilter, PaginationState, SortingState } from "@/types/index";
-import type { Member } from "@/types/member";
-import type { User } from "@/types/user";
+
+type ApiResponse = RouterOutput["member"]["list"];
+type OrganizationMemberRow = ApiResponse["rows"][number];
 
 type Props = {
   organizationId: string;
-  columns: ColumnDef<{ users: User; members: Member }, unknown>[];
-};
-
-type ApiResponse = {
-  rows: { users: User; members: Member }[];
-  count: number;
-  limit: number;
-  offset: number;
+  columns: ColumnDef<OrganizationMemberRow, unknown>[];
 };
 
 export function OrganisationMembersDataTable({ columns, organizationId }: Props) {
@@ -30,19 +27,28 @@ export function OrganisationMembersDataTable({ columns, organizationId }: Props)
   const [filters] = useState<ListFilter[]>([{ column: "organizationId", value: organizationId }]);
   const debouncedSearch = useDebouncedValue(search, 300);
 
+  const input = useMemo(
+    () =>
+      buildCollectionQueryInput({
+        filters,
+        input: { embed: "user" },
+        pagination,
+        search: debouncedSearch,
+        sorting,
+      }),
+    [debouncedSearch, filters, pagination, sorting]
+  );
+
   const {
     data: apiResponse,
     isLoading,
     error: queryError,
     refetch,
-  } = useQueryApi<ApiResponse>({
-    endpoint: "/api/members",
-    pagination,
-    sorting,
-    search: debouncedSearch,
-    filters,
-    queryKey: ["organization-members", "list", organizationId],
-    keepPreviousData: true,
+  } = useQuery({
+    placeholderData: keepPreviousQueryData,
+    ...apiQuery.member.list.queryOptions({
+      input,
+    }),
   });
 
   const data = {
@@ -56,7 +62,7 @@ export function OrganisationMembersDataTable({ columns, organizationId }: Props)
   const error = queryError ? queryError.message : null;
 
   return (
-    <DataTable<{ users: User; members: Member }>
+    <DataTable<OrganizationMemberRow>
       columns={columns}
       data={data.data}
       count={data.count}

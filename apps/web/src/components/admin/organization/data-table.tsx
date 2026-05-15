@@ -1,23 +1,18 @@
 "use client";
 
+import { keepPreviousData as keepPreviousQueryData, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useQueryApi } from "@/hooks/use-query-api";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import type { PaginationState, SortingState } from "@/types/index";
 import type { Organization } from "@/types/organization";
 
 interface Props {
   columns: ColumnDef<Organization, unknown>[];
-}
-
-interface ApiResponse {
-  rows: Organization[];
-  count: number;
-  limit: number;
-  offset: number;
 }
 
 export function OrganizationsDataTable({ columns }: Props) {
@@ -27,18 +22,21 @@ export function OrganizationsDataTable({ columns }: Props) {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
 
+  const input = useMemo(
+    () => buildCollectionQueryInput({ pagination, search: debouncedSearch, sorting }),
+    [debouncedSearch, pagination, sorting]
+  );
+
   const {
     data: apiResponse,
     isLoading,
     error: queryError,
     refetch,
-  } = useQueryApi<ApiResponse>({
-    endpoint: "/api/organizations",
-    pagination,
-    sorting,
-    search: debouncedSearch,
-    queryKey: ["organizations", "list"],
-    keepPreviousData: true,
+  } = useQuery({
+    placeholderData: keepPreviousQueryData,
+    ...apiQuery.organization.list.queryOptions({
+      input,
+    }),
   });
 
   const data = {

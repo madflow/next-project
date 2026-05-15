@@ -1,0 +1,9 @@
+{
+  "extends": "@repo/typescript-config/internal-package.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["node"]
+  },
+  "exclude": ["dist", "node_modules"],
+  "include": ["**/*.ts"]
+}

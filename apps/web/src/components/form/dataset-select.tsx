@@ -41,7 +41,7 @@ export function DatasetSelect({
       return defaultValue;
     }
 
-    return data.rows.some((item) => item.datasets.id === defaultValue) ? defaultValue : "";
+    return data.rows.some((item) => item.dataset?.id === defaultValue) ? defaultValue : "";
   }, [data?.rows, defaultValue]);
 
   React.useEffect(() => {
@@ -54,8 +54,8 @@ export function DatasetSelect({
       return;
     }
 
-    const selectedDataset = data.rows.find((item) => item.datasets.id === selectedValue);
-    onDatasetLabelChange?.(selectedDataset?.datasets.name ?? null);
+    const selectedDataset = data.rows.find((item) => item.dataset?.id === selectedValue);
+    onDatasetLabelChange?.(selectedDataset?.dataset?.name ?? null);
   }, [data?.rows, onDatasetLabelChange, selectedValue]);
 
   if (isLoading) {
@@ -100,15 +100,21 @@ export function DatasetSelect({
       <SelectContent data-testid="app.dropdown.dataset.content">
         <SelectGroup key="dataset-group">
           <SelectLabel key="dataset-label">{t("selectDataset")}</SelectLabel>
-          {data.rows.map((item) => (
-            <SelectItem
-              className="truncate"
-              key={item.datasets.id}
-              value={item.datasets.id}
-              data-testid={`dataset-dropdown-item-${item.datasets.id}`}>
-              {item.datasets.name}
-            </SelectItem>
-          ))}
+          {data.rows.flatMap((item) => {
+            if (!item.dataset) {
+              return [];
+            }
+
+            return [
+              <SelectItem
+                className="truncate"
+                key={item.dataset.id}
+                value={item.dataset.id}
+                data-testid={`dataset-dropdown-item-${item.dataset.id}`}>
+                {item.dataset.name}
+              </SelectItem>,
+            ];
+          })}
         </SelectGroup>
       </SelectContent>
     </Select>

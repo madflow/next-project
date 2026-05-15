@@ -99,7 +99,7 @@ test.describe("API Variablesets by id @api", () => {
     test("denies access for user with no organization", async ({ page }) => {
       await loginAs(page, "accountInNoOrg");
       const response = await page.request.get(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/variables`);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user with dataset access", async ({ page }) => {
@@ -128,7 +128,7 @@ test.describe("API Variablesets by id @api", () => {
     test("denies access for user with no organization", async ({ page }) => {
       await loginAs(page, "accountInNoOrg");
       const response = await page.request.get(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user with dataset access", async ({ page }) => {
@@ -256,33 +256,27 @@ test.describe("API Variablesets by id @api", () => {
     });
   });
 
-  test.describe("DELETE /api/variablesets/:id/contents", () => {
+  test.describe("DELETE /api/variablesets/:id/contents/:contentId", () => {
     test("denies access when not logged in", async ({ page }) => {
-      const response = await page.request.delete(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
-        data: {
-          contentId: NON_EXISTENT_ID,
-        },
-      });
+      const response = await page.request.delete(
+        `/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents/${NON_EXISTENT_ID}`
+      );
       expect(response.status()).toBe(401);
     });
 
     test("denies access for user with no organization", async ({ page }) => {
       await loginAs(page, "accountInNoOrg");
-      const response = await page.request.delete(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
-        data: {
-          contentId: NON_EXISTENT_ID,
-        },
-      });
+      const response = await page.request.delete(
+        `/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents/${NON_EXISTENT_ID}`
+      );
       expect(response.status()).toBe(401);
     });
 
     test("denies access for regular user", async ({ page }) => {
       await loginAs(page, "regularUser");
-      const response = await page.request.delete(`/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents`, {
-        data: {
-          contentId: NON_EXISTENT_ID,
-        },
-      });
+      const response = await page.request.delete(
+        `/api/variablesets/${ACCESSIBLE_VARIABLESET_ID}/contents/${NON_EXISTENT_ID}`
+      );
       expect(response.status()).toBe(401);
     });
 
@@ -301,11 +295,7 @@ test.describe("API Variablesets by id @api", () => {
 
       const created = (await createResponse.json()) as { id: string };
 
-      const deleteResponse = await page.request.delete(`/api/variablesets/${tempId}/contents`, {
-        data: {
-          contentId: created.id,
-        },
-      });
+      const deleteResponse = await page.request.delete(`/api/variablesets/${tempId}/contents/${created.id}`);
 
       expect(deleteResponse.status()).toBe(200);
       expect(await deleteResponse.json()).toEqual({ success: true });

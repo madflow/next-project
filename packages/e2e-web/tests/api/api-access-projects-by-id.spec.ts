@@ -17,7 +17,7 @@ test.describe("API projects by id access @api", () => {
       await loginAs(page, "accountInNoOrg");
 
       const response = await page.request.get(PROJECT_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user in the project organization", async ({ page }) => {

@@ -1,8 +1,9 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { addSplitVariableAction, removeSplitVariableAction } from "@/actions/dataset-splitvariable";
 import { AdminVariableRow } from "@/components/admin/variable-row";
@@ -11,19 +12,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ItemGroup } from "@/components/ui/item";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchInput } from "@/components/ui/search-input";
-import { useQueryApi } from "@/hooks/use-query-api";
-import type { DatasetVariable } from "@/types/dataset-variable";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 
 interface SplitVariablesAssignmentProps {
   datasetId: string;
   onRefresh?: () => void;
-}
-
-interface ApiResponse {
-  rows: DatasetVariable[];
-  count: number;
-  limit: number;
-  offset: number;
 }
 
 export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariablesAssignmentProps) {
@@ -34,30 +28,50 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
   const [isRemoving, setIsRemoving] = useState<string | null>(null);
 
   // Fetch available variables (not yet split variables)
+  const availableInput = useMemo(
+    () =>
+      buildCollectionQueryInput({
+        input: { id: datasetId },
+        pagination: { pageIndex: 0, pageSize: 100 },
+        search: availableSearch,
+        sorting: [],
+      }),
+    [availableSearch, datasetId]
+  );
+
   const {
     data: availableResponse,
     isLoading: isLoadingAvailable,
     refetch: refetchAvailable,
-  } = useQueryApi<ApiResponse>({
-    endpoint: `/api/datasets/${datasetId}/variables/available-for-split`,
-    pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
-    search: availableSearch,
-    queryKey: ["available-split-variables", datasetId, availableSearch],
+  } = useQuery({
+    ...apiQuery.dataset.variables.availableForSplit.queryOptions({
+      input: availableInput,
+    }),
   });
 
   // Fetch assigned split variables
+  const assignedInput = useMemo(
+    () =>
+      buildCollectionQueryInput({
+        input: { embed: "variable", id: datasetId },
+        pagination: { pageIndex: 0, pageSize: 100 },
+        search: assignedSearch,
+        sorting: [{ desc: false, id: "variable:name" }],
+      }),
+    [assignedSearch, datasetId]
+  );
+
   const {
     data: assignedResponse,
     isLoading: isLoadingAssigned,
     refetch: refetchAssigned,
-  } = useQueryApi<ApiResponse>({
-    endpoint: `/api/datasets/${datasetId}/splitvariables`,
-    pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
-    search: assignedSearch,
-    queryKey: ["assigned-split-variables", datasetId, assignedSearch],
+  } = useQuery({
+    ...apiQuery.dataset.splitVariables.list.queryOptions({
+      input: assignedInput,
+    }),
   });
+
+  const assignedRows = assignedResponse?.rows.filter((item) => item.variable) ?? [];
 
   const handleAssignVariable = async (variableId: string) => {
     setIsAssigning(variableId);
@@ -161,7 +175,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
             <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.assigned.section">
               {isLoadingAssigned ? (
                 <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
-              ) : assignedResponse?.rows.length === 0 ? (
+              ) : assignedRows.length === 0 ? (
                 <div
                   className="text-muted-foreground p-4 text-center text-sm"
                   data-testid="admin.dataset.splitvariables.assigned.empty">
@@ -169,26 +183,26 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
                 </div>
               ) : (
                 <ItemGroup className="gap-1 p-2" data-testid="admin.dataset.splitvariables.assigned.variables.list">
-                  {assignedResponse?.rows.map((variable) => (
+                  {assignedRows.map((item) => (
                     <AdminVariableRow
-                      key={variable.id}
+                      key={item.id}
                       actions={
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleRemoveVariable(variable.id)}
-                          disabled={isRemoving === variable.id}
+                          onClick={() => handleRemoveVariable(item.variableId)}
+                          disabled={isRemoving === item.variableId}
                           className="mt-0.5 h-6 w-6 shrink-0 p-0"
                           data-testid="admin.dataset.splitvariables.assignment.remove">
-                          {isRemoving === variable.id ? "..." : <X className="h-3 w-3" />}
+                          {isRemoving === item.variableId ? "..." : <X className="h-3 w-3" />}
                         </Button>
                       }
                       className="hover:bg-muted items-start gap-2 p-2"
-                      label={variable.label}
-                      measure={variable.measure}
-                      variableName={variable.name}
-                      variableType={variable.type}
-                      data-testid={`admin.dataset.splitvariables.assigned.variable.${variable.id}`}></AdminVariableRow>
+                      label={item.variable?.label}
+                      measure={item.variable?.measure}
+                      variableName={item.variable?.name}
+                      variableType={item.variable?.type}
+                      data-testid={`admin.dataset.splitvariables.assigned.variable.${item.id}`}></AdminVariableRow>
                   ))}
                 </ItemGroup>
               )}

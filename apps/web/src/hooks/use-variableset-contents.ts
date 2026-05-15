@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { apiQuery } from "@/lib/api-client";
 
 export type VariablesetContentEntry = {
   id: string;
@@ -25,17 +26,10 @@ export type VariablesetContentEntry = {
 
 export function useVariablesetContents(variablesetId: string | null) {
   return useQuery({
-    queryKey: ["variableset-contents", variablesetId],
-    queryFn: async (): Promise<VariablesetContentEntry[]> => {
-      if (!variablesetId) return [];
-
-      const response = await fetch(`/api/variablesets/${variablesetId}/contents`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch variableset contents");
-      }
-      const data = await response.json();
-      return data.contents || [];
-    },
     enabled: !!variablesetId,
+    ...apiQuery.variableset.contents.get.queryOptions({
+      input: { id: variablesetId ?? "" },
+      select: (data): VariablesetContentEntry[] => data.contents || [],
+    }),
   });
 }

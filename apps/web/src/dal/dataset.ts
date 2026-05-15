@@ -1,19 +1,12 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
-import {
-  datasetProject,
-  dataset as entity,
-  member,
-  organization,
-  project,
-  selectDatasetSchema,
-} from "@repo/database/schema";
+import { eq } from "drizzle-orm";
+import { dataset as entity, organization } from "@repo/database/schema";
 import { deleteDataset as s3DeleteDataset } from "@repo/storage";
-import { getAuthenticatedClient, getSessionUser, withAdminCheck, withSessionCheck } from "@/dal/dal";
-import { createListWithJoins } from "@/dal/dal-joins";
-import { DalException, DalNotAuthorizedException } from "@/lib/exception";
+import { getAuthenticatedClient, withAdminCheck, withSessionCheck } from "@/dal/dal";
+import { DalException } from "@/lib/exception";
+import type { DatasetWithOrganizationJoin } from "@/types/dataset";
 
-const findFn = async (id: string) => {
+const findFn = async (id: string): Promise<DatasetWithOrganizationJoin | null> => {
   const db = await getAuthenticatedClient();
   const [result] = await db
     .select()
@@ -32,15 +25,6 @@ const findFn = async (id: string) => {
 };
 
 export const find = withSessionCheck(findFn);
-
-export const list = withAdminCheck(
-  createListWithJoins(entity, selectDatasetSchema, [
-    {
-      table: organization,
-      condition: eq(entity.organizationId, organization.id),
-    },
-  ])
-);
 
 export const deleteDataset = withAdminCheck(async (datasetId: string) => {
   const db = await getAuthenticatedClient();
@@ -67,33 +51,3 @@ export const deleteDataset = withAdminCheck(async (datasetId: string) => {
     throw new DalException("Failed to delete dataset. Please try again.");
   }
 });
-
-export async function assertAccess(datasetId: string) {
-  const canAccess = await hasAccess(datasetId);
-  if (!canAccess) {
-    throw new DalNotAuthorizedException("You do not have access to this dataset");
-  }
-}
-
-async function hasAccess(datasetId: string) {
-  const user = await getSessionUser();
-  if (!user) {
-    return false;
-  }
-
-  if (user.role === "admin") {
-    return true;
-  }
-
-  const db = await getAuthenticatedClient();
-
-  const rows = await db
-    .select()
-    .from(entity)
-    .innerJoin(datasetProject, eq(entity.id, datasetProject.datasetId))
-    .innerJoin(project, eq(project.id, datasetProject.projectId))
-    .innerJoin(organization, eq(organization.id, project.organizationId))
-    .innerJoin(member, eq(member.organizationId, organization.id))
-    .where(and(eq(member.userId, user.id), eq(entity.id, datasetId)));
-  return rows.length > 0;
-}

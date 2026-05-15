@@ -13,6 +13,9 @@
     "apps/web": {
       "ignoreDependencies": ["webpack"]
     },
+    "packages/api": {
+      "project": ["src/**/*.ts"]
+    },
     "packages/worker": {
       "entry": ["src/runner.ts"],
       "project": ["src/**/*.ts"]
