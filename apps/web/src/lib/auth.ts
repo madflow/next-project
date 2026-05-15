@@ -1,3 +1,4 @@
+import { apiKey } from "@better-auth/api-key";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
@@ -200,6 +201,11 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    apiKey({
+      references: "user",
+      defaultPrefix: "uak_",
+      enableMetadata: true,
+    }),
     adminPlugin(),
     organizationPlugin({
       schema: {

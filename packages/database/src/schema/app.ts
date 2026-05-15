@@ -26,8 +26,8 @@ export const project = pgTable(
       .default(sql`uuidv7()`),
     name: text("name").notNull(),
     slug: text("slug").unique().notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => /* @__PURE__ */ new Date()),
     metadata: jsonb("metadata").$type<Record<string, unknown>>(),
     organizationId: uuid("organization_id")
       .notNull()
@@ -65,7 +65,7 @@ export const dataset = pgTable("datasets", {
     .references(() => organization.id, { onDelete: "cascade" }),
 
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => /* @__PURE__ */ new Date()),
 });
 
 export const insertDatasetSchema = createInsertSchema(dataset);
@@ -223,7 +223,7 @@ export const datasetVariableset = pgTable(
       .notNull()
       .references(() => dataset.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => /* @__PURE__ */ new Date()),
     orderIndex: integer("order_index").notNull().default(0),
     category: datasetVariablesetCategoryEnum().notNull().default("general"),
     attributes: jsonb("attributes").$type<z.infer<typeof datasetVariablesetAttributes>>(),
@@ -283,7 +283,7 @@ export const datasetVariablesetContent = pgTable(
     subsetId: uuid("subset_id").references((): AnyPgColumn => datasetVariableset.id, { onDelete: "cascade" }),
     attributes: jsonb("attributes").$type<VariablesetContentAttributes>(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => /* @__PURE__ */ new Date()),
   },
   (table) => [
     uniqueIndex("dataset_variableset_contents_variable_idx")
@@ -364,5 +364,5 @@ export const job = pgTable("jobs", {
   lastError: text("last_error"),
   status: jobStateEnum("status").notNull().default("created"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => /* @__PURE__ */ new Date()),
 });

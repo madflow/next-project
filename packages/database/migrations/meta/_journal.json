@@ -127,6 +127,20 @@
       "when": 1778605848879,
       "tag": "0017_green_spencer_smythe",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1779184145260,
+      "tag": "0018_goofy_hitman",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1779197483622,
+      "tag": "0019_yellow_lord_hawal",
+      "breakpoints": true
     }
   ]
 }
