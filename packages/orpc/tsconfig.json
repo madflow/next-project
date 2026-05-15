@@ -1,0 +1,5 @@
+{
+  "exclude": ["node_modules"],
+  "extends": "@repo/typescript-config/internal-package.json",
+  "include": ["src"]
+}
