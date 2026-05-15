@@ -1,12 +1,14 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { reorderVariablesetsAction } from "@/actions/dataset-variableset";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQueryApi } from "@/hooks/use-query-api";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 import { ExportImportActions } from "../dataset-variableset/export-import-actions";
 import { VariableAssignment } from "../dataset-variableset/variable-assignment";
@@ -17,10 +19,6 @@ interface VariablesetTabProps {
   datasetId: string;
 }
 
-interface HierarchyResponse {
-  hierarchy: VariablesetTreeNode[];
-}
-
 export function VariablesetTab({ datasetId }: VariablesetTabProps) {
   const t = useTranslations("adminDatasetVariableset");
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
@@ -28,16 +26,28 @@ export function VariablesetTab({ datasetId }: VariablesetTabProps) {
   const [editingVariableset, setEditingVariableset] = useState<DatasetVariableset | undefined>();
   const [assignmentKey, setAssignmentKey] = useState(0);
 
+  const input = useMemo(
+    () =>
+      buildCollectionQueryInput({
+        input: { hierarchical: "true", id: datasetId },
+        pagination: { pageIndex: 0, pageSize: 1000 },
+        search: "",
+        sorting: [],
+      }),
+    [datasetId]
+  );
+
   const {
     data: hierarchyResponse,
     isLoading,
     refetch,
-  } = useQueryApi<HierarchyResponse>({
-    endpoint: `/api/datasets/${datasetId}/variablesets?hierarchical=true`,
-    pagination: { pageIndex: 0, pageSize: 1000 },
-    sorting: [],
-    search: "",
-    queryKey: ["variableset-hierarchy", datasetId],
+  } = useQuery({
+    ...apiQuery.dataset.variablesets.list.queryOptions({
+      input,
+      select: (data) => ({
+        hierarchy: "hierarchy" in data ? data.hierarchy : [],
+      }),
+    }),
   });
 
   const hierarchy = hierarchyResponse?.hierarchy || [];

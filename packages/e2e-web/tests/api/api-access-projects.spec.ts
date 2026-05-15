@@ -16,7 +16,7 @@ test.describe("API Projects @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
       const response = await page.request.get("/api/projects");
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for admin user", async ({ page }) => {
@@ -79,8 +79,7 @@ test.describe("API Projects @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0]).toHaveProperty("projects");
-      expect(data.rows[0].projects.name).toContain("Test");
+      expect(data.rows[0].name).toContain("Test");
     });
 
     test("searches by project slug", async ({ page }) => {
@@ -114,7 +113,7 @@ test.describe("API Projects @api", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].projects.name.toLowerCase()).toContain("test");
+      expect(data.rows[0].name.toLowerCase()).toContain("test");
     });
   });
 
@@ -127,7 +126,7 @@ test.describe("API Projects @api", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].projects.name <= data.rows[1].projects.name).toBe(true);
+      expect(data.rows[0].name <= data.rows[1].name).toBe(true);
     });
 
     test("orders by project name descending", async ({ page }) => {
@@ -139,20 +138,20 @@ test.describe("API Projects @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      expect(data.rows[0].projects.name >= data.rows[1].projects.name).toBe(true);
+      expect(data.rows[0].name >= data.rows[1].name).toBe(true);
     });
 
     test("orders by organization name using joined table syntax", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects?order=organizations:name.asc");
+      const response = await page.request.get("/api/projects?embed=organization&order=organization:name.asc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
-      expect(data.rows[0]).toHaveProperty("organizations");
-      expect(data.rows[0].organizations).toHaveProperty("name");
+      expect(data.rows[0]).toHaveProperty("organization");
+      expect(data.rows[0].organization).toHaveProperty("name");
     });
 
     test("orders by creation date", async ({ page }) => {
@@ -164,8 +163,8 @@ test.describe("API Projects @api", () => {
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThanOrEqual(2);
-      const firstDate = new Date(data.rows[0].projects.createdAt);
-      const secondDate = new Date(data.rows[1].projects.createdAt);
+      const firstDate = new Date(data.rows[0].createdAt);
+      const secondDate = new Date(data.rows[1].createdAt);
       expect(firstDate >= secondDate).toBe(true);
     });
 
@@ -173,22 +172,22 @@ test.describe("API Projects @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects?order=organizations:name.asc,name.desc");
+      const response = await page.request.get("/api/projects?embed=organization&order=organization:name.asc,name.desc");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
     });
 
-    test("ignores invalid order parameters", async ({ page }) => {
+    test("rejects invalid order parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       const response = await page.request.get("/api/projects?order=invalidcolumn.asc");
-      expect(response.status()).toBe(200);
+      expect(response.status()).toBe(422);
 
       const data = await response.json();
-      expect(Array.isArray(data.rows)).toBe(true);
+      expect(data.code).toBe("INPUT_VALIDATION_FAILED");
     });
   });
 
@@ -201,7 +200,7 @@ test.describe("API Projects @api", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].projects.name).toBe("Test Project");
+      expect(data.rows[0].name).toBe("Test Project");
     });
 
     test("filters by project slug", async ({ page }) => {
@@ -212,42 +211,44 @@ test.describe("API Projects @api", () => {
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].projects.slug).toBe("test-project");
+      expect(data.rows[0].slug).toBe("test-project");
     });
 
     test("filters by organization name using joined table syntax", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects?organizations:name=Test Organization");
+      const response = await page.request.get("/api/projects?embed=organization&organization:name=Test Organization");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0]).toHaveProperty("organizations");
-      expect(data.rows[0].organizations.name).toBe("Test Organization");
+      expect(data.rows[0]).toHaveProperty("organization");
+      expect(data.rows[0].organization.name).toBe("Test Organization");
     });
 
     test("filters by organization slug using joined table syntax", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects?organizations:slug=test-organization");
+      const response = await page.request.get("/api/projects?embed=organization&organization:slug=test-organization");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].organizations.slug).toBe("test-organization");
+      expect(data.rows[0].organization.slug).toBe("test-organization");
     });
 
     test("applies multiple filters with AND logic", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects?name=Test Project&organizations:name=Test Organization");
+      const response = await page.request.get(
+        "/api/projects?embed=organization&name=Test Project&organization:name=Test Organization"
+      );
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].projects.name).toBe("Test Project");
-      expect(data.rows[0].organizations.name).toBe("Test Organization");
+      expect(data.rows[0].name).toBe("Test Project");
+      expect(data.rows[0].organization.name).toBe("Test Organization");
     });
 
     test("returns empty results for non-matching filters", async ({ page }) => {
@@ -262,15 +263,15 @@ test.describe("API Projects @api", () => {
       expect(data.count).toBe(0);
     });
 
-    test("ignores invalid filter parameters", async ({ page }) => {
+    test("rejects invalid filter parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       const response = await page.request.get("/api/projects?invalidcolumn=value");
-      expect(response.status()).toBe(200);
+      expect(response.status()).toBe(422);
 
       const data = await response.json();
-      expect(Array.isArray(data.rows)).toBe(true);
+      expect(data.code).toBe("INPUT_VALIDATION_FAILED");
     });
   });
 
@@ -280,7 +281,7 @@ test.describe("API Projects @api", () => {
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       const response = await page.request.get(
-        "/api/projects?search=Test&organizations:name=Test Organization&order=name.asc&limit=5"
+        "/api/projects?embed=organization&search=Test&organization:name=Test Organization&order=name.asc&limit=5"
       );
       expect(response.status()).toBe(200);
 
@@ -293,13 +294,15 @@ test.describe("API Projects @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects?organizations:name=Test Organization&limit=3&offset=0");
+      const response = await page.request.get(
+        "/api/projects?embed=organization&organization:name=Test Organization&limit=3&offset=0"
+      );
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.limit).toBe(3);
       expect(data.offset).toBe(0);
-      expect(data.rows[0].organizations.name).toBe("Test Organization");
+      expect(data.rows[0].organization.name).toBe("Test Organization");
     });
   });
 
@@ -326,21 +329,20 @@ test.describe("API Projects @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
-      const response = await page.request.get("/api/projects");
+      const response = await page.request.get("/api/projects?embed=organization");
       expect(response.status()).toBe(200);
 
       const data = await response.json();
       expect(data.rows.length).toBeGreaterThan(0);
       const project = data.rows[0];
-      expect(project).toHaveProperty("projects");
-      expect(project.projects).toHaveProperty("id");
-      expect(project.projects).toHaveProperty("name");
-      expect(project.projects).toHaveProperty("slug");
-      expect(project.projects).toHaveProperty("organizationId");
-      expect(project).toHaveProperty("organizations");
-      expect(project.organizations).toHaveProperty("id");
-      expect(project.organizations).toHaveProperty("name");
-      expect(project.organizations).toHaveProperty("slug");
+      expect(project).toHaveProperty("id");
+      expect(project).toHaveProperty("name");
+      expect(project).toHaveProperty("slug");
+      expect(project).toHaveProperty("organizationId");
+      expect(project).toHaveProperty("organization");
+      expect(project.organization).toHaveProperty("id");
+      expect(project.organization).toHaveProperty("name");
+      expect(project.organization).toHaveProperty("slug");
     });
 
     test("count accuracy with filters", async ({ page }) => {
@@ -352,7 +354,7 @@ test.describe("API Projects @api", () => {
       const allData = await allResponse.json();
 
       // Get filtered count
-      const filteredResponse = await page.request.get("/api/projects?organizations:name=Test Organization");
+      const filteredResponse = await page.request.get("/api/projects?organization:name=Test Organization");
       const filteredData = await filteredResponse.json();
 
       expect(filteredData.count).toBeLessThanOrEqual(allData.count);
@@ -364,12 +366,12 @@ test.describe("API Projects @api", () => {
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       // Check if test project exists
-      const response = await page.request.get(`/api/projects?id=${TEST_PROJECT_ID}`);
+      const response = await page.request.get(`/api/projects?embed=organization&id=${TEST_PROJECT_ID}`);
       expect(response.status()).toBe(200);
 
       const data = await response.json();
-      expect(data.rows[0].projects.id).toBe(TEST_PROJECT_ID);
-      expect(data.rows[0].organizations.id).toBe(TEST_ORGANIZATION_ID);
+      expect(data.rows[0].id).toBe(TEST_PROJECT_ID);
+      expect(data.rows[0].organization.id).toBe(TEST_ORGANIZATION_ID);
     });
   });
 });

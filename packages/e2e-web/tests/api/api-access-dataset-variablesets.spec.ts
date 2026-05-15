@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { expect, test } from "@playwright/test";
 import { testIds, testUsers } from "../../config";
 import { loginUser } from "../../utils";
@@ -155,7 +156,7 @@ test.describe("API Dataset Variable Sets @api", () => {
       expect([200, 400].includes(response.status())).toBe(true);
     });
 
-    test("returns 400 for non-existent dataset", async ({ page }) => {
+    test("returns 404 for non-existent dataset", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
@@ -178,8 +179,7 @@ test.describe("API Dataset Variable Sets @api", () => {
           },
         },
       });
-      // Import endpoint's assertAccess error gets converted differently due to form parsing
-      expect(response.status()).toBe(400);
+      expect(response.status()).toBe(404);
     });
 
     test("returns 400 for invalid file format", async ({ page }) => {

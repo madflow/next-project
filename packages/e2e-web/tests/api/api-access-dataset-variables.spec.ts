@@ -9,7 +9,7 @@ test.describe("Api access dataset variables @api", () => {
     await page.goto("/");
     await loginUser(page, testUsers.accountInNoOrg.email, testUsers.accountInNoOrg.password);
     const list = await page.request.get(TEST_ENDPOINT);
-    expect(list.status()).toBe(401);
+    expect(list.status()).toBe(403);
   });
 
   test("list logged in as regular user", async ({ page }) => {

@@ -1,23 +1,18 @@
 "use client";
 
+import { keepPreviousData as keepPreviousQueryData, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useQueryApi } from "@/hooks/use-query-api";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import type { PaginationState, SortingState } from "@/types/index";
 import type { AuthUser } from "@/types/user";
 
 interface Props {
   columns: ColumnDef<AuthUser, unknown>[];
-}
-
-interface ApiResponse {
-  rows: AuthUser[];
-  count: number;
-  limit: number;
-  offset: number;
 }
 
 export function UsersDataTable({ columns }: Props) {
@@ -27,18 +22,21 @@ export function UsersDataTable({ columns }: Props) {
   const debouncedSearch = useDebouncedValue(search, 300);
   const t = useTranslations("user");
 
+  const input = useMemo(
+    () => buildCollectionQueryInput({ pagination, search: debouncedSearch, sorting }),
+    [debouncedSearch, pagination, sorting]
+  );
+
   const {
     data: apiResponse,
     isLoading,
     error: queryError,
     refetch,
-  } = useQueryApi<ApiResponse>({
-    endpoint: "/api/users",
-    pagination,
-    sorting,
-    search: debouncedSearch,
-    queryKey: ["users", "list"],
-    keepPreviousData: true,
+  } = useQuery({
+    placeholderData: keepPreviousQueryData,
+    ...apiQuery.user.list.queryOptions({
+      input,
+    }),
   });
 
   // Convert Error object to string for the DataTable component

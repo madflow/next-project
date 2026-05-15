@@ -4,23 +4,10 @@ import { defaultClient as db } from "@repo/database/clients";
 import {
   UpdateDatasetVariableData,
   datasetVariable as entity,
-  selectDatasetVariableSchema,
   updateDatasetVariableSchema,
 } from "@repo/database/schema";
-import { ListOptions, createList, withAdminCheck, withSessionCheck } from "@/dal/dal";
+import { withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { DalException } from "@/lib/exception";
-
-const baseList = createList(entity, selectDatasetVariableSchema);
-
-async function listByDatasetFn(datasetId: string, options: ListOptions = {}) {
-  const listOptions: ListOptions = {
-    ...options,
-    filters: [...(options.filters || []), { column: "datasetId", operator: "eq", value: datasetId }],
-  };
-  return baseList(listOptions);
-}
-
-export const listByDataset = withSessionCheck(listByDatasetFn);
 
 async function updateFn(id: string, data: UpdateDatasetVariableData) {
   const updateData = updateDatasetVariableSchema.parse(data);

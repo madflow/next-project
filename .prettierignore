@@ -1,3 +1,4 @@
 apps/web/src/components/ui/**
 .agents
 apps/analysis/.venv/**
+packages/e2e-web/test-results/**

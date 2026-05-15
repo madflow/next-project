@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -8,16 +9,11 @@ import { ProjectSelect } from "@/components/form/project-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ApiResponsePayload, useQueryApi } from "@/hooks/use-api";
-import { Project } from "@/types/project";
+import { apiQuery } from "@/lib/api-client";
 
 type DatasetProjectsProps = {
   datasetId: string;
   organizationId: string;
-};
-
-type ResponseRow = {
-  projects: Project;
 };
 
 export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsProps) {
@@ -25,13 +21,19 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
   const [isAddingToProject, setIsAddingToProject] = useState(false);
   const t = useTranslations("adminDatasetEditor");
 
-  const { data, isSuccess, isError, refetch } = useQueryApi<ApiResponsePayload<ResponseRow>>(
-    `/api/datasets/${datasetId}/projects`,
-    {
-      limit: 100,
-      offset: 0,
-    }
-  );
+  const { data, isSuccess, isError, refetch } = useQuery({
+    enabled: !!datasetId,
+    ...apiQuery.dataset.projects.list.queryOptions({
+      input: {
+        embed: "project",
+        id: datasetId,
+        limit: "100",
+        offset: "0",
+      },
+    }),
+  });
+
+  const rows = data?.rows.filter((item) => item.project) ?? [];
 
   const handleAddToProject = async () => {
     if (!selectedProject) {
@@ -93,9 +95,9 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.rows.map((item) => (
-                  <TableRow key={item.projects.id}>
-                    <TableCell className="font-medium">{item.projects.name}</TableCell>
+                {rows.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.project?.name}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

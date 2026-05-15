@@ -12,10 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DatasetWithOrganization } from "@/types/dataset";
+import type { DatasetWithEmbeddedOrganization } from "@/types/dataset";
 
 type InfoDatasetModalProps = {
-  dataset: DatasetWithOrganization;
+  dataset: DatasetWithEmbeddedOrganization;
 };
 export const InfoDatasetModal = ({ dataset }: InfoDatasetModalProps) => {
   const t = useTranslations("adminDatasetInfoModal");
@@ -28,7 +28,7 @@ export const InfoDatasetModal = ({ dataset }: InfoDatasetModalProps) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[768px]">
         <DialogHeader>
-          <DialogTitle>{dataset.datasets.name}</DialogTitle>
+          <DialogTitle>{dataset.name}</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <Code>{JSON.stringify(dataset, null, 2)}</Code>

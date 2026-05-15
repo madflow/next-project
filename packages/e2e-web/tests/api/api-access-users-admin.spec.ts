@@ -16,7 +16,7 @@ test.describe("API users admin access @api", () => {
       await loginAs(page, "regularUser");
 
       const response = await page.request.get(USERS_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for admin without organization memberships", async ({ page }) => {
@@ -41,7 +41,7 @@ test.describe("API users admin access @api", () => {
       await loginAs(page, "regularUser");
 
       const response = await page.request.get(USER_DETAIL_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for admin without organization memberships", async ({ page }) => {

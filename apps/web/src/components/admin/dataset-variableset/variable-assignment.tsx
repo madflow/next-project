@@ -11,9 +11,10 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useQuery } from "@tanstack/react-query";
 import { FolderOpen, GripVertical, Plus, Search, Unlink, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { DatasetVariableMeasure, DatasetVariableType, VariablesetContentAttributes } from "@repo/database/schema";
 import {
@@ -31,22 +32,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchInput } from "@/components/ui/search-input";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useQueryApi } from "@/hooks/use-query-api";
 import { type VariablesetContentEntry, useVariablesetContents } from "@/hooks/use-variableset-contents";
-import type { DatasetVariable } from "@/types/dataset-variable";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import { AllowedStatisticsSelector } from "./allowed-statistics-selector";
 
 interface VariableAssignmentProps {
   datasetId: string;
   selectedSetId: string | null;
   onRefresh: () => void;
-}
-
-interface AvailableApiResponse {
-  rows: DatasetVariable[];
-  count: number;
-  limit: number;
-  offset: number;
 }
 
 // --- Sortable item: variable ---
@@ -198,17 +192,26 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // Fetch unassigned variables
+  const unassignedInput = useMemo(
+    () =>
+      buildCollectionQueryInput({
+        input: { id: datasetId },
+        pagination: { pageIndex: 0, pageSize: 100 },
+        search: availableSearch,
+        sorting: [],
+      }),
+    [availableSearch, datasetId]
+  );
+
   const {
     data: unassignedResponse,
     isLoading: isLoadingUnassigned,
     refetch: refetchUnassigned,
-  } = useQueryApi<AvailableApiResponse>({
-    endpoint: `/api/datasets/${datasetId}/variables/unassigned`,
-    pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
-    search: availableSearch,
-    queryKey: ["unassigned-variables", datasetId, availableSearch],
+  } = useQuery({
     enabled: !!selectedSetId,
+    ...apiQuery.dataset.variables.unassigned.queryOptions({
+      input: unassignedInput,
+    }),
   });
 
   // Fetch unified contents (variables + subsets interleaved by position)

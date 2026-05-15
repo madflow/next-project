@@ -19,6 +19,7 @@ import {
   matchesAdhocUrlSelection,
   parseAdhocUrlState,
 } from "@/lib/adhoc-url-state";
+import { apiClient } from "@/lib/api-client";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
@@ -167,12 +168,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           return null;
         }
 
-        const response = await fetch(`/api/variablesets/${selection.variablesetId}/variables`);
-        if (!response.ok) {
-          return null;
-        }
-
-        const data = (await response.json()) as VariablesResponse;
+        const data = (await apiClient.variableset.variables.list({ id: selection.variablesetId })) as VariablesResponse;
         return {
           type: "set" as const,
           variableset,
@@ -185,28 +181,25 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
         : null;
 
       if (selection.parentVariablesetId) {
-        const response = await fetch(`/api/variablesets/${selection.parentVariablesetId}/variables`);
-        if (response.ok) {
-          const data = (await response.json()) as VariablesResponse;
-          const variable = data.rows.find((item) => item.name === selection.variableName);
+        const data = (await apiClient.variableset.variables.list({
+          id: selection.parentVariablesetId,
+        })) as VariablesResponse;
+        const variable = data.rows.find((item) => item.name === selection.variableName);
 
-          if (variable) {
-            return {
-              type: "variable" as const,
-              variable,
-              parentVariableset: parentVariableset || undefined,
-            };
-          }
+        if (variable) {
+          return {
+            type: "variable" as const,
+            variable,
+            parentVariableset: parentVariableset || undefined,
+          };
         }
       }
 
-      const params = new URLSearchParams({ name: selection.variableName, limit: "1" });
-      const response = await fetch(`/api/datasets/${datasetId}/variables?${params.toString()}`);
-      if (!response.ok) {
-        return null;
-      }
-
-      const data = (await response.json()) as VariablesResponse;
+      const data = (await apiClient.dataset.variables.list({
+        id: datasetId,
+        limit: "1",
+        name: selection.variableName,
+      })) as VariablesResponse;
       const variable = data.rows.find((item) => item.name === selection.variableName);
 
       if (!variable) {

@@ -33,21 +33,25 @@ export function ChartExportMenu({
           variant="outline"
           size="icon-sm"
           disabled={disabled}
+          data-testid="chart-export-trigger"
           aria-label={t("buttonLabel")}
           title={t("buttonLabel")}>
           <DownloadIcon className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => void onExportImage()} disabled={disabled}>
+        <DropdownMenuItem data-testid="chart-export-image" onClick={() => void onExportImage()} disabled={disabled}>
           <FileImageIcon className="h-4 w-4" />
           {t("image")}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => void onExportExcel()} disabled={disabled}>
+        <DropdownMenuItem data-testid="chart-export-excel" onClick={() => void onExportExcel()} disabled={disabled}>
           <SheetIcon className="h-4 w-4" />
           {t("excel")}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => void onExportPowerPoint()} disabled={disabled}>
+        <DropdownMenuItem
+          data-testid="chart-export-powerpoint"
+          onClick={() => void onExportPowerPoint()}
+          disabled={disabled}>
           <PresentationIcon className="h-4 w-4" />
           {t("powerpoint")}
         </DropdownMenuItem>

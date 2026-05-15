@@ -18,7 +18,7 @@ test.describe("API organizations by id access @api", () => {
       await loginAs(page, "accountInNoOrg");
 
       const response = await page.request.get(ORGANIZATION_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user in the organization", async ({ page }) => {
@@ -52,7 +52,7 @@ test.describe("API organizations by id access @api", () => {
       await loginAs(page, "accountInNoOrg");
 
       const response = await page.request.get(ORGANIZATION_PROJECTS_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user in the organization", async ({ page }) => {

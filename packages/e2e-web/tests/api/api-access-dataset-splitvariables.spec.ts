@@ -33,7 +33,7 @@ test.describe("API dataset split variables access @api", () => {
       await loginAs(page, "accountInNoOrg");
 
       const response = await page.request.get(LIST_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user with dataset access", async ({ page }) => {
@@ -72,7 +72,7 @@ test.describe("API dataset split variables access @api", () => {
       const response = await page.request.post(
         `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/splitvariables/${PLACEHOLDER_VARIABLE_ID}`
       );
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("denies access for regular user with dataset access", async ({ page }) => {
@@ -81,7 +81,7 @@ test.describe("API dataset split variables access @api", () => {
       const response = await page.request.post(
         `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/splitvariables/${PLACEHOLDER_VARIABLE_ID}`
       );
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for admin without organization memberships", async ({ browser }) => {
@@ -133,7 +133,7 @@ test.describe("API dataset split variables access @api", () => {
       const response = await page.request.delete(
         `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/splitvariables/${PLACEHOLDER_VARIABLE_ID}`
       );
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("denies access for regular user with dataset access", async ({ page }) => {
@@ -142,7 +142,7 @@ test.describe("API dataset split variables access @api", () => {
       const response = await page.request.delete(
         `/api/datasets/${DATASET_WITH_VARIABLESETS_ID}/splitvariables/${PLACEHOLDER_VARIABLE_ID}`
       );
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for admin without organization memberships", async ({ browser }) => {

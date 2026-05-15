@@ -5,9 +5,11 @@ import { join } from "node:path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { z } from "zod";
+import { createAuth } from "@repo/auth/server";
 import { adminClient, adminPool } from "@repo/database/clients";
 import {
   account,
+  apikey,
   dataset,
   datasetProject,
   datasetSplitVariable,
@@ -30,6 +32,7 @@ import { createDataset as createDatasetService } from "@/lib/dataset-service";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const auth = createAuth();
 
 const ADMIN_USER_UID = "0198e599-eab0-7cb8-861f-72a8f6d7abb1";
 const REGULAR_USER_UID = "0198e59c-e576-78d2-8606-61f0275aca5a";
@@ -112,6 +115,19 @@ interface CreateUserParams {
   emailVerified: boolean;
   role: string;
   password: string;
+}
+
+async function createAPIKeyForUser(userId: string, name: string) {
+  const createdKey = await auth.api.createApiKey({
+    body: {
+      name,
+      userId,
+    },
+  });
+
+  console.log(`API key created: ${name}`);
+
+  return createdKey;
 }
 
 async function createUser({ id, name, email, emailVerified, role, password }: CreateUserParams) {
@@ -364,6 +380,7 @@ async function createDatasetVariableSets(datasetId: string, fixtureFile: string)
 
 // Truncate tables in the correct order to respect foreign key constraints
 console.log("Truncating tables...");
+await adminClient.delete(apikey).execute();
 await adminClient.delete(session).execute();
 await adminClient.delete(invitation).execute();
 await adminClient.delete(member).execute();
@@ -406,6 +423,7 @@ try {
     role: "admin",
     password: "Tester12345",
   });
+  const adminAPIKey = await createAPIKeyForUser(adminUserId, "Seeded Admin API Key");
 
   // Add admin as owner of the organization
   await adminClient.insert(member).values({
@@ -596,6 +614,7 @@ try {
 
   await adminPool.end();
 
+  console.log(`Admin API key: ${adminAPIKey.key}`);
   console.log("Seed completed successfully");
   process.exit(0);
 } catch (error) {

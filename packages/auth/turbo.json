@@ -1,0 +1,15 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL"]
+    },
+    "check-types": {
+      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL"]
+    },
+    "lint": {
+      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL"]
+    }
+  }
+}

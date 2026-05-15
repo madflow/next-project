@@ -21,6 +21,13 @@ type DistributionExportPayload = {
   };
 };
 
+const EXPORT_MENU_ITEM_TEST_IDS = {
+  excel: "chart-export-excel",
+  powerpoint: "chart-export-powerpoint",
+} as const;
+
+type ExportMenuItemTestId = (typeof EXPORT_MENU_ITEM_TEST_IDS)[keyof typeof EXPORT_MENU_ITEM_TEST_IDS];
+
 function colorChannelToHex(channel: number) {
   return channel.toString(16).padStart(2, "0");
 }
@@ -47,7 +54,7 @@ async function selectDegreeVariable(page: Page) {
 }
 
 async function selectTheme(page: Page, themeName: string) {
-  await page.getByRole("combobox", { name: "Change theme" }).click();
+  await page.getByTestId("theme-selector").click();
   await page.getByRole("option", { name: themeName }).click();
   await expect.poll(() => page.evaluate(() => document.body.className)).toContain(`theme-${themeName.toLowerCase()}`);
 }
@@ -122,9 +129,15 @@ async function readRenderedBarColor(page: Page) {
   });
 }
 
-async function captureExportPayload(page: Page, routePattern: string, menuItemName: string) {
+async function captureExportPayload(
+  page: Page,
+  routePattern: string,
+  menuItemTestId: ExportMenuItemTestId
+): Promise<DistributionExportPayload> {
   let capturedPayload: DistributionExportPayload | null = null;
   const isExcelExport = routePattern === EXCEL_EXPORT_ROUTE;
+  const exportTrigger = page.getByTestId("chart-export-trigger");
+  const exportMenuItem = page.getByTestId(menuItemTestId);
 
   await page.route(routePattern, async (route) => {
     capturedPayload = JSON.parse(route.request().postData() ?? "{}") as DistributionExportPayload;
@@ -140,13 +153,21 @@ async function captureExportPayload(page: Page, routePattern: string, menuItemNa
     });
   });
 
-  await page.getByRole("button", { name: "Export chart" }).click();
-  await page.getByRole("menuitem", { name: menuItemName }).click();
+  await exportTrigger.click();
+  await expect(exportMenuItem).toBeVisible();
+  await exportMenuItem.click();
+  await expect(exportMenuItem).toBeHidden();
 
   await expect.poll(() => capturedPayload).not.toBeNull();
   await page.unroute(routePattern);
 
-  return capturedPayload as DistributionExportPayload;
+  const payload = capturedPayload;
+
+  if (!payload) {
+    throw new Error("Expected export payload to be captured");
+  }
+
+  return payload;
 }
 
 function expectDistributionColorsToMatchTheme(
@@ -174,11 +195,15 @@ test.describe("Adhoc Analysis - Export Theme Colors", () => {
     expect(new Set(expectedPalette)).toEqual(new Set([expectedBarColor]));
     expect(colorChannelToHex(Number.parseInt(expectedBarColor.slice(1, 3), 16))).toBe(expectedBarColor.slice(1, 3));
 
-    const excelPayload = await captureExportPayload(page, EXCEL_EXPORT_ROUTE, "Export as Excel");
+    const excelPayload = await captureExportPayload(page, EXCEL_EXPORT_ROUTE, EXPORT_MENU_ITEM_TEST_IDS.excel);
     expect(excelPayload.file_name).toMatch(/^degree-\d{4}-\d{2}-\d{2}\.xlsx$/);
     expectDistributionColorsToMatchTheme(excelPayload, expectedPalette, expectedBarColor);
 
-    const powerpointPayload = await captureExportPayload(page, POWERPOINT_EXPORT_ROUTE, "Export as PowerPoint");
+    const powerpointPayload = await captureExportPayload(
+      page,
+      POWERPOINT_EXPORT_ROUTE,
+      EXPORT_MENU_ITEM_TEST_IDS.powerpoint
+    );
     expect(powerpointPayload.file_name).toMatch(/^degree-\d{4}-\d{2}-\d{2}\.pptx$/);
     expectDistributionColorsToMatchTheme(powerpointPayload, expectedPalette, expectedBarColor);
   });

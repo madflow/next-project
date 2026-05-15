@@ -1,23 +1,18 @@
 "use client";
 
+import { keepPreviousData as keepPreviousQueryData, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useQueryApi } from "@/hooks/use-query-api";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import type { PaginationState, SortingState } from "@/types";
 import type { DatasetVariable } from "@/types/dataset-variable";
 import { useDatasetVariableColumns } from "./columns";
 
 interface Props {
   datasetId: string;
-}
-
-interface ApiResponse {
-  rows: DatasetVariable[];
-  count: number;
-  limit: number;
-  offset: number;
 }
 
 export function DatasetVariablesDataTable({ datasetId }: Props) {
@@ -28,18 +23,21 @@ export function DatasetVariablesDataTable({ datasetId }: Props) {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
 
+  const input = useMemo(
+    () => buildCollectionQueryInput({ input: { id: datasetId }, pagination, search: debouncedSearch, sorting }),
+    [datasetId, debouncedSearch, pagination, sorting]
+  );
+
   const {
     data: apiResponse,
     isLoading,
     error: queryError,
     refetch,
-  } = useQueryApi<ApiResponse>({
-    endpoint: `/api/datasets/${datasetId}/variables`,
-    pagination,
-    sorting,
-    search: debouncedSearch,
-    queryKey: ["dataset-variables", "list", datasetId],
-    keepPreviousData: true,
+  } = useQuery({
+    placeholderData: keepPreviousQueryData,
+    ...apiQuery.dataset.variables.list.queryOptions({
+      input,
+    }),
   });
 
   const data = {

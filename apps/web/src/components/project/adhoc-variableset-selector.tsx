@@ -9,6 +9,7 @@ import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
 import { useVariablesetContents } from "@/hooks/use-variableset-contents";
 import { useVariablesetVariables } from "@/hooks/use-variableset-variables";
+import { apiClient } from "@/lib/api-client";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
@@ -258,15 +259,12 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
   };
 
   const handleSelectSet = async (node: VariablesetTreeNode) => {
-    const response = await fetch(`/api/variablesets/${node.id}/variables`);
-    if (response.ok) {
-      const data = await response.json();
-      onSelectionChangeAction({
-        type: "set",
-        variableset: node,
-        variables: data.rows,
-      });
-    }
+    const data = await apiClient.variableset.variables.list({ id: node.id });
+    onSelectionChangeAction({
+      type: "set",
+      variableset: node,
+      variables: data.rows,
+    });
   };
 
   const handleSelectVariable = (variable: DatasetVariableWithAttributes, parentVariableset?: VariablesetTreeNode) => {
@@ -313,7 +311,12 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
       <CardFooter className="flex justify-end px-2">
         <Select value={activeTheme} onValueChange={setActiveTheme}>
           <SelectPrimitive.Trigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title={tTheme("changeTheme")}>
+            <Button
+              data-testid="theme-selector"
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              title={tTheme("changeTheme")}>
               <Palette className="h-4 w-4" />
             </Button>
           </SelectPrimitive.Trigger>

@@ -1,31 +1,29 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useQueryApi } from "@/hooks/use-query-api";
 import { getStatsResponseItem, isSplitVariableStats } from "@/lib/analysis-bridge";
+import { apiQuery } from "@/lib/api-client";
+import { buildCollectionQueryInput } from "@/lib/collection-query";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type StatsResponse } from "@/types/stats";
 
-type SplitVariablesResponse = {
-  rows: DatasetVariableWithAttributes[];
-  count: number;
-  limit: number;
-  offset: number;
-};
-
 export function useSplitVariables(datasetId?: string, enabled: boolean = true) {
-  const { data, isLoading } = useQueryApi<SplitVariablesResponse>({
-    endpoint: `/api/datasets/${datasetId}/splitvariables`,
-    pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
-    search: "",
-    queryKey: ["dataset-split-variables", datasetId],
+  const { data, isLoading } = useQuery({
     enabled: Boolean(datasetId) && enabled,
+    ...apiQuery.dataset.splitVariables.list.queryOptions({
+      input: buildCollectionQueryInput({
+        input: { embed: "variable", id: datasetId ?? "" },
+        pagination: { pageIndex: 0, pageSize: 100 },
+        search: "",
+        sorting: [{ desc: false, id: "variable:name" }],
+      }),
+    }),
   });
 
   return {
-    splitVariables: data?.rows ?? [],
+    splitVariables: data?.rows.flatMap((row) => (row.variable ? [row.variable] : [])) ?? [],
     isLoading,
   };
 }

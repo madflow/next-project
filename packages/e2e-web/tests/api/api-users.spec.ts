@@ -13,7 +13,7 @@ test.describe("API Users @api", () => {
       await page.goto("/");
       await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
       const response = await page.request.get("/api/users");
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for admin user", async ({ page }) => {
@@ -180,15 +180,15 @@ test.describe("API Users @api", () => {
       expect(data.rows.length).toBeGreaterThan(0);
     });
 
-    test("ignores invalid order parameters", async ({ page }) => {
+    test("rejects invalid order parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       const response = await page.request.get("/api/users?order=invalidcolumn.asc");
-      expect(response.status()).toBe(200);
+      expect(response.status()).toBe(422);
 
       const data = await response.json();
-      expect(Array.isArray(data.rows)).toBe(true);
+      expect(data.code).toBe("INPUT_VALIDATION_FAILED");
     });
   });
 
@@ -254,15 +254,15 @@ test.describe("API Users @api", () => {
       expect(data.count).toBe(0);
     });
 
-    test("ignores invalid filter parameters", async ({ page }) => {
+    test("rejects invalid filter parameters", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.admin.email, testUsers.admin.password);
 
       const response = await page.request.get("/api/users?invalidcolumn=value");
-      expect(response.status()).toBe(200);
+      expect(response.status()).toBe(422);
 
       const data = await response.json();
-      expect(Array.isArray(data.rows)).toBe(true);
+      expect(data.code).toBe("INPUT_VALIDATION_FAILED");
     });
   });
 

@@ -56,7 +56,7 @@ test.describe("API dataset resources access @api", () => {
       await loginAs(page, "accountInNoOrg");
 
       const response = await page.request.get(PROJECTS_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user with dataset access", async ({ page }) => {
@@ -137,7 +137,7 @@ test.describe("API dataset resources access @api", () => {
       await loginAs(page, "accountInNoOrg");
 
       const response = await page.request.get(AVAILABLE_FOR_SPLIT_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user with dataset access", async ({ page }) => {
@@ -171,7 +171,7 @@ test.describe("API dataset resources access @api", () => {
       await loginAs(page, "accountInNoOrg");
 
       const response = await page.request.get(UNASSIGNED_VARIABLES_ENDPOINT);
-      expect(response.status()).toBe(401);
+      expect(response.status()).toBe(403);
     });
 
     test("allows access for regular user with dataset access", async ({ page }) => {

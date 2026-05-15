@@ -3,6 +3,7 @@
 import { Check, Download, EllipsisVertical, Upload, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
+import type { VariableSetImportOptions, VariableSetImportResult } from "@repo/api/shared/variableset-transfer";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +22,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import type { VariableSetImportOptions, VariableSetImportResult } from "@/types/dataset-variableset-export";
 
 interface ExportImportActionsProps {
   datasetId: string;

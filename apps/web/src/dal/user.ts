@@ -1,18 +1,11 @@
 import "server-only";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { z } from "zod";
-import {
-  user as entity,
-  member,
-  organization,
-  selectOrganizationSchema,
-  selectUserSchema,
-} from "@repo/database/schema";
-import { createFind, createList, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/dal/dal";
+import { user as entity, selectUserSchema } from "@repo/database/schema";
+import { createFind, getAuthenticatedClient, getSessionUser, withAdminCheck } from "@/dal/dal";
 import { DalNotAuthorizedException } from "@/lib/exception";
 
 export const find = withAdminCheck(createFind(entity, selectUserSchema));
-export const list = withAdminCheck(createList(entity, selectUserSchema));
 
 // Schema for dataset in the tree
 const datasetSchema = z.object({
@@ -55,7 +48,6 @@ const userContextSchema = z.object({
   organizations: z.array(organizationSchema),
 });
 
-type UserDetails = z.infer<typeof userDetailsSchema>;
 type UserContext = z.infer<typeof userContextSchema>;
 
 export const getUserWithContext = async (): Promise<
@@ -254,55 +246,3 @@ export const getUserWithContext = async (): Promise<
     };
   }
 };
-
-export async function getCurrentUser(): Promise<UserDetails | null> {
-  const sessionUser = await getSessionUser();
-
-  if (!sessionUser) {
-    return null;
-  }
-  const db = await getAuthenticatedClient();
-  const [user] = await db.select().from(entity).where(eq(entity.id, sessionUser.id)).limit(1);
-  if (!user) {
-    return null;
-  }
-
-  const parsed = userDetailsSchema.safeParse({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    emailVerified: user.emailVerified,
-    image: user.image,
-    role: user.role,
-    locale: user.locale,
-  });
-
-  if (parsed.success) {
-    return parsed.data;
-  } else {
-    return null;
-  }
-}
-
-export async function getCurrentUserOrganizations(): Promise<z.infer<typeof selectOrganizationSchema>[]> {
-  const sessionUser = await getSessionUser();
-
-  if (!sessionUser) {
-    return [];
-  }
-
-  const userId = sessionUser.id;
-
-  const db = await getAuthenticatedClient();
-
-  const userOrganizations = await db
-    .select({ organizations: organization })
-    .from(organization)
-    .innerJoin(member, eq(member.organizationId, organization.id))
-    .innerJoin(entity, eq(member.userId, entity.id))
-    .where(eq(member.userId, userId));
-
-  return userOrganizations.map((uo) => {
-    return uo.organizations;
-  });
-}

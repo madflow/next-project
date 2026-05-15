@@ -12,7 +12,7 @@ test.describe("Api members @api", () => {
     await page.goto("/");
     await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
     const list = await page.request.get("/api/members");
-    expect(list.status()).toBe(401);
+    expect(list.status()).toBe(403);
   });
 
   test("list logged in as admin user", async ({ page }) => {
