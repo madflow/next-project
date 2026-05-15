@@ -13,6 +13,10 @@
     "apps/web": {
       "ignoreDependencies": ["webpack"]
     },
+    "packages/orpc": {
+      "entry": ["src/client/index.ts", "src/server/index.ts"],
+      "project": ["src/**/*.ts"]
+    },
     "packages/worker": {
       "entry": ["src/runner.ts"],
       "project": ["src/**/*.ts"]
