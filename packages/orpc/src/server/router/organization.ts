@@ -5,10 +5,12 @@ import type { Context } from "../context";
 
 const os = implement(contract).$context<Context>();
 
-const list = os.list.handler(async ({ context }) => {
+const list = os.list.handler(async ({ context, input }) => {
   const { db } = context;
 
-  const rows = await db.select().from(organizationSchema).execute();
+  const { limit, offset } = input;
+
+  const rows = await db.select().from(organizationSchema).limit(limit).offset(offset).execute();
 
   return rows;
 });
