@@ -4,10 +4,15 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "disableSourceOfProjectReferenceRedirect": true,
     "emitDeclarationOnly": true,
+    "incremental": true,
+    "module": "es2022",
+    "moduleResolution": "bundler",
     "noEmit": false,
     "outDir": "${configDir}/dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "tsBuildInfoFile": "${configDir}/.cache/tsbuildinfo.json"
   },
   "extends": "./base.json"
 }

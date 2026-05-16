@@ -1,5 +1,5 @@
 import { oc } from "@orpc/contract";
-import { contract as organization } from "./organization.js";
+import { contract as organization } from "./organization";
 
 export const appContract = oc
   .errors({

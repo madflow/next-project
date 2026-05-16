@@ -3,8 +3,8 @@ import type { ContractRouterClient, InferContractRouterOutputs } from "@orpc/con
 import { ResponseValidationPlugin } from "@orpc/contract/plugins";
 import { OpenAPILink } from "@orpc/openapi-client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import { appContract } from "../contract/index.js";
-import { joinUrl } from "../utils.js";
+import { appContract } from "../contract";
+import { joinUrl } from "../utils";
 
 export { isDefinedError, safe } from "@orpc/client";
 

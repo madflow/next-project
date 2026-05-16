@@ -341,19 +341,19 @@ importers:
     dependencies:
       '@orpc/client':
         specifier: ^1.14.3
-        version: 1.14.3(@opentelemetry/api@1.9.1)
+        version: 1.14.3
       '@orpc/contract':
         specifier: ^1.14.3
-        version: 1.14.3(@opentelemetry/api@1.9.1)
+        version: 1.14.3
       '@orpc/openapi-client':
         specifier: ^1.14.3
-        version: 1.14.3(@opentelemetry/api@1.9.1)
+        version: 1.14.3
       '@orpc/server':
         specifier: ^1.14.3
-        version: 1.14.3(@opentelemetry/api@1.9.1)(ws@8.18.3)
+        version: 1.14.3
       '@orpc/tanstack-query':
         specifier: ^1.14.3
-        version: 1.14.3(@opentelemetry/api@1.9.1)(@orpc/client@1.14.3(@opentelemetry/api@1.9.1))(@tanstack/query-core@5.100.9)
+        version: 1.14.3(@orpc/client@1.14.3)
       '@repo/database':
         specifier: workspace:*
         version: link:../database
@@ -369,10 +369,7 @@ importers:
         version: link:../typescript-config
       eslint:
         specifier: ^9.39.4
-        version: 9.39.4(jiti@2.7.0)
-      tsdown:
-        specifier: ^0.22.0
-        version: 0.22.0(oxc-resolver@11.19.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0))(tsx@4.21.0)(typescript@6.0.3)
+        version: 9.39.4
       typescript:
         specifier: ^6.0.0
         version: 6.0.3
@@ -7929,6 +7926,11 @@ snapshots:
       eslint: 9.39.4(jiti@2.7.0)
       eslint-visitor-keys: 3.4.3
 
+  '@eslint-community/eslint-utils@4.9.1(eslint@9.39.4)':
+    dependencies:
+      eslint: 9.39.4
+      eslint-visitor-keys: 3.4.3
+
   '@eslint-community/regexpp@4.12.2': {}
 
   '@eslint/config-array@0.21.2':
@@ -8460,19 +8462,19 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.7.1(@opentelemetry/api@1.9.1)
 
-  '@orpc/client@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/client@1.14.3':
     dependencies:
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-fetch': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-peer': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
+      '@orpc/standard-server-fetch': 1.14.3
+      '@orpc/standard-server-peer': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/contract@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/contract@1.14.3':
     dependencies:
-      '@orpc/client': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/client': 1.14.3
+      '@orpc/shared': 1.14.3
       '@standard-schema/spec': 1.1.0
       openapi-types: 12.1.3
     transitivePeerDependencies:
@@ -8480,91 +8482,86 @@ snapshots:
 
   '@orpc/interop@1.14.3': {}
 
-  '@orpc/openapi-client@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/openapi-client@1.14.3':
     dependencies:
-      '@orpc/client': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/contract': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/client': 1.14.3
+      '@orpc/contract': 1.14.3
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/server@1.14.3(@opentelemetry/api@1.9.1)(ws@8.18.3)':
+  '@orpc/server@1.14.3':
     dependencies:
-      '@orpc/client': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/contract': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/client': 1.14.3
+      '@orpc/contract': 1.14.3
       '@orpc/interop': 1.14.3
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-aws-lambda': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-fastify': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-fetch': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-node': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-peer': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
+      '@orpc/standard-server-aws-lambda': 1.14.3
+      '@orpc/standard-server-fastify': 1.14.3
+      '@orpc/standard-server-fetch': 1.14.3
+      '@orpc/standard-server-node': 1.14.3
+      '@orpc/standard-server-peer': 1.14.3
       cookie: 1.1.1
-    optionalDependencies:
-      ws: 8.18.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
       - fastify
 
-  '@orpc/shared@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/shared@1.14.3':
     dependencies:
       radash: 12.1.1
       type-fest: 5.6.0
-    optionalDependencies:
-      '@opentelemetry/api': 1.9.1
 
-  '@orpc/standard-server-aws-lambda@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/standard-server-aws-lambda@1.14.3':
     dependencies:
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-fetch': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-node': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
+      '@orpc/standard-server-fetch': 1.14.3
+      '@orpc/standard-server-node': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/standard-server-fastify@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/standard-server-fastify@1.14.3':
     dependencies:
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-node': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
+      '@orpc/standard-server-node': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/standard-server-fetch@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/standard-server-fetch@1.14.3':
     dependencies:
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/standard-server-node@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/standard-server-node@1.14.3':
     dependencies:
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server-fetch': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
+      '@orpc/standard-server-fetch': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/standard-server-peer@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/standard-server-peer@1.14.3':
     dependencies:
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/standard-server': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
+      '@orpc/standard-server': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/standard-server@1.14.3(@opentelemetry/api@1.9.1)':
+  '@orpc/standard-server@1.14.3':
     dependencies:
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
+      '@orpc/shared': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/tanstack-query@1.14.3(@opentelemetry/api@1.9.1)(@orpc/client@1.14.3(@opentelemetry/api@1.9.1))(@tanstack/query-core@5.100.9)':
+  '@orpc/tanstack-query@1.14.3(@orpc/client@1.14.3)':
     dependencies:
-      '@orpc/client': 1.14.3(@opentelemetry/api@1.9.1)
-      '@orpc/shared': 1.14.3(@opentelemetry/api@1.9.1)
-      '@tanstack/query-core': 5.100.9
+      '@orpc/client': 1.14.3
+      '@orpc/shared': 1.14.3
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
@@ -11566,6 +11563,45 @@ snapshots:
   eslint-visitor-keys@4.2.1: {}
 
   eslint-visitor-keys@5.0.1: {}
+
+  eslint@9.39.4:
+    dependencies:
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4)
+      '@eslint-community/regexpp': 4.12.2
+      '@eslint/config-array': 0.21.2
+      '@eslint/config-helpers': 0.4.2
+      '@eslint/core': 0.17.0
+      '@eslint/eslintrc': 3.3.5
+      '@eslint/js': 9.39.4
+      '@eslint/plugin-kit': 0.4.1
+      '@humanfs/node': 0.16.8
+      '@humanwhocodes/module-importer': 1.0.1
+      '@humanwhocodes/retry': 0.4.3
+      '@types/estree': 1.0.9
+      ajv: 6.15.0
+      chalk: 4.1.2
+      cross-spawn: 7.0.6
+      debug: 4.4.3
+      escape-string-regexp: 4.0.0
+      eslint-scope: 8.4.0
+      eslint-visitor-keys: 4.2.1
+      espree: 10.4.0
+      esquery: 1.7.0
+      esutils: 2.0.3
+      fast-deep-equal: 3.1.3
+      file-entry-cache: 8.0.0
+      find-up: 5.0.0
+      glob-parent: 6.0.2
+      ignore: 5.3.2
+      imurmurhash: 0.1.4
+      is-glob: 4.0.3
+      json-stable-stringify-without-jsonify: 1.0.1
+      lodash.merge: 4.6.2
+      minimatch: 3.1.5
+      natural-compare: 1.4.0
+      optionator: 0.9.4
+    transitivePeerDependencies:
+      - supports-color
 
   eslint@9.39.4(jiti@2.7.0):
     dependencies:
