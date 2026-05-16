@@ -22,6 +22,7 @@
   "dependencies": {
     "@orpc/client": "^1.14.3",
     "@orpc/contract": "^1.14.3",
+    "@orpc/openapi": "^1.14.3",
     "@orpc/openapi-client": "^1.14.3",
     "@orpc/server": "^1.14.3",
     "@orpc/tanstack-query": "^1.14.3",

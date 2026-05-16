@@ -3,7 +3,10 @@ import { z } from "zod";
 import { selectOrganizationSchema } from "@repo/database/schema";
 import { listInputSchema } from "./query";
 
-const listOrganizationContract = oc.input(listInputSchema).output(z.array(selectOrganizationSchema));
+const listOrganizationContract = oc.input(listInputSchema).output(z.array(selectOrganizationSchema)).route({
+  method: "GET",
+  path: "/organizations",
+});
 
 export const contract = {
   list: listOrganizationContract,

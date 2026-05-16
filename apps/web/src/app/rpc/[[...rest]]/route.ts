@@ -1,6 +1,7 @@
-import { createRPCHandler } from "@repo/orpc/server";
+import { defaultClient as db } from "@repo/database/clients";
+import { createApi } from "@repo/orpc/server";
 
-const handler = createRPCHandler();
+const handler = createApi({ db });
 
 export const HEAD = handler;
 export const GET = handler;
