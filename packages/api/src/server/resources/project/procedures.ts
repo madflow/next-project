@@ -1,4 +1,4 @@
-import { ORPCError, implement } from "@orpc/server";
+import { ORPCError } from "@orpc/server";
 import { eq, getTableColumns } from "drizzle-orm";
 import {
   type CreateProjectData,
@@ -8,13 +8,12 @@ import {
   organization,
   project as projectTable,
 } from "@repo/database/schema";
-import { projectContract } from "../../../shared/contract/resources/project";
+import { api, call, toProcedureContext } from "../../base";
 import { listCollection } from "../../collection-query";
 import type { Context } from "../../context";
-import { withIntegrityConstraintErrors } from "../../errors/integrity-constraint-error";
 import { projectQueryDefinition } from "./query-definition";
 
-const ps = implement(projectContract).$context<Context>();
+const ps = api.project;
 
 type ProjectListRow = Project & {
   organization?: Organization;
@@ -28,33 +27,11 @@ type UpdateProjectInput = {
 };
 
 export async function createProject(context: Pick<Context, "db">, input: CreateProjectData) {
-  return withIntegrityConstraintErrors(async () => {
-    const [project] = await context.db.insert(projectTable).values(input).returning();
-
-    if (project === undefined) {
-      throw new Error("Failed to create project");
-    }
-
-    return project;
-  });
+  return call(create, input, { context: toProcedureContext(context) });
 }
 
 export async function updateProject(context: Pick<Context, "db">, input: UpdateProjectInput) {
-  const { id } = input.params;
-  const changes = input.body;
-
-  return withIntegrityConstraintErrors(async () => {
-    const [project] = await context.db.update(projectTable).set(changes).where(eq(projectTable.id, id)).returning();
-
-    if (project === undefined) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Project not found",
-        status: 404,
-      });
-    }
-
-    return project;
-  });
+  return call(update, input, { context: toProcedureContext(context) });
 }
 
 export async function listProjects(context: Pick<Context, "db">, input: unknown) {
@@ -69,6 +46,20 @@ export async function listProjects(context: Pick<Context, "db">, input: unknown)
 }
 
 export async function deleteProject(context: Pick<Context, "db">, input: { id: string }) {
+  return call(remove, input, { context: toProcedureContext(context) });
+}
+
+const create = ps.create.handler(async ({ context, input }) => {
+  const [project] = await context.db.insert(projectTable).values(input).returning();
+
+  if (project === undefined) {
+    throw new Error("Failed to create project");
+  }
+
+  return project;
+});
+
+const remove = ps.delete.handler(async ({ context, input }) => {
   const [project] = await context.db.delete(projectTable).where(eq(projectTable.id, input.id)).returning();
 
   if (project === undefined) {
@@ -79,12 +70,34 @@ export async function deleteProject(context: Pick<Context, "db">, input: { id: s
   }
 
   return project;
-}
+});
 
-const create = ps.create.handler(async ({ context, input }) => createProject(context, input));
-const remove = ps.delete.handler(async ({ context, input }) => deleteProject(context, input));
-const list = ps.list.handler(async ({ context, input }) => listProjects(context, input));
-const update = ps.update.handler(async ({ context, input }) => updateProject(context, input));
+const list = ps.list.handler(async ({ context, input }) =>
+  listCollection<ProjectListRow>({
+    db: context.db,
+    definition: projectQueryDefinition,
+    embedSelections: {
+      organization: getTableColumns(organization),
+    },
+    input,
+  })
+);
+
+const update = ps.update.handler(async ({ context, input }) => {
+  const { id } = input.params;
+  const changes = input.body;
+
+  const [project] = await context.db.update(projectTable).set(changes).where(eq(projectTable.id, id)).returning();
+
+  if (project === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Project not found",
+      status: 404,
+    });
+  }
+
+  return project;
+});
 
 export const project = {
   create,

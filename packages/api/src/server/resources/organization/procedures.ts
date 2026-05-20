@@ -1,4 +1,4 @@
-import { ORPCError, implement } from "@orpc/server";
+import { ORPCError } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import {
   type CreateOrganizationData,
@@ -6,13 +6,12 @@ import {
   type UpdateOrganizationData,
   organization as organizationTable,
 } from "@repo/database/schema";
-import { organizationContract } from "../../../shared/contract/resources/organization";
+import { api, call, toProcedureContext } from "../../base";
 import { listCollection } from "../../collection-query";
 import type { Context } from "../../context";
-import { withIntegrityConstraintErrors } from "../../errors/integrity-constraint-error";
 import { organizationQueryDefinition } from "./query-definition";
 
-const os = implement(organizationContract).$context<Context>();
+const os = api.organization;
 
 type UpdateOrganizationInput = {
   body: Omit<UpdateOrganizationData, "id">;
@@ -22,37 +21,11 @@ type UpdateOrganizationInput = {
 };
 
 export async function createOrganization(context: Pick<Context, "db">, input: CreateOrganizationData) {
-  return withIntegrityConstraintErrors(async () => {
-    const [organization] = await context.db.insert(organizationTable).values(input).returning();
-
-    if (organization === undefined) {
-      throw new Error("Failed to create organization");
-    }
-
-    return organization;
-  });
+  return call(create, input, { context: toProcedureContext(context) });
 }
 
 export async function updateOrganization(context: Pick<Context, "db">, input: UpdateOrganizationInput) {
-  const { id } = input.params;
-  const changes = input.body;
-
-  return withIntegrityConstraintErrors(async () => {
-    const [organization] = await context.db
-      .update(organizationTable)
-      .set(changes)
-      .where(eq(organizationTable.id, id))
-      .returning();
-
-    if (organization === undefined) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Organization not found",
-        status: 404,
-      });
-    }
-
-    return organization;
-  });
+  return call(update, input, { context: toProcedureContext(context) });
 }
 
 export async function listOrganizations(context: Pick<Context, "db">, input: unknown) {
@@ -64,6 +37,20 @@ export async function listOrganizations(context: Pick<Context, "db">, input: unk
 }
 
 export async function deleteOrganization(context: Pick<Context, "db">, input: { id: string }) {
+  return call(remove, input, { context: toProcedureContext(context) });
+}
+
+const create = os.create.handler(async ({ context, input }) => {
+  const [organization] = await context.db.insert(organizationTable).values(input).returning();
+
+  if (organization === undefined) {
+    throw new Error("Failed to create organization");
+  }
+
+  return organization;
+});
+
+const remove = os.delete.handler(async ({ context, input }) => {
   const [organization] = await context.db
     .delete(organizationTable)
     .where(eq(organizationTable.id, input.id))
@@ -77,12 +64,35 @@ export async function deleteOrganization(context: Pick<Context, "db">, input: { 
   }
 
   return organization;
-}
+});
 
-const create = os.create.handler(async ({ context, input }) => createOrganization(context, input));
-const remove = os.delete.handler(async ({ context, input }) => deleteOrganization(context, input));
-const list = os.list.handler(async ({ context, input }) => listOrganizations(context, input));
-const update = os.update.handler(async ({ context, input }) => updateOrganization(context, input));
+const list = os.list.handler(async ({ context, input }) =>
+  listCollection<OrganizationRecord>({
+    db: context.db,
+    definition: organizationQueryDefinition,
+    input,
+  })
+);
+
+const update = os.update.handler(async ({ context, input }) => {
+  const { id } = input.params;
+  const changes = input.body;
+
+  const [organization] = await context.db
+    .update(organizationTable)
+    .set(changes)
+    .where(eq(organizationTable.id, id))
+    .returning();
+
+  if (organization === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Organization not found",
+      status: 404,
+    });
+  }
+
+  return organization;
+});
 
 export const organization = {
   create,

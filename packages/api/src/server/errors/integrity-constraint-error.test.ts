@@ -43,6 +43,24 @@ describe("toIntegrityConstraintORPCError", () => {
     });
   });
 
+  test("maps still-referenced foreign key errors as restricted operations", () => {
+    const mapped = toIntegrityConstraintORPCError(
+      createQueryError({
+        code: "23503",
+        constraint: "projects_organization_id_organizations_id_fk",
+        detail: 'Key (id)=(org_1) is still referenced from table "projects".',
+      })
+    );
+
+    assert.ok(mapped instanceof ORPCError);
+    assert.equal(mapped.code, "FOREIGN_KEY_VIOLATION");
+    assert.equal(mapped.message, "Record is still referenced by other data");
+    assert.deepEqual(mapped.data, {
+      fields: ["id"],
+      reason: "restricted",
+    });
+  });
+
   test("falls back to the generic integrity error for unknown class 23 codes", () => {
     const mapped = toIntegrityConstraintORPCError(createQueryError({ code: "23P01" }));
 
