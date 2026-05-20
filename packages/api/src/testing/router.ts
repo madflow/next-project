@@ -178,6 +178,30 @@ export function createMockDeleteDb(row: Record<string, unknown> | undefined) {
   return { db: toDatabaseInstance(db), state };
 }
 
+export function createMockDeleteDbError(error: unknown) {
+  const state: MockDeleteState = {};
+
+  const db = {
+    delete(table: unknown) {
+      state.table = table;
+
+      return {
+        where(where: unknown) {
+          state.where = where;
+
+          return {
+            async returning() {
+              throw error;
+            },
+          };
+        },
+      };
+    },
+  };
+
+  return { db: toDatabaseInstance(db), state };
+}
+
 export function createMockUpdateDb(row: Record<string, unknown> | undefined) {
   const state: MockUpdateState = {};
 

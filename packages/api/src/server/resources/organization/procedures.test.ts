@@ -4,6 +4,7 @@ import { describe, test } from "node:test";
 import { organization as organizationTable } from "@repo/database/schema";
 import {
   createMockDeleteDb,
+  createMockDeleteDbError,
   createMockInsertDb,
   createMockInsertDbError,
   createMockListDb,
@@ -162,6 +163,37 @@ describe("listOrganizations", () => {
         error.code === "NOT_FOUND" &&
         error.status === 404 &&
         error.message === "Organization not found"
+    );
+  });
+
+  test("maps delete constraint errors to oRPC conflict errors", async () => {
+    const referencedOrganizationError = Object.assign(new Error("Failed query"), {
+      cause: {
+        code: "23503",
+        constraint: "projects_organization_id_organizations_id_fk",
+        detail: 'Key (id)=(550e8400-e29b-41d4-a716-446655440000) is still referenced from table "projects".',
+        schema: "public",
+        table: "organizations",
+      },
+    });
+    const { db } = createMockDeleteDbError(referencedOrganizationError);
+
+    await assert.rejects(
+      () => deleteOrganization({ db }, { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) => {
+        if (!(error instanceof ORPCError)) {
+          return false;
+        }
+
+        assert.equal(error.code, "FOREIGN_KEY_VIOLATION");
+        assert.equal(error.message, "Record is still referenced by other data");
+        assert.equal(error.status, 409);
+        assert.deepEqual(error.data, {
+          fields: ["id"],
+          reason: "restricted",
+        });
+        return true;
+      }
     );
   });
 

@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import type { DatabaseInstance } from "@repo/database/clients";
 import { emptyUpdateMessage } from "../../shared/contract/update";
-import { createMockDeleteDb, createMockInsertDbError, createMockUpdateDb } from "../../testing/router";
+import {
+  createMockDeleteDb,
+  createMockDeleteDbError,
+  createMockInsertDbError,
+  createMockUpdateDb,
+} from "../../testing/router";
 import { createOpenAPIHandler } from "./create-openapi-handler";
 
 describe("createOpenAPIHandler", () => {
@@ -176,6 +181,40 @@ describe("createOpenAPIHandler", () => {
     assert.equal(response.status, 404);
     assert.equal(body.code, "NOT_FOUND");
     assert.equal(body.message, "Organization not found");
+  });
+
+  test("returns 409 with structured database error data for delete constraint errors", async () => {
+    const referencedOrganizationError = Object.assign(new Error("Failed query"), {
+      cause: {
+        code: "23503",
+        constraint: "projects_organization_id_organizations_id_fk",
+        detail: 'Key (id)=(550e8400-e29b-41d4-a716-446655440000) is still referenced from table "projects".',
+        schema: "public",
+        table: "organizations",
+      },
+    });
+    const { db } = createMockDeleteDbError(referencedOrganizationError);
+    const handler = createOpenAPIHandler({ db });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/organizations/550e8400-e29b-41d4-a716-446655440000", { method: "DELETE" })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      data?: {
+        fields?: string[];
+        reason?: string;
+      };
+      message: string;
+    };
+
+    assert.equal(response.status, 409);
+    assert.equal(body.code, "FOREIGN_KEY_VIOLATION");
+    assert.equal(body.message, "Record is still referenced by other data");
+    assert.deepEqual(body.data, {
+      fields: ["id"],
+      reason: "restricted",
+    });
   });
 
   test("returns 404 for missing organizations on PUT", async () => {

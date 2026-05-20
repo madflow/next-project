@@ -1,4 +1,4 @@
-import { ORPCError, implement } from "@orpc/server";
+import { ORPCError } from "@orpc/server";
 import { eq, getTableColumns } from "drizzle-orm";
 import {
   type CreateMemberData,
@@ -10,13 +10,12 @@ import {
   organization,
   user,
 } from "@repo/database/schema";
-import { memberContract } from "../../../shared/contract/resources/member";
+import { api, call, toProcedureContext } from "../../base";
 import { listCollection } from "../../collection-query";
 import type { Context } from "../../context";
-import { withIntegrityConstraintErrors } from "../../errors/integrity-constraint-error";
 import { memberQueryDefinition } from "./query-definition";
 
-const ms = implement(memberContract).$context<Context>();
+const ms = api.member;
 
 type MemberListRow = MemberRecord & {
   organization?: Organization;
@@ -31,33 +30,11 @@ type UpdateMemberInput = {
 };
 
 export async function createMember(context: Pick<Context, "db">, input: CreateMemberData) {
-  return withIntegrityConstraintErrors(async () => {
-    const [member] = await context.db.insert(memberTable).values(input).returning();
-
-    if (member === undefined) {
-      throw new Error("Failed to create member");
-    }
-
-    return member;
-  });
+  return call(create, input, { context: toProcedureContext(context) });
 }
 
 export async function updateMember(context: Pick<Context, "db">, input: UpdateMemberInput) {
-  const { id } = input.params;
-  const changes = input.body;
-
-  return withIntegrityConstraintErrors(async () => {
-    const [member] = await context.db.update(memberTable).set(changes).where(eq(memberTable.id, id)).returning();
-
-    if (member === undefined) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Member not found",
-        status: 404,
-      });
-    }
-
-    return member;
-  });
+  return call(update, input, { context: toProcedureContext(context) });
 }
 
 export async function listMembers(context: Pick<Context, "db">, input: unknown) {
@@ -73,6 +50,20 @@ export async function listMembers(context: Pick<Context, "db">, input: unknown) 
 }
 
 export async function deleteMember(context: Pick<Context, "db">, input: { id: string }) {
+  return call(remove, input, { context: toProcedureContext(context) });
+}
+
+const create = ms.create.handler(async ({ context, input }) => {
+  const [member] = await context.db.insert(memberTable).values(input).returning();
+
+  if (member === undefined) {
+    throw new Error("Failed to create member");
+  }
+
+  return member;
+});
+
+const remove = ms.delete.handler(async ({ context, input }) => {
   const [member] = await context.db.delete(memberTable).where(eq(memberTable.id, input.id)).returning();
 
   if (member === undefined) {
@@ -83,12 +74,35 @@ export async function deleteMember(context: Pick<Context, "db">, input: { id: st
   }
 
   return member;
-}
+});
 
-const create = ms.create.handler(async ({ context, input }) => createMember(context, input));
-const remove = ms.delete.handler(async ({ context, input }) => deleteMember(context, input));
-const list = ms.list.handler(async ({ context, input }) => listMembers(context, input));
-const update = ms.update.handler(async ({ context, input }) => updateMember(context, input));
+const list = ms.list.handler(async ({ context, input }) =>
+  listCollection<MemberListRow>({
+    db: context.db,
+    definition: memberQueryDefinition,
+    embedSelections: {
+      organization: getTableColumns(organization),
+      user: getTableColumns(user),
+    },
+    input,
+  })
+);
+
+const update = ms.update.handler(async ({ context, input }) => {
+  const { id } = input.params;
+  const changes = input.body;
+
+  const [member] = await context.db.update(memberTable).set(changes).where(eq(memberTable.id, id)).returning();
+
+  if (member === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Member not found",
+      status: 404,
+    });
+  }
+
+  return member;
+});
 
 export const member = {
   create,

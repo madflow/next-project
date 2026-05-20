@@ -106,7 +106,15 @@ function parseKeyDetail(detail?: string): ParsedKeyDetail | undefined {
   };
 }
 
+function isRestrictedForeignKeyViolation(error: PostgresErrorLike) {
+  return error.code === "23503" && error.detail?.includes("is still referenced") === true;
+}
+
 function getDefaultMessage(error: PostgresErrorLike, parsedKeyDetail?: ParsedKeyDetail) {
+  if (isRestrictedForeignKeyViolation(error)) {
+    return "Record is still referenced by other data";
+  }
+
   if (error.constraint && constraintMessages[error.constraint]) {
     return constraintMessages[error.constraint];
   }
@@ -150,7 +158,11 @@ export function toIntegrityConstraintORPCError(error: unknown) {
     ? integrityConstraintErrorCodes[postgresCode]
     : "INTEGRITY_CONSTRAINT_VIOLATION";
   const fields = parsedKeyDetail?.fields ?? (postgresError.column ? [postgresError.column] : undefined);
-  const reason = isIntegrityConstraintCode(postgresCode) ? integrityConstraintReasons[postgresCode] : "conflict";
+  const reason = isRestrictedForeignKeyViolation(postgresError)
+    ? "restricted"
+    : isIntegrityConstraintCode(postgresCode)
+      ? integrityConstraintReasons[postgresCode]
+      : "conflict";
 
   return new ORPCError(code, {
     cause: error,
@@ -161,12 +173,4 @@ export function toIntegrityConstraintORPCError(error: unknown) {
     message: getDefaultMessage(postgresError, parsedKeyDetail),
     status,
   });
-}
-
-export async function withIntegrityConstraintErrors<T>(callback: () => Promise<T>): Promise<T> {
-  try {
-    return await callback();
-  } catch (error) {
-    throw toIntegrityConstraintORPCError(error) ?? error;
-  }
 }
