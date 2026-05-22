@@ -4,76 +4,103 @@
     "better-auth-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
+      "skillPath": "better-auth/best-practices/SKILL.md",
       "computedHash": "a4c830509e85557b59339d8d93a4e243e9e59c686e7678854d39230e12c2a6dc"
     },
     "better-auth-security-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
+      "skillPath": "security/SKILL.md",
       "computedHash": "5717187bba9c22030c7174c74012f01c359f21e2ce87e0eb80e24244d8b8c915"
     },
     "create-auth-skill": {
       "source": "better-auth/skills",
       "sourceType": "github",
+      "skillPath": "better-auth/create-auth/SKILL.md",
       "computedHash": "31c027d02dbf1faa37f58191f574b9443143042fb2b684fe32df53ab0270487c"
     },
     "deepl-translate": {
       "source": "madflow/skills",
       "sourceType": "github",
+      "skillPath": "deepl-translate/SKILL.md",
       "computedHash": "8cc5e7e7631f6efedeedc35908c1b173750ac435a251dbc7e35efbd946df923f"
+    },
+    "dev": {
+      "source": "microsoft/playwright-cli",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/dev/SKILL.md",
+      "computedHash": "da14d3749ab3f65b479db8b056ab64cd262ce15d07dd642f7d3263ad10708c1b"
     },
     "email-and-password-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
+      "skillPath": "better-auth/emailAndPassword/SKILL.md",
       "computedHash": "747d7f73bd9e2ec5317b8ef88dc70f97df716d00e3d02de4051feebaa48b062d"
     },
     "next-best-practices": {
       "source": "vercel-labs/next-skills",
       "sourceType": "github",
-      "computedHash": "515ba75178bd44875812d9a560bdf14651f86709f89cf1d4f209638e879807f3"
+      "skillPath": "skills/next-best-practices/SKILL.md",
+      "computedHash": "f4678aef4ffc10a5ea64a91e57abe5a5081af813b06d58d565caf3e8ef56e26c"
     },
     "next-cache-components": {
       "source": "vercel-labs/next-skills",
       "sourceType": "github",
-      "computedHash": "a94b83ddcd2ff1c30722577f693b1bfe32f2e1a83abdd6c08c2d6cc6753b53c8"
+      "skillPath": "skills/next-cache-components/SKILL.md",
+      "computedHash": "f835d8226c28abf012cc013928e2627c8a7a046de61127ef229be1711bd1f255"
+    },
+    "next-upgrade": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "skillPath": "skills/next-upgrade/SKILL.md",
+      "computedHash": "e3aeb1f9e8a68d24df0c1c2e3c8ab97ede09a7251a2c76988318d02254346979"
     },
     "organization-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
+      "skillPath": "better-auth/organization/SKILL.md",
       "computedHash": "79a5a85b43d10e9fe37582b3506b051a33a991817b938f349099baa5ddba21aa"
     },
     "playwright-cli": {
       "source": "microsoft/playwright-cli",
       "sourceType": "github",
-      "computedHash": "7075ab30f588019197a2f1518bb4c9d33d69d33352af079b5f9c60303ad3886e"
+      "skillPath": "skills/playwright-cli/SKILL.md",
+      "computedHash": "84495cfda62b6c012afc4cc34a0c35bfc7923ba35983b8c04ce4cace0f35a5d8"
     },
     "pptx-manipulation": {
       "source": "madflow/skills",
       "sourceType": "github",
+      "skillPath": "pptx-manipulation/SKILL.md",
       "computedHash": "8cb2f288ff88f5d1760fa5366d40e3ab02a76da86ec77bee621e69146bf76464"
     },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
-      "computedHash": "507f011a70e8b3ae242bdc0bb5b39fd91a1d4049a0f3c281991ccf84973d591c"
+      "skillPath": "skills/shadcn/SKILL.md",
+      "computedHash": "80a6226e78f6d1fe464214ae0ef449d49d8ffaa3e7704f011e9b418c678ad4d1"
     },
     "spss-file-convert": {
       "source": "madflow/skills",
       "sourceType": "github",
+      "skillPath": "spss-file-convert/SKILL.md",
       "computedHash": "621bc2c9b95ef2d3fe1e236b18efc4582de8efaeec5cf445195a147c512a19e9"
     },
     "spss-file-metadata": {
       "source": "madflow/skills",
       "sourceType": "github",
+      "skillPath": "spss-file-metadata/SKILL.md",
       "computedHash": "acba9c09e87535f592e0757493bccff583477bfeb61e423cd1b5e8d90745cc88"
     },
     "two-factor-authentication-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
+      "skillPath": "better-auth/twoFactor/SKILL.md",
       "computedHash": "7e297aaf887e11fdc03e52bdbf44974e161e8f7c393170ced7dc66cace4f6d46"
     },
     "xlsx-manipulation": {
       "source": "madflow/skills",
       "sourceType": "github",
+      "skillPath": "xlsx-manipulation/SKILL.md",
       "computedHash": "08491dd6f5b4b0a2b7946150e4f1c601552ef12b02e6882386b6ba2c55489aca"
     }
   }
