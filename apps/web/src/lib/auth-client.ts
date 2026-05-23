@@ -1,9 +1,9 @@
-import { adminClient } from "better-auth/client/plugins";
-import { organizationClient } from "better-auth/client/plugins";
-import { inferAdditionalFields } from "better-auth/client/plugins";
-import { createAuthClient } from "better-auth/react";
+import { createAuthClient } from "@repo/auth/client";
 import { env } from "@/env";
-import type { auth } from "./auth";
+
+const authClient = createAuthClient({
+  baseURL: env.NEXT_PUBLIC_BASE_URL!,
+});
 
 export const {
   admin,
@@ -22,7 +22,4 @@ export const {
   updateUser,
   deleteUser,
   changeEmail,
-} = createAuthClient({
-  baseURL: env.NEXT_PUBLIC_BASE_URL!,
-  plugins: [adminClient(), organizationClient(), inferAdditionalFields<typeof auth>()],
-});
+} = authClient;
