@@ -1,20 +1,38 @@
 import { call, implement, onError } from "@orpc/server";
 import { appContract } from "../shared/contract/app";
+import { requireAdmin, requireAuthenticated } from "./auth/guard";
+import { anonymousPrincipal } from "./auth/principal";
 import type { Context } from "./context";
 import { toIntegrityConstraintORPCError } from "./errors/integrity-constraint-error";
 
-export const api = implement(appContract)
-  .$context<Context>()
-  .use(
-    onError((error) => {
-      throw toIntegrityConstraintORPCError(error) ?? error;
-    })
-  );
+const baseApi = implement(appContract).$context<Context>();
 
-export function toProcedureContext(context: Pick<Context, "db"> & Partial<Pick<Context, "headers">>): Context {
+const authenticatedMiddleware = baseApi.middleware(async ({ context, next }) => {
+  requireAuthenticated(context);
+  return next();
+});
+
+const adminMiddleware = baseApi.middleware(async ({ context, next }) => {
+  requireAdmin(context);
+  return next();
+});
+
+const api = baseApi.use(
+  onError((error) => {
+    throw toIntegrityConstraintORPCError(error) ?? error;
+  })
+);
+
+const authenticatedApi = api.use(authenticatedMiddleware);
+export const adminApi = authenticatedApi.use(adminMiddleware);
+
+export type ProcedureContextInput = Pick<Context, "db"> & Partial<Omit<Context, "db">>;
+
+export function toProcedureContext(context: ProcedureContextInput): Context {
   return {
     db: context.db,
     headers: context.headers ?? new Headers(),
+    principal: context.principal ?? anonymousPrincipal,
   };
 }
 

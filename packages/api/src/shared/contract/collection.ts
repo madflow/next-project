@@ -17,6 +17,8 @@ export const collectionInputSchema = z
   })
   .catchall(z.union([z.string(), z.array(z.string())]));
 
+export type CollectionInput = z.input<typeof collectionInputSchema>;
+
 const orderByItemSchema = z.object({
   field: z.string(),
   direction: orderDirectionSchema,

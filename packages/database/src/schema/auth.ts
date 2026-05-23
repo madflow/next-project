@@ -223,6 +223,7 @@ export const apikey = pgTable(
 
 export const authSchema = {
   account,
+  apikey,
   invitation,
   member,
   organization,

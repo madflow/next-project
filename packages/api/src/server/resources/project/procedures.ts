@@ -8,12 +8,12 @@ import {
   organization,
   project as projectTable,
 } from "@repo/database/schema";
-import { api, call, toProcedureContext } from "../../base";
+import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
+import { type ProcedureContextInput, adminApi, call, toProcedureContext } from "../../base";
 import { listCollection } from "../../collection-query";
-import type { Context } from "../../context";
 import { projectQueryDefinition } from "./query-definition";
 
-const ps = api.project;
+const ps = adminApi.project;
 
 type ProjectListRow = Project & {
   organization?: Organization;
@@ -26,26 +26,19 @@ type UpdateProjectInput = {
   };
 };
 
-export async function createProject(context: Pick<Context, "db">, input: CreateProjectData) {
+export async function createProject(context: ProcedureContextInput, input: CreateProjectData) {
   return call(create, input, { context: toProcedureContext(context) });
 }
 
-export async function updateProject(context: Pick<Context, "db">, input: UpdateProjectInput) {
+export async function updateProject(context: ProcedureContextInput, input: UpdateProjectInput) {
   return call(update, input, { context: toProcedureContext(context) });
 }
 
-export async function listProjects(context: Pick<Context, "db">, input: unknown) {
-  return listCollection<ProjectListRow>({
-    db: context.db,
-    definition: projectQueryDefinition,
-    embedSelections: {
-      organization: getTableColumns(organization),
-    },
-    input,
-  });
+export async function listProjects(context: ProcedureContextInput, input: CollectionInput) {
+  return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
 }
 
-export async function deleteProject(context: Pick<Context, "db">, input: { id: string }) {
+export async function deleteProject(context: ProcedureContextInput, input: { id: string }) {
   return call(remove, input, { context: toProcedureContext(context) });
 }
 

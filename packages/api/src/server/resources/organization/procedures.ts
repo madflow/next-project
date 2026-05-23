@@ -6,12 +6,12 @@ import {
   type UpdateOrganizationData,
   organization as organizationTable,
 } from "@repo/database/schema";
-import { api, call, toProcedureContext } from "../../base";
+import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
+import { type ProcedureContextInput, adminApi, call, toProcedureContext } from "../../base";
 import { listCollection } from "../../collection-query";
-import type { Context } from "../../context";
 import { organizationQueryDefinition } from "./query-definition";
 
-const os = api.organization;
+const os = adminApi.organization;
 
 type UpdateOrganizationInput = {
   body: Omit<UpdateOrganizationData, "id">;
@@ -20,23 +20,19 @@ type UpdateOrganizationInput = {
   };
 };
 
-export async function createOrganization(context: Pick<Context, "db">, input: CreateOrganizationData) {
+export async function createOrganization(context: ProcedureContextInput, input: CreateOrganizationData) {
   return call(create, input, { context: toProcedureContext(context) });
 }
 
-export async function updateOrganization(context: Pick<Context, "db">, input: UpdateOrganizationInput) {
+export async function updateOrganization(context: ProcedureContextInput, input: UpdateOrganizationInput) {
   return call(update, input, { context: toProcedureContext(context) });
 }
 
-export async function listOrganizations(context: Pick<Context, "db">, input: unknown) {
-  return listCollection<OrganizationRecord>({
-    db: context.db,
-    definition: organizationQueryDefinition,
-    input,
-  });
+export async function listOrganizations(context: ProcedureContextInput, input: CollectionInput) {
+  return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
 }
 
-export async function deleteOrganization(context: Pick<Context, "db">, input: { id: string }) {
+export async function deleteOrganization(context: ProcedureContextInput, input: { id: string }) {
   return call(remove, input, { context: toProcedureContext(context) });
 }
 

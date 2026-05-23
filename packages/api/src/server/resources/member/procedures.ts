@@ -10,12 +10,12 @@ import {
   organization,
   user,
 } from "@repo/database/schema";
-import { api, call, toProcedureContext } from "../../base";
+import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
+import { type ProcedureContextInput, adminApi, call, toProcedureContext } from "../../base";
 import { listCollection } from "../../collection-query";
-import type { Context } from "../../context";
 import { memberQueryDefinition } from "./query-definition";
 
-const ms = api.member;
+const ms = adminApi.member;
 
 type MemberListRow = MemberRecord & {
   organization?: Organization;
@@ -29,27 +29,19 @@ type UpdateMemberInput = {
   };
 };
 
-export async function createMember(context: Pick<Context, "db">, input: CreateMemberData) {
+export async function createMember(context: ProcedureContextInput, input: CreateMemberData) {
   return call(create, input, { context: toProcedureContext(context) });
 }
 
-export async function updateMember(context: Pick<Context, "db">, input: UpdateMemberInput) {
+export async function updateMember(context: ProcedureContextInput, input: UpdateMemberInput) {
   return call(update, input, { context: toProcedureContext(context) });
 }
 
-export async function listMembers(context: Pick<Context, "db">, input: unknown) {
-  return listCollection<MemberListRow>({
-    db: context.db,
-    definition: memberQueryDefinition,
-    embedSelections: {
-      organization: getTableColumns(organization),
-      user: getTableColumns(user),
-    },
-    input,
-  });
+export async function listMembers(context: ProcedureContextInput, input: CollectionInput) {
+  return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
 }
 
-export async function deleteMember(context: Pick<Context, "db">, input: { id: string }) {
+export async function deleteMember(context: ProcedureContextInput, input: { id: string }) {
   return call(remove, input, { context: toProcedureContext(context) });
 }
 

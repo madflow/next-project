@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { member as memberTable } from "@repo/database/schema";
+import { createAdminProcedureContext } from "../../../testing/auth";
 import { createMockDeleteDb, createMockInsertDb, createMockListDb, createMockUpdateDb } from "../../../testing/router";
 import { createMember, deleteMember, listMembers, updateMember } from "./procedures";
 
@@ -17,7 +18,7 @@ describe("listMembers", () => {
     const row = { id: "550e8400-e29b-41d4-a716-446655440002", ...input };
     const { db, state } = createMockInsertDb(row);
 
-    const result = await createMember({ db }, input);
+    const result = await createMember(createAdminProcedureContext(db), input);
 
     assert.deepEqual(result, row);
     assert.equal(state.table, memberTable);
@@ -34,7 +35,7 @@ describe("listMembers", () => {
     };
     const { db, state } = createMockDeleteDb(row);
 
-    const result = await deleteMember({ db }, { id: row.id });
+    const result = await deleteMember(createAdminProcedureContext(db), { id: row.id });
 
     assert.deepEqual(result, row);
     assert.equal(state.table, memberTable);
@@ -59,7 +60,7 @@ describe("listMembers", () => {
     };
     const { db, state } = createMockUpdateDb(row);
 
-    const result = await updateMember({ db }, input);
+    const result = await updateMember(createAdminProcedureContext(db), input);
 
     assert.deepEqual(result, row);
     assert.equal(state.table, memberTable);
@@ -71,7 +72,11 @@ describe("listMembers", () => {
     const { db } = createMockUpdateDb(undefined);
 
     await assert.rejects(
-      () => updateMember({ db }, { body: { role: "admin" }, params: { id: "550e8400-e29b-41d4-a716-446655440002" } }),
+      () =>
+        updateMember(createAdminProcedureContext(db), {
+          body: { role: "admin" },
+          params: { id: "550e8400-e29b-41d4-a716-446655440002" },
+        }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "NOT_FOUND" &&
@@ -92,10 +97,12 @@ describe("listMembers", () => {
     ];
     const { db, state } = createMockListDb(rows, 42);
 
-    const result = await listMembers(
-      { db },
-      { limit: "5", order: "role.asc", organizationId: "eq.550e8400-e29b-41d4-a716-446655440000", offset: "2" }
-    );
+    const result = await listMembers(createAdminProcedureContext(db), {
+      limit: "5",
+      order: "role.asc",
+      organizationId: "eq.550e8400-e29b-41d4-a716-446655440000",
+      offset: "2",
+    });
 
     assert.deepEqual(result.rows, rows);
     assert.equal(result.count, 42);
@@ -144,10 +151,10 @@ describe("listMembers", () => {
     ];
     const { db, state } = createMockListDb(rows, 1);
 
-    const result = await listMembers(
-      { db },
-      { embed: "organization,user", order: "organization:name.asc,user:name.desc" }
-    );
+    const result = await listMembers(createAdminProcedureContext(db), {
+      embed: "organization,user",
+      order: "organization:name.asc,user:name.desc",
+    });
 
     assert.deepEqual(result.rows, rows);
     assert.deepEqual(result.orderBy, [
@@ -170,7 +177,7 @@ describe("listMembers", () => {
     ];
     const { db, state } = createMockListDb(rows, 1);
 
-    const result = await listMembers({ db }, { "user:email": "eq.admin@example.com" });
+    const result = await listMembers(createAdminProcedureContext(db), { "user:email": "eq.admin@example.com" });
 
     assert.deepEqual(result.rows, rows);
     assert.equal(state.joinCount, 2);
@@ -188,7 +195,7 @@ describe("listMembers", () => {
     ];
     const { db, state } = createMockListDb(rows, 1);
 
-    const result = await listMembers({ db }, { search: "admin" });
+    const result = await listMembers(createAdminProcedureContext(db), { search: "admin" });
 
     assert.deepEqual(result.rows, rows);
     assert.equal(state.joinCount, 2);
@@ -199,7 +206,7 @@ describe("listMembers", () => {
     const { db } = createMockListDb([], 0);
 
     await assert.rejects(
-      () => listMembers({ db }, { embed: "owner" }),
+      () => listMembers(createAdminProcedureContext(db), { embed: "owner" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "INPUT_VALIDATION_FAILED" &&

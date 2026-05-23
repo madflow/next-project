@@ -3,6 +3,12 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { organization as organizationTable } from "@repo/database/schema";
 import {
+  createAdminAPIKeyProcedureContext,
+  createAdminProcedureContext,
+  createAnonymousProcedureContext,
+  createUserProcedureContext,
+} from "../../../testing/auth";
+import {
   createMockDeleteDb,
   createMockDeleteDbError,
   createMockInsertDb,
@@ -20,7 +26,7 @@ describe("listOrganizations", () => {
     const row = { id: "550e8400-e29b-41d4-a716-446655440000", logo: null, metadata: null, ...input, settings: null };
     const { db, state } = createMockInsertDb(row);
 
-    const result = await createOrganization({ db }, input);
+    const result = await createOrganization(createAdminProcedureContext(db), input);
 
     assert.deepEqual(result, row);
     assert.equal(state.table, organizationTable);
@@ -42,7 +48,7 @@ describe("listOrganizations", () => {
     const { db, state } = createMockInsertDbError(duplicateSlugError);
 
     await assert.rejects(
-      () => createOrganization({ db }, input),
+      () => createOrganization(createAdminProcedureContext(db), input),
       (error: unknown) => {
         if (!(error instanceof ORPCError)) {
           return false;
@@ -83,7 +89,7 @@ describe("listOrganizations", () => {
     };
     const { db, state } = createMockUpdateDb(row);
 
-    const result = await updateOrganization({ db }, input);
+    const result = await updateOrganization(createAdminProcedureContext(db), input);
 
     assert.deepEqual(result, row);
     assert.equal(state.table, organizationTable);
@@ -112,7 +118,7 @@ describe("listOrganizations", () => {
     const { db, state } = createMockUpdateDbError(duplicateSlugError);
 
     await assert.rejects(
-      () => updateOrganization({ db }, input),
+      () => updateOrganization(createAdminProcedureContext(db), input),
       (error: unknown) => {
         if (!(error instanceof ORPCError)) {
           return false;
@@ -146,7 +152,7 @@ describe("listOrganizations", () => {
     };
     const { db, state } = createMockDeleteDb(row);
 
-    const result = await deleteOrganization({ db }, { id: row.id });
+    const result = await deleteOrganization(createAdminProcedureContext(db), { id: row.id });
 
     assert.deepEqual(result, row);
     assert.equal(state.table, organizationTable);
@@ -157,7 +163,7 @@ describe("listOrganizations", () => {
     const { db } = createMockDeleteDb(undefined);
 
     await assert.rejects(
-      () => deleteOrganization({ db }, { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      () => deleteOrganization(createAdminProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "NOT_FOUND" &&
@@ -179,7 +185,7 @@ describe("listOrganizations", () => {
     const { db } = createMockDeleteDbError(referencedOrganizationError);
 
     await assert.rejects(
-      () => deleteOrganization({ db }, { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      () => deleteOrganization(createAdminProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
       (error: unknown) => {
         if (!(error instanceof ORPCError)) {
           return false;
@@ -202,10 +208,10 @@ describe("listOrganizations", () => {
 
     await assert.rejects(
       () =>
-        updateOrganization(
-          { db },
-          { body: { name: "Acme Updated" }, params: { id: "550e8400-e29b-41d4-a716-446655440000" } }
-        ),
+        updateOrganization(createAdminProcedureContext(db), {
+          body: { name: "Acme Updated" },
+          params: { id: "550e8400-e29b-41d4-a716-446655440000" },
+        }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "NOT_FOUND" &&
@@ -218,10 +224,12 @@ describe("listOrganizations", () => {
     const rows = [{ id: "org_1", name: "Acme", slug: "acme" }];
     const { db, state } = createMockListDb(rows, 42);
 
-    const result = await listOrganizations(
-      { db },
-      { limit: "5", name: "ilike.*acme*", order: "name.asc", offset: "2" }
-    );
+    const result = await listOrganizations(createAdminProcedureContext(db), {
+      limit: "5",
+      name: "ilike.*acme*",
+      order: "name.asc",
+      offset: "2",
+    });
 
     assert.deepEqual(result.rows, rows);
     assert.equal(result.count, 42);
@@ -238,7 +246,7 @@ describe("listOrganizations", () => {
     const rows = [{ id: "org_1", name: "Acme", slug: "acme" }];
     const { db, state } = createMockListDb(rows, 1);
 
-    const result = await listOrganizations({ db }, { search: "acme" });
+    const result = await listOrganizations(createAdminProcedureContext(db), { search: "acme" });
 
     assert.deepEqual(result.rows, rows);
     assert.notEqual(state.rowWhere, undefined);
@@ -249,12 +257,48 @@ describe("listOrganizations", () => {
     const { db } = createMockListDb([], 0);
 
     await assert.rejects(
-      () => listOrganizations({ db }, { settings: "eq.theme" }),
+      () => listOrganizations(createAdminProcedureContext(db), { settings: "eq.theme" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "INPUT_VALIDATION_FAILED" &&
         error.status === 422 &&
         error.message.includes("Field 'settings' does not support filtering")
     );
+  });
+
+  test("rejects anonymous access to organization listing", async () => {
+    const { db } = createMockListDb([], 0);
+
+    await assert.rejects(
+      () => listOrganizations(createAnonymousProcedureContext(db), {}),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("rejects non-admin access to organization listing", async () => {
+    const { db } = createMockListDb([], 0);
+
+    await assert.rejects(
+      () => listOrganizations(createUserProcedureContext(db), {}),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+
+  test("allows admin API keys to access organization listing", async () => {
+    const rows = [{ id: "org_1", name: "Acme", slug: "acme" }];
+    const { db } = createMockListDb(rows, 1);
+
+    const result = await listOrganizations(createAdminAPIKeyProcedureContext(db), {});
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
   });
 });

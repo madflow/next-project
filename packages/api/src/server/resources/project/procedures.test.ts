@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { project as projectTable } from "@repo/database/schema";
+import { createAdminProcedureContext } from "../../../testing/auth";
 import { createMockDeleteDb, createMockInsertDb, createMockListDb, createMockUpdateDb } from "../../../testing/router";
 import { createProject, deleteProject, listProjects, updateProject } from "./procedures";
 
@@ -17,7 +18,7 @@ describe("listProjects", () => {
     const row = { id: "550e8400-e29b-41d4-a716-446655440001", metadata: null, ...input, updatedAt: null };
     const { db, state } = createMockInsertDb(row);
 
-    const result = await createProject({ db }, input);
+    const result = await createProject(createAdminProcedureContext(db), input);
 
     assert.deepEqual(result, row);
     assert.equal(state.table, projectTable);
@@ -36,7 +37,7 @@ describe("listProjects", () => {
     };
     const { db, state } = createMockDeleteDb(row);
 
-    const result = await deleteProject({ db }, { id: row.id });
+    const result = await deleteProject(createAdminProcedureContext(db), { id: row.id });
 
     assert.deepEqual(result, row);
     assert.equal(state.table, projectTable);
@@ -63,7 +64,7 @@ describe("listProjects", () => {
     };
     const { db, state } = createMockUpdateDb(row);
 
-    const result = await updateProject({ db }, input);
+    const result = await updateProject(createAdminProcedureContext(db), input);
 
     assert.deepEqual(result, row);
     assert.equal(state.table, projectTable);
@@ -76,10 +77,10 @@ describe("listProjects", () => {
 
     await assert.rejects(
       () =>
-        updateProject(
-          { db },
-          { body: { name: "Acme Project Updated" }, params: { id: "550e8400-e29b-41d4-a716-446655440001" } }
-        ),
+        updateProject(createAdminProcedureContext(db), {
+          body: { name: "Acme Project Updated" },
+          params: { id: "550e8400-e29b-41d4-a716-446655440001" },
+        }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "NOT_FOUND" &&
@@ -99,7 +100,12 @@ describe("listProjects", () => {
     ];
     const { db, state } = createMockListDb(rows, 42);
 
-    const result = await listProjects({ db }, { limit: "5", name: "ilike.*acme*", order: "name.asc", offset: "2" });
+    const result = await listProjects(createAdminProcedureContext(db), {
+      limit: "5",
+      name: "ilike.*acme*",
+      order: "name.asc",
+      offset: "2",
+    });
 
     assert.deepEqual(result.rows, rows);
     assert.equal(result.count, 42);
@@ -124,7 +130,7 @@ describe("listProjects", () => {
     ];
     const { db, state } = createMockListDb(rows, 1);
 
-    const result = await listProjects({ db }, { search: "acme" });
+    const result = await listProjects(createAdminProcedureContext(db), { search: "acme" });
 
     assert.deepEqual(result.rows, rows);
     assert.equal(state.joinCount, 0);
@@ -154,7 +160,10 @@ describe("listProjects", () => {
     ];
     const { db, state } = createMockListDb(rows, 1);
 
-    const result = await listProjects({ db }, { embed: "organization", order: "organization:name.asc" });
+    const result = await listProjects(createAdminProcedureContext(db), {
+      embed: "organization",
+      order: "organization:name.asc",
+    });
 
     assert.deepEqual(result.rows, rows);
     assert.deepEqual(result.orderBy, [{ direction: "asc", field: "name", relationship: "organization" }]);
@@ -176,7 +185,7 @@ describe("listProjects", () => {
     ];
     const { db, state } = createMockListDb(rows, 1);
 
-    const result = await listProjects({ db }, { "organization:name": "eq.Acme Org" });
+    const result = await listProjects(createAdminProcedureContext(db), { "organization:name": "eq.Acme Org" });
 
     assert.deepEqual(result.rows, rows);
     assert.equal(state.joinCount, 2);
@@ -186,7 +195,7 @@ describe("listProjects", () => {
     const { db } = createMockListDb([], 0);
 
     await assert.rejects(
-      () => listProjects({ db }, { metadata: "eq.theme" }),
+      () => listProjects(createAdminProcedureContext(db), { metadata: "eq.theme" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "INPUT_VALIDATION_FAILED" &&
@@ -199,7 +208,7 @@ describe("listProjects", () => {
     const { db } = createMockListDb([], 0);
 
     await assert.rejects(
-      () => listProjects({ db }, { embed: "owner" }),
+      () => listProjects(createAdminProcedureContext(db), { embed: "owner" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "INPUT_VALIDATION_FAILED" &&

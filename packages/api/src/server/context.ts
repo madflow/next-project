@@ -1,18 +1,27 @@
+import type { AuthInstance } from "@repo/auth/server";
 import type { DatabaseInstance } from "@repo/database/clients";
+import { type Principal, resolvePrincipal } from "./auth/principal";
 
 type CreateORPCContextOptions = {
+  auth: AuthInstance;
   db: DatabaseInstance;
   headers: Headers;
 };
 
-export const createORPCContext = ({
+export const createORPCContext = async ({
+  auth,
   db,
   headers,
-}: CreateORPCContextOptions): {
+}: CreateORPCContextOptions): Promise<{
   db: DatabaseInstance;
   headers: Headers;
-} => {
-  return { db, headers };
+  principal: Principal;
+}> => {
+  return {
+    db,
+    headers,
+    principal: await resolvePrincipal({ auth, db, headers }),
+  };
 };
 
-export type Context = ReturnType<typeof createORPCContext>;
+export type Context = Awaited<ReturnType<typeof createORPCContext>>;

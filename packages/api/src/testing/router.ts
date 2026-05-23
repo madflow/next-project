@@ -26,6 +26,11 @@ type MockUpdateState = {
   where?: unknown;
 };
 
+type MockLookupState = {
+  selection?: unknown;
+  where?: unknown;
+};
+
 function toDatabaseInstance<T extends object>(db: T): DatabaseInstance {
   return db as unknown as DatabaseInstance;
 }
@@ -246,6 +251,34 @@ export function createMockUpdateDbError(error: unknown) {
               return {
                 async returning() {
                   throw error;
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  return { db: toDatabaseInstance(db), state };
+}
+
+export function createMockLookupUserDb(row: Record<string, unknown> | undefined) {
+  const state: MockLookupState = {};
+
+  const db = {
+    select(selection?: unknown) {
+      state.selection = selection;
+
+      return {
+        from() {
+          return {
+            where(where: unknown) {
+              state.where = where;
+
+              return {
+                async limit() {
+                  return row ? [row] : [];
                 },
               };
             },

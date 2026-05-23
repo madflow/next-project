@@ -1,6 +1,7 @@
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { ORPCError, ValidationError, onError } from "@orpc/server";
 import { z } from "zod";
+import type { AuthInstance } from "@repo/auth/server";
 import { DatabaseInstance } from "@repo/database/clients";
 import { createORPCContext } from "../context";
 import { appRouter } from "../router";
@@ -9,7 +10,7 @@ function toZodValidationError(error: ValidationError) {
   return new z.ZodError(error.issues as z.core.$ZodIssue[]);
 }
 
-export const createOpenAPIHandler = ({ db }: { db: DatabaseInstance }) => {
+export const createOpenAPIHandler = ({ auth, db }: { auth: AuthInstance; db: DatabaseInstance }) => {
   const handler = new OpenAPIHandler(appRouter, {
     clientInterceptors: [
       onError((error) => {
@@ -37,7 +38,7 @@ export const createOpenAPIHandler = ({ db }: { db: DatabaseInstance }) => {
     ],
   });
   return async (request: Request) => {
-    const context = createORPCContext({ db, headers: request.headers });
+    const context = await createORPCContext({ auth, db, headers: request.headers });
     const { matched, response } = await handler.handle(request, {
       prefix: "/rpc",
       context,
