@@ -14,10 +14,17 @@ import {
   createMockInsertDb,
   createMockInsertDbError,
   createMockListDb,
+  createMockSequentialSelectDb,
   createMockUpdateDb,
   createMockUpdateDbError,
 } from "../../../testing/router";
-import { createOrganization, deleteOrganization, listOrganizations, updateOrganization } from "./procedures";
+import {
+  createOrganization,
+  deleteOrganization,
+  getOrganization,
+  listOrganizations,
+  updateOrganization,
+} from "./procedures";
 
 describe("listOrganizations", () => {
   test("inserts and returns the created organization", async () => {
@@ -300,5 +307,59 @@ describe("listOrganizations", () => {
 
     assert.deepEqual(result.rows, rows);
     assert.equal(result.count, 1);
+  });
+
+  test("returns an organization by id for organization members", async () => {
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      logo: null,
+      metadata: null,
+      name: "Acme",
+      settings: null,
+      slug: "acme",
+    };
+    const { db, state } = createMockSequentialSelectDb([[row], [{ id: "membership_1" }]]);
+
+    const result = await getOrganization(createUserProcedureContext(db), { id: row.id });
+
+    assert.deepEqual(result, row);
+    assert.equal(state.whereValues.length, 2);
+    assert.deepEqual(state.limitValues, [1, 1]);
+  });
+
+  test("returns not found when the organization does not exist", async () => {
+    const { db } = createMockSequentialSelectDb([[]]);
+
+    await assert.rejects(
+      () => getOrganization(createAdminProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "NOT_FOUND" &&
+        error.status === 404 &&
+        error.message === "Organization not found"
+    );
+  });
+
+  test("rejects non-member access to an organization", async () => {
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      logo: null,
+      metadata: null,
+      name: "Acme",
+      settings: null,
+      slug: "acme",
+    };
+    const { db } = createMockSequentialSelectDb([[row], []]);
+
+    await assert.rejects(
+      () => getOrganization(createUserProcedureContext(db), { id: row.id }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
   });
 });

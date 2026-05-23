@@ -2,9 +2,19 @@ import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { member as memberTable } from "@repo/database/schema";
-import { createAdminProcedureContext } from "../../../testing/auth";
-import { createMockDeleteDb, createMockInsertDb, createMockListDb, createMockUpdateDb } from "../../../testing/router";
-import { createMember, deleteMember, listMembers, updateMember } from "./procedures";
+import {
+  createAdminProcedureContext,
+  createAnonymousProcedureContext,
+  createUserProcedureContext,
+} from "../../../testing/auth";
+import {
+  createMockDeleteDb,
+  createMockInsertDb,
+  createMockListDb,
+  createMockSequentialSelectDb,
+  createMockUpdateDb,
+} from "../../../testing/router";
+import { createMember, deleteMember, getMember, listMembers, updateMember } from "./procedures";
 
 describe("listMembers", () => {
   test("inserts and returns the created member", async () => {
@@ -212,6 +222,95 @@ describe("listMembers", () => {
         error.code === "INPUT_VALIDATION_FAILED" &&
         error.status === 422 &&
         error.message.includes("Unknown embed 'owner'")
+    );
+  });
+
+  test("returns a member with embedded organization and user when requested", async () => {
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      id: "member_1",
+      organization: {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440000",
+        logo: null,
+        metadata: null,
+        name: "Acme Org",
+        settings: null,
+        slug: "acme-org",
+      },
+      organizationId: "550e8400-e29b-41d4-a716-446655440000",
+      role: "member",
+      user: {
+        banExpires: null,
+        banReason: null,
+        banned: null,
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        email: "user@example.com",
+        emailVerified: true,
+        id: "550e8400-e29b-41d4-a716-446655440010",
+        image: null,
+        locale: "en",
+        name: "Regular User",
+        role: "user",
+        updatedAt: new Date("2024-01-02T00:00:00.000Z"),
+      },
+      userId: "550e8400-e29b-41d4-a716-446655440010",
+    };
+    const { db, state } = createMockSequentialSelectDb([[row]]);
+
+    const result = await getMember(createUserProcedureContext(db), {
+      embed: "organization,user",
+      id: row.id,
+    });
+
+    assert.deepEqual(result, row);
+    assert.equal(state.whereValues.length, 1);
+    assert.deepEqual(state.limitValues, [1]);
+  });
+
+  test("returns not found when the member does not exist", async () => {
+    const { db } = createMockSequentialSelectDb([[]]);
+
+    await assert.rejects(
+      () => getMember(createAdminProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440002" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "NOT_FOUND" &&
+        error.status === 404 &&
+        error.message === "Member not found"
+    );
+  });
+
+  test("rejects anonymous access to a member", async () => {
+    const { db } = createMockSequentialSelectDb([]);
+
+    await assert.rejects(
+      () => getMember(createAnonymousProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440002" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("rejects access to other users' member records", async () => {
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      id: "member_1",
+      organizationId: "550e8400-e29b-41d4-a716-446655440000",
+      role: "member",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+    };
+    const { db } = createMockSequentialSelectDb([[row]]);
+
+    await assert.rejects(
+      () => getMember(createUserProcedureContext(db), { id: row.id }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
     );
   });
 });

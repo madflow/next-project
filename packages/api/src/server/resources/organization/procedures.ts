@@ -7,11 +7,13 @@ import {
   organization as organizationTable,
 } from "@repo/database/schema";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
-import { type ProcedureContextInput, adminApi, call, toProcedureContext } from "../../base";
-import { listCollection } from "../../collection-query";
+import { requireOrganizationMembership } from "../../auth/access";
+import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
+import { getCollectionRow, listCollection } from "../../collection-query";
 import { organizationQueryDefinition } from "./query-definition";
 
 const os = adminApi.organization;
+const authenticatedOrganizationApi = authenticatedApi.organization;
 
 type UpdateOrganizationInput = {
   body: Omit<UpdateOrganizationData, "id">;
@@ -30,6 +32,10 @@ export async function updateOrganization(context: ProcedureContextInput, input: 
 
 export async function listOrganizations(context: ProcedureContextInput, input: CollectionInput) {
   return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
+}
+
+export async function getOrganization(context: ProcedureContextInput, input: { embed?: string; id: string }) {
+  return call(get, input, { context: toProcedureContext(context) });
 }
 
 export async function deleteOrganization(context: ProcedureContextInput, input: { id: string }) {
@@ -70,6 +76,26 @@ const list = os.list.handler(async ({ context, input }) =>
   })
 );
 
+const get = authenticatedOrganizationApi.get.handler(async ({ context, input }) => {
+  const organization = await getCollectionRow<OrganizationRecord>({
+    db: context.db,
+    definition: organizationQueryDefinition,
+    input,
+    where: eq(organizationTable.id, input.id),
+  });
+
+  if (organization === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Organization not found",
+      status: 404,
+    });
+  }
+
+  await requireOrganizationMembership(context, organization.id);
+
+  return organization;
+});
+
 const update = os.update.handler(async ({ context, input }) => {
   const { id } = input.params;
   const changes = input.body;
@@ -93,6 +119,7 @@ const update = os.update.handler(async ({ context, input }) => {
 export const organization = {
   create,
   delete: remove,
+  get,
   list,
   update,
 };

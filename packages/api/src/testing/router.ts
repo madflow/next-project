@@ -31,6 +31,19 @@ type MockLookupState = {
   where?: unknown;
 };
 
+type MockGetState = {
+  joinCount: number;
+  limit?: number;
+  rowSelection?: unknown;
+  where?: unknown;
+};
+
+type MockQuerySequenceState = {
+  limitValues: number[];
+  selections: unknown[];
+  whereValues: unknown[];
+};
+
 function toDatabaseInstance<T extends object>(db: T): DatabaseInstance {
   return db as unknown as DatabaseInstance;
 }
@@ -283,6 +296,88 @@ export function createMockLookupUserDb(row: Record<string, unknown> | undefined)
               };
             },
           };
+        },
+      };
+    },
+  };
+
+  return { db: toDatabaseInstance(db), state };
+}
+
+export function createMockGetDb(row: Record<string, unknown> | undefined) {
+  const state: MockGetState = {
+    joinCount: 0,
+  };
+
+  const builder = {
+    $dynamic() {
+      return this;
+    },
+    async execute() {
+      return row ? [row] : [];
+    },
+    from() {
+      return this;
+    },
+    innerJoin() {
+      state.joinCount += 1;
+      return this;
+    },
+    limit(limit: number) {
+      state.limit = limit;
+      return this;
+    },
+    where(where: unknown) {
+      state.where = where;
+      return this;
+    },
+  };
+
+  const db = {
+    select(selection?: unknown) {
+      state.rowSelection = selection;
+      return builder;
+    },
+  };
+
+  return { db: toDatabaseInstance(db), state };
+}
+
+export function createMockSequentialSelectDb(rows: Array<Array<Record<string, unknown>>>) {
+  const state: MockQuerySequenceState = {
+    limitValues: [],
+    selections: [],
+    whereValues: [],
+  };
+
+  let queryIndex = 0;
+
+  const db = {
+    select(selection?: unknown) {
+      state.selections.push(selection);
+      const currentRows = rows[queryIndex] ?? [];
+      queryIndex += 1;
+
+      return {
+        $dynamic() {
+          return this;
+        },
+        async execute() {
+          return currentRows;
+        },
+        from() {
+          return this;
+        },
+        innerJoin() {
+          return this;
+        },
+        limit(limit: number) {
+          state.limitValues.push(limit);
+          return this;
+        },
+        where(where: unknown) {
+          state.whereValues.push(where);
+          return this;
         },
       };
     },

@@ -9,11 +9,13 @@ import {
   project as projectTable,
 } from "@repo/database/schema";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
-import { type ProcedureContextInput, adminApi, call, toProcedureContext } from "../../base";
-import { listCollection } from "../../collection-query";
+import { requireOrganizationMembership } from "../../auth/access";
+import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
+import { getCollectionRow, listCollection } from "../../collection-query";
 import { projectQueryDefinition } from "./query-definition";
 
 const ps = adminApi.project;
+const authenticatedProjectApi = authenticatedApi.project;
 
 type ProjectListRow = Project & {
   organization?: Organization;
@@ -36,6 +38,10 @@ export async function updateProject(context: ProcedureContextInput, input: Updat
 
 export async function listProjects(context: ProcedureContextInput, input: CollectionInput) {
   return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
+}
+
+export async function getProject(context: ProcedureContextInput, input: { embed?: string; id: string }) {
+  return call(get, input, { context: toProcedureContext(context) });
 }
 
 export async function deleteProject(context: ProcedureContextInput, input: { id: string }) {
@@ -76,6 +82,29 @@ const list = ps.list.handler(async ({ context, input }) =>
   })
 );
 
+const get = authenticatedProjectApi.get.handler(async ({ context, input }) => {
+  const project = await getCollectionRow<ProjectListRow>({
+    db: context.db,
+    definition: projectQueryDefinition,
+    embedSelections: {
+      organization: getTableColumns(organization),
+    },
+    input,
+    where: eq(projectTable.id, input.id),
+  });
+
+  if (project === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Project not found",
+      status: 404,
+    });
+  }
+
+  await requireOrganizationMembership(context, project.organizationId);
+
+  return project;
+});
+
 const update = ps.update.handler(async ({ context, input }) => {
   const { id } = input.params;
   const changes = input.body;
@@ -95,6 +124,7 @@ const update = ps.update.handler(async ({ context, input }) => {
 export const project = {
   create,
   delete: remove,
+  get,
   list,
   update,
 };

@@ -11,11 +11,13 @@ import {
   user,
 } from "@repo/database/schema";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
-import { type ProcedureContextInput, adminApi, call, toProcedureContext } from "../../base";
-import { listCollection } from "../../collection-query";
+import { requireMemberReadAccess } from "../../auth/access";
+import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
+import { getCollectionRow, listCollection } from "../../collection-query";
 import { memberQueryDefinition } from "./query-definition";
 
 const ms = adminApi.member;
+const authenticatedMemberApi = authenticatedApi.member;
 
 type MemberListRow = MemberRecord & {
   organization?: Organization;
@@ -39,6 +41,10 @@ export async function updateMember(context: ProcedureContextInput, input: Update
 
 export async function listMembers(context: ProcedureContextInput, input: CollectionInput) {
   return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
+}
+
+export async function getMember(context: ProcedureContextInput, input: { embed?: string; id: string }) {
+  return call(get, input, { context: toProcedureContext(context) });
 }
 
 export async function deleteMember(context: ProcedureContextInput, input: { id: string }) {
@@ -80,6 +86,30 @@ const list = ms.list.handler(async ({ context, input }) =>
   })
 );
 
+const get = authenticatedMemberApi.get.handler(async ({ context, input }) => {
+  const member = await getCollectionRow<MemberListRow>({
+    db: context.db,
+    definition: memberQueryDefinition,
+    embedSelections: {
+      organization: getTableColumns(organization),
+      user: getTableColumns(user),
+    },
+    input,
+    where: eq(memberTable.id, input.id),
+  });
+
+  if (member === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Member not found",
+      status: 404,
+    });
+  }
+
+  requireMemberReadAccess(context, member.userId);
+
+  return member;
+});
+
 const update = ms.update.handler(async ({ context, input }) => {
   const { id } = input.params;
   const changes = input.body;
@@ -99,6 +129,7 @@ const update = ms.update.handler(async ({ context, input }) => {
 export const member = {
   create,
   delete: remove,
+  get,
   list,
   update,
 };

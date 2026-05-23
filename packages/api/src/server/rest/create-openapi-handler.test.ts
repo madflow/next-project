@@ -6,6 +6,7 @@ import { adminSessionData, createMockAuth, userSessionData } from "../../testing
 import {
   createMockDeleteDb,
   createMockDeleteDbError,
+  createMockGetDb,
   createMockInsertDbError,
   createMockListDb,
   createMockUpdateDb,
@@ -306,5 +307,53 @@ describe("createOpenAPIHandler", () => {
     assert.equal(response.status, 403);
     assert.equal(body.code, "FORBIDDEN");
     assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
+  test("returns 200 with the project for valid GET by id requests", async () => {
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      id: "550e8400-e29b-41d4-a716-446655440002",
+      metadata: null,
+      name: "Acme Project",
+      organizationId: userSessionData.session.userId,
+      slug: "acme-project",
+      updatedAt: null,
+    };
+    const serializedRow = {
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+    };
+    const { db } = createMockGetDb(row);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(new Request(`http://localhost/rpc/projects/${row.id}`, { method: "GET" }));
+    const body = (await response.json()) as typeof serializedRow;
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, serializedRow);
+  });
+
+  test("returns 422 for invalid embeds on GET by id requests", async () => {
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db: {} as DatabaseInstance,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/projects/550e8400-e29b-41d4-a716-446655440002?embed=owner", { method: "GET" })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 422);
+    assert.equal(body.code, "INPUT_VALIDATION_FAILED");
+    assert.ok(body.message.includes("Unknown embed 'owner'"));
   });
 });

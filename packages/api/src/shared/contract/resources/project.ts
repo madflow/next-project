@@ -6,7 +6,7 @@ import {
   selectProjectSchema,
   updateProjectSchema,
 } from "@repo/database/schema";
-import { collectionInputSchema, createCollectionResultSchema } from "../collection";
+import { collectionEmbedInputSchema, collectionInputSchema, createCollectionResultSchema } from "../collection";
 import { emptyUpdateMessage, hasUpdateChanges } from "../update";
 
 const listProjectRowSchema = selectProjectSchema.extend({
@@ -22,6 +22,14 @@ const listProjectContract = oc.input(collectionInputSchema).output(listProjectRe
   method: "GET",
   path: "/projects",
 });
+
+const getProjectContract = oc
+  .input(projectIdSchema.merge(collectionEmbedInputSchema))
+  .output(listProjectRowSchema)
+  .route({
+    method: "GET",
+    path: "/projects/{id}",
+  });
 
 const createProjectContract = oc.input(insertProjectSchema).output(selectProjectSchema).route({
   method: "POST",
@@ -54,6 +62,7 @@ const deleteProjectContract = oc.input(projectIdSchema).output(selectProjectSche
 export const projectContract = {
   create: createProjectContract,
   delete: deleteProjectContract,
+  get: getProjectContract,
   list: listProjectContract,
   update: updateProjectContract,
 };

@@ -1,12 +1,19 @@
 import { z } from "zod";
 
 const orderDirections = ["asc", "desc"] as const;
+const embedSchema = z.string().trim().min(1).optional();
 
 export const orderDirectionSchema = z.enum(orderDirections);
 
+export const collectionEmbedInputSchema = z
+  .object({
+    embed: embedSchema,
+  })
+  .strict();
+
 export const collectionInputSchema = z
   .object({
-    embed: z.string().trim().min(1).optional(),
+    embed: embedSchema,
     limit: z.coerce.number().int().min(1).max(100).default(10),
     offset: z.coerce.number().int().min(0).default(0),
     order: z.string().trim().min(1).optional(),

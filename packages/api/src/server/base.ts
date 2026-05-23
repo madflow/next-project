@@ -23,7 +23,7 @@ const api = baseApi.use(
   })
 );
 
-const authenticatedApi = api.use(authenticatedMiddleware);
+export const authenticatedApi = api.use(authenticatedMiddleware);
 export const adminApi = authenticatedApi.use(adminMiddleware);
 
 export type ProcedureContextInput = Pick<Context, "db"> & Partial<Omit<Context, "db">>;

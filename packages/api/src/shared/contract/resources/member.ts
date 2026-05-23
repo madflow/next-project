@@ -7,7 +7,7 @@ import {
   selectUserSchema,
   updateMemberSchema,
 } from "@repo/database/schema";
-import { collectionInputSchema, createCollectionResultSchema } from "../collection";
+import { collectionEmbedInputSchema, collectionInputSchema, createCollectionResultSchema } from "../collection";
 import { emptyUpdateMessage, hasUpdateChanges } from "../update";
 
 const listMemberRowSchema = selectMemberSchema.extend({
@@ -23,6 +23,11 @@ const memberIdSchema = z.object({
 const listMemberContract = oc.input(collectionInputSchema).output(listMemberResultSchema).route({
   method: "GET",
   path: "/members",
+});
+
+const getMemberContract = oc.input(memberIdSchema.merge(collectionEmbedInputSchema)).output(listMemberRowSchema).route({
+  method: "GET",
+  path: "/members/{id}",
 });
 
 const createMemberContract = oc.input(insertMemberSchema).output(selectMemberSchema).route({
@@ -56,6 +61,7 @@ const deleteMemberContract = oc.input(memberIdSchema).output(selectMemberSchema)
 export const memberContract = {
   create: createMemberContract,
   delete: deleteMemberContract,
+  get: getMemberContract,
   list: listMemberContract,
   update: updateMemberContract,
 };
