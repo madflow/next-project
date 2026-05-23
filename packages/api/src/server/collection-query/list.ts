@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
-import { count, getTableColumns } from "drizzle-orm";
+import { and, count, getTableColumns } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import type { SelectedFields } from "drizzle-orm/pg-core/query-builders/select.types";
 import type { DatabaseInstance } from "@repo/database/clients";
 import type { CollectionQuery, CollectionQueryDefinition } from "./definition";
@@ -12,6 +13,7 @@ type ListCollectionOptions = {
   input: unknown;
   baseSelection?: SelectedFields;
   embedSelections?: Record<string, SelectedFields>;
+  where?: SQL<unknown>;
 };
 
 type ListCollectionResult<TRow> = {
@@ -88,12 +90,14 @@ export async function listCollection<TRow>({
   input,
   baseSelection,
   embedSelections,
+  where: baseWhere,
 }: ListCollectionOptions): Promise<ListCollectionResult<TRow>> {
   try {
     const collectionQuery = parseCollectionQuery(definition, input);
     const rowSelection = buildRowSelection(definition, collectionQuery, baseSelection, embedSelections);
     const usedRelationshipNames = getUsedRelationshipNames(collectionQuery);
-    const where = compileDrizzleCollectionWhere(definition, collectionQuery);
+    const queryWhere = compileDrizzleCollectionWhere(definition, collectionQuery);
+    const where = queryWhere && baseWhere ? and(baseWhere, queryWhere) : (queryWhere ?? baseWhere);
     const orderBy = compileDrizzleCollectionOrderBy(definition, collectionQuery);
 
     let rowsQuery = db.select(rowSelection).from(definition.table).$dynamic();

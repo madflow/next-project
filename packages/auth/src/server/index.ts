@@ -167,6 +167,11 @@ export function createAuth({
         references: "user",
         defaultPrefix: "uak_",
         enableMetadata: true,
+        rateLimit: {
+          enabled: true,
+          maxRequests: 300,
+          timeWindow: 60 * 1000,
+        },
       }),
       adminPlugin(),
       organizationPlugin({

@@ -22,6 +22,7 @@ import {
   createOrganization,
   deleteOrganization,
   getOrganization,
+  listOrganizationProjects,
   listOrganizations,
   updateOrganization,
 } from "./procedures";
@@ -328,6 +329,62 @@ describe("listOrganizations", () => {
     assert.deepEqual(state.limitValues, [1, 1]);
   });
 
+  test("returns organization projects for organization members", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "project_1",
+        metadata: null,
+        name: "Acme Project",
+        organizationId: "550e8400-e29b-41d4-a716-446655440000",
+        slug: "acme-project",
+        updatedAt: null,
+      },
+    ];
+    const { db, state } = createMockSequentialSelectDb([[{ id: "membership_1" }], rows, [{ count: 1 }]]);
+
+    const result = await listOrganizationProjects(createUserProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      limit: "5",
+      order: "name.asc",
+      offset: "2",
+      search: "acme",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.equal(result.limit, 5);
+    assert.equal(result.offset, 2);
+    assert.deepEqual(result.orderBy, [{ direction: "asc", field: "name" }]);
+    assert.equal(state.whereValues.length, 3);
+    assert.deepEqual(state.limitValues, [1, 5]);
+    assert.deepEqual(state.offsets, [2]);
+  });
+
+  test("allows admins to list organization projects without membership", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "project_1",
+        metadata: null,
+        name: "Acme Project",
+        organizationId: "550e8400-e29b-41d4-a716-446655440000",
+        slug: "acme-project",
+        updatedAt: null,
+      },
+    ];
+    const { db, state } = createMockListDb(rows, 1);
+
+    const result = await listOrganizationProjects(createAdminProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.notEqual(state.rowWhere, undefined);
+    assert.notEqual(state.countWhere, undefined);
+  });
+
   test("returns not found when the organization does not exist", async () => {
     const { db } = createMockSequentialSelectDb([[]]);
 
@@ -355,6 +412,33 @@ describe("listOrganizations", () => {
 
     await assert.rejects(
       () => getOrganization(createUserProcedureContext(db), { id: row.id }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+
+  test("rejects anonymous access to organization projects", async () => {
+    const { db } = createMockSequentialSelectDb([]);
+
+    await assert.rejects(
+      () =>
+        listOrganizationProjects(createAnonymousProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("rejects non-member access to organization projects", async () => {
+    const { db } = createMockSequentialSelectDb([[]]);
+
+    await assert.rejects(
+      () => listOrganizationProjects(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "FORBIDDEN" &&

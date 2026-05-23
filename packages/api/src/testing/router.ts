@@ -39,7 +39,10 @@ type MockGetState = {
 };
 
 type MockQuerySequenceState = {
+  joinCounts: number[];
   limitValues: number[];
+  offsets: number[];
+  orderByValues: unknown[][];
   selections: unknown[];
   whereValues: unknown[];
 };
@@ -345,7 +348,10 @@ export function createMockGetDb(row: Record<string, unknown> | undefined) {
 
 export function createMockSequentialSelectDb(rows: Array<Array<Record<string, unknown>>>) {
   const state: MockQuerySequenceState = {
+    joinCounts: [],
     limitValues: [],
+    offsets: [],
+    orderByValues: [],
     selections: [],
     whereValues: [],
   };
@@ -369,10 +375,19 @@ export function createMockSequentialSelectDb(rows: Array<Array<Record<string, un
           return this;
         },
         innerJoin() {
+          state.joinCounts[queryIndex - 1] = (state.joinCounts[queryIndex - 1] ?? 0) + 1;
           return this;
         },
         limit(limit: number) {
           state.limitValues.push(limit);
+          return this;
+        },
+        offset(offset: number) {
+          state.offsets.push(offset);
+          return this;
+        },
+        orderBy(...orderBy: unknown[]) {
+          state.orderByValues.push(orderBy);
           return this;
         },
         where(where: unknown) {

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { insertOrganizationSchema, selectOrganizationSchema, updateOrganizationSchema } from "@repo/database/schema";
 import { collectionEmbedInputSchema, collectionInputSchema, createCollectionResultSchema } from "../collection";
 import { emptyUpdateMessage, hasUpdateChanges } from "../update";
+import { listProjectResultSchema } from "./project";
 
 const listOrganizationResultSchema = createCollectionResultSchema(selectOrganizationSchema);
 const organizationIdSchema = z.object({
@@ -20,6 +21,14 @@ const getOrganizationContract = oc
   .route({
     method: "GET",
     path: "/organizations/{id}",
+  });
+
+const listOrganizationProjectsContract = oc
+  .input(organizationIdSchema.merge(collectionInputSchema))
+  .output(listProjectResultSchema)
+  .route({
+    method: "GET",
+    path: "/organizations/{id}/projects",
   });
 
 const createOrganizationContract = oc.input(insertOrganizationSchema).output(selectOrganizationSchema).route({
@@ -55,5 +64,8 @@ export const organizationContract = {
   delete: deleteOrganizationContract,
   get: getOrganizationContract,
   list: listOrganizationContract,
+  projects: {
+    list: listOrganizationProjectsContract,
+  },
   update: updateOrganizationContract,
 };

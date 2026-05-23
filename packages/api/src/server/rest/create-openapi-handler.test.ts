@@ -9,6 +9,7 @@ import {
   createMockGetDb,
   createMockInsertDbError,
   createMockListDb,
+  createMockSequentialSelectDb,
   createMockUpdateDb,
 } from "../../testing/router";
 import { createOpenAPIHandler } from "./create-openapi-handler";
@@ -299,6 +300,72 @@ describe("createOpenAPIHandler", () => {
     });
 
     const response = await handler(new Request("http://localhost/rpc/organizations", { method: "GET" }));
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 403);
+    assert.equal(body.code, "FORBIDDEN");
+    assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
+  test("returns 200 with organization projects for organization members", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440002",
+        metadata: null,
+        name: "Acme Project",
+        organizationId: "550e8400-e29b-41d4-a716-446655440000",
+        slug: "acme-project",
+        updatedAt: null,
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+    }));
+    const { db } = createMockSequentialSelectDb([[{ id: "membership_1" }], rows, [{ count: 1 }]]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        "http://localhost/rpc/organizations/550e8400-e29b-41d4-a716-446655440000/projects?limit=5&offset=2&order=name.asc",
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy?: Array<{ direction: string; field: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name" }]);
+  });
+
+  test("returns 403 for authenticated non-members on organization project lists", async () => {
+    const { db } = createMockSequentialSelectDb([[]]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/organizations/550e8400-e29b-41d4-a716-446655440000/projects", { method: "GET" })
+    );
     const body = (await response.json()) as {
       code: string;
       message: string;

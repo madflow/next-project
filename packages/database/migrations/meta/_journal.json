@@ -141,6 +141,13 @@
       "when": 1779197483622,
       "tag": "0019_yellow_lord_hawal",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1779569285201,
+      "tag": "0020_api-key-rate-limit-defaults",
+      "breakpoints": true
     }
   ]
 }

@@ -1,15 +1,20 @@
 import { ORPCError } from "@orpc/server";
-import { eq } from "drizzle-orm";
+import { eq, getTableColumns } from "drizzle-orm";
 import {
   type CreateOrganizationData,
+  type Organization,
   type Organization as OrganizationRecord,
+  type Project,
   type UpdateOrganizationData,
+  organization as organizationRelation,
   organization as organizationTable,
+  project as projectTable,
 } from "@repo/database/schema";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
 import { requireOrganizationMembership } from "../../auth/access";
 import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
 import { getCollectionRow, listCollection } from "../../collection-query";
+import { projectQueryDefinition } from "../project/query-definition";
 import { organizationQueryDefinition } from "./query-definition";
 
 const os = adminApi.organization;
@@ -20,6 +25,14 @@ type UpdateOrganizationInput = {
   params: {
     id: string;
   };
+};
+
+type OrganizationProjectsInput = CollectionInput & {
+  id: string;
+};
+
+type OrganizationProjectListRow = Project & {
+  organization?: Organization;
 };
 
 export async function createOrganization(context: ProcedureContextInput, input: CreateOrganizationData) {
@@ -36,6 +49,10 @@ export async function listOrganizations(context: ProcedureContextInput, input: C
 
 export async function getOrganization(context: ProcedureContextInput, input: { embed?: string; id: string }) {
   return call(get, input, { context: toProcedureContext(context) });
+}
+
+export async function listOrganizationProjects(context: ProcedureContextInput, input: OrganizationProjectsInput) {
+  return call(projectsList, input, { context: toProcedureContext(context) });
 }
 
 export async function deleteOrganization(context: ProcedureContextInput, input: { id: string }) {
@@ -96,6 +113,21 @@ const get = authenticatedOrganizationApi.get.handler(async ({ context, input }) 
   return organization;
 });
 
+const projectsList = authenticatedOrganizationApi.projects.list.handler(async ({ context, input }) => {
+  await requireOrganizationMembership(context, input.id);
+  const { id, ...collectionInput } = input;
+
+  return listCollection<OrganizationProjectListRow>({
+    db: context.db,
+    definition: projectQueryDefinition,
+    embedSelections: {
+      organization: getTableColumns(organizationRelation),
+    },
+    input: collectionInput,
+    where: eq(projectTable.organizationId, id),
+  });
+});
+
 const update = os.update.handler(async ({ context, input }) => {
   const { id } = input.params;
   const changes = input.body;
@@ -121,5 +153,8 @@ export const organization = {
   delete: remove,
   get,
   list,
+  projects: {
+    list: projectsList,
+  },
   update,
 };

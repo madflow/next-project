@@ -13,7 +13,7 @@ const listProjectRowSchema = selectProjectSchema.extend({
   organization: selectOrganizationSchema.optional(),
 });
 
-const listProjectResultSchema = createCollectionResultSchema(listProjectRowSchema);
+export const listProjectResultSchema = createCollectionResultSchema(listProjectRowSchema);
 const projectIdSchema = z.object({
   id: z.uuid(),
 });
