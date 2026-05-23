@@ -17,6 +17,7 @@ describe("createOpenAPIHandler", () => {
     const handler = createOpenAPIHandler({
       auth: createMockAuth({ session: adminSessionData }),
       db: {} as DatabaseInstance,
+      pathPrefix: "/rpc",
     });
 
     const response = await handler(
@@ -57,7 +58,11 @@ describe("createOpenAPIHandler", () => {
       },
     });
     const { db } = createMockInsertDbError(duplicateSlugError);
-    const handler = createOpenAPIHandler({ auth: createMockAuth({ session: adminSessionData }), db });
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
 
     const response = await handler(
       new Request("http://localhost/rpc/organizations", {
@@ -101,7 +106,11 @@ describe("createOpenAPIHandler", () => {
       createdAt: row.createdAt.toISOString(),
     };
     const { db } = createMockUpdateDb(row);
-    const handler = createOpenAPIHandler({ auth: createMockAuth({ session: adminSessionData }), db });
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
 
     const response = await handler(
       new Request(`http://localhost/rpc/organizations/${row.id}`, {
@@ -122,6 +131,7 @@ describe("createOpenAPIHandler", () => {
     const handler = createOpenAPIHandler({
       auth: createMockAuth({ session: adminSessionData }),
       db: {} as DatabaseInstance,
+      pathPrefix: "/rpc",
     });
 
     const response = await handler(
@@ -165,7 +175,11 @@ describe("createOpenAPIHandler", () => {
       createdAt: row.createdAt.toISOString(),
     };
     const { db } = createMockDeleteDb(row);
-    const handler = createOpenAPIHandler({ auth: createMockAuth({ session: adminSessionData }), db });
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
 
     const response = await handler(new Request(`http://localhost/rpc/organizations/${row.id}`, { method: "DELETE" }));
     const body = (await response.json()) as typeof serializedRow;
@@ -176,7 +190,11 @@ describe("createOpenAPIHandler", () => {
 
   test("returns 404 for missing organizations on DELETE", async () => {
     const { db } = createMockDeleteDb(undefined);
-    const handler = createOpenAPIHandler({ auth: createMockAuth({ session: adminSessionData }), db });
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
 
     const response = await handler(
       new Request("http://localhost/rpc/organizations/550e8400-e29b-41d4-a716-446655440000", { method: "DELETE" })
@@ -202,7 +220,11 @@ describe("createOpenAPIHandler", () => {
       },
     });
     const { db } = createMockDeleteDbError(referencedOrganizationError);
-    const handler = createOpenAPIHandler({ auth: createMockAuth({ session: adminSessionData }), db });
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
 
     const response = await handler(
       new Request("http://localhost/rpc/organizations/550e8400-e29b-41d4-a716-446655440000", { method: "DELETE" })
@@ -227,7 +249,11 @@ describe("createOpenAPIHandler", () => {
 
   test("returns 404 for missing organizations on PUT", async () => {
     const { db } = createMockUpdateDb(undefined);
-    const handler = createOpenAPIHandler({ auth: createMockAuth({ session: adminSessionData }), db });
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
 
     const response = await handler(
       new Request("http://localhost/rpc/organizations/550e8400-e29b-41d4-a716-446655440000", {
@@ -250,7 +276,7 @@ describe("createOpenAPIHandler", () => {
 
   test("returns 401 for anonymous requests to admin routes", async () => {
     const { db } = createMockListDb([], 0);
-    const handler = createOpenAPIHandler({ auth: createMockAuth(), db });
+    const handler = createOpenAPIHandler({ auth: createMockAuth(), db, pathPrefix: "/rpc" });
 
     const response = await handler(new Request("http://localhost/rpc/organizations", { method: "GET" }));
     const body = (await response.json()) as {
@@ -265,7 +291,11 @@ describe("createOpenAPIHandler", () => {
 
   test("returns 403 for authenticated non-admin requests", async () => {
     const { db } = createMockListDb([], 0);
-    const handler = createOpenAPIHandler({ auth: createMockAuth({ session: userSessionData }), db });
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
 
     const response = await handler(new Request("http://localhost/rpc/organizations", { method: "GET" }));
     const body = (await response.json()) as {

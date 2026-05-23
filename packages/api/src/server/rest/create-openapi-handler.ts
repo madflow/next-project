@@ -10,7 +10,15 @@ function toZodValidationError(error: ValidationError) {
   return new z.ZodError(error.issues as z.core.$ZodIssue[]);
 }
 
-export const createOpenAPIHandler = ({ auth, db }: { auth: AuthInstance; db: DatabaseInstance }) => {
+export const createOpenAPIHandler = ({
+  auth,
+  db,
+  pathPrefix = "/rpc",
+}: {
+  auth: AuthInstance;
+  db: DatabaseInstance;
+  pathPrefix: `/${string}`;
+}) => {
   const handler = new OpenAPIHandler(appRouter, {
     clientInterceptors: [
       onError((error) => {
@@ -40,7 +48,7 @@ export const createOpenAPIHandler = ({ auth, db }: { auth: AuthInstance; db: Dat
   return async (request: Request) => {
     const context = await createORPCContext({ auth, db, headers: request.headers });
     const { matched, response } = await handler.handle(request, {
-      prefix: "/rpc",
+      prefix: pathPrefix,
       context,
     });
     if (matched) {
