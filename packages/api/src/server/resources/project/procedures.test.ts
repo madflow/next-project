@@ -246,7 +246,7 @@ describe("listProjects", () => {
       slug: "acme-project",
       updatedAt: null,
     };
-    const { db, state } = createMockSequentialSelectDb([[row], [{ id: "membership_1" }]]);
+    const { db, state } = createMockSequentialSelectDb([[row], [{ exists: true }]]);
 
     const result = await getProject(createUserProcedureContext(db), {
       embed: "organization",
@@ -255,7 +255,7 @@ describe("listProjects", () => {
 
     assert.deepEqual(result, row);
     assert.equal(state.whereValues.length, 2);
-    assert.deepEqual(state.limitValues, [1, 1]);
+    assert.deepEqual(state.limitValues, [1]);
   });
 
   test("returns not found when the project does not exist", async () => {
@@ -294,7 +294,7 @@ describe("listProjects", () => {
       slug: "acme-project",
       updatedAt: null,
     };
-    const { db } = createMockSequentialSelectDb([[row], []]);
+    const { db } = createMockSequentialSelectDb([[row], [{ exists: false }]]);
 
     await assert.rejects(
       () => getProject(createUserProcedureContext(db), { id: row.id }),

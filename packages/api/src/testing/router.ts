@@ -358,8 +358,31 @@ export function createMockSequentialSelectDb(rows: Array<Array<Record<string, un
 
   let queryIndex = 0;
 
+  const subqueryBuilder = {
+    from() {
+      return this;
+    },
+    where(where: unknown) {
+      state.whereValues.push(where);
+      return this;
+    },
+  };
+
   const db = {
+    async execute() {
+      const currentRows = rows[queryIndex] ?? [];
+      queryIndex += 1;
+
+      return {
+        rows: currentRows,
+      };
+    },
     select(selection?: unknown) {
+      if (selection && typeof selection === "object" && "one" in selection) {
+        state.selections.push(selection);
+        return subqueryBuilder;
+      }
+
       state.selections.push(selection);
       const currentRows = rows[queryIndex] ?? [];
       queryIndex += 1;

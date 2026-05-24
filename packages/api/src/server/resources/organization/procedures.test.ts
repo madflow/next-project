@@ -320,13 +320,13 @@ describe("listOrganizations", () => {
       settings: null,
       slug: "acme",
     };
-    const { db, state } = createMockSequentialSelectDb([[row], [{ id: "membership_1" }]]);
+    const { db, state } = createMockSequentialSelectDb([[row], [{ exists: true }]]);
 
     const result = await getOrganization(createUserProcedureContext(db), { id: row.id });
 
     assert.deepEqual(result, row);
     assert.equal(state.whereValues.length, 2);
-    assert.deepEqual(state.limitValues, [1, 1]);
+    assert.deepEqual(state.limitValues, [1]);
   });
 
   test("returns organization projects for organization members", async () => {
@@ -341,7 +341,7 @@ describe("listOrganizations", () => {
         updatedAt: null,
       },
     ];
-    const { db, state } = createMockSequentialSelectDb([[{ id: "membership_1" }], rows, [{ count: 1 }]]);
+    const { db, state } = createMockSequentialSelectDb([[{ exists: true }], rows, [{ count: 1 }]]);
 
     const result = await listOrganizationProjects(createUserProcedureContext(db), {
       id: "550e8400-e29b-41d4-a716-446655440000",
@@ -357,7 +357,7 @@ describe("listOrganizations", () => {
     assert.equal(result.offset, 2);
     assert.deepEqual(result.orderBy, [{ direction: "asc", field: "name" }]);
     assert.equal(state.whereValues.length, 3);
-    assert.deepEqual(state.limitValues, [1, 5]);
+    assert.deepEqual(state.limitValues, [5]);
     assert.deepEqual(state.offsets, [2]);
   });
 
@@ -408,7 +408,7 @@ describe("listOrganizations", () => {
       settings: null,
       slug: "acme",
     };
-    const { db } = createMockSequentialSelectDb([[row], []]);
+    const { db } = createMockSequentialSelectDb([[row], [{ exists: false }]]);
 
     await assert.rejects(
       () => getOrganization(createUserProcedureContext(db), { id: row.id }),
@@ -435,7 +435,7 @@ describe("listOrganizations", () => {
   });
 
   test("rejects non-member access to organization projects", async () => {
-    const { db } = createMockSequentialSelectDb([[]]);
+    const { db } = createMockSequentialSelectDb([[{ exists: false }]]);
 
     await assert.rejects(
       () => listOrganizationProjects(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),

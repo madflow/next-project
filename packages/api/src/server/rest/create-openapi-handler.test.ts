@@ -326,7 +326,7 @@ describe("createOpenAPIHandler", () => {
       ...row,
       createdAt: row.createdAt.toISOString(),
     }));
-    const { db } = createMockSequentialSelectDb([[{ id: "membership_1" }], rows, [{ count: 1 }]]);
+    const { db } = createMockSequentialSelectDb([[{ exists: true }], rows, [{ count: 1 }]]);
     const handler = createOpenAPIHandler({
       auth: createMockAuth({ session: userSessionData }),
       db,
@@ -356,7 +356,7 @@ describe("createOpenAPIHandler", () => {
   });
 
   test("returns 403 for authenticated non-members on organization project lists", async () => {
-    const { db } = createMockSequentialSelectDb([[]]);
+    const { db } = createMockSequentialSelectDb([[{ exists: false }]]);
     const handler = createOpenAPIHandler({
       auth: createMockAuth({ session: userSessionData }),
       db,

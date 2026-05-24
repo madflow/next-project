@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, exists, sql } from "drizzle-orm";
 import { member } from "@repo/database/schema";
 import type { Context } from "../context";
 import { authVoter } from "./voter";
@@ -34,14 +34,15 @@ export async function requireOrganizationMembership(
 
   const userId = getAuthenticatedUserId(context);
 
-  const rows = await context.db
-    .select({ id: member.id })
+  const membershipSubquery = context.db
+    .select({ one: sql`1` })
     .from(member)
-    .where(and(eq(member.organizationId, organizationId), eq(member.userId, userId)))
-    .limit(1)
-    .execute();
+    .where(and(eq(member.organizationId, organizationId), eq(member.userId, userId)));
 
-  if (rows.length === 0) {
+  const result = await context.db.execute(sql`select ${exists(membershipSubquery)} as "exists"`);
+  const membershipExists = result.rows[0]?.exists;
+
+  if (!membershipExists) {
     throwAccessDenied();
   }
 }
