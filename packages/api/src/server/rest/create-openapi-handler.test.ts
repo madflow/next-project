@@ -7,6 +7,7 @@ import {
   createMockDeleteDb,
   createMockDeleteDbError,
   createMockGetDb,
+  createMockInsertDb,
   createMockInsertDbError,
   createMockListDb,
   createMockSequentialSelectDb,
@@ -47,6 +48,180 @@ describe("createOpenAPIHandler", () => {
     assert.ok(Array.isArray(body.data.fieldErrors.name));
     assert.deepEqual(body.data.formErrors, []);
     assert.equal(body.data.fieldErrors.name?.[0], "Invalid input: expected string, received undefined");
+  });
+
+  test("returns 200 with created users for valid POST requests", async () => {
+    const row = {
+      banExpires: null,
+      banReason: null,
+      banned: false,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      email: "new@example.com",
+      emailVerified: false,
+      id: "550e8400-e29b-41d4-a716-446655440099",
+      image: null,
+      locale: "en",
+      name: "New User",
+      role: "user",
+      updatedAt: new Date("2024-01-02T00:00:00.000Z"),
+    };
+    const serializedRow = {
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+    };
+    const { db } = createMockInsertDb(row);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/users", {
+        body: JSON.stringify({
+          banned: false,
+          email: row.email,
+          emailVerified: row.emailVerified,
+          image: row.image,
+          locale: row.locale,
+          name: row.name,
+          role: row.role,
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+        method: "POST",
+      })
+    );
+    const body = (await response.json()) as typeof serializedRow;
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, serializedRow);
+  });
+
+  test("returns 200 with paginated users for valid GET collection requests", async () => {
+    const rows = [
+      {
+        banExpires: null,
+        banReason: null,
+        banned: false,
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        email: "user@example.com",
+        emailVerified: true,
+        id: "550e8400-e29b-41d4-a716-446655440010",
+        image: null,
+        locale: "en",
+        name: "Regular User",
+        role: "user",
+        updatedAt: new Date("2024-01-02T00:00:00.000Z"),
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+    }));
+    const { db } = createMockListDb(rows, 1);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/users?limit=5&offset=2&order=name.asc", { method: "GET" })
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy: Array<{ direction: string; field: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name" }]);
+  });
+
+  test("returns 200 with updated users for valid PUT requests", async () => {
+    const row = {
+      banExpires: null,
+      banReason: null,
+      banned: null,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      email: "user@example.com",
+      emailVerified: true,
+      id: "550e8400-e29b-41d4-a716-446655440010",
+      image: null,
+      locale: "de",
+      name: "Regular User",
+      role: "admin",
+      updatedAt: new Date("2024-01-02T00:00:00.000Z"),
+    };
+    const serializedRow = {
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+    };
+    const { db } = createMockUpdateDb(row);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(`http://localhost/rpc/users/${row.id}`, {
+        body: JSON.stringify({ locale: row.locale, role: row.role }),
+        headers: {
+          "content-type": "application/json",
+        },
+        method: "PUT",
+      })
+    );
+    const body = (await response.json()) as typeof serializedRow;
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, serializedRow);
+  });
+
+  test("returns 200 with deleted users for valid DELETE requests", async () => {
+    const row = {
+      banExpires: null,
+      banReason: null,
+      banned: null,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      email: "user@example.com",
+      emailVerified: true,
+      id: "550e8400-e29b-41d4-a716-446655440010",
+      image: null,
+      locale: "en",
+      name: "Regular User",
+      role: "user",
+      updatedAt: new Date("2024-01-02T00:00:00.000Z"),
+    };
+    const serializedRow = {
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+    };
+    const { db } = createMockDeleteDb(row);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(new Request(`http://localhost/rpc/users/${row.id}`, { method: "DELETE" }));
+    const body = (await response.json()) as typeof serializedRow;
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, serializedRow);
   });
 
   test("returns 409 with structured database error data for duplicate organization slugs", async () => {
@@ -308,6 +483,34 @@ describe("createOpenAPIHandler", () => {
     assert.equal(response.status, 403);
     assert.equal(body.code, "FORBIDDEN");
     assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
+  test("returns 200 with null for anonymous current user requests", async () => {
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth(),
+      db: {} as DatabaseInstance,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(new Request("http://localhost/rpc/currentuser", { method: "GET" }));
+    const body = (await response.json()) as null;
+
+    assert.equal(response.status, 200);
+    assert.equal(body, null);
+  });
+
+  test("returns 200 with an empty array for anonymous current user organizations requests", async () => {
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth(),
+      db: {} as DatabaseInstance,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(new Request("http://localhost/rpc/currentuser/organizations", { method: "GET" }));
+    const body = (await response.json()) as unknown[];
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, []);
   });
 
   test("returns 200 with organization projects for organization members", async () => {

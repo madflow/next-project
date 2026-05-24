@@ -17,14 +17,14 @@ const adminMiddleware = baseApi.middleware(async ({ context, next }) => {
   return next();
 });
 
-const api = baseApi.use(
+const api: typeof baseApi = baseApi.use(
   onError((error) => {
     throw toIntegrityConstraintORPCError(error) ?? error;
   })
-);
+) as unknown as typeof baseApi;
 
-export const authenticatedApi = api.use(authenticatedMiddleware);
-export const adminApi = authenticatedApi.use(adminMiddleware);
+export const authenticatedApi: typeof baseApi = api.use(authenticatedMiddleware) as unknown as typeof baseApi;
+export const adminApi: typeof baseApi = authenticatedApi.use(adminMiddleware) as unknown as typeof baseApi;
 
 export type ProcedureContextInput = Pick<Context, "db"> & Partial<Omit<Context, "db">>;
 
