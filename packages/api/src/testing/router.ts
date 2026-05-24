@@ -65,6 +65,18 @@ export function createMockListDb(rows: Array<Record<string, unknown>>, totalCoun
     orderBy: [],
   };
 
+  const subqueryBuilder = {
+    from() {
+      return this;
+    },
+    innerJoin() {
+      return this;
+    },
+    where() {
+      return this;
+    },
+  };
+
   const rowBuilder = {
     $dynamic() {
       return this;
@@ -118,6 +130,10 @@ export function createMockListDb(rows: Array<Record<string, unknown>>, totalCoun
 
   const db = {
     select(selection?: unknown) {
+      if (selection && typeof selection === "object" && "one" in selection) {
+        return subqueryBuilder;
+      }
+
       if (selection && typeof selection === "object" && "count" in selection) {
         state.countSelection = selection;
         return countBuilder;
