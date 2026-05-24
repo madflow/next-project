@@ -18,7 +18,11 @@ export {
   type UpdateDatasetData,
 };
 
-export type DatasetWithOrganization = {
+export type DatasetWithEmbeddedOrganization = Dataset & {
+  organization?: Organization;
+};
+
+export type DatasetWithOrganizationJoin = {
   datasets: Dataset;
   organizations: Organization;
 };

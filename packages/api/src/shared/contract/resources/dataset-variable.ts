@@ -6,7 +6,7 @@ const listDatasetVariableRowSchema = selectDatasetVariableSchema.extend({
   dataset: selectDatasetSchema.optional(),
 });
 
-const listDatasetVariableResultSchema = createCollectionResultSchema(listDatasetVariableRowSchema);
+export const listDatasetVariableResultSchema = createCollectionResultSchema(listDatasetVariableRowSchema);
 
 const listDatasetVariableContract = oc.input(collectionInputSchema).output(listDatasetVariableResultSchema).route({
   method: "GET",

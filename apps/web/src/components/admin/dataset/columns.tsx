@@ -9,55 +9,55 @@ import { remove } from "@/actions/dataset";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatFileSize } from "@/lib/utils";
-import type { DatasetWithOrganization } from "@/types/dataset";
+import type { DatasetWithEmbeddedOrganization } from "@/types/dataset";
 import { DeleteDatasetDialog } from "./delete-dataset-dialog";
 import { InfoDatasetModal } from "./info-dataset-modal";
 
-export const columns: ColumnDef<DatasetWithOrganization>[] = [
+export const columns: ColumnDef<DatasetWithEmbeddedOrganization>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.name" />,
     cell: function Cell({ row }) {
       return (
         <Link
-          href={`/admin/datasets/${row.original.datasets.id}/editor`}
+          href={`/admin/datasets/${row.original.id}/editor`}
           className="text-primary flex cursor-pointer items-center gap-1 font-medium hover:underline">
-          {row.original.datasets.name}
+          {row.original.name}
           <Pencil className="h-3 w-3" />
         </Link>
       );
     },
   },
   {
-    accessorKey: "organizations:name",
+    accessorKey: "organization:name",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.organization" />,
-    cell: ({ row }) => row.original.organizations.name,
+    cell: ({ row }) => row.original.organization?.name,
   },
   {
     accessorKey: "filename",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.filename" />,
-    cell: ({ row }) => row.original.datasets.filename,
+    cell: ({ row }) => row.original.filename,
   },
   {
     accessorKey: "fileType",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.type" />,
-    cell: ({ row }) => row.original.datasets.fileType.toUpperCase(),
+    cell: ({ row }) => row.original.fileType.toUpperCase(),
   },
   {
     accessorKey: "fileSize",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.size" />,
-    cell: ({ row }) => formatFileSize(row.original.datasets.fileSize),
+    cell: ({ row }) => formatFileSize(row.original.fileSize),
   },
   {
     accessorKey: "createdAt",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.uploaded" />,
-    cell: ({ row }) => formatDate(row.original.datasets.createdAt),
+    cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     id: "actions",
     cell: function Cell({ row }) {
       const t = useTranslations("adminDataset");
-      const dataset = row.original.datasets;
+      const dataset = row.original;
 
       const handleDelete = async (id: string) => {
         try {

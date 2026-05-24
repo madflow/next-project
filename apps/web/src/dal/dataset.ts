@@ -12,8 +12,9 @@ import { deleteDataset as s3DeleteDataset } from "@repo/storage";
 import { getAuthenticatedClient, getSessionUser, withAdminCheck, withSessionCheck } from "@/dal/dal";
 import { createListWithJoins } from "@/dal/dal-joins";
 import { DalException, DalNotAuthorizedException } from "@/lib/exception";
+import type { DatasetWithOrganizationJoin } from "@/types/dataset";
 
-const findFn = async (id: string) => {
+const findFn = async (id: string): Promise<DatasetWithOrganizationJoin | null> => {
   const db = await getAuthenticatedClient();
   const [result] = await db
     .select()

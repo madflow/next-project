@@ -7,14 +7,14 @@ import { DataTable } from "@/components/datatable/data-table";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryApi } from "@/hooks/use-query-api";
 import type { PaginationState, SortingState } from "@/types";
-import type { DatasetWithOrganization } from "@/types/dataset";
+import type { DatasetWithEmbeddedOrganization } from "@/types/dataset";
 
 interface Props {
-  columns: ColumnDef<DatasetWithOrganization, unknown>[];
+  columns: ColumnDef<DatasetWithEmbeddedOrganization, unknown>[];
 }
 
 interface ApiResponse {
-  rows: DatasetWithOrganization[];
+  rows: DatasetWithEmbeddedOrganization[];
   count: number;
   limit: number;
   offset: number;
@@ -33,7 +33,7 @@ export function DatasetsDataTable({ columns }: Props) {
     error: queryError,
     refetch,
   } = useQueryApi<ApiResponse>({
-    endpoint: "/api/datasets",
+    endpoint: "/api/datasets?embed=organization",
     pagination,
     sorting,
     search: debouncedSearch,
@@ -44,7 +44,7 @@ export function DatasetsDataTable({ columns }: Props) {
   const error = queryError ? queryError.message : null;
 
   return (
-    <DataTable<DatasetWithOrganization>
+    <DataTable<DatasetWithEmbeddedOrganization>
       columns={columns}
       data={apiResponse?.rows ?? []}
       count={apiResponse?.count ?? 0}

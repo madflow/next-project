@@ -579,6 +579,84 @@ describe("createOpenAPIHandler", () => {
     assert.equal(body.message, "You do not have enough permission to perform this action.");
   });
 
+  test("returns 200 with dataset variables for dataset members", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        label: "Age",
+        measure: "scale",
+        missingRanges: null,
+        missingValues: null,
+        name: "age",
+        type: "int32",
+        valueLabels: null,
+        variableLabels: null,
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+    }));
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        "http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variables?limit=5&offset=2&order=name.asc",
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy?: Array<{ direction: string; field: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name" }]);
+  });
+
+  test("returns 403 for authenticated non-members on dataset variable lists", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variables", { method: "GET" })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 403);
+    assert.equal(body.code, "FORBIDDEN");
+    assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
   test("returns 200 with the project for valid GET by id requests", async () => {
     const row = {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
@@ -607,6 +685,40 @@ describe("createOpenAPIHandler", () => {
     assert.deepEqual(body, serializedRow);
   });
 
+  test("returns 200 with the dataset for valid GET by id requests", async () => {
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      description: null,
+      fileHash: "hash_1",
+      filename: "acme.csv",
+      fileSize: 123,
+      fileType: "csv",
+      id: "550e8400-e29b-41d4-a716-446655440002",
+      name: "Acme Dataset",
+      organizationId: userSessionData.session.userId,
+      storageKey: "datasets/acme.csv",
+      updatedAt: null,
+      uploadedAt: new Date("2024-01-01T00:00:00.000Z"),
+    };
+    const serializedRow = {
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+      uploadedAt: row.uploadedAt.toISOString(),
+    };
+    const { db } = createMockGetDb(row);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(new Request(`http://localhost/rpc/datasets/${row.id}`, { method: "GET" }));
+    const body = (await response.json()) as typeof serializedRow;
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, serializedRow);
+  });
+
   test("returns 422 for invalid embeds on GET by id requests", async () => {
     const handler = createOpenAPIHandler({
       auth: createMockAuth({ session: adminSessionData }),
@@ -616,6 +728,26 @@ describe("createOpenAPIHandler", () => {
 
     const response = await handler(
       new Request("http://localhost/rpc/projects/550e8400-e29b-41d4-a716-446655440002?embed=owner", { method: "GET" })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 422);
+    assert.equal(body.code, "INPUT_VALIDATION_FAILED");
+    assert.ok(body.message.includes("Unknown embed 'owner'"));
+  });
+
+  test("returns 422 for invalid dataset embeds on GET by id requests", async () => {
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db: {} as DatabaseInstance,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440002?embed=owner", { method: "GET" })
     );
     const body = (await response.json()) as {
       code: string;

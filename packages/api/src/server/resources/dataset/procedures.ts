@@ -1,15 +1,19 @@
-import { type SQL, and, eq, exists, getTableColumns, sql } from "drizzle-orm";
+import { ORPCError } from "@orpc/server";
+import { type SQL, eq, getTableColumns } from "drizzle-orm";
 import {
   type Dataset as DatasetRecord,
+  type DatasetVariable as DatasetVariableRecord,
   type Organization,
   dataset as datasetTable,
-  member,
+  datasetVariable as datasetVariableTable,
   organization,
 } from "@repo/database/schema";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
-import { authVoter } from "../../auth/voter";
+import { requireOrganizationMembership } from "../../auth/access";
 import { type ProcedureContextInput, authenticatedApi, call, toProcedureContext } from "../../base";
-import { listCollection } from "../../collection-query";
+import { getCollectionRow, listCollection } from "../../collection-query";
+import { datasetVariableQueryDefinition } from "../dataset-variable/query-definition";
+import { getDatasetRelatedAccessWhere, requireDatasetAccess } from "./access";
 import { datasetQueryDefinition } from "./query-definition";
 
 const authenticatedDatasetApi = authenticatedApi.dataset;
@@ -18,28 +22,28 @@ type DatasetListRow = DatasetRecord & {
   organization?: Organization;
 };
 
+type DatasetVariablesInput = CollectionInput & {
+  id: string;
+};
+
+type DatasetVariableListRow = DatasetVariableRecord & {
+  dataset?: DatasetRecord;
+};
+
 function getDatasetAccessWhere(context: ProcedureContextInput): SQL<unknown> | undefined {
-  const procedureContext = toProcedureContext(context);
-
-  if (authVoter.canAccessAdminOperations(procedureContext.principal)) {
-    return undefined;
-  }
-
-  const { principal } = procedureContext;
-  if (principal.kind === "anonymous") {
-    return undefined;
-  }
-
-  const membershipSubquery = context.db
-    .select({ one: sql`1` })
-    .from(member)
-    .where(and(eq(member.userId, principal.user.id), eq(member.organizationId, datasetTable.organizationId)));
-
-  return exists(membershipSubquery);
+  return getDatasetRelatedAccessWhere(context, datasetTable.id);
 }
 
 export async function listDatasets(context: ProcedureContextInput, input: CollectionInput) {
   return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
+}
+
+export async function getDataset(context: ProcedureContextInput, input: { embed?: string; id: string }) {
+  return call(get, input, { context: toProcedureContext(context) });
+}
+
+export async function listDatasetVariables(context: ProcedureContextInput, input: DatasetVariablesInput) {
+  return call(variablesList, input, { context: toProcedureContext(context) });
 }
 
 const list = authenticatedDatasetApi.list.handler(async ({ context, input }) => {
@@ -56,6 +60,48 @@ const list = authenticatedDatasetApi.list.handler(async ({ context, input }) => 
   });
 });
 
+const get = authenticatedDatasetApi.get.handler(async ({ context, input }) => {
+  const dataset = await getCollectionRow<DatasetListRow>({
+    db: context.db,
+    definition: datasetQueryDefinition,
+    embedSelections: {
+      organization: getTableColumns(organization),
+    },
+    input,
+    where: eq(datasetTable.id, input.id),
+  });
+
+  if (dataset === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Dataset not found",
+      status: 404,
+    });
+  }
+
+  await requireOrganizationMembership(context, dataset.organizationId);
+
+  return dataset;
+});
+
+const variablesList = authenticatedDatasetApi.variables.list.handler(async ({ context, input }) => {
+  await requireDatasetAccess(context, input.id);
+  const { id, ...collectionInput } = input;
+
+  return listCollection<DatasetVariableListRow>({
+    db: context.db,
+    definition: datasetVariableQueryDefinition,
+    embedSelections: {
+      dataset: getTableColumns(datasetTable),
+    },
+    input: collectionInput,
+    where: eq(datasetVariableTable.datasetId, id),
+  });
+});
+
 export const dataset = {
+  get,
   list,
+  variables: {
+    list: variablesList,
+  },
 };
