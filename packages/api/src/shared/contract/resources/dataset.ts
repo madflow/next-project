@@ -2,6 +2,7 @@ import { oc } from "@orpc/contract";
 import { z } from "zod";
 import { selectDatasetSchema, selectOrganizationSchema } from "@repo/database/schema";
 import { collectionEmbedInputSchema, collectionInputSchema, createCollectionResultSchema } from "../collection";
+import { listDatasetProjectResultSchema } from "./dataset-project";
 import { listDatasetVariableResultSchema } from "./dataset-variable";
 
 const listDatasetRowSchema = selectDatasetSchema.extend({
@@ -34,9 +35,20 @@ const listDatasetVariablesContract = oc
     path: "/datasets/{id}/variables",
   });
 
+const listDatasetProjectsContract = oc
+  .input(datasetIdSchema.merge(collectionInputSchema))
+  .output(listDatasetProjectResultSchema)
+  .route({
+    method: "GET",
+    path: "/datasets/{id}/projects",
+  });
+
 export const datasetContract = {
   get: getDatasetContract,
   list: listDatasetContract,
+  projects: {
+    list: listDatasetProjectsContract,
+  },
   variables: {
     list: listDatasetVariablesContract,
   },

@@ -579,6 +579,88 @@ describe("createOpenAPIHandler", () => {
     assert.equal(body.message, "You do not have enough permission to perform this action.");
   });
 
+  test("returns 200 with dataset projects for dataset members", async () => {
+    const rows = [
+      {
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        project: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: "550e8400-e29b-41d4-a716-446655440002",
+          metadata: null,
+          name: "Acme Project",
+          organizationId: "550e8400-e29b-41d4-a716-446655440001",
+          slug: "acme-project",
+          updatedAt: null,
+        },
+        projectId: "550e8400-e29b-41d4-a716-446655440002",
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      project: {
+        ...row.project,
+        createdAt: row.project.createdAt.toISOString(),
+      },
+    }));
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        "http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/projects?limit=5&offset=2&order=project:name.asc",
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy?: Array<{ direction: string; field: string; relationship?: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name", relationship: "project" }]);
+  });
+
+  test("returns 403 for authenticated non-members on dataset project lists", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/projects", { method: "GET" })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 403);
+    assert.equal(body.code, "FORBIDDEN");
+    assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
   test("returns 200 with dataset variables for dataset members", async () => {
     const rows = [
       {

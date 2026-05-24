@@ -7,7 +7,7 @@ const listDatasetProjectRowSchema = selectDatasetProjectSchema.extend({
   project: selectProjectSchema.optional(),
 });
 
-const listDatasetProjectResultSchema = createCollectionResultSchema(listDatasetProjectRowSchema);
+export const listDatasetProjectResultSchema = createCollectionResultSchema(listDatasetProjectRowSchema);
 
 const listDatasetProjectContract = oc.input(collectionInputSchema).output(listDatasetProjectResultSchema).route({
   method: "GET",

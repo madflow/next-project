@@ -17,7 +17,8 @@ type DatasetProjectsProps = {
 };
 
 type ResponseRow = {
-  projects: Project;
+  id: string;
+  project?: Project;
 };
 
 export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsProps) {
@@ -26,12 +27,14 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
   const t = useTranslations("adminDatasetEditor");
 
   const { data, isSuccess, isError, refetch } = useQueryApi<ApiResponsePayload<ResponseRow>>(
-    `/api/datasets/${datasetId}/projects`,
+    `/api/datasets/${datasetId}/projects?embed=project`,
     {
       limit: 100,
       offset: 0,
     }
   );
+
+  const rows = data?.rows.filter((item) => item.project) ?? [];
 
   const handleAddToProject = async () => {
     if (!selectedProject) {
@@ -93,9 +96,9 @@ export function DatasetProjects({ datasetId, organizationId }: DatasetProjectsPr
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.rows.map((item) => (
-                  <TableRow key={item.projects.id}>
-                    <TableCell className="font-medium">{item.projects.name}</TableCell>
+                {rows.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.project?.name}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

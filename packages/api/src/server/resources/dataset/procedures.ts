@@ -1,17 +1,22 @@
 import { ORPCError } from "@orpc/server";
 import { type SQL, eq, getTableColumns } from "drizzle-orm";
 import {
+  type DatasetProject as DatasetProjectRecord,
   type Dataset as DatasetRecord,
   type DatasetVariable as DatasetVariableRecord,
   type Organization,
+  type Project as ProjectRecord,
+  datasetProject as datasetProjectTable,
   dataset as datasetTable,
   datasetVariable as datasetVariableTable,
   organization,
+  project,
 } from "@repo/database/schema";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
 import { requireOrganizationMembership } from "../../auth/access";
 import { type ProcedureContextInput, authenticatedApi, call, toProcedureContext } from "../../base";
 import { getCollectionRow, listCollection } from "../../collection-query";
+import { datasetProjectQueryDefinition } from "../dataset-project/query-definition";
 import { datasetVariableQueryDefinition } from "../dataset-variable/query-definition";
 import { getDatasetRelatedAccessWhere, requireDatasetAccess } from "./access";
 import { datasetQueryDefinition } from "./query-definition";
@@ -24,6 +29,15 @@ type DatasetListRow = DatasetRecord & {
 
 type DatasetVariablesInput = CollectionInput & {
   id: string;
+};
+
+type DatasetProjectsInput = CollectionInput & {
+  id: string;
+};
+
+type DatasetProjectListRow = DatasetProjectRecord & {
+  dataset?: DatasetRecord;
+  project?: ProjectRecord;
 };
 
 type DatasetVariableListRow = DatasetVariableRecord & {
@@ -44,6 +58,10 @@ export async function getDataset(context: ProcedureContextInput, input: { embed?
 
 export async function listDatasetVariables(context: ProcedureContextInput, input: DatasetVariablesInput) {
   return call(variablesList, input, { context: toProcedureContext(context) });
+}
+
+export async function listDatasetProjects(context: ProcedureContextInput, input: DatasetProjectsInput) {
+  return call(projectsList, input, { context: toProcedureContext(context) });
 }
 
 const list = authenticatedDatasetApi.list.handler(async ({ context, input }) => {
@@ -98,9 +116,28 @@ const variablesList = authenticatedDatasetApi.variables.list.handler(async ({ co
   });
 });
 
+const projectsList = authenticatedDatasetApi.projects.list.handler(async ({ context, input }) => {
+  await requireDatasetAccess(context, input.id);
+  const { id, ...collectionInput } = input;
+
+  return listCollection<DatasetProjectListRow>({
+    db: context.db,
+    definition: datasetProjectQueryDefinition,
+    embedSelections: {
+      dataset: getTableColumns(datasetTable),
+      project: getTableColumns(project),
+    },
+    input: collectionInput,
+    where: eq(datasetProjectTable.datasetId, id),
+  });
+});
+
 export const dataset = {
   get,
   list,
+  projects: {
+    list: projectsList,
+  },
   variables: {
     list: variablesList,
   },

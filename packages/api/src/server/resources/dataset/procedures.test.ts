@@ -7,7 +7,7 @@ import {
   createUserProcedureContext,
 } from "../../../testing/auth";
 import { createMockListDb, createMockSequentialSelectDb } from "../../../testing/router";
-import { getDataset, listDatasetVariables, listDatasets } from "./procedures";
+import { getDataset, listDatasetProjects, listDatasetVariables, listDatasets } from "./procedures";
 
 describe("listDatasets", () => {
   test("returns paginated rows with validated scalar filters", async () => {
@@ -357,6 +357,108 @@ describe("listDatasetVariables", () => {
 
     await assert.rejects(
       () => listDatasetVariables(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+});
+
+describe("listDatasetProjects", () => {
+  test("returns dataset projects for dataset members", async () => {
+    const rows = [
+      {
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        project: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: "550e8400-e29b-41d4-a716-446655440002",
+          metadata: null,
+          name: "Acme Project",
+          organizationId: "550e8400-e29b-41d4-a716-446655440001",
+          slug: "acme-project",
+          updatedAt: null,
+        },
+        projectId: "550e8400-e29b-41d4-a716-446655440002",
+      },
+    ];
+    const { db, state } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+
+    const result = await listDatasetProjects(createUserProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      limit: "5",
+      offset: "2",
+      order: "project:name.asc",
+      search: "acme",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.equal(result.limit, 5);
+    assert.equal(result.offset, 2);
+    assert.deepEqual(result.orderBy, [{ direction: "asc", field: "name", relationship: "project" }]);
+    assert.equal(state.whereValues.length, 4);
+    assert.deepEqual(state.limitValues, [5]);
+    assert.deepEqual(state.offsets, [2]);
+  });
+
+  test("allows admins to list dataset projects without membership", async () => {
+    const rows = [
+      {
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        project: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: "550e8400-e29b-41d4-a716-446655440002",
+          metadata: null,
+          name: "Acme Project",
+          organizationId: "550e8400-e29b-41d4-a716-446655440001",
+          slug: "acme-project",
+          updatedAt: null,
+        },
+        projectId: "550e8400-e29b-41d4-a716-446655440002",
+      },
+    ];
+    const { db, state } = createMockListDb(rows, 1);
+
+    const result = await listDatasetProjects(createAdminProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.notEqual(state.rowWhere, undefined);
+    assert.notEqual(state.countWhere, undefined);
+  });
+
+  test("rejects anonymous access to dataset projects", async () => {
+    const { db } = createMockSequentialSelectDb([]);
+
+    await assert.rejects(
+      () => listDatasetProjects(createAnonymousProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("rejects non-member access to dataset projects", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+
+    await assert.rejects(
+      () => listDatasetProjects(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "FORBIDDEN" &&

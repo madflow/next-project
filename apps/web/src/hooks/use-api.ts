@@ -59,7 +59,9 @@ export const useQueryApi = <T>(
       });
     }
 
-    const response = await fetch(`${endpoint}?${params.toString()}`, { signal });
+    const url = new URL(endpoint, "http://localhost");
+    const separator = url.search ? "&" : "?";
+    const response = await fetch(`${endpoint}${separator}${params.toString()}`, { signal });
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
