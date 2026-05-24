@@ -26,6 +26,19 @@ interface ApiResponse {
   offset: number;
 }
 
+type AssignedSplitVariableRow = {
+  id: string;
+  variable?: DatasetVariable;
+  variableId: string;
+};
+
+interface AssignedApiResponse {
+  rows: AssignedSplitVariableRow[];
+  count: number;
+  limit: number;
+  offset: number;
+}
+
 export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariablesAssignmentProps) {
   const t = useTranslations("adminDatasetSplitVariables");
   const [availableSearch, setAvailableSearch] = useState("");
@@ -51,13 +64,15 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
     data: assignedResponse,
     isLoading: isLoadingAssigned,
     refetch: refetchAssigned,
-  } = useQueryApi<ApiResponse>({
-    endpoint: `/api/datasets/${datasetId}/splitvariables`,
+  } = useQueryApi<AssignedApiResponse>({
+    endpoint: `/api/datasets/${datasetId}/splitvariables?embed=variable`,
     pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
+    sorting: [{ desc: false, id: "variable:name" }],
     search: assignedSearch,
     queryKey: ["assigned-split-variables", datasetId, assignedSearch],
   });
+
+  const assignedRows = assignedResponse?.rows.filter((item) => item.variable) ?? [];
 
   const handleAssignVariable = async (variableId: string) => {
     setIsAssigning(variableId);
@@ -161,7 +176,7 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
             <ScrollArea className="h-96" data-testid="admin.dataset.splitvariables.assigned.section">
               {isLoadingAssigned ? (
                 <div className="text-muted-foreground p-4 text-center text-sm">{"Loading..."}</div>
-              ) : assignedResponse?.rows.length === 0 ? (
+              ) : assignedRows.length === 0 ? (
                 <div
                   className="text-muted-foreground p-4 text-center text-sm"
                   data-testid="admin.dataset.splitvariables.assigned.empty">
@@ -169,26 +184,26 @@ export function SplitVariablesAssignment({ datasetId, onRefresh }: SplitVariable
                 </div>
               ) : (
                 <ItemGroup className="gap-1 p-2" data-testid="admin.dataset.splitvariables.assigned.variables.list">
-                  {assignedResponse?.rows.map((variable) => (
+                  {assignedRows.map((item) => (
                     <AdminVariableRow
-                      key={variable.id}
+                      key={item.id}
                       actions={
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleRemoveVariable(variable.id)}
-                          disabled={isRemoving === variable.id}
+                          onClick={() => handleRemoveVariable(item.variableId)}
+                          disabled={isRemoving === item.variableId}
                           className="mt-0.5 h-6 w-6 shrink-0 p-0"
                           data-testid="admin.dataset.splitvariables.assignment.remove">
-                          {isRemoving === variable.id ? "..." : <X className="h-3 w-3" />}
+                          {isRemoving === item.variableId ? "..." : <X className="h-3 w-3" />}
                         </Button>
                       }
                       className="hover:bg-muted items-start gap-2 p-2"
-                      label={variable.label}
-                      measure={variable.measure}
-                      variableName={variable.name}
-                      variableType={variable.type}
-                      data-testid={`admin.dataset.splitvariables.assigned.variable.${variable.id}`}></AdminVariableRow>
+                      label={item.variable?.label}
+                      measure={item.variable?.measure}
+                      variableName={item.variable?.name}
+                      variableType={item.variable?.type}
+                      data-testid={`admin.dataset.splitvariables.assigned.variable.${item.id}`}></AdminVariableRow>
                   ))}
                 </ItemGroup>
               )}

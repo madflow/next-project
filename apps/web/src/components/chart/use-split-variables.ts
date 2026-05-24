@@ -7,8 +7,14 @@ import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type StatsResponse } from "@/types/stats";
 
+type SplitVariableRow = {
+  id: string;
+  variable?: DatasetVariableWithAttributes;
+  variableId: string;
+};
+
 type SplitVariablesResponse = {
-  rows: DatasetVariableWithAttributes[];
+  rows: SplitVariableRow[];
   count: number;
   limit: number;
   offset: number;
@@ -16,16 +22,16 @@ type SplitVariablesResponse = {
 
 export function useSplitVariables(datasetId?: string, enabled: boolean = true) {
   const { data, isLoading } = useQueryApi<SplitVariablesResponse>({
-    endpoint: `/api/datasets/${datasetId}/splitvariables`,
+    endpoint: `/api/datasets/${datasetId}/splitvariables?embed=variable`,
     pagination: { pageIndex: 0, pageSize: 100 },
-    sorting: [],
+    sorting: [{ desc: false, id: "variable:name" }],
     search: "",
     queryKey: ["dataset-split-variables", datasetId],
     enabled: Boolean(datasetId) && enabled,
   });
 
   return {
-    splitVariables: data?.rows ?? [],
+    splitVariables: data?.rows.flatMap((row) => (row.variable ? [row.variable] : [])) ?? [],
     isLoading,
   };
 }

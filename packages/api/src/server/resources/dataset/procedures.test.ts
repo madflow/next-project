@@ -7,7 +7,15 @@ import {
   createUserProcedureContext,
 } from "../../../testing/auth";
 import { createMockListDb, createMockSequentialSelectDb } from "../../../testing/router";
-import { getDataset, listDatasetProjects, listDatasetVariables, listDatasets } from "./procedures";
+import {
+  getDataset,
+  listDatasetAvailableSplitVariables,
+  listDatasetProjects,
+  listDatasetSplitVariables,
+  listDatasetVariables,
+  listDatasetVariablesets,
+  listDatasets,
+} from "./procedures";
 
 describe("listDatasets", () => {
   test("returns paginated rows with validated scalar filters", async () => {
@@ -366,6 +374,112 @@ describe("listDatasetVariables", () => {
   });
 });
 
+describe("listDatasetAvailableSplitVariables", () => {
+  test("returns dataset variables that are not assigned as split variables", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        label: "Age",
+        measure: "scale",
+        missingRanges: null,
+        missingValues: null,
+        name: "age",
+        type: "int32",
+        valueLabels: null,
+        variableLabels: null,
+      },
+    ];
+    const { db, state } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+
+    const result = await listDatasetAvailableSplitVariables(createUserProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      limit: "5",
+      offset: "2",
+      order: "name.asc",
+      search: "age",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.equal(result.limit, 5);
+    assert.equal(result.offset, 2);
+    assert.deepEqual(result.orderBy, [{ direction: "asc", field: "name" }]);
+    assert.equal(state.whereValues.length, 6);
+    assert.deepEqual(state.limitValues, [5]);
+    assert.deepEqual(state.offsets, [2]);
+  });
+
+  test("allows admins to list available split variables without membership", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        label: "Age",
+        measure: "scale",
+        missingRanges: null,
+        missingValues: null,
+        name: "age",
+        type: "int32",
+        valueLabels: null,
+        variableLabels: null,
+      },
+    ];
+    const { db, state } = createMockListDb(rows, 1);
+
+    const result = await listDatasetAvailableSplitVariables(createAdminProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.notEqual(state.rowWhere, undefined);
+    assert.notEqual(state.countWhere, undefined);
+  });
+
+  test("rejects anonymous access to available split variables", async () => {
+    const { db } = createMockSequentialSelectDb([]);
+
+    await assert.rejects(
+      () =>
+        listDatasetAvailableSplitVariables(createAnonymousProcedureContext(db), {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("rejects non-member access to available split variables", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+
+    await assert.rejects(
+      () =>
+        listDatasetAvailableSplitVariables(createUserProcedureContext(db), {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+});
+
 describe("listDatasetProjects", () => {
   test("returns dataset projects for dataset members", async () => {
     const rows = [
@@ -459,6 +573,291 @@ describe("listDatasetProjects", () => {
 
     await assert.rejects(
       () => listDatasetProjects(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+});
+
+describe("listDatasetSplitVariables", () => {
+  test("returns dataset split variables for dataset members", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440004",
+        variable: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          datasetId: "550e8400-e29b-41d4-a716-446655440000",
+          id: "550e8400-e29b-41d4-a716-446655440003",
+          label: "Age",
+          measure: "scale",
+          missingRanges: null,
+          missingValues: null,
+          name: "age",
+          type: "int32",
+          valueLabels: null,
+          variableLabels: null,
+        },
+        variableId: "550e8400-e29b-41d4-a716-446655440003",
+      },
+    ];
+    const { db, state } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+
+    const result = await listDatasetSplitVariables(createUserProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      limit: "5",
+      offset: "2",
+      order: "variable:name.asc",
+      search: "age",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.equal(result.limit, 5);
+    assert.equal(result.offset, 2);
+    assert.deepEqual(result.orderBy, [{ direction: "asc", field: "name", relationship: "variable" }]);
+    assert.equal(state.whereValues.length, 4);
+    assert.deepEqual(state.limitValues, [5]);
+    assert.deepEqual(state.offsets, [2]);
+  });
+
+  test("allows admins to list dataset split variables without membership", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440004",
+        variable: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          datasetId: "550e8400-e29b-41d4-a716-446655440000",
+          id: "550e8400-e29b-41d4-a716-446655440003",
+          label: "Age",
+          measure: "scale",
+          missingRanges: null,
+          missingValues: null,
+          name: "age",
+          type: "int32",
+          valueLabels: null,
+          variableLabels: null,
+        },
+        variableId: "550e8400-e29b-41d4-a716-446655440003",
+      },
+    ];
+    const { db, state } = createMockListDb(rows, 1);
+
+    const result = await listDatasetSplitVariables(createAdminProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.notEqual(state.rowWhere, undefined);
+    assert.notEqual(state.countWhere, undefined);
+  });
+
+  test("rejects anonymous access to dataset split variables", async () => {
+    const { db } = createMockSequentialSelectDb([]);
+
+    await assert.rejects(
+      () =>
+        listDatasetSplitVariables(createAnonymousProcedureContext(db), {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("rejects non-member access to dataset split variables", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+
+    await assert.rejects(
+      () => listDatasetSplitVariables(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+});
+
+describe("listDatasetVariablesets", () => {
+  test("returns a flat dataset variableset list for dataset members", async () => {
+    const rows = [
+      {
+        attributes: null,
+        category: "general",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        description: "Top level set",
+        id: "550e8400-e29b-41d4-a716-446655440005",
+        name: "Demographics",
+        orderIndex: 100,
+        parentId: null,
+        updatedAt: null,
+      },
+    ];
+    const { db, state } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+
+    const result = await listDatasetVariablesets(createUserProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      limit: "5",
+      offset: "2",
+      search: "demo",
+    });
+    assert.ok("rows" in result);
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.equal(result.limit, 5);
+    assert.equal(result.offset, 2);
+    assert.deepEqual(result.orderBy, [
+      { direction: "asc", field: "orderIndex" },
+      { direction: "asc", field: "name" },
+    ]);
+    assert.equal(state.whereValues.length, 4);
+    assert.deepEqual(state.limitValues, [5]);
+    assert.deepEqual(state.offsets, [2]);
+    assert.equal(state.orderByValues[0]?.length, 2);
+  });
+
+  test("returns variableset hierarchy for dataset members when requested", async () => {
+    const hierarchyRows = [
+      {
+        attributes: null,
+        category: "general",
+        description: "Top level set",
+        id: "550e8400-e29b-41d4-a716-446655440005",
+        name: "Demographics",
+        orderIndex: 100,
+        parentId: null,
+        variableCount: "2",
+      },
+      {
+        attributes: null,
+        category: "general",
+        description: "Nested set",
+        id: "550e8400-e29b-41d4-a716-446655440006",
+        name: "Age Group",
+        orderIndex: 200,
+        parentId: "550e8400-e29b-41d4-a716-446655440005",
+        variableCount: "1",
+      },
+    ];
+    const { db, state } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      hierarchyRows,
+    ]);
+
+    const result = await listDatasetVariablesets(createUserProcedureContext(db), {
+      hierarchical: "true",
+      id: "550e8400-e29b-41d4-a716-446655440000",
+    });
+
+    assert.deepEqual(result, {
+      hierarchy: [
+        {
+          attributes: null,
+          category: "general",
+          children: [
+            {
+              attributes: null,
+              category: "general",
+              children: [],
+              description: "Nested set",
+              id: "550e8400-e29b-41d4-a716-446655440006",
+              level: 1,
+              name: "Age Group",
+              orderIndex: 200,
+              parentId: "550e8400-e29b-41d4-a716-446655440005",
+              variableCount: 1,
+            },
+          ],
+          description: "Top level set",
+          id: "550e8400-e29b-41d4-a716-446655440005",
+          level: 0,
+          name: "Demographics",
+          orderIndex: 100,
+          parentId: null,
+          variableCount: 2,
+        },
+      ],
+    });
+    assert.equal(state.whereValues.length, 2);
+  });
+
+  test("allows admins to list dataset variablesets without membership", async () => {
+    const rows = [
+      {
+        attributes: null,
+        category: "general",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        description: "Top level set",
+        id: "550e8400-e29b-41d4-a716-446655440005",
+        name: "Demographics",
+        orderIndex: 100,
+        parentId: null,
+        updatedAt: null,
+      },
+    ];
+    const { db, state } = createMockListDb(rows, 1);
+
+    const result = await listDatasetVariablesets(createAdminProcedureContext(db), {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+    });
+    assert.ok("rows" in result);
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.notEqual(state.rowWhere, undefined);
+    assert.notEqual(state.countWhere, undefined);
+  });
+
+  test("rejects anonymous access to dataset variablesets", async () => {
+    const { db } = createMockSequentialSelectDb([]);
+
+    await assert.rejects(
+      () =>
+        listDatasetVariablesets(createAnonymousProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("rejects non-member access to dataset variablesets", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+
+    await assert.rejects(
+      () => listDatasetVariablesets(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440000" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "FORBIDDEN" &&

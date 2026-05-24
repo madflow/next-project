@@ -11,7 +11,7 @@ const listDatasetSplitVariableRowSchema = selectDatasetSplitVariableSchema.exten
   variable: selectDatasetVariableSchema.optional(),
 });
 
-const listDatasetSplitVariableResultSchema = createCollectionResultSchema(listDatasetSplitVariableRowSchema);
+export const listDatasetSplitVariableResultSchema = createCollectionResultSchema(listDatasetSplitVariableRowSchema);
 
 const listDatasetSplitVariableContract = oc
   .input(collectionInputSchema)

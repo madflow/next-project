@@ -417,6 +417,13 @@ export function createMockSequentialSelectDb(rows: Array<Array<Record<string, un
           state.joinCounts[queryIndex - 1] = (state.joinCounts[queryIndex - 1] ?? 0) + 1;
           return this;
         },
+        leftJoin() {
+          state.joinCounts[queryIndex - 1] = (state.joinCounts[queryIndex - 1] ?? 0) + 1;
+          return this;
+        },
+        groupBy() {
+          return this;
+        },
         limit(limit: number) {
           state.limitValues.push(limit);
           return this;

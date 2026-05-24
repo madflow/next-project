@@ -661,6 +661,176 @@ describe("createOpenAPIHandler", () => {
     assert.equal(body.message, "You do not have enough permission to perform this action.");
   });
 
+  test("returns 200 with dataset split variables for dataset members", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440004",
+        variable: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          datasetId: "550e8400-e29b-41d4-a716-446655440000",
+          id: "550e8400-e29b-41d4-a716-446655440003",
+          label: "Age",
+          measure: "scale",
+          missingRanges: null,
+          missingValues: null,
+          name: "age",
+          type: "int32",
+          valueLabels: null,
+          variableLabels: null,
+        },
+        variableId: "550e8400-e29b-41d4-a716-446655440003",
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+      variable: {
+        ...row.variable,
+        createdAt: row.variable.createdAt.toISOString(),
+      },
+    }));
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        "http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/splitvariables?limit=5&offset=2&order=variable:name.asc",
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy?: Array<{ direction: string; field: string; relationship?: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name", relationship: "variable" }]);
+  });
+
+  test("returns 403 for authenticated non-members on dataset split variable lists", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/splitvariables", {
+        method: "GET",
+      })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 403);
+    assert.equal(body.code, "FORBIDDEN");
+    assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
+  test("returns 200 with dataset variables available for split for dataset members", async () => {
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        id: "550e8400-e29b-41d4-a716-446655440003",
+        label: "Age",
+        measure: "scale",
+        missingRanges: null,
+        missingValues: null,
+        name: "age",
+        type: "int32",
+        valueLabels: null,
+        variableLabels: null,
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+    }));
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        "http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variables/available-for-split?limit=5&offset=2&order=name.asc",
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy?: Array<{ direction: string; field: string; relationship?: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name" }]);
+  });
+
+  test("returns 403 for authenticated non-members on dataset available split variable lists", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variables/available-for-split", {
+        method: "GET",
+      })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 403);
+    assert.equal(body.code, "FORBIDDEN");
+    assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
   test("returns 200 with dataset variables for dataset members", async () => {
     const rows = [
       {
@@ -728,6 +898,172 @@ describe("createOpenAPIHandler", () => {
 
     const response = await handler(
       new Request("http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variables", { method: "GET" })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 403);
+    assert.equal(body.code, "FORBIDDEN");
+    assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
+  test("returns 200 with flat dataset variablesets for dataset members", async () => {
+    const rows = [
+      {
+        attributes: null,
+        category: "general",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        datasetId: "550e8400-e29b-41d4-a716-446655440000",
+        description: "Top level set",
+        id: "550e8400-e29b-41d4-a716-446655440005",
+        name: "Demographics",
+        orderIndex: 100,
+        parentId: null,
+        updatedAt: null,
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+    }));
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        "http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variablesets?limit=5&offset=2&search=demo",
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy?: Array<{ direction: string; field: string; relationship?: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [
+      { direction: "asc", field: "orderIndex" },
+      { direction: "asc", field: "name" },
+    ]);
+  });
+
+  test("returns 200 with hierarchical dataset variablesets for dataset members", async () => {
+    const hierarchyRows = [
+      {
+        attributes: null,
+        category: "general",
+        description: "Top level set",
+        id: "550e8400-e29b-41d4-a716-446655440005",
+        name: "Demographics",
+        orderIndex: 100,
+        parentId: null,
+        variableCount: "2",
+      },
+      {
+        attributes: null,
+        category: "general",
+        description: "Nested set",
+        id: "550e8400-e29b-41d4-a716-446655440006",
+        name: "Age Group",
+        orderIndex: 200,
+        parentId: "550e8400-e29b-41d4-a716-446655440005",
+        variableCount: "1",
+      },
+    ];
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+      hierarchyRows,
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        "http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variablesets?hierarchical=true&limit=1000&offset=0",
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as
+      | {
+          hierarchy: Array<{
+            children: unknown[];
+            id: string;
+            level: number;
+            variableCount: number;
+          }>;
+        }
+      | {
+          code: string;
+          message: string;
+        };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, {
+      hierarchy: [
+        {
+          attributes: null,
+          category: "general",
+          children: [
+            {
+              attributes: null,
+              category: "general",
+              children: [],
+              description: "Nested set",
+              id: "550e8400-e29b-41d4-a716-446655440006",
+              level: 1,
+              name: "Age Group",
+              orderIndex: 200,
+              parentId: "550e8400-e29b-41d4-a716-446655440005",
+              variableCount: 1,
+            },
+          ],
+          description: "Top level set",
+          id: "550e8400-e29b-41d4-a716-446655440005",
+          level: 0,
+          name: "Demographics",
+          orderIndex: 100,
+          parentId: null,
+          variableCount: 2,
+        },
+      ],
+    });
+  });
+
+  test("returns 403 for authenticated non-members on dataset variableset lists", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: false }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request("http://localhost/rpc/datasets/550e8400-e29b-41d4-a716-446655440000/variablesets", { method: "GET" })
     );
     const body = (await response.json()) as {
       code: string;
