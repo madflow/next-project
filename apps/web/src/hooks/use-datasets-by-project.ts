@@ -1,27 +1,40 @@
-import { Dataset } from "@/types/dataset";
-import { Project } from "@/types/project";
+import { type Dataset } from "@/types/dataset";
+import { type DatasetProject } from "@/types/dataset-project";
+import { type Project } from "@/types/project";
 import { ApiResponsePayload, UseQueryApiOptions, useQueryApi } from "./use-api";
 
-type ApiResponseRow = {
-  datasets: Dataset;
-  projects: Project;
+type ApiResponseRow = DatasetProject & {
+  dataset?: Dataset;
+  project?: Project;
 };
 
-export function useDatasetsByProject(projectId: string, options?: UseQueryApiOptions) {
+type DatasetsByProjectOptions = Omit<UseQueryApiOptions, "embed">;
+
+function toApiQueryOrder(column: string) {
+  return column.replace(/^datasets:/, "dataset:").replace(/^projects:/, "project:");
+}
+
+export function useDatasetsByProject(projectId: string, options?: DatasetsByProjectOptions) {
   const endpoint = `/api/projects/${projectId}/datasets`;
 
   let finalOptions: UseQueryApiOptions;
   if (!options) {
     finalOptions = {
+      embed: "dataset,project",
       enabled: !!projectId,
-      offset: 0,
       limit: 250,
-      order: [{ column: "datasets:name", direction: "asc" }],
+      offset: 0,
+      order: [{ column: "dataset:name", direction: "asc" }],
     };
   } else {
     finalOptions = {
       ...options,
+      embed: "dataset,project",
       enabled: !!projectId && options.enabled,
+      order: options.order?.map((item) => ({
+        ...item,
+        column: toApiQueryOrder(item.column),
+      })),
     };
   }
 

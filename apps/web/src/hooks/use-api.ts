@@ -15,6 +15,7 @@ const apiQueryOrderSchema = z.array(
 const apiQueryFilterSchema = z.object({ column: z.string(), value: z.string(), operator: z.enum(["eq", "="]) });
 
 const apiQueryHookParamsSchema = z.object({
+  embed: z.string().optional(),
   limit: z.number().optional(),
   offset: z.number().optional(),
   search: z.string().optional(),
@@ -41,6 +42,9 @@ export const useQueryApi = <T>(
 
   const fetchData: QueryFunction<T, QueryKey> = async ({ signal }) => {
     const params = new URLSearchParams();
+    if (options.embed) {
+      params.append("embed", options.embed);
+    }
     if (options.limit) {
       params.append("limit", options.limit.toString());
     }
@@ -71,9 +75,15 @@ export const useQueryApi = <T>(
   };
 
   const queryKeyValue = React.useMemo<QueryKey>(() => {
-    return [options.queryKey, options.limit, options.offset, options.search, options.order, options.filters].filter(
-      (item) => item
-    );
+    return [
+      options.queryKey,
+      options.embed,
+      options.limit,
+      options.offset,
+      options.search,
+      options.order,
+      options.filters,
+    ].filter((item) => item);
   }, [options]);
 
   const queryOptions: UseQueryOptions<T, Error, T, QueryKey> = {

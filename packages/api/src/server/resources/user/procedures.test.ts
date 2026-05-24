@@ -7,8 +7,14 @@ import {
   createAnonymousProcedureContext,
   createUserProcedureContext,
 } from "../../../testing/auth";
-import { createMockDeleteDb, createMockInsertDb, createMockListDb, createMockUpdateDb } from "../../../testing/router";
-import { createUser, deleteUser, listUsers, updateUser } from "./procedures";
+import {
+  createMockDeleteDb,
+  createMockGetDb,
+  createMockInsertDb,
+  createMockListDb,
+  createMockUpdateDb,
+} from "../../../testing/router";
+import { createUser, deleteUser, getUser, listUsers, updateUser } from "./procedures";
 
 describe("users", () => {
   test("inserts and returns the created user", async () => {
@@ -163,6 +169,44 @@ describe("users", () => {
     assert.equal(state.offset, 2);
   });
 
+  test("returns the user by id", async () => {
+    const row = {
+      banExpires: null,
+      banReason: null,
+      banned: false,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      email: "user@example.com",
+      emailVerified: true,
+      id: "550e8400-e29b-41d4-a716-446655440010",
+      image: null,
+      locale: "en",
+      name: "Regular User",
+      role: "user",
+      updatedAt: new Date("2024-01-02T00:00:00.000Z"),
+    };
+    const { db, state } = createMockGetDb(row);
+
+    const result = await getUser(createAdminProcedureContext(db), { id: row.id });
+
+    assert.deepEqual(result, row);
+    assert.notEqual(state.rowSelection, undefined);
+    assert.notEqual(state.where, undefined);
+    assert.equal(state.limit, 1);
+  });
+
+  test("maps missing users on get to not found errors", async () => {
+    const { db } = createMockGetDb(undefined);
+
+    await assert.rejects(
+      () => getUser(createAdminProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440010" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "NOT_FOUND" &&
+        error.status === 404 &&
+        error.message === "User not found"
+    );
+  });
+
   test("parses search across name and email", async () => {
     const rows = [
       {
@@ -214,6 +258,18 @@ describe("users", () => {
 
     await assert.rejects(
       () => listUsers(createUserProcedureContext(db), {}),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+
+  test("rejects non-admin access to get by id", async () => {
+    const { db } = createMockGetDb(undefined);
+
+    await assert.rejects(
+      () => getUser(createUserProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440010" }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "FORBIDDEN" &&

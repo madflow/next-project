@@ -14,7 +14,7 @@ export const collectionEmbedInputSchema = z
 export const collectionInputSchema = z
   .object({
     embed: embedSchema,
-    limit: z.coerce.number().int().min(1).max(100).default(10),
+    limit: z.coerce.number().int().min(1).max(250).default(10),
     offset: z.coerce.number().int().min(0).default(0),
     order: z.string().trim().min(1).optional(),
     search: z

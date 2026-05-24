@@ -20,7 +20,7 @@ function parsePositiveInteger(rawValue: string | null, fieldName: "limit" | "off
       throw new HttpException(400, { message: "'limit' must be greater than 0" });
     }
 
-    return Math.min(parsedValue, 100);
+    return Math.min(parsedValue, 250);
   }
 
   if (parsedValue < 0) {

@@ -14,6 +14,11 @@ const listUserContract = oc.input(collectionInputSchema).output(listUserResultSc
   path: "/users",
 });
 
+const getUserContract = oc.input(userIdSchema).output(selectUserSchema).route({
+  method: "GET",
+  path: "/users/{id}",
+});
+
 const createUserContract = oc.input(insertUserSchema).output(selectUserSchema).route({
   method: "POST",
   path: "/users",
@@ -45,6 +50,7 @@ const deleteUserContract = oc.input(userIdSchema).output(selectUserSchema).route
 export const userContract = {
   create: createUserContract,
   delete: deleteUserContract,
+  get: getUserContract,
   list: listUserContract,
   update: updateUserContract,
 };

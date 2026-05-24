@@ -8,6 +8,7 @@ import {
 } from "@repo/database/schema";
 import { collectionEmbedInputSchema, collectionInputSchema, createCollectionResultSchema } from "../collection";
 import { emptyUpdateMessage, hasUpdateChanges } from "../update";
+import { listDatasetProjectResultSchema } from "./dataset-project";
 
 const listProjectRowSchema = selectProjectSchema.extend({
   organization: selectOrganizationSchema.optional(),
@@ -29,6 +30,14 @@ const getProjectContract = oc
   .route({
     method: "GET",
     path: "/projects/{id}",
+  });
+
+const listProjectDatasetsContract = oc
+  .input(projectIdSchema.merge(collectionInputSchema))
+  .output(listDatasetProjectResultSchema)
+  .route({
+    method: "GET",
+    path: "/projects/{id}/datasets",
   });
 
 const createProjectContract = oc.input(insertProjectSchema).output(selectProjectSchema).route({
@@ -62,6 +71,9 @@ const deleteProjectContract = oc.input(projectIdSchema).output(selectProjectSche
 export const projectContract = {
   create: createProjectContract,
   delete: deleteProjectContract,
+  datasets: {
+    list: listProjectDatasetsContract,
+  },
   get: getProjectContract,
   list: listProjectContract,
   update: updateProjectContract,

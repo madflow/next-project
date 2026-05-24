@@ -2,9 +2,13 @@ import { ORPCError } from "@orpc/server";
 import { eq, getTableColumns } from "drizzle-orm";
 import {
   type CreateProjectData,
+  type Dataset,
+  type DatasetProject as DatasetProjectRecord,
   type Organization,
   type Project,
   type UpdateProjectData,
+  dataset,
+  datasetProject as datasetProjectTable,
   organization,
   project as projectTable,
 } from "@repo/database/schema";
@@ -12,6 +16,7 @@ import { type CollectionInput, collectionInputSchema } from "../../../shared/con
 import { requireOrganizationMembership } from "../../auth/access";
 import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
 import { getCollectionRow, listCollection } from "../../collection-query";
+import { datasetProjectQueryDefinition } from "../dataset-project/query-definition";
 import { projectQueryDefinition } from "./query-definition";
 
 const ps = adminApi.project;
@@ -28,6 +33,15 @@ type UpdateProjectInput = {
   };
 };
 
+type ProjectDatasetsInput = CollectionInput & {
+  id: string;
+};
+
+type ProjectDatasetListRow = DatasetProjectRecord & {
+  dataset?: Dataset;
+  project?: Project;
+};
+
 export async function createProject(context: ProcedureContextInput, input: CreateProjectData) {
   return call(create, input, { context: toProcedureContext(context) });
 }
@@ -42,6 +56,10 @@ export async function listProjects(context: ProcedureContextInput, input: Collec
 
 export async function getProject(context: ProcedureContextInput, input: { embed?: string; id: string }) {
   return call(get, input, { context: toProcedureContext(context) });
+}
+
+export async function listProjectDatasets(context: ProcedureContextInput, input: ProjectDatasetsInput) {
+  return call(datasetsList, input, { context: toProcedureContext(context) });
 }
 
 export async function deleteProject(context: ProcedureContextInput, input: { id: string }) {
@@ -105,6 +123,37 @@ const get = authenticatedProjectApi.get.handler(async ({ context, input }) => {
   return project;
 });
 
+const datasetsList = authenticatedProjectApi.datasets.list.handler(async ({ context, input }) => {
+  const project = await getCollectionRow<Project>({
+    db: context.db,
+    definition: projectQueryDefinition,
+    input: {},
+    where: eq(projectTable.id, input.id),
+  });
+
+  if (project === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Project not found",
+      status: 404,
+    });
+  }
+
+  await requireOrganizationMembership(context, project.organizationId);
+
+  const { id, ...collectionInput } = input;
+
+  return listCollection<ProjectDatasetListRow>({
+    db: context.db,
+    definition: datasetProjectQueryDefinition,
+    embedSelections: {
+      dataset: getTableColumns(dataset),
+      project: getTableColumns(projectTable),
+    },
+    input: collectionInput,
+    where: eq(datasetProjectTable.projectId, id),
+  });
+});
+
 const update = ps.update.handler(async ({ context, input }) => {
   const { id } = input.params;
   const changes = input.body;
@@ -123,6 +172,9 @@ const update = ps.update.handler(async ({ context, input }) => {
 
 export const project = {
   create,
+  datasets: {
+    list: datasetsList,
+  },
   delete: remove,
   get,
   list,

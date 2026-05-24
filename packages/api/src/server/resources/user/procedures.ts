@@ -8,7 +8,7 @@ import {
 } from "@repo/database/schema";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
 import { type ProcedureContextInput, adminApi, call, toProcedureContext } from "../../base";
-import { listCollection } from "../../collection-query";
+import { getCollectionRow, listCollection } from "../../collection-query";
 import { userQueryDefinition } from "./query-definition";
 
 const us = adminApi.user;
@@ -30,6 +30,10 @@ export async function updateUser(context: ProcedureContextInput, input: UpdateUs
 
 export async function listUsers(context: ProcedureContextInput, input: CollectionInput) {
   return call(list, collectionInputSchema.parse(input), { context: toProcedureContext(context) });
+}
+
+export async function getUser(context: ProcedureContextInput, input: { id: string }) {
+  return call(get, input, { context: toProcedureContext(context) });
 }
 
 export async function deleteUser(context: ProcedureContextInput, input: { id: string }) {
@@ -67,6 +71,24 @@ const list = us.list.handler(async ({ context, input }) =>
   })
 );
 
+const get = us.get.handler(async ({ context, input }) => {
+  const user = await getCollectionRow<UserRecord>({
+    db: context.db,
+    definition: userQueryDefinition,
+    input,
+    where: eq(userTable.id, input.id),
+  });
+
+  if (user === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "User not found",
+      status: 404,
+    });
+  }
+
+  return user;
+});
+
 const update = us.update.handler(async ({ context, input }) => {
   const { id } = input.params;
   const changes = input.body;
@@ -86,6 +108,7 @@ const update = us.update.handler(async ({ context, input }) => {
 export const user = {
   create,
   delete: remove,
+  get,
   list,
   update,
 };

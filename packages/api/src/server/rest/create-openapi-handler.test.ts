@@ -148,6 +148,40 @@ describe("createOpenAPIHandler", () => {
     assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name" }]);
   });
 
+  test("returns 200 with the user for valid GET by id requests", async () => {
+    const row = {
+      banExpires: null,
+      banReason: null,
+      banned: false,
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      email: "user@example.com",
+      emailVerified: true,
+      id: "550e8400-e29b-41d4-a716-446655440010",
+      image: null,
+      locale: "en",
+      name: "Regular User",
+      role: "user",
+      updatedAt: new Date("2024-01-02T00:00:00.000Z"),
+    };
+    const serializedRow = {
+      ...row,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+    };
+    const { db } = createMockGetDb(row);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(new Request(`http://localhost/rpc/users/${row.id}`, { method: "GET" }));
+    const body = (await response.json()) as typeof serializedRow;
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body, serializedRow);
+  });
+
   test("returns 200 with updated users for valid PUT requests", async () => {
     const row = {
       banExpires: null,
@@ -558,6 +592,95 @@ describe("createOpenAPIHandler", () => {
     assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name" }]);
   });
 
+  test("returns 200 with project datasets for project members", async () => {
+    const organizationId = "550e8400-e29b-41d4-a716-446655440000";
+    const projectId = "550e8400-e29b-41d4-a716-446655440001";
+    const rows = [
+      {
+        dataset: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          description: null,
+          fileHash: "hash_1",
+          filename: "acme.csv",
+          fileSize: 123,
+          fileType: "csv",
+          id: "550e8400-e29b-41d4-a716-446655440010",
+          name: "Acme Dataset",
+          organizationId,
+          storageKey: "datasets/acme.csv",
+          updatedAt: null,
+          uploadedAt: new Date("2024-01-01T00:00:00.000Z"),
+        },
+        datasetId: "550e8400-e29b-41d4-a716-446655440010",
+        id: "550e8400-e29b-41d4-a716-446655440011",
+        project: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: projectId,
+          metadata: null,
+          name: "Acme Project",
+          organizationId,
+          slug: "acme-project",
+          updatedAt: null,
+        },
+        projectId,
+      },
+    ];
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      dataset: {
+        ...row.dataset,
+        createdAt: row.dataset.createdAt.toISOString(),
+        uploadedAt: row.dataset.uploadedAt.toISOString(),
+      },
+      project: {
+        ...row.project,
+        createdAt: row.project.createdAt.toISOString(),
+      },
+    }));
+    const { db } = createMockSequentialSelectDb([
+      [
+        {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: projectId,
+          metadata: null,
+          name: "Acme Project",
+          organizationId,
+          slug: "acme-project",
+          updatedAt: null,
+        },
+      ],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(
+        `http://localhost/rpc/projects/${projectId}/datasets?embed=dataset,project&limit=5&offset=2&order=dataset:name.asc`,
+        { method: "GET" }
+      )
+    );
+    const body = (await response.json()) as {
+      count: number;
+      limit: number;
+      offset: number;
+      orderBy?: Array<{ direction: string; field: string; relationship?: string }>;
+      rows: typeof serializedRows;
+    };
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(body.rows, serializedRows);
+    assert.equal(body.count, 1);
+    assert.equal(body.limit, 5);
+    assert.equal(body.offset, 2);
+    assert.deepEqual(body.orderBy, [{ direction: "asc", field: "name", relationship: "dataset" }]);
+  });
+
   test("returns 403 for authenticated non-members on organization project lists", async () => {
     const { db } = createMockSequentialSelectDb([[{ exists: false }]]);
     const handler = createOpenAPIHandler({
@@ -568,6 +691,41 @@ describe("createOpenAPIHandler", () => {
 
     const response = await handler(
       new Request("http://localhost/rpc/organizations/550e8400-e29b-41d4-a716-446655440000/projects", { method: "GET" })
+    );
+    const body = (await response.json()) as {
+      code: string;
+      message: string;
+    };
+
+    assert.equal(response.status, 403);
+    assert.equal(body.code, "FORBIDDEN");
+    assert.equal(body.message, "You do not have enough permission to perform this action.");
+  });
+
+  test("returns 403 for authenticated non-members on project dataset lists", async () => {
+    const projectId = "550e8400-e29b-41d4-a716-446655440001";
+    const { db } = createMockSequentialSelectDb([
+      [
+        {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: projectId,
+          metadata: null,
+          name: "Acme Project",
+          organizationId: "550e8400-e29b-41d4-a716-446655440000",
+          slug: "acme-project",
+          updatedAt: null,
+        },
+      ],
+      [{ exists: false }],
+    ]);
+    const handler = createOpenAPIHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(`http://localhost/rpc/projects/${projectId}/datasets`, { method: "GET" })
     );
     const body = (await response.json()) as {
       code: string;

@@ -14,7 +14,14 @@ import {
   createMockSequentialSelectDb,
   createMockUpdateDb,
 } from "../../../testing/router";
-import { createProject, deleteProject, getProject, listProjects, updateProject } from "./procedures";
+import {
+  createProject,
+  deleteProject,
+  getProject,
+  listProjectDatasets,
+  listProjects,
+  updateProject,
+} from "./procedures";
 
 describe("listProjects", () => {
   test("inserts and returns the created project", async () => {
@@ -298,6 +305,104 @@ describe("listProjects", () => {
 
     await assert.rejects(
       () => getProject(createUserProcedureContext(db), { id: row.id }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+});
+
+describe("listProjectDatasets", () => {
+  test("returns linked dataset rows for project members", async () => {
+    const projectId = "550e8400-e29b-41d4-a716-446655440001";
+    const organizationId = "550e8400-e29b-41d4-a716-446655440000";
+    const rows = [
+      {
+        dataset: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          description: null,
+          fileHash: "hash_1",
+          filename: "acme.csv",
+          fileSize: 123,
+          fileType: "csv",
+          id: "550e8400-e29b-41d4-a716-446655440010",
+          name: "Acme Dataset",
+          organizationId,
+          storageKey: "datasets/acme.csv",
+          updatedAt: null,
+          uploadedAt: new Date("2024-01-01T00:00:00.000Z"),
+        },
+        datasetId: "550e8400-e29b-41d4-a716-446655440010",
+        id: "550e8400-e29b-41d4-a716-446655440011",
+        project: {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: projectId,
+          metadata: null,
+          name: "Acme Project",
+          organizationId,
+          slug: "acme-project",
+          updatedAt: null,
+        },
+        projectId,
+      },
+    ];
+    const { db, state } = createMockSequentialSelectDb([
+      [
+        {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: projectId,
+          metadata: null,
+          name: "Acme Project",
+          organizationId,
+          slug: "acme-project",
+          updatedAt: null,
+        },
+      ],
+      [{ exists: true }],
+      rows,
+      [{ count: 1 }],
+    ]);
+
+    const result = await listProjectDatasets(createUserProcedureContext(db), {
+      embed: "dataset,project",
+      id: projectId,
+      limit: "5",
+      offset: "2",
+      order: "dataset:name.asc",
+      search: "acme",
+    });
+
+    assert.deepEqual(result.rows, rows);
+    assert.equal(result.count, 1);
+    assert.equal(result.limit, 5);
+    assert.equal(result.offset, 2);
+    assert.deepEqual(result.orderBy, [{ direction: "asc", field: "name", relationship: "dataset" }]);
+    assert.equal(state.whereValues.length, 4);
+    assert.deepEqual(state.limitValues, [1, 5]);
+    assert.deepEqual(state.offsets, [2]);
+  });
+
+  test("rejects non-member access to project datasets", async () => {
+    const projectId = "550e8400-e29b-41d4-a716-446655440001";
+    const { db } = createMockSequentialSelectDb([
+      [
+        {
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          id: projectId,
+          metadata: null,
+          name: "Acme Project",
+          organizationId: "550e8400-e29b-41d4-a716-446655440000",
+          slug: "acme-project",
+          updatedAt: null,
+        },
+      ],
+      [{ exists: false }],
+    ]);
+
+    await assert.rejects(
+      () => listProjectDatasets(createUserProcedureContext(db), { id: projectId }),
       (error: unknown) =>
         error instanceof ORPCError &&
         error.code === "FORBIDDEN" &&
