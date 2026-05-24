@@ -259,28 +259,19 @@ function parseCollectionFilter(
   }
 
   const separatorIndex = rawValue.indexOf(".");
-  if (separatorIndex < 1) {
-    issues.push(createIssue([rawField], `Filter '${rawField}' must use the '<operator>.<value>' format`));
-    return null;
-  }
-
-  const rawOperator = rawValue.slice(0, separatorIndex);
+  const rawOperator = separatorIndex < 1 ? rawValue : rawValue.slice(0, separatorIndex);
   const parsedOperator = filterOperatorSchema.safeParse(rawOperator);
-  if (!parsedOperator.success) {
-    issues.push(createIssue([rawField], `Unsupported filter operator '${rawOperator}' for '${rawField}'`));
-    return null;
-  }
-
-  const rawFilterValue = rawValue.slice(separatorIndex + 1);
-  const value = parseFilterValue(rawField, fieldReference.fieldDefinition, parsedOperator.data, rawFilterValue, issues);
-  if (value === null && parsedOperator.data !== "is") {
+  const operator = parsedOperator.success ? parsedOperator.data : "eq";
+  const rawFilterValue = parsedOperator.success ? rawValue.slice(separatorIndex + 1) : rawValue;
+  const value = parseFilterValue(rawField, fieldReference.fieldDefinition, operator, rawFilterValue, issues);
+  if (value === null && operator !== "is") {
     return null;
   }
 
   return {
     field: fieldReference.field,
     relationship: fieldReference.relationship,
-    operator: parsedOperator.data,
+    operator,
     value,
   };
 }

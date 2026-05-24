@@ -76,6 +76,20 @@ describe("parseCollectionQuery", () => {
     assert.deepEqual(query.searchBy, []);
   });
 
+  test("defaults plain scalar filters to eq", () => {
+    const query = parseCollectionQuery(organizationQueryDefinition, {
+      createdAt: "2024-01-01T00:00:00.000Z",
+      name: "Acme Inc.",
+      slug: "foo.bar",
+    });
+
+    assert.deepEqual(query.filters, [
+      { field: "createdAt", operator: "eq", relationship: undefined, value: new Date("2024-01-01T00:00:00.000Z") },
+      { field: "name", operator: "eq", relationship: undefined, value: "Acme Inc." },
+      { field: "slug", operator: "eq", relationship: undefined, value: "foo.bar" },
+    ]);
+  });
+
   test("parses configured search fields", () => {
     const query = parseCollectionQuery(organizationQueryDefinition, {
       search: "acme",
@@ -127,6 +141,16 @@ describe("parseCollectionQuery", () => {
     assert.deepEqual(query.orderBy, [
       { direction: "asc", field: "name", relationship: "organization" },
       { direction: "desc", field: "name", relationship: undefined },
+    ]);
+  });
+
+  test("defaults relationship filters to eq", () => {
+    const query = parseCollectionQuery(projectQueryDefinition, {
+      "organization:name": "Acme Org",
+    });
+
+    assert.deepEqual(query.filters, [
+      { field: "name", operator: "eq", relationship: "organization", value: "Acme Org" },
     ]);
   });
 
