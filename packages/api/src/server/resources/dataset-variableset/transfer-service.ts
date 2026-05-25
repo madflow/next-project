@@ -14,7 +14,7 @@ import type {
   VariableSetExportFile,
   VariableSetImportOptions,
   VariableSetImportResult,
-} from "../shared/variableset-transfer";
+} from "../../../shared/exchange/dataset-variableset-transfer";
 
 export async function exportVariableSets(db: DatabaseInstance, datasetId: string): Promise<VariableSetExportFile> {
   const datasetInfo = await db
