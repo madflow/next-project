@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
@@ -12,7 +11,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { fetchVariableRawData } from "@/dal/dataset-raw-data";
+import { useDatasetRawData } from "@/hooks/use-dataset-raw-data";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 
 const PAGE_SIZE = 5;
@@ -56,10 +55,9 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
   const page = pageByKey[variableKey] ?? 1;
   const setPage = (p: number) => setPageByKey((prev) => ({ ...prev, [variableKey]: p }));
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["text-explorer", datasetId, variable.name, page],
-    queryFn: () => fetchVariableRawData(datasetId!, [variable.name], { page, pageSize: PAGE_SIZE }),
-    enabled: !!datasetId,
+  const { data, isLoading, isError } = useDatasetRawData(datasetId ?? null, variable.name, {
+    page,
+    pageSize: PAGE_SIZE,
   });
 
   const variableData = data?.data[variable.name];
@@ -85,15 +83,23 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
   }
 
   const pageNumbers = buildPageNumbers(currentPage, totalPages);
+  const valueOccurrences = new Map<string, number>();
 
   return (
     <div className="space-y-3">
       <ul className="overflow-hidden rounded-md">
-        {values.map((value, index) => (
-          <li key={index} className={`border-b px-3 py-2 text-sm ${index % 2 === 0 ? "bg-muted/50" : "bg-background"}`}>
-            {value}
-          </li>
-        ))}
+        {values.map((value, index) => {
+          const occurrence = valueOccurrences.get(value) ?? 0;
+          valueOccurrences.set(value, occurrence + 1);
+
+          return (
+            <li
+              key={`${value}-${occurrence}`}
+              className={`border-b px-3 py-2 text-sm ${index % 2 === 0 ? "bg-muted/50" : "bg-background"}`}>
+              {value}
+            </li>
+          );
+        })}
       </ul>
       <div className="flex items-center gap-2">
         <Pagination className="flex-1 justify-start">
@@ -109,9 +115,10 @@ export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProp
                 className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
-            {pageNumbers.map((item, i) =>
+            {pageNumbers.map((item, index) =>
               item === "ellipsis" ? (
-                <PaginationItem key={`ellipsis-${i}`}>
+                <PaginationItem
+                  key={`ellipsis-${pageNumbers[index - 1] ?? "start"}-${pageNumbers[index + 1] ?? "end"}`}>
                   <PaginationEllipsis />
                 </PaginationItem>
               ) : (
