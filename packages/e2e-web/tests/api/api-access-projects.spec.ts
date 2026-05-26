@@ -12,11 +12,16 @@ test.describe("API Projects @api", () => {
       expect(response.status()).toBe(401);
     });
 
-    test("denies access for regular user", async ({ page }) => {
+    test("allows access for regular user in organization", async ({ page }) => {
       await page.goto("/");
       await loginUser(page, testUsers.regularUser.email, testUsers.regularUser.password);
       const response = await page.request.get("/api/projects");
-      expect(response.status()).toBe(403);
+
+      expect(response.status()).toBe(200);
+
+      const data = await response.json();
+      expect(Array.isArray(data.rows)).toBe(true);
+      expect(data.rows.length).toBeGreaterThan(0);
     });
 
     test("allows access for admin user", async ({ page }) => {
