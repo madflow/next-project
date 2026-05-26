@@ -6,7 +6,7 @@ import {
   UpdateDatasetVariablesetData,
   VariablesetContentAttributes,
 } from "@repo/database/schema";
-import { ServerActionFailureException } from "@/lib/exception";
+import { ServerActionValidationException } from "@/lib/exception";
 import { withAdminAuth } from "@/lib/server-action-utils";
 import { getServerAPIClient } from "@/lib/server-api-client";
 
@@ -35,7 +35,7 @@ export const deleteVariableset = withAdminAuth(async (id: string) => {
 export const updateContentAttributesAction = withAdminAuth(
   async (variablesetId: string, variableId: string, attributes: VariablesetContentAttributes | null) => {
     if (attributes?.valueRange && attributes.valueRange.min > attributes.valueRange.max) {
-      throw new ServerActionFailureException("Min value must be less than or equal to max value");
+      throw new ServerActionValidationException("Min value must be less than or equal to max value");
     }
 
     const api = await getServerAPIClient();

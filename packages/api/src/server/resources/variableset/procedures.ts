@@ -240,6 +240,13 @@ async function addContentToVariableset(
   referenceId: string,
   attributes?: VariablesetContentAttributes | null
 ): Promise<DatasetVariablesetContentRecord> {
+  if (contentType === "subset" && referenceId === variablesetId) {
+    throw new ORPCError("BAD_REQUEST", {
+      message: "A variableset cannot include itself as a subset",
+      status: 400,
+    });
+  }
+
   const maxPosition = await context.db
     .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
     .from(datasetVariablesetContent)
@@ -342,11 +349,26 @@ const contentsCreate = adminVariablesetApi.contents.create.handler(async ({ cont
 });
 
 const contentsDelete = adminVariablesetApi.contents.delete.handler(async ({ context, input }) => {
-  await context.db
-    .delete(datasetVariablesetContent)
-    .where(
-      and(eq(datasetVariablesetContent.id, input.contentId), eq(datasetVariablesetContent.variablesetId, input.id))
-    );
+  await context.db.transaction(async (tx) => {
+    const [deletedContent] = await tx
+      .delete(datasetVariablesetContent)
+      .where(
+        and(eq(datasetVariablesetContent.id, input.contentId), eq(datasetVariablesetContent.variablesetId, input.id))
+      )
+      .returning({
+        contentType: datasetVariablesetContent.contentType,
+        subsetId: datasetVariablesetContent.subsetId,
+      });
+
+    if (deletedContent?.contentType === "subset" && deletedContent.subsetId) {
+      await tx
+        .update(datasetVariablesetTable)
+        .set({ parentId: null, updatedAt: new Date() })
+        .where(
+          and(eq(datasetVariablesetTable.id, deletedContent.subsetId), eq(datasetVariablesetTable.parentId, input.id))
+        );
+    }
+  });
 
   return { success: true };
 });

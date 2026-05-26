@@ -25,10 +25,11 @@ function createMockCreateDatasetVariablesetWithParentDb(
       table: unknown;
       values: unknown;
     }>,
+    transactionCalls: 0,
     where: undefined as unknown,
   };
 
-  const db = {
+  const tx = {
     insert(table: unknown) {
       return {
         values(values: unknown) {
@@ -56,6 +57,26 @@ function createMockCreateDatasetVariablesetWithParentDb(
           return [{ maxPos: 200 }];
         },
       };
+    },
+  };
+
+  const db = {
+    async transaction(
+      callback: (tx: {
+        insert: (table: unknown) => {
+          values: (values: unknown) => {
+            returning?: () => Promise<Array<Record<string, unknown> & { id: string; parentId: string }>>;
+          };
+        };
+        select: () => {
+          from: () => {
+            where: (where: unknown) => Promise<Array<{ maxPos: number }>>;
+          };
+        };
+      }) => Promise<unknown>
+    ) {
+      state.transactionCalls += 1;
+      return callback(tx);
     },
   };
 
@@ -197,6 +218,7 @@ describe("dataset variableset mutations", () => {
       subsetId: row.id,
       variablesetId: input.parentId,
     });
+    assert.equal(state.transactionCalls, 1);
     assert.notEqual(state.where, undefined);
   });
 
@@ -417,6 +439,46 @@ describe("dataset variableset mutations", () => {
         error.code === "BAD_REQUEST" &&
         error.status === 400 &&
         error.message === "Some variablesets do not belong to the specified parent"
+    );
+  });
+
+  test("rejects dataset variableset reorder payloads with duplicate ids", async () => {
+    const duplicateId = "550e8400-e29b-41d4-a716-446655440010";
+    const { db } = createMockReorderDatasetVariablesetsDb([duplicateId, "550e8400-e29b-41d4-a716-446655440011"]);
+
+    await assert.rejects(
+      () =>
+        reorderDatasetVariablesets(createAdminProcedureContext(db), {
+          datasetId: "550e8400-e29b-41d4-a716-446655440000",
+          parentId: null,
+          reorderedIds: [duplicateId, duplicateId],
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.status === 400 &&
+        error.message === "reorderedIds must not contain duplicate variableset IDs"
+    );
+  });
+
+  test("rejects dataset variableset reorder payloads missing sibling ids", async () => {
+    const { db } = createMockReorderDatasetVariablesetsDb([
+      "550e8400-e29b-41d4-a716-446655440010",
+      "550e8400-e29b-41d4-a716-446655440011",
+    ]);
+
+    await assert.rejects(
+      () =>
+        reorderDatasetVariablesets(createAdminProcedureContext(db), {
+          datasetId: "550e8400-e29b-41d4-a716-446655440000",
+          parentId: null,
+          reorderedIds: ["550e8400-e29b-41d4-a716-446655440010"],
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.status === 400 &&
+        error.message === "reorderedIds must include every sibling variableset exactly once"
     );
   });
 
