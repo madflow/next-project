@@ -1,15 +1,3 @@
-export class DalException extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-export class DalNotAuthorizedException extends DalException {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
 export class ServerActionException extends Error {
   constructor(message: string) {
     super(message);

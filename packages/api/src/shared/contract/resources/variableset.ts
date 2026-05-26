@@ -4,6 +4,7 @@ import {
   selectDatasetVariableSchema,
   selectDatasetVariablesetContentSchema,
   selectDatasetVariablesetSchema,
+  variablesetContentAttributes,
 } from "@repo/database/schema";
 import { createCollectionResultSchema } from "../collection";
 
@@ -14,6 +15,14 @@ const variablesetIdSchema = z.object({
 const datasetVariablesetIdSchema = z.object({
   id: z.uuid(),
   setId: z.uuid(),
+});
+
+const variablesetContentIdSchema = variablesetIdSchema.extend({
+  contentId: z.uuid(),
+});
+
+const variablesetVariableIdSchema = variablesetIdSchema.extend({
+  variableId: z.uuid(),
 });
 
 const datasetVariablesetVariablesInputSchema = datasetVariablesetIdSchema.extend({
@@ -47,6 +56,16 @@ const getVariablesetContentsResultSchema = z.object({
   contents: z.array(variablesetContentEntrySchema),
 });
 
+const mutationSuccessResultSchema = z.object({
+  success: z.literal(true),
+});
+
+const createVariablesetContentBodySchema = z.object({
+  attributes: variablesetContentAttributes.optional().nullable(),
+  contentType: z.enum(["variable", "subset"]),
+  referenceId: z.uuid(),
+});
+
 const listVariablesetVariablesContract = oc
   .input(variablesetIdSchema)
   .output(listVariablesetVariableResultSchema)
@@ -60,6 +79,58 @@ const getVariablesetContentsContract = oc.input(variablesetIdSchema).output(getV
   path: "/variablesets/{id}/contents",
 });
 
+const createVariablesetContentContract = oc
+  .input(
+    z.object({
+      body: createVariablesetContentBodySchema,
+      params: variablesetIdSchema,
+    })
+  )
+  .output(selectDatasetVariablesetContentSchema)
+  .route({
+    inputStructure: "detailed",
+    method: "POST",
+    path: "/variablesets/{id}/contents",
+  });
+
+const deleteVariablesetContentContract = oc
+  .input(variablesetContentIdSchema)
+  .output(mutationSuccessResultSchema)
+  .route({
+    method: "DELETE",
+    path: "/variablesets/{id}/contents/{contentId}",
+  });
+
+const reorderVariablesetContentsContract = oc
+  .input(
+    z.object({
+      body: z.object({
+        contentIds: z.array(z.uuid()),
+      }),
+      params: variablesetIdSchema,
+    })
+  )
+  .output(mutationSuccessResultSchema)
+  .route({
+    inputStructure: "detailed",
+    method: "PUT",
+    path: "/variablesets/{id}/contents/reorder",
+  });
+
+const updateVariablesetVariableAttributesContract = oc
+  .input(
+    z.object({
+      body: variablesetContentAttributes.nullable(),
+      params: variablesetVariableIdSchema,
+    })
+  )
+  .output(selectDatasetVariablesetContentSchema)
+  .route({
+    inputStructure: "detailed",
+    method: "PUT",
+    path: "/variablesets/{id}/variables/{variableId}/attributes",
+  });
+
 const listDatasetVariablesetVariablesContract = oc
   .input(datasetVariablesetVariablesInputSchema)
   .output(listVariablesetVariableResultSchema)
@@ -70,7 +141,11 @@ const listDatasetVariablesetVariablesContract = oc
 
 export const variablesetContract = {
   contents: {
+    create: createVariablesetContentContract,
+    delete: deleteVariablesetContentContract,
     get: getVariablesetContentsContract,
+    reorder: reorderVariablesetContentsContract,
+    updateAttributes: updateVariablesetVariableAttributesContract,
   },
   datasetVariables: {
     list: listDatasetVariablesetVariablesContract,

@@ -1,7 +1,15 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
-import { selectDatasetSchema, selectDatasetSplitVariableSchema, selectOrganizationSchema } from "@repo/database/schema";
+import {
+  insertDatasetProjectSchema,
+  selectDatasetProjectSchema,
+  selectDatasetSchema,
+  selectDatasetSplitVariableSchema,
+  selectOrganizationSchema,
+  updateDatasetSchema,
+} from "@repo/database/schema";
 import { collectionEmbedInputSchema, collectionInputSchema, createCollectionResultSchema } from "../collection";
+import { emptyUpdateMessage, hasUpdateChanges } from "../update";
 import { listDatasetProjectResultSchema } from "./dataset-project";
 import { listDatasetSplitVariableResultSchema } from "./dataset-split-variable";
 import { listDatasetVariableResultSchema } from "./dataset-variable";
@@ -28,6 +36,29 @@ const getDatasetContract = oc
     method: "GET",
     path: "/datasets/{id}",
   });
+
+const updateDatasetBodySchema = updateDatasetSchema.omit({ id: true }).refine(hasUpdateChanges, {
+  message: emptyUpdateMessage,
+});
+
+const updateDatasetContract = oc
+  .input(
+    z.object({
+      body: updateDatasetBodySchema,
+      params: datasetIdSchema,
+    })
+  )
+  .output(selectDatasetSchema)
+  .route({
+    inputStructure: "detailed",
+    method: "PUT",
+    path: "/datasets/{id}",
+  });
+
+const deleteDatasetContract = oc.input(datasetIdSchema).output(selectDatasetSchema).route({
+  method: "DELETE",
+  path: "/datasets/{id}",
+});
 
 const listDatasetVariablesContract = oc
   .input(datasetIdSchema.merge(collectionInputSchema))
@@ -59,6 +90,19 @@ const listDatasetProjectsContract = oc
   .route({
     method: "GET",
     path: "/datasets/{id}/projects",
+  });
+
+const createDatasetProjectContract = oc
+  .input(
+    z.object({
+      datasetId: insertDatasetProjectSchema.shape.datasetId,
+      projectId: insertDatasetProjectSchema.shape.projectId,
+    })
+  )
+  .output(selectDatasetProjectSchema)
+  .route({
+    method: "POST",
+    path: "/datasets/{datasetId}/projects/{projectId}",
   });
 
 const listDatasetSplitVariablesContract = oc
@@ -109,9 +153,11 @@ const listDatasetVariablesetsContract = oc
   });
 
 export const datasetContract = {
+  delete: deleteDatasetContract,
   get: getDatasetContract,
   list: listDatasetContract,
   projects: {
+    create: createDatasetProjectContract,
     list: listDatasetProjectsContract,
   },
   splitVariables: {
@@ -127,4 +173,5 @@ export const datasetContract = {
     list: listDatasetVariablesContract,
     unassigned: listDatasetUnassignedVariablesContract,
   },
+  update: updateDatasetContract,
 };

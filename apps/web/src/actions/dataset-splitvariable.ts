@@ -1,18 +1,16 @@
 "use server";
 
-import { addSplitVariable, removeSplitVariable } from "@/dal/dataset-splitvariable";
-import { ServerActionFailureException } from "@/lib/exception";
+import { withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
-export async function addSplitVariableAction(datasetId: string, variableId: string) {
-  const created = await addSplitVariable(datasetId, variableId);
+export const addSplitVariableAction = withAdminAuth(async (datasetId: string, variableId: string) => {
+  const api = await getServerAPIClient();
 
-  if (!created) {
-    throw new ServerActionFailureException("Failed to add split variable");
-  }
+  return api.dataset.splitVariables.create({ id: datasetId, variableId });
+});
 
-  return created;
-}
+export const removeSplitVariableAction = withAdminAuth(async (datasetId: string, variableId: string) => {
+  const api = await getServerAPIClient();
 
-export async function removeSplitVariableAction(datasetId: string, variableId: string) {
-  await removeSplitVariable(datasetId, variableId);
-}
+  await api.dataset.splitVariables.delete({ id: datasetId, variableId });
+});

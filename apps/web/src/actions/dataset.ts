@@ -1,11 +1,9 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
-import { UpdateDatasetData, dataset, datasetProject } from "@repo/database/schema";
-import { deleteDataset } from "@/dal/dataset";
+import { UpdateDatasetData } from "@repo/database/schema";
 import { CreateDatasetResult, createDataset } from "@/lib/dataset-service";
 import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 type UploadDatasetResult = CreateDatasetResult;
 
@@ -43,13 +41,23 @@ export const uploadDatasetWithFormData = withAdminAuth(async (formData: FormData
 });
 
 export const addToProject = withAdminAuth(async (datasetId: string, projectId: string) => {
-  await db.insert(datasetProject).values({ projectId, datasetId });
+  const api = await getServerAPIClient();
+
+  await api.dataset.projects.create({ datasetId, projectId });
 });
 
-export async function remove(datasetId: string) {
-  await deleteDataset(datasetId);
-}
+export const remove = withAdminAuth(async (datasetId: string) => {
+  const api = await getServerAPIClient();
+
+  await api.dataset.delete({ id: datasetId });
+});
 
 export const update = withAdminAuth(async (datasetId: string, values: UpdateDatasetData) => {
-  await db.update(dataset).set(values).where(eq(dataset.id, datasetId));
+  const api = await getServerAPIClient();
+  const body = Object.fromEntries(Object.entries(values).filter(([key]) => key !== "id"));
+
+  await api.dataset.update({
+    body,
+    params: { id: datasetId },
+  });
 });

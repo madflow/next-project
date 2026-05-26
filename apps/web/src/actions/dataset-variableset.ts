@@ -6,100 +6,104 @@ import {
   UpdateDatasetVariablesetData,
   VariablesetContentAttributes,
 } from "@repo/database/schema";
-import {
-  addContentToVariableset,
-  create,
-  detachSubset,
-  remove,
-  removeContentFromVariableset,
-  reorderContents,
-  reorderVariablesets,
-  update,
-  updateContentAttributes,
-} from "@/dal/dataset-variableset";
 import { ServerActionFailureException } from "@/lib/exception";
+import { withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
-export async function createVariableset(data: CreateDatasetVariablesetData) {
-  const created = await create(data);
+export const createVariableset = withAdminAuth(async (data: CreateDatasetVariablesetData) => {
+  const api = await getServerAPIClient();
 
-  if (!created) {
-    throw new ServerActionFailureException("Failed to create variable set");
+  return api.datasetVariableset.create(data);
+});
+
+export const updateVariableset = withAdminAuth(async (id: string, data: UpdateDatasetVariablesetData) => {
+  const api = await getServerAPIClient();
+  const body = Object.fromEntries(Object.entries(data).filter(([key]) => key !== "id"));
+
+  return api.datasetVariableset.update({
+    body,
+    params: { id },
+  });
+});
+
+export const deleteVariableset = withAdminAuth(async (id: string) => {
+  const api = await getServerAPIClient();
+
+  await api.datasetVariableset.delete({ id });
+});
+
+export const updateContentAttributesAction = withAdminAuth(
+  async (variablesetId: string, variableId: string, attributes: VariablesetContentAttributes | null) => {
+    if (attributes?.valueRange && attributes.valueRange.min > attributes.valueRange.max) {
+      throw new ServerActionFailureException("Min value must be less than or equal to max value");
+    }
+
+    const api = await getServerAPIClient();
+
+    return api.variableset.contents.updateAttributes({
+      body: attributes,
+      params: {
+        id: variablesetId,
+        variableId,
+      },
+    });
   }
+);
 
-  return created;
-}
+export const reorderVariablesetsAction = withAdminAuth(
+  async (datasetId: string, parentId: string | null, reorderedIds: string[]) => {
+    const api = await getServerAPIClient();
 
-export async function updateVariableset(id: string, data: UpdateDatasetVariablesetData) {
-  const updated = await update(id, data);
-
-  if (!updated) {
-    throw new ServerActionFailureException("Failed to update variable set");
+    return api.datasetVariableset.reorder({
+      datasetId,
+      parentId,
+      reorderedIds,
+    });
   }
+);
 
-  return updated;
-}
+export const addContentToVariablesetAction = withAdminAuth(
+  async (
+    variablesetId: string,
+    contentType: DatasetVariablesetContentType,
+    referenceId: string,
+    attributes?: VariablesetContentAttributes | null
+  ) => {
+    const api = await getServerAPIClient();
 
-export async function deleteVariableset(id: string) {
-  await remove(id);
-}
-
-export async function updateContentAttributesAction(
-  variablesetId: string,
-  variableId: string,
-  attributes: VariablesetContentAttributes | null
-) {
-  if (attributes?.valueRange && attributes.valueRange.min > attributes.valueRange.max) {
-    throw new ServerActionFailureException("Min value must be less than or equal to max value");
+    return api.variableset.contents.create({
+      body: {
+        attributes,
+        contentType,
+        referenceId,
+      },
+      params: { id: variablesetId },
+    });
   }
+);
 
-  const updated = await updateContentAttributes(variablesetId, variableId, attributes);
+export const removeContentFromVariablesetAction = withAdminAuth(async (variablesetId: string, contentId: string) => {
+  const api = await getServerAPIClient();
 
-  if (!updated) {
-    throw new ServerActionFailureException("Failed to update content attributes");
-  }
+  await api.variableset.contents.delete({
+    contentId,
+    id: variablesetId,
+  });
+});
 
-  return updated;
-}
+export const reorderContentsAction = withAdminAuth(async (variablesetId: string, reorderedContentIds: string[]) => {
+  const api = await getServerAPIClient();
 
-export async function reorderVariablesetsAction(datasetId: string, parentId: string | null, reorderedIds: string[]) {
-  const result = await reorderVariablesets(datasetId, parentId, reorderedIds);
+  return api.variableset.contents.reorder({
+    body: {
+      contentIds: reorderedContentIds,
+    },
+    params: { id: variablesetId },
+  });
+});
 
-  if (!result || !result.success) {
-    throw new ServerActionFailureException("Failed to reorder variablesets");
-  }
+export const detachSubsetAction = withAdminAuth(async (subsetId: string) => {
+  const api = await getServerAPIClient();
 
-  return result;
-}
-
-export async function addContentToVariablesetAction(
-  variablesetId: string,
-  contentType: DatasetVariablesetContentType,
-  referenceId: string,
-  attributes?: VariablesetContentAttributes | null
-) {
-  const created = await addContentToVariableset(variablesetId, contentType, referenceId, attributes);
-
-  if (!created) {
-    throw new ServerActionFailureException("Failed to add content to variableset");
-  }
-
-  return created;
-}
-
-export async function removeContentFromVariablesetAction(variablesetId: string, contentId: string) {
-  await removeContentFromVariableset(variablesetId, contentId);
-}
-
-export async function reorderContentsAction(variablesetId: string, reorderedContentIds: string[]) {
-  const result = await reorderContents(variablesetId, reorderedContentIds);
-
-  if (!result || !result.success) {
-    throw new ServerActionFailureException("Failed to reorder variableset contents");
-  }
-
-  return result;
-}
-
-export async function detachSubsetAction(subsetId: string) {
-  await detachSubset(subsetId);
-}
+  await api.datasetVariableset.detach({ id: subsetId });
+});
