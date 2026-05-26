@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { DatasetVariable } from "@repo/database/schema";
 import { EditDatasetVariableForm } from "@/components/admin/dataset-editor/edit-dataset-variable-form";
 import { PageLayout } from "@/components/page/page-layout";
-import { find } from "@/dal/dataset-variable";
+import { isNotFoundAPIError } from "@/lib/api-errors";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 type PageProps = {
   params: Promise<{
@@ -16,8 +17,19 @@ export default async function EditDatasetVariablePage(props: PageProps) {
   const params = await props.params;
   const { id: datasetId, variableId } = params;
   const t = await getTranslations("adminDatasetEditor");
+  const api = await getServerAPIClient();
 
-  const datasetVariable = (await find(variableId)) as DatasetVariable;
+  let datasetVariable;
+
+  try {
+    datasetVariable = (await api.datasetVariable.get({ id: variableId })) as DatasetVariable;
+  } catch (error) {
+    if (isNotFoundAPIError(error)) {
+      return notFound();
+    }
+
+    throw error;
+  }
 
   if (!datasetVariable) {
     return notFound();

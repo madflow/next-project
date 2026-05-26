@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, exists, getTableColumns, sql } from "drizzle-orm";
 import {
   type CreateProjectData,
   type Dataset,
@@ -9,6 +9,7 @@ import {
   type UpdateProjectData,
   dataset,
   datasetProject as datasetProjectTable,
+  member,
   organization,
   project as projectTable,
 } from "@repo/database/schema";
@@ -89,7 +90,7 @@ const remove = ps.delete.handler(async ({ context, input }) => {
   return project;
 });
 
-const list = ps.list.handler(async ({ context, input }) =>
+const list = authenticatedProjectApi.list.handler(async ({ context, input }) =>
   listCollection<ProjectListRow>({
     db: context.db,
     definition: projectQueryDefinition,
@@ -97,6 +98,7 @@ const list = ps.list.handler(async ({ context, input }) =>
       organization: getTableColumns(organization),
     },
     input,
+    where: getProjectAccessWhere(context),
   })
 );
 
@@ -180,3 +182,27 @@ export const project = {
   list,
   update,
 };
+
+function getProjectAccessWhere(context: ProcedureContextInput) {
+  const procedureContext = toProcedureContext(context);
+
+  if (procedureContext.principal.kind === "anonymous") {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Missing user session. Please log in!",
+      status: 401,
+    });
+  }
+
+  if (procedureContext.principal.user.role === "admin") {
+    return undefined;
+  }
+
+  const membershipSubquery = context.db
+    .select({ one: sql`1` })
+    .from(member)
+    .where(
+      and(eq(member.organizationId, projectTable.organizationId), eq(member.userId, procedureContext.principal.user.id))
+    );
+
+  return exists(membershipSubquery);
+}

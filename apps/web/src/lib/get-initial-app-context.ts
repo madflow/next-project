@@ -1,11 +1,10 @@
 import "server-only";
 import { Organization } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { defaultClient as db } from "@repo/database/clients";
-import { organization as organizationTable, project as projectTable } from "@repo/database/schema";
 import { type Project } from "@/types/project";
+import { isNotFoundAPIError } from "./api-errors";
 import { auth } from "./auth";
+import { getServerAPIClient } from "./server-api-client";
 
 type InitialAppContext = {
   organization: Organization | null;
@@ -19,8 +18,9 @@ type InitialAppContext = {
  */
 export async function getInitialAppContext(projectSlug?: string): Promise<InitialAppContext> {
   try {
+    const requestHeaders = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: requestHeaders,
     });
 
     if (!session?.user) {
@@ -34,12 +34,19 @@ export async function getInitialAppContext(projectSlug?: string): Promise<Initia
       return { organization: null, project: null };
     }
 
-    // Fetch organization details
-    const [org] = await db
-      .select()
-      .from(organizationTable)
-      .where(eq(organizationTable.id, activeOrganizationId))
-      .limit(1);
+    const api = await getServerAPIClient();
+
+    let org;
+
+    try {
+      org = await api.organization.get({ id: activeOrganizationId });
+    } catch (error) {
+      if (isNotFoundAPIError(error)) {
+        return { organization: null, project: null };
+      }
+
+      throw error;
+    }
 
     if (!org) {
       return { organization: null, project: null };
@@ -54,10 +61,14 @@ export async function getInitialAppContext(projectSlug?: string): Promise<Initia
       metadata: org.metadata ?? null,
     };
 
-    // If projectSlug is provided, fetch the project
     let project: Project | null = null;
     if (projectSlug) {
-      const [proj] = await db.select().from(projectTable).where(eq(projectTable.slug, projectSlug)).limit(1);
+      const projects = await api.project.list({
+        limit: "1",
+        organizationId: activeOrganizationId,
+        slug: projectSlug,
+      });
+      const proj = projects.rows[0] ?? null;
 
       if (proj && proj.organizationId === activeOrganizationId) {
         project = proj;

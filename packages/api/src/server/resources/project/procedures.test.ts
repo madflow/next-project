@@ -234,6 +234,37 @@ describe("listProjects", () => {
     );
   });
 
+  test("rejects anonymous access to project listing", async () => {
+    const { db } = createMockListDb([], 0);
+
+    await assert.rejects(
+      () => listProjects(createAnonymousProcedureContext(db), {}),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "UNAUTHORIZED" &&
+        error.status === 401 &&
+        error.message === "Missing user session. Please log in!"
+    );
+  });
+
+  test("scopes non-admin project listing to membership", async () => {
+    const rows = [
+      {
+        id: "project_1",
+        name: "Acme Project",
+        organizationId: "550e8400-e29b-41d4-a716-446655440000",
+        slug: "acme-project",
+      },
+    ];
+    const { db, state } = createMockListDb(rows, 1);
+
+    const result = await listProjects(createUserProcedureContext(db), { slug: "acme-project" });
+
+    assert.deepEqual(result.rows, rows);
+    assert.notEqual(state.rowWhere, undefined);
+    assert.notEqual(state.countWhere, undefined);
+  });
+
   test("returns a project with embedded organization when requested", async () => {
     const row = {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),

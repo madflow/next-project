@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { EditProjectForm } from "@/components/admin/project/edit-project-form";
 import { PageLayout } from "@/components/page/page-layout";
-import { find } from "@/dal/project";
+import { isNotFoundAPIError } from "@/lib/api-errors";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 type EditProjectPageProps = {
   params: Promise<{
@@ -11,7 +12,18 @@ type EditProjectPageProps = {
 };
 export default async function EditProjectPage({ params }: EditProjectPageProps) {
   const { id } = await params;
-  const project = await find(id);
+  const api = await getServerAPIClient();
+  let project;
+
+  try {
+    project = await api.project.get({ id });
+  } catch (error) {
+    if (isNotFoundAPIError(error)) {
+      notFound();
+    }
+
+    throw error;
+  }
 
   if (!project) {
     notFound();
