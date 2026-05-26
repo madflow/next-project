@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { and, eq, getTableColumns, notExists, sql } from "drizzle-orm";
 import {
+  type CreateDatasetProjectData,
   type CreateDatasetSplitVariableData,
   type DatasetProject as DatasetProjectRecord,
   type Dataset as DatasetRecord,
@@ -9,6 +10,7 @@ import {
   type DatasetVariableset as DatasetVariablesetRecord,
   type Organization,
   type Project as ProjectRecord,
+  type UpdateDatasetData,
   datasetProject as datasetProjectTable,
   datasetSplitVariable as datasetSplitVariableTable,
   dataset as datasetTable,
@@ -18,6 +20,7 @@ import {
   organization,
   project,
 } from "@repo/database/schema";
+import { deleteDataset as deleteStoredDataset } from "@repo/storage";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
 import { requireOrganizationMembership } from "../../auth/access";
 import { authVoter } from "../../auth/voter";
@@ -105,6 +108,21 @@ export async function getDataset(context: ProcedureContextInput, input: { embed?
   return call(get, input, { context: toProcedureContext(context) });
 }
 
+type UpdateDatasetInput = {
+  body: Omit<UpdateDatasetData, "id">;
+  params: {
+    id: string;
+  };
+};
+
+export async function updateDataset(context: ProcedureContextInput, input: UpdateDatasetInput) {
+  return call(update, input, { context: toProcedureContext(context) });
+}
+
+export async function deleteDataset(context: ProcedureContextInput, input: { id: string }) {
+  return call(remove, input, { context: toProcedureContext(context) });
+}
+
 export async function listDatasetVariables(context: ProcedureContextInput, input: DatasetVariablesInput) {
   return call(variablesList, input, { context: toProcedureContext(context) });
 }
@@ -119,6 +137,13 @@ export async function listDatasetUnassignedVariables(context: ProcedureContextIn
 
 export async function listDatasetProjects(context: ProcedureContextInput, input: DatasetProjectsInput) {
   return call(projectsList, input, { context: toProcedureContext(context) });
+}
+
+export async function createDatasetProject(
+  context: ProcedureContextInput,
+  input: { datasetId: string; projectId: string }
+) {
+  return call(projectsCreate, input, { context: toProcedureContext(context) });
 }
 
 export async function listDatasetSplitVariables(context: ProcedureContextInput, input: DatasetSplitVariablesInput) {
@@ -212,6 +237,64 @@ const get = authenticatedDatasetApi.get.handler(async ({ context, input }) => {
   return dataset;
 });
 
+const update = ds.update.handler(async ({ context, input }) => {
+  const [dataset] = await context.db
+    .update(datasetTable)
+    .set(input.body)
+    .where(eq(datasetTable.id, input.params.id))
+    .returning();
+
+  if (dataset === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Dataset not found",
+      status: 404,
+    });
+  }
+
+  return dataset;
+});
+
+const remove = ds.delete.handler(async ({ context, input }) => {
+  const [dataset] = await context.db
+    .select()
+    .from(datasetTable)
+    .where(eq(datasetTable.id, input.id))
+    .limit(1)
+    .execute();
+
+  if (dataset === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Dataset not found",
+      status: 404,
+    });
+  }
+
+  try {
+    if (dataset.storageKey) {
+      await deleteStoredDataset(dataset.storageKey);
+    }
+
+    const [deletedDataset] = await context.db.delete(datasetTable).where(eq(datasetTable.id, input.id)).returning();
+
+    if (deletedDataset === undefined) {
+      throw new ORPCError("NOT_FOUND", {
+        message: "Dataset not found",
+        status: 404,
+      });
+    }
+
+    return deletedDataset;
+  } catch (error) {
+    if (error instanceof ORPCError) {
+      throw error;
+    }
+
+    throw new Error("Failed to delete dataset. Please try again.", {
+      cause: error,
+    });
+  }
+});
+
 const variablesList = authenticatedDatasetApi.variables.list.handler(async ({ context, input }) => {
   await requireDatasetAccess(context, input.id);
   const { id, ...collectionInput } = input;
@@ -296,6 +379,30 @@ const projectsList = authenticatedDatasetApi.projects.list.handler(async ({ cont
     input: collectionInput,
     where: eq(datasetProjectTable.datasetId, id),
   });
+});
+
+const projectsCreate = authenticatedDatasetApi.projects.create.handler(async ({ context, input }) => {
+  await requireDatasetAccess(context, input.datasetId);
+
+  if (!authVoter.canAccessAdminOperations(context.principal)) {
+    throw new ORPCError("FORBIDDEN", {
+      message: "You do not have enough permission to perform this action.",
+      status: 403,
+    });
+  }
+
+  const insertData: CreateDatasetProjectData = {
+    datasetId: input.datasetId,
+    projectId: input.projectId,
+  };
+
+  const [created] = await context.db.insert(datasetProjectTable).values(insertData).returning();
+
+  if (created === undefined) {
+    throw new Error("Failed to add dataset to project");
+  }
+
+  return created;
 });
 
 const splitVariablesList = authenticatedDatasetApi.splitVariables.list.handler(async ({ context, input }) => {
@@ -415,9 +522,11 @@ const variablesetsList = authenticatedDatasetApi.variablesets.list.handler(async
 });
 
 export const dataset = {
+  delete: remove,
   get,
   list,
   projects: {
+    create: projectsCreate,
     list: projectsList,
   },
   splitVariables: {
@@ -433,4 +542,5 @@ export const dataset = {
     list: variablesList,
     unassigned: variablesUnassignedList,
   },
+  update,
 };

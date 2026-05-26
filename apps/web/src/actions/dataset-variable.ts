@@ -1,19 +1,21 @@
 "use server";
 
 import { UpdateDatasetVariableData } from "@repo/database/schema";
-import { remove as dalRemove, update as dalUpdate } from "@/dal/dataset-variable";
-import { ServerActionFailureException } from "@/lib/exception";
+import { withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
-export async function update(id: string, data: UpdateDatasetVariableData) {
-  const updatedVariable = await dalUpdate(id, data);
+export const update = withAdminAuth(async (id: string, data: UpdateDatasetVariableData) => {
+  const api = await getServerAPIClient();
+  const body = Object.fromEntries(Object.entries(data).filter(([key]) => key !== "id"));
 
-  if (!updatedVariable) {
-    throw new ServerActionFailureException("Failed to update dataset variable");
-  }
+  return api.datasetVariable.update({
+    body,
+    params: { id },
+  });
+});
 
-  return updatedVariable;
-}
+export const remove = withAdminAuth(async (id: string) => {
+  const api = await getServerAPIClient();
 
-export async function remove(id: string) {
-  await dalRemove(id);
-}
+  await api.datasetVariable.delete({ id });
+});

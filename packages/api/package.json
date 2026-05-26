@@ -38,6 +38,7 @@
     "@aws-sdk/client-s3": "^3.1005.0",
     "@repo/auth": "workspace:*",
     "@repo/database": "workspace:*",
+    "@repo/storage": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "zod": "^4.4.3"
   },

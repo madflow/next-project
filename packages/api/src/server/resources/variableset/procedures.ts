@@ -1,15 +1,18 @@
 import { ORPCError } from "@orpc/server";
-import { and, eq, getTableColumns, ilike, isNull, or } from "drizzle-orm";
+import { and, eq, getTableColumns, ilike, isNull, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import {
   type DatasetVariable as DatasetVariableRecord,
+  type DatasetVariablesetContentType,
+  type VariablesetContentAttributes,
   datasetVariable as datasetVariableTable,
   datasetVariablesetContent,
   datasetVariableset as datasetVariablesetTable,
 } from "@repo/database/schema";
-import { type ProcedureContextInput, authenticatedApi, call, toProcedureContext } from "../../base";
+import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
 import { requireDatasetAccess } from "../dataset/access";
 
+const adminVariablesetApi = adminApi.variableset;
 const authenticatedVariablesetApi = authenticatedApi.variableset;
 const subsetVariablesetTable = alias(datasetVariablesetTable, "subset_dataset_variableset");
 
@@ -18,6 +21,8 @@ type VariablesetVariableRow = DatasetVariableRecord & {
   orderIndex?: number;
 };
 
+type DatasetVariablesetContentRecord = typeof datasetVariablesetContent.$inferSelect;
+
 type DatasetVariablesetVariablesInput = {
   id: string;
   limit?: number | string;
@@ -25,6 +30,34 @@ type DatasetVariablesetVariablesInput = {
   search?: string;
   setId: string;
   unassigned?: string;
+};
+
+type CreateVariablesetContentInput = {
+  body: {
+    attributes?: VariablesetContentAttributes | null;
+    contentType: DatasetVariablesetContentType;
+    referenceId: string;
+  };
+  params: {
+    id: string;
+  };
+};
+
+type ReorderVariablesetContentsInput = {
+  body: {
+    contentIds: string[];
+  };
+  params: {
+    id: string;
+  };
+};
+
+type UpdateVariablesetVariableAttributesInput = {
+  body: VariablesetContentAttributes | null;
+  params: {
+    id: string;
+    variableId: string;
+  };
 };
 
 function notFoundError(message: string) {
@@ -172,6 +205,85 @@ export async function listDatasetVariablesetVariables(
   return call(datasetVariablesList, input, { context: toProcedureContext(context) });
 }
 
+export async function createVariablesetContent(context: ProcedureContextInput, input: CreateVariablesetContentInput) {
+  return call(contentsCreate, input, { context: toProcedureContext(context) });
+}
+
+export async function deleteVariablesetContent(
+  context: ProcedureContextInput,
+  input: {
+    contentId: string;
+    id: string;
+  }
+) {
+  return call(contentsDelete, input, { context: toProcedureContext(context) });
+}
+
+export async function reorderVariablesetContents(
+  context: ProcedureContextInput,
+  input: ReorderVariablesetContentsInput
+) {
+  return call(contentsReorder, input, { context: toProcedureContext(context) });
+}
+
+export async function updateVariablesetVariableAttributes(
+  context: ProcedureContextInput,
+  input: UpdateVariablesetVariableAttributesInput
+) {
+  return call(contentsUpdateAttributes, input, { context: toProcedureContext(context) });
+}
+
+async function addContentToVariableset(
+  context: ProcedureContextInput,
+  variablesetId: string,
+  contentType: DatasetVariablesetContentType,
+  referenceId: string,
+  attributes?: VariablesetContentAttributes | null
+): Promise<DatasetVariablesetContentRecord> {
+  const maxPosition = await context.db
+    .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
+    .from(datasetVariablesetContent)
+    .where(eq(datasetVariablesetContent.variablesetId, variablesetId));
+
+  const values = {
+    attributes:
+      contentType === "variable" ? (attributes ?? { allowedStatistics: { distribution: true, mean: false } }) : null,
+    contentType,
+    position: (maxPosition[0]?.maxPos ?? -100) + 100,
+    subsetId: contentType === "subset" ? referenceId : null,
+    variableId: contentType === "variable" ? referenceId : null,
+    variablesetId,
+  };
+
+  if (contentType === "subset") {
+    let created: DatasetVariablesetContentRecord | undefined;
+
+    await context.db.transaction(async (tx) => {
+      const [inserted] = await tx.insert(datasetVariablesetContent).values(values).returning();
+      created = inserted;
+
+      await tx
+        .update(datasetVariablesetTable)
+        .set({ parentId: variablesetId, updatedAt: new Date() })
+        .where(eq(datasetVariablesetTable.id, referenceId));
+    });
+
+    if (!created) {
+      throw new Error("Failed to add content to variableset");
+    }
+
+    return created;
+  }
+
+  const [created] = await context.db.insert(datasetVariablesetContent).values(values).returning();
+
+  if (!created) {
+    throw new Error("Failed to add content to variableset");
+  }
+
+  return created;
+}
+
 const variablesList = authenticatedVariablesetApi.variables.list.handler(async ({ context, input }) => {
   const variableset = await getVariablesetRecord(context, input.id);
 
@@ -217,6 +329,85 @@ const contentsGet = authenticatedVariablesetApi.contents.get.handler(async ({ co
   return { contents };
 });
 
+const contentsCreate = adminVariablesetApi.contents.create.handler(async ({ context, input }) => {
+  await getVariablesetRecord(context, input.params.id);
+
+  return addContentToVariableset(
+    context,
+    input.params.id,
+    input.body.contentType,
+    input.body.referenceId,
+    input.body.attributes
+  );
+});
+
+const contentsDelete = adminVariablesetApi.contents.delete.handler(async ({ context, input }) => {
+  await context.db
+    .delete(datasetVariablesetContent)
+    .where(
+      and(eq(datasetVariablesetContent.id, input.contentId), eq(datasetVariablesetContent.variablesetId, input.id))
+    );
+
+  return { success: true };
+});
+
+const contentsReorder = adminVariablesetApi.contents.reorder.handler(async ({ context, input }) => {
+  const items = await context.db
+    .select({ id: datasetVariablesetContent.id })
+    .from(datasetVariablesetContent)
+    .where(eq(datasetVariablesetContent.variablesetId, input.params.id));
+
+  const existingIds = new Set(items.map((item) => item.id));
+
+  if (
+    input.body.contentIds.length !== items.length ||
+    new Set(input.body.contentIds).size !== input.body.contentIds.length ||
+    input.body.contentIds.some((contentId) => !existingIds.has(contentId))
+  ) {
+    throw new ORPCError("BAD_REQUEST", {
+      message: "contentIds must exactly match the existing content IDs for this variable set",
+      status: 400,
+    });
+  }
+
+  await context.db.transaction(async (tx) => {
+    for (let index = 0; index < input.body.contentIds.length; index++) {
+      const contentId = input.body.contentIds[index];
+
+      if (!contentId) {
+        continue;
+      }
+
+      await tx
+        .update(datasetVariablesetContent)
+        .set({ position: index * 100, updatedAt: new Date() })
+        .where(eq(datasetVariablesetContent.id, contentId));
+    }
+  });
+
+  return { success: true };
+});
+
+const contentsUpdateAttributes = adminVariablesetApi.contents.updateAttributes.handler(async ({ context, input }) => {
+  const [updated] = await context.db
+    .update(datasetVariablesetContent)
+    .set({ attributes: input.body, updatedAt: new Date() })
+    .where(
+      and(
+        eq(datasetVariablesetContent.variablesetId, input.params.id),
+        eq(datasetVariablesetContent.variableId, input.params.variableId),
+        eq(datasetVariablesetContent.contentType, "variable")
+      )
+    )
+    .returning();
+
+  if (!updated) {
+    throw notFoundError("Variableset variable content not found");
+  }
+
+  return updated;
+});
+
 const datasetVariablesList = authenticatedVariablesetApi.datasetVariables.list.handler(async ({ context, input }) => {
   await requireDatasetAccess(context, input.id);
 
@@ -243,7 +434,11 @@ const datasetVariablesList = authenticatedVariablesetApi.datasetVariables.list.h
 
 export const variableset = {
   contents: {
+    create: contentsCreate,
+    delete: contentsDelete,
     get: contentsGet,
+    reorder: contentsReorder,
+    updateAttributes: contentsUpdateAttributes,
   },
   datasetVariables: {
     list: datasetVariablesList,

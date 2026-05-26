@@ -11,9 +11,12 @@ import {
   createMockInsertDb,
   createMockListDb,
   createMockSequentialSelectDb,
+  createMockUpdateDb,
 } from "../../../testing/router";
 import {
+  createDatasetProject,
   createDatasetSplitVariable,
+  deleteDataset,
   deleteDatasetSplitVariable,
   getDataset,
   listDatasetAvailableSplitVariables,
@@ -23,6 +26,7 @@ import {
   listDatasetVariables,
   listDatasetVariablesets,
   listDatasets,
+  updateDataset,
 } from "./procedures";
 
 describe("listDatasets", () => {
@@ -293,7 +297,7 @@ describe("getDataset", () => {
       id: "550e8400-e29b-41d4-a716-446655440010",
       name: "Acme Dataset",
       organizationId: "550e8400-e29b-41d4-a716-446655440000",
-      storageKey: "datasets/acme.csv",
+      storageKey: "",
       updatedAt: null,
       uploadedAt: new Date("2024-01-01T00:00:00.000Z"),
     };
@@ -306,6 +310,92 @@ describe("getDataset", () => {
         error.code === "FORBIDDEN" &&
         error.status === 403 &&
         error.message === "You do not have enough permission to perform this action."
+    );
+  });
+});
+
+describe("dataset mutations", () => {
+  test("updates and returns the dataset for admins", async () => {
+    const input = {
+      body: {
+        description: "Updated description",
+      },
+      params: {
+        id: "550e8400-e29b-41d4-a716-446655440010",
+      },
+    };
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      description: input.body.description,
+      fileHash: "hash_1",
+      fileSize: 123,
+      fileType: "csv",
+      filename: "acme.csv",
+      id: input.params.id,
+      name: "Acme Dataset",
+      organizationId: "550e8400-e29b-41d4-a716-446655440000",
+      storageKey: "datasets/acme.csv",
+      updatedAt: null,
+      uploadedAt: new Date("2024-01-01T00:00:00.000Z"),
+    };
+    const { db, state } = createMockUpdateDb(row);
+
+    const result = await updateDataset(createAdminProcedureContext(db), input);
+
+    assert.deepEqual(result, row);
+    assert.deepEqual(state.set, input.body);
+  });
+
+  test("maps missing datasets on update to not found errors", async () => {
+    const { db } = createMockUpdateDb(undefined);
+
+    await assert.rejects(
+      () =>
+        updateDataset(createAdminProcedureContext(db), {
+          body: { description: "Updated description" },
+          params: { id: "550e8400-e29b-41d4-a716-446655440010" },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "NOT_FOUND" &&
+        error.status === 404 &&
+        error.message === "Dataset not found"
+    );
+  });
+
+  test("deletes and returns the removed dataset for admins", async () => {
+    const row = {
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      description: null,
+      fileHash: "hash_1",
+      fileSize: 123,
+      fileType: "csv",
+      filename: "acme.csv",
+      id: "550e8400-e29b-41d4-a716-446655440010",
+      name: "Acme Dataset",
+      organizationId: "550e8400-e29b-41d4-a716-446655440000",
+      storageKey: "",
+      updatedAt: null,
+      uploadedAt: new Date("2024-01-01T00:00:00.000Z"),
+    };
+    const { db, state } = createMockSequentialSelectDb([[row], [row]]);
+
+    const result = await deleteDataset(createAdminProcedureContext(db), { id: row.id });
+
+    assert.deepEqual(result, row);
+    assert.equal(state.limitValues[0], 1);
+  });
+
+  test("maps missing datasets on delete to not found errors", async () => {
+    const { db } = createMockSequentialSelectDb([[]]);
+
+    await assert.rejects(
+      () => deleteDataset(createAdminProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440010" }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "NOT_FOUND" &&
+        error.status === 404 &&
+        error.message === "Dataset not found"
     );
   });
 });
@@ -856,6 +946,48 @@ describe("dataset split variable mutations", () => {
         deleteDatasetSplitVariable(createUserProcedureContext(db), {
           id: "550e8400-e29b-41d4-a716-446655440000",
           variableId: "550e8400-e29b-41d4-a716-446655440003",
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "FORBIDDEN" &&
+        error.status === 403 &&
+        error.message === "You do not have enough permission to perform this action."
+    );
+  });
+});
+
+describe("dataset project mutations", () => {
+  test("creates a dataset project for admins", async () => {
+    const row = {
+      datasetId: "550e8400-e29b-41d4-a716-446655440000",
+      id: "550e8400-e29b-41d4-a716-446655440004",
+      projectId: "550e8400-e29b-41d4-a716-446655440003",
+    };
+    const { db, state } = createMockInsertDb(row);
+
+    const result = await createDatasetProject(createAdminProcedureContext(db), {
+      datasetId: row.datasetId,
+      projectId: row.projectId,
+    });
+
+    assert.deepEqual(result, row);
+    assert.deepEqual(state.values, {
+      datasetId: row.datasetId,
+      projectId: row.projectId,
+    });
+  });
+
+  test("rejects non-admin dataset project creation", async () => {
+    const { db } = createMockSequentialSelectDb([
+      [{ organizationId: "550e8400-e29b-41d4-a716-446655440000" }],
+      [{ exists: true }],
+    ]);
+
+    await assert.rejects(
+      () =>
+        createDatasetProject(createUserProcedureContext(db), {
+          datasetId: "550e8400-e29b-41d4-a716-446655440000",
+          projectId: "550e8400-e29b-41d4-a716-446655440003",
         }),
       (error: unknown) =>
         error instanceof ORPCError &&

@@ -378,6 +378,9 @@ export function createMockSequentialSelectDb(rows: Array<Array<Record<string, un
     from() {
       return this;
     },
+    innerJoin() {
+      return this;
+    },
     where(where: unknown) {
       state.whereValues.push(where);
       return this;
@@ -385,6 +388,21 @@ export function createMockSequentialSelectDb(rows: Array<Array<Record<string, un
   };
 
   const db = {
+    delete() {
+      return {
+        where(where: unknown) {
+          state.whereValues.push(where);
+          const currentRows = rows[queryIndex] ?? [];
+          queryIndex += 1;
+
+          return {
+            async returning() {
+              return currentRows;
+            },
+          };
+        },
+      };
+    },
     async execute() {
       const currentRows = rows[queryIndex] ?? [];
       queryIndex += 1;
