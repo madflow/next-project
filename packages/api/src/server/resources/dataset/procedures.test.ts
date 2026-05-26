@@ -378,16 +378,16 @@ describe("dataset mutations", () => {
       updatedAt: null,
       uploadedAt: new Date("2024-01-01T00:00:00.000Z"),
     };
-    const { db, state } = createMockSequentialSelectDb([[row], [row]]);
+    const { db, state } = createMockDeleteDb(row);
 
     const result = await deleteDataset(createAdminProcedureContext(db), { id: row.id });
 
     assert.deepEqual(result, row);
-    assert.equal(state.limitValues[0], 1);
+    assert.notEqual(state.where, undefined);
   });
 
   test("maps missing datasets on delete to not found errors", async () => {
-    const { db } = createMockSequentialSelectDb([[]]);
+    const { db } = createMockDeleteDb(undefined);
 
     await assert.rejects(
       () => deleteDataset(createAdminProcedureContext(db), { id: "550e8400-e29b-41d4-a716-446655440010" }),

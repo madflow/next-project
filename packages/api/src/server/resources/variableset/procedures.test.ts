@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import type { DatabaseInstance } from "@repo/database/clients";
-import { datasetVariablesetContent } from "@repo/database/schema";
+import { datasetVariablesetContent, datasetVariableset as datasetVariablesetTable } from "@repo/database/schema";
 import {
   createAdminProcedureContext,
   createAnonymousProcedureContext,
@@ -104,6 +104,69 @@ function createMockReorderVariablesetContentsDb(existingIds: string[]) {
           };
         },
       });
+    },
+  };
+
+  return { db: db as unknown as DatabaseInstance, state };
+}
+
+function createMockDeleteVariablesetContentDb(deletedContent?: {
+  contentType: "subset" | "variable";
+  subsetId: string | null;
+}) {
+  const state = {
+    deleteTable: undefined as unknown,
+    deleteWhere: undefined as unknown,
+    updates: [] as Array<{ set: unknown; table: unknown; where: unknown }>,
+  };
+
+  const tx = {
+    delete(table: unknown) {
+      state.deleteTable = table;
+
+      return {
+        where(where: unknown) {
+          state.deleteWhere = where;
+
+          return {
+            async returning() {
+              return deletedContent ? [deletedContent] : [];
+            },
+          };
+        },
+      };
+    },
+    update(table: unknown) {
+      return {
+        set(set: unknown) {
+          return {
+            async where(where: unknown) {
+              state.updates.push({ set, table, where });
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const db = {
+    async transaction(
+      callback: (tx: {
+        delete: (table: unknown) => {
+          where: (where: unknown) => {
+            returning: (
+              selection?: unknown
+            ) => Promise<Array<{ contentType: "subset" | "variable"; subsetId: string | null }>>;
+          };
+        };
+        update: (table: unknown) => {
+          set: (set: unknown) => {
+            where: (where: unknown) => Promise<void>;
+          };
+        };
+      }) => Promise<void>
+    ) {
+      await callback(tx);
     },
   };
 
@@ -318,6 +381,31 @@ describe("variableset", () => {
     assert.notEqual(state.where, undefined);
   });
 
+  test("rejects self-referential subset content creation", async () => {
+    const variablesetId = "550e8400-e29b-41d4-a716-446655440005";
+    const { db } = createMockSequentialSelectDb([
+      [{ datasetId: "550e8400-e29b-41d4-a716-446655440000", id: variablesetId }],
+    ]);
+
+    await assert.rejects(
+      () =>
+        createVariablesetContent(createAdminProcedureContext(db), {
+          body: {
+            contentType: "subset",
+            referenceId: variablesetId,
+          },
+          params: {
+            id: variablesetId,
+          },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.status === 400 &&
+        error.message === "A variableset cannot include itself as a subset"
+    );
+  });
+
   test("updates variableset variable attributes for admins", async () => {
     const input = {
       body: {
@@ -374,8 +462,11 @@ describe("variableset", () => {
     );
   });
 
-  test("deletes variableset content for admins", async () => {
-    const { db, state } = createMockDeleteDb(undefined);
+  test("deletes subset content for admins and detaches the nested variableset", async () => {
+    const { db, state } = createMockDeleteVariablesetContentDb({
+      contentType: "subset",
+      subsetId: "550e8400-e29b-41d4-a716-446655440021",
+    });
 
     const result = await deleteVariablesetContent(createAdminProcedureContext(db), {
       contentId: "550e8400-e29b-41d4-a716-446655440020",
@@ -383,8 +474,12 @@ describe("variableset", () => {
     });
 
     assert.deepEqual(result, { success: true });
-    assert.equal(state.table, datasetVariablesetContent);
-    assert.notEqual(state.where, undefined);
+    assert.equal(state.deleteTable, datasetVariablesetContent);
+    assert.notEqual(state.deleteWhere, undefined);
+    assert.equal(state.updates.length, 1);
+    assert.equal(state.updates[0]?.table, datasetVariablesetTable);
+    assert.equal((state.updates[0]?.set as { parentId: string | null }).parentId, null);
+    assert.ok((state.updates[0]?.set as { updatedAt: unknown }).updatedAt instanceof Date);
   });
 
   test("reorders variableset contents for admins", async () => {

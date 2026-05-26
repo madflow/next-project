@@ -255,35 +255,10 @@ const update = ds.update.handler(async ({ context, input }) => {
 });
 
 const remove = ds.delete.handler(async ({ context, input }) => {
-  const [dataset] = await context.db
-    .select()
-    .from(datasetTable)
-    .where(eq(datasetTable.id, input.id))
-    .limit(1)
-    .execute();
-
-  if (dataset === undefined) {
-    throw new ORPCError("NOT_FOUND", {
-      message: "Dataset not found",
-      status: 404,
-    });
-  }
+  let deletedDataset: DatasetRecord | undefined;
 
   try {
-    if (dataset.storageKey) {
-      await deleteStoredDataset(dataset.storageKey);
-    }
-
-    const [deletedDataset] = await context.db.delete(datasetTable).where(eq(datasetTable.id, input.id)).returning();
-
-    if (deletedDataset === undefined) {
-      throw new ORPCError("NOT_FOUND", {
-        message: "Dataset not found",
-        status: 404,
-      });
-    }
-
-    return deletedDataset;
+    [deletedDataset] = await context.db.delete(datasetTable).where(eq(datasetTable.id, input.id)).returning();
   } catch (error) {
     if (error instanceof ORPCError) {
       throw error;
@@ -293,6 +268,25 @@ const remove = ds.delete.handler(async ({ context, input }) => {
       cause: error,
     });
   }
+
+  if (deletedDataset === undefined) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Dataset not found",
+      status: 404,
+    });
+  }
+
+  if (deletedDataset.storageKey) {
+    try {
+      await deleteStoredDataset(deletedDataset.storageKey);
+    } catch (error) {
+      throw new Error("Dataset was deleted, but removing the stored file failed.", {
+        cause: error,
+      });
+    }
+  }
+
+  return deletedDataset;
 });
 
 const variablesList = authenticatedDatasetApi.variables.list.handler(async ({ context, input }) => {

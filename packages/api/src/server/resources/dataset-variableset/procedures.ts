@@ -59,27 +59,29 @@ export async function detachDatasetVariableset(context: ProcedureContextInput, i
 }
 
 const create = adminDatasetVariablesetApi.create.handler(async ({ context, input }) => {
-  const [datasetVariableset] = await context.db.insert(datasetVariablesetTable).values(input).returning();
+  return context.db.transaction(async (tx) => {
+    const [datasetVariableset] = await tx.insert(datasetVariablesetTable).values(input).returning();
 
-  if (datasetVariableset === undefined) {
-    throw new Error("Failed to create dataset variableset");
-  }
+    if (datasetVariableset === undefined) {
+      throw new Error("Failed to create dataset variableset");
+    }
 
-  if (datasetVariableset.parentId) {
-    const maxPosition = await context.db
-      .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
-      .from(datasetVariablesetContent)
-      .where(eq(datasetVariablesetContent.variablesetId, datasetVariableset.parentId));
+    if (datasetVariableset.parentId) {
+      const maxPosition = await tx
+        .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
+        .from(datasetVariablesetContent)
+        .where(eq(datasetVariablesetContent.variablesetId, datasetVariableset.parentId));
 
-    await context.db.insert(datasetVariablesetContent).values({
-      contentType: "subset",
-      position: (maxPosition[0]?.maxPos ?? -100) + 100,
-      subsetId: datasetVariableset.id,
-      variablesetId: datasetVariableset.parentId,
-    });
-  }
+      await tx.insert(datasetVariablesetContent).values({
+        contentType: "subset",
+        position: (maxPosition[0]?.maxPos ?? -100) + 100,
+        subsetId: datasetVariableset.id,
+        variablesetId: datasetVariableset.parentId,
+      });
+    }
 
-  return datasetVariableset;
+    return datasetVariableset;
+  });
 });
 
 const list = authenticatedDatasetVariablesetApi.list.handler(async ({ context, input }) => {
@@ -143,11 +145,26 @@ const reorder = adminDatasetVariablesetApi.reorder.handler(async ({ context, inp
     .execute();
 
   const existingIds = new Set(variablesets.map((variableset) => variableset.id));
+
+  if (new Set(input.reorderedIds).size !== input.reorderedIds.length) {
+    throw new ORPCError("BAD_REQUEST", {
+      message: "reorderedIds must not contain duplicate variableset IDs",
+      status: 400,
+    });
+  }
+
   const invalidIds = input.reorderedIds.filter((id) => !existingIds.has(id));
 
   if (invalidIds.length > 0) {
     throw new ORPCError("BAD_REQUEST", {
       message: "Some variablesets do not belong to the specified parent",
+      status: 400,
+    });
+  }
+
+  if (input.reorderedIds.length !== variablesets.length) {
+    throw new ORPCError("BAD_REQUEST", {
+      message: "reorderedIds must include every sibling variableset exactly once",
       status: 400,
     });
   }
