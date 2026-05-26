@@ -5,7 +5,8 @@ import { columns } from "@/components/admin/organization-members/columns";
 import { OrganisationMembersDataTable } from "@/components/admin/organization-members/data-table";
 import { PageLayout } from "@/components/page/page-layout";
 import { Button } from "@/components/ui/button";
-import { find } from "@/dal/organization";
+import { isNotFoundAPIError } from "@/lib/api-errors";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 type OrganisationMembersPageProps = {
   params: Promise<{
@@ -14,7 +15,18 @@ type OrganisationMembersPageProps = {
 };
 export default async function OrganisationMembersPage({ params }: OrganisationMembersPageProps) {
   const { id } = await params;
-  const organization = await find(id);
+  const api = await getServerAPIClient();
+  let organization;
+
+  try {
+    organization = await api.organization.get({ id });
+  } catch (error) {
+    if (isNotFoundAPIError(error)) {
+      notFound();
+    }
+
+    throw error;
+  }
 
   if (!organization) {
     notFound();

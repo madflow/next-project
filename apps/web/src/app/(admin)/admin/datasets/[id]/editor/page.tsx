@@ -6,8 +6,8 @@ import { SplitVariablesTab } from "@/components/admin/dataset-editor/splitvariab
 import { VariablesetTab } from "@/components/admin/dataset-editor/variableset-tab";
 import { PageLayout } from "@/components/page/page-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { find } from "@/dal/dataset";
-import { find as findOrganization } from "@/dal/organization";
+import { isNotFoundAPIError } from "@/lib/api-errors";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 type PageProps = {
   params: Promise<{
@@ -18,20 +18,31 @@ type PageProps = {
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
   const t = await getTranslations("adminDatasetEditor");
-  const dataset = await find(id);
+  const api = await getServerAPIClient();
+  let dataset;
+
+  try {
+    dataset = await api.dataset.get({ embed: "organization", id });
+  } catch (error) {
+    if (isNotFoundAPIError(error)) {
+      return notFound();
+    }
+
+    throw error;
+  }
 
   if (!dataset) {
     return notFound();
   }
 
-  const organization = await findOrganization(dataset.datasets.organizationId);
+  const organization = dataset.organization;
 
   if (!organization) {
     return notFound();
   }
 
   return (
-    <PageLayout title={t("editor.title", { name: dataset?.datasets.name || "" })}>
+    <PageLayout title={t("editor.title", { name: dataset.name || "" })}>
       <Tabs defaultValue="variables">
         <TabsList>
           <TabsTrigger value="variables" data-testid="app.admin.editor.variables.tab">

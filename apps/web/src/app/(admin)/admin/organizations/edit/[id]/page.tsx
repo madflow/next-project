@@ -2,7 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { EditOrganizationForm } from "@/components/admin/organization/edit-organization-form";
 import { PageLayout } from "@/components/page/page-layout";
-import { find } from "@/dal/organization";
+import { isNotFoundAPIError } from "@/lib/api-errors";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 type EditOrganizationPageProps = {
   params: Promise<{
@@ -12,7 +13,18 @@ type EditOrganizationPageProps = {
 
 export default async function EditOrganizationPage({ params }: EditOrganizationPageProps) {
   const { id } = await params;
-  const organization = await find(id);
+  const api = await getServerAPIClient();
+  let organization;
+
+  try {
+    organization = await api.organization.get({ id });
+  } catch (error) {
+    if (isNotFoundAPIError(error)) {
+      notFound();
+    }
+
+    throw error;
+  }
 
   if (!organization) {
     notFound();

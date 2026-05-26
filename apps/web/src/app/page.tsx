@@ -1,30 +1,24 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getUserWithContext } from "@/dal/user";
-import { auth } from "@/lib/auth";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session) {
+  const api = await getServerAPIClient();
+  const currentUser = await api.currentuser.get({});
+
+  if (!currentUser) {
     redirect("/auth/login");
   } else {
-    const userWithContext = await getUserWithContext();
+    const organizations = await api.currentuser.organizations.list({});
 
-    const data = userWithContext.success ? userWithContext.data : null;
+    if (organizations.length === 1) {
+      const firstOrg = organizations[0];
+      if (firstOrg) {
+        const projects = await api.organization.projects.list({ id: firstOrg.id, limit: "2", offset: "0" });
+        const firstProject = projects.rows[0] ?? null;
 
-    if (!data) {
-      redirect("/auth/login");
-    }
-
-    if (data.organizationCount === 1) {
-      const firstOrg = data.organizations[0];
-      if (firstOrg?.projects.length === 1) {
-        const firstProject = firstOrg.projects[0] ?? null;
-        if (firstProject) {
+        if (projects.count === 1 && firstProject) {
           redirect(`/project/${firstProject.slug}/adhoc`);
         }
       }
