@@ -1,22 +1,27 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
-import {
-  type CreateProjectData as CreateData,
-  type UpdateProjectData as UpdateData,
-  project as entity,
-} from "@repo/database/schema";
+import { type CreateProjectData as CreateData, type UpdateProjectData as UpdateData } from "@repo/database/schema";
 import { withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 export const create = withAdminAuth(async (data: CreateData) => {
-  await db.insert(entity).values(data).returning();
+  const api = await getServerAPIClient();
+
+  await api.project.create(data);
 });
 
 export const update = withAdminAuth(async (id: string, data: UpdateData) => {
-  await db.update(entity).set(data).where(eq(entity.id, id)).returning();
+  const api = await getServerAPIClient();
+  const body = Object.fromEntries(Object.entries(data).filter(([key]) => key !== "id"));
+
+  await api.project.update({
+    body,
+    params: { id },
+  });
 });
 
 export const remove = withAdminAuth(async (id: string) => {
-  await db.delete(entity).where(eq(entity.id, id));
+  const api = await getServerAPIClient();
+
+  await api.project.delete({ id });
 });

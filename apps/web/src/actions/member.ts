@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { defaultClient as db } from "@repo/database/clients";
 import { type CreateMemberData, member as memberTable, organization as organizationTable } from "@repo/database/schema";
 import { withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 type AddMemberData = {
   userId: string;
@@ -44,9 +45,10 @@ export const addMember = withAdminAuth(async (organizationId: string, data: AddM
 });
 
 export const removeMember = withAdminAuth(async (memberId: string) => {
+  const api = await getServerAPIClient();
   const [member] = await db.select().from(memberTable).where(eq(memberTable.id, memberId)).limit(1);
 
-  await db.delete(memberTable).where(eq(memberTable.id, memberId));
+  await api.member.delete({ id: memberId });
 
   if (member) {
     revalidatePath(`/admin/organizations/${member.organizationId}/members`);
