@@ -5,13 +5,13 @@ import { defaultClient as db } from "@repo/database/clients";
 import {
   type CreateUserData as CreateData,
   type UpdateUserData as UpdateData,
-  user as entity,
   invitation,
 } from "@repo/database/schema";
 import { env } from "@/env";
 import { auth } from "@/lib/auth";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 function validateCallbackURL(callbackURL: string | undefined): void {
   if (!callbackURL) return;
@@ -29,7 +29,9 @@ function validateCallbackURL(callbackURL: string | undefined): void {
 }
 
 export const create = withAdminAuth(async (data: CreateData) => {
-  await db.insert(entity).values(data).returning();
+  const api = await getServerAPIClient();
+
+  await api.user.create(data);
 });
 
 export async function createWithInvitation(
@@ -69,9 +71,17 @@ export async function createWithInvitation(
 }
 
 export const update = withAdminAuth(async (id: string, data: UpdateData) => {
-  await db.update(entity).set(data).where(eq(entity.id, id)).returning();
+  const api = await getServerAPIClient();
+  const body = Object.fromEntries(Object.entries(data).filter(([key]) => key !== "id"));
+
+  await api.user.update({
+    body,
+    params: { id },
+  });
 });
 
 export const remove = withAdminAuth(async (id: string) => {
-  await db.delete(entity).where(eq(entity.id, id));
+  const api = await getServerAPIClient();
+
+  await api.user.delete({ id });
 });

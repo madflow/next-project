@@ -1,6 +1,6 @@
 "use server";
 
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   type CreateOrganizationData as CreateData,
@@ -11,6 +11,7 @@ import {
   updateOrganizationSchema,
 } from "@repo/database/schema";
 import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
+import { getServerAPIClient } from "@/lib/server-api-client";
 
 export const create = withAdminAuth(async (data: CreateData) => {
   const parsedData = insertOrganizationSchema.parse(data);
@@ -30,10 +31,18 @@ export const create = withAdminAuth(async (data: CreateData) => {
 });
 
 export const update = withAdminAuth(async (id: string, data: UpdateData) => {
+  const api = await getServerAPIClient();
   const parsedData = updateOrganizationSchema.parse(data);
-  await db.update(entity).set(parsedData).where(eq(entity.id, id));
+  const body = Object.fromEntries(Object.entries(parsedData).filter(([key]) => key !== "id"));
+
+  await api.organization.update({
+    body,
+    params: { id },
+  });
 });
 
 export const remove = withAdminAuth(async (id: string) => {
-  await db.delete(entity).where(eq(entity.id, id));
+  const api = await getServerAPIClient();
+
+  await api.organization.delete({ id });
 });
