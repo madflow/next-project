@@ -32,7 +32,7 @@ openpyxl = "^3.1.5"
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.0"
 ruff = "^0.15.0"
-mypy = "^1.10.1"
+mypy = "^2.0.0"
 pre-commit = "^4.0.0"
 black = "^26.0.0"
 pytest-cov = "^7.0.0"
