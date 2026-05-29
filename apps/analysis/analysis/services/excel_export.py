@@ -45,6 +45,7 @@ SANS_SERIF_FONT_FAMILY = 2
 INVALID_SHEET_TITLE_CHARS = "[]:*?/\\"
 WHOLE_PERCENT_NUMBER_FORMAT = '0"%"'
 STACKED_CHART_NUMBER_FORMAT = '0"%"'
+PERCENT_AXIS_MAJOR_UNIT = 20.0
 PIE_PERCENT_NUMBER_FORMAT = "0%"
 MEAN_NUMBER_FORMAT = "0.0"
 CHARTSHEET_SIZE_MULTIPLIER = 2
@@ -395,9 +396,11 @@ def _set_value_axis_range(
     minimum: float,
     maximum: float,
     number_format: str,
+    major_unit: float | None = None,
 ) -> None:
     chart.y_axis.scaling.min = minimum
     chart.y_axis.scaling.max = maximum
+    chart.y_axis.majorUnit = major_unit
     chart.y_axis.numFmt = number_format
 
 
@@ -575,7 +578,13 @@ def _build_distribution_chart(
         _series_reference(worksheet, 2, 2, len(points)), titles_from_data=True
     )
     _set_string_categories(chart, worksheet, len(points))
-    _set_value_axis_range(chart, 0.0, 100.0, WHOLE_PERCENT_NUMBER_FORMAT)
+    _set_value_axis_range(
+        chart,
+        0.0,
+        100.0,
+        WHOLE_PERCENT_NUMBER_FORMAT,
+        major_unit=PERCENT_AXIS_MAJOR_UNIT,
+    )
     _configure_data_labels(
         chart,
         position="outEnd",
@@ -614,7 +623,13 @@ def _build_stacked_bar_chart(
         titles_from_data=True,
     )
     _set_string_categories(chart, worksheet, len(rows))
-    _set_value_axis_range(chart, 0.0, 100.0, STACKED_CHART_NUMBER_FORMAT)
+    _set_value_axis_range(
+        chart,
+        0.0,
+        100.0,
+        STACKED_CHART_NUMBER_FORMAT,
+        major_unit=PERCENT_AXIS_MAJOR_UNIT,
+    )
     _configure_data_labels(
         chart,
         position="ctr",

@@ -36,6 +36,64 @@ def test_build_presentation_for_mean_bar_uses_numeric_axis_format() -> None:
     assert chart.value_axis.tick_labels.number_format == "0.0"
 
 
+@pytest.mark.parametrize(
+    "chart_payload",
+    [
+        {
+            "kind": "bar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "horizontalBar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "multiResponse",
+            "points": [
+                {"label": "Email", "value": 55, "color": "#ff0000"},
+                {"label": "Phone", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "horizontalStackedBar",
+            "rows": [
+                {
+                    "label": "Group A",
+                    "segments": [
+                        {"label": "Yes", "value": 60, "color": "#1f2937"},
+                        {"label": "No", "value": 40, "color": "#e5e7eb"},
+                    ],
+                }
+            ],
+        },
+    ],
+    ids=["bar", "horizontal-bar", "multi-response", "stacked"],
+)
+def test_build_presentation_for_percentage_charts_uses_20_point_axis_ticks(
+    chart_payload: dict[str, Any],
+) -> None:
+    """Percentage-based chart exports should pin the axis to 20-point intervals."""
+    payload = {
+        "file_name": f"{chart_payload['kind']}-export-2026-03-17.pptx",
+        "title": "Chart export",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+        "palette": ["#ff0000", "#00ff00"],
+        "chart": chart_payload,
+    }
+
+    presentation_bytes = build_presentation(payload)
+    presentation = Presentation(BytesIO(presentation_bytes))
+
+    chart = cast(Any, presentation.slides[0].shapes[2]).chart
+    assert chart.value_axis.major_unit == pytest.approx(20.0)
+
+
 def test_build_presentation_for_distribution_preserves_point_colors() -> None:
     """Distribution exports should keep each point color in the chart."""
     payload = {
