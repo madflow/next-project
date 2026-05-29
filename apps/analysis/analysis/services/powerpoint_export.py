@@ -194,8 +194,8 @@ def _style_category_axis(chart: Any, reverse_order: bool = False) -> None:
 
 def _configure_default_legend(chart: Any) -> None:
     chart.has_legend = True
-    chart.legend.position = XL_LEGEND_POSITION.BOTTOM
-    chart.legend.include_in_layout = False
+    chart.legend.position = XL_LEGEND_POSITION.TOP
+    chart.legend.include_in_layout = True
     _apply_export_font(chart.legend.font)
 
 

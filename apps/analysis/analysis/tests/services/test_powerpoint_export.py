@@ -4,6 +4,7 @@ from typing import Any, cast
 import pytest
 from pptx import Presentation
 from pptx.dml.color import RGBColor
+from pptx.enum.chart import XL_LEGEND_POSITION
 from pydantic import ValidationError
 
 from analysis.services.powerpoint_export import EXPORT_FONT_NAME, build_presentation
@@ -182,8 +183,34 @@ def test_build_presentation_uses_arial_for_slide_and_chart_text() -> None:
     assert chart.value_axis.tick_labels.font.name == EXPORT_FONT_NAME
     assert chart.category_axis.tick_labels.font.name == EXPORT_FONT_NAME
     assert chart.legend.font.name == EXPORT_FONT_NAME
+    assert chart.legend.position == XL_LEGEND_POSITION.TOP
+    assert chart.legend.include_in_layout is True
     assert chart.plots[0].data_labels.font.name == EXPORT_FONT_NAME
     assert chart.series[0].points[0].data_label.font.name == EXPORT_FONT_NAME
+
+
+def test_build_presentation_for_pie_chart_places_legend_above_chart() -> None:
+    """Pie chart exports should place legends above the chart area."""
+    payload = {
+        "file_name": "pie-export-2026-03-17.pptx",
+        "title": "Preferred contact",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+        "palette": ["#ff0000", "#00ff00"],
+        "chart": {
+            "kind": "pie",
+            "points": [
+                {"label": "Email", "value": 55, "color": "#ff0000"},
+                {"label": "Phone", "value": 45, "color": "#00ff00"},
+            ],
+        },
+    }
+
+    presentation_bytes = build_presentation(payload)
+    presentation = Presentation(BytesIO(presentation_bytes))
+
+    chart = cast(Any, presentation.slides[0].shapes[2]).chart
+    assert chart.legend.position == XL_LEGEND_POSITION.TOP
+    assert chart.legend.include_in_layout is True
 
 
 def test_build_presentation_for_stacked_chart_uses_contrast_label_color() -> None:

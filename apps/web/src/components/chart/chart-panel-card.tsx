@@ -20,7 +20,7 @@ import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 import { SplitVariableSelector } from "../project/split-variable-selector";
 import { Code } from "../ui/code";
 import { ChartExportMenu } from "./chart-export-menu";
-import { getChartIcon } from "./chart-shared";
+import { getChartIcon } from "./chart-helpers";
 
 type ChartPanelCardProps = {
   variable: DatasetVariableWithAttributes;

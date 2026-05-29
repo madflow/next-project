@@ -56,7 +56,7 @@ function MultiResponseTooltip() {
       formatter={(value, _name, item) => (
         <div className="flex items-center gap-2">
           <div
-            className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+            className="size-2.5 shrink-0 rounded-[2px]"
             style={{
               backgroundColor: item.payload.fill || item.color,
             }}
@@ -130,8 +130,9 @@ function HorizontalStackedBarChart({
         ))}
         {!hideLegend && (
           <ChartLegend
-            content={<ChartLegendContent />}
-            className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+            verticalAlign="top"
+            content={<ChartLegendContent verticalAlign="top" />}
+            className="flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
           />
         )}
       </BarChart>

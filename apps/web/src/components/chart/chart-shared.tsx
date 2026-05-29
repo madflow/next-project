@@ -1,15 +1,5 @@
 "use client";
 
-import {
-  BarChart3Icon,
-  ChartBarBigIcon,
-  ChartBarDecreasingIcon,
-  ChartBarStackedIcon,
-  ChartColumnBigIcon,
-  ChartPieIcon,
-  SheetIcon,
-  TextIcon,
-} from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis, YAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
@@ -21,41 +11,7 @@ import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from 
 import { getPlotAreaHorizontalBorderCoordinates, getPlotAreaVerticalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { type ThemeChartColors } from "@/types/organization";
-import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
-
-type PercentageChartConfigTranslations = {
-  percentLabel: string;
-};
-
-export function createPercentageChartConfig({ percentLabel }: PercentageChartConfigTranslations) {
-  return {
-    percentage: {
-      label: percentLabel,
-      color: "var(--chart-1)",
-    },
-  } satisfies ChartConfig;
-}
-
-export function getChartIcon(chartType: AnalysisChartType) {
-  switch (chartType) {
-    case "bar":
-      return <ChartColumnBigIcon className="h-4 w-4" />;
-    case "horizontalBar":
-      return <ChartBarDecreasingIcon className="h-4 w-4" />;
-    case "horizontalStackedBar":
-      return <ChartBarStackedIcon className="h-4 w-4" />;
-    case "pie":
-      return <ChartPieIcon className="h-4 w-4" />;
-    case "metrics":
-      return <SheetIcon className="h-4 w-4" />;
-    case "meanBar":
-      return <ChartBarBigIcon className="h-4 w-4" />;
-    case "textExplorer":
-      return <TextIcon className="h-4 w-4" />;
-    default:
-      return <BarChart3Icon className="h-4 w-4" />;
-  }
-}
+import { type StatsResponse } from "@/types/stats";
 
 export function BarChartContent({
   variable,
@@ -207,10 +163,10 @@ export function PieChartContent({
   });
 
   const renderOrderedLegend = () => (
-    <div className="flex -translate-y-2 flex-wrap items-center justify-center gap-4 pt-3 *:basis-1/4 *:justify-center">
+    <div className="flex flex-wrap items-center justify-center gap-4 pb-3 *:basis-1/4 *:justify-center">
       {pieData.map((item) => (
         <div key={item.label} className="flex items-center gap-1.5">
-          <div className="h-2 w-2 shrink-0 rounded-[2px]" style={{ backgroundColor: item.fill }} />
+          <div className="size-2 shrink-0 rounded-[2px]" style={{ backgroundColor: item.fill }} />
           <span className="text-xs">{item.label}</span>
         </div>
       ))}
@@ -243,7 +199,7 @@ export function PieChartContent({
             formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
           />
         </Pie>
-        <ChartLegend fontSize={12} content={renderOrderedLegend} />
+        <ChartLegend fontSize={12} verticalAlign="top" content={renderOrderedLegend} />
       </PieChart>
     </ChartContainer>
   );
