@@ -4,6 +4,9 @@ export default defineConfig(({ watch }) => ({
   entry: {
     index: "src/index.ts",
   },
+  deps: {
+    alwaysBundle: [/^@repo\/database(?:\/.*)?$/],
+  },
   format: ["esm"],
   outDir: "dist",
   platform: "node",

@@ -7,14 +7,14 @@
   "scripts": {
     "clean": "git clean -xdf .cache dist .turbo node_modules",
     "build": "tsdown",
-    "dev": "tsdown",
+    "dev": "tsdown --watch",
     "check-types": "tsc --noEmit",
     "lint": "eslint --max-warnings=0 ."
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "dependencies": {
