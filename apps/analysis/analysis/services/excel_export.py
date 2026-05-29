@@ -613,7 +613,7 @@ def _build_stacked_bar_chart(
     chart.title = title
     legend = chart.legend
     if legend is not None:
-        legend.position = "b"
+        legend.position = "t"
 
     chart.width = 10
     chart.height = max(min(len(rows) // 2 + 4, 10), 6)
@@ -653,7 +653,7 @@ def _build_pie_chart(
     chart.title = title
     legend = chart.legend
     if legend is not None:
-        legend.position = "b"
+        legend.position = "t"
 
     chart.width = 10
     chart.height = 7

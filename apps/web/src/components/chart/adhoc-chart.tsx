@@ -30,13 +30,9 @@ import { type ThemeChartColors } from "@/types/organization";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { ChartExportSurface } from "./chart-export-surface";
+import { createPercentageChartConfig } from "./chart-helpers";
 import { ChartPanelCard } from "./chart-panel-card";
-import {
-  BarChartContent,
-  HorizontalBarChartContent,
-  PieChartContent,
-  createPercentageChartConfig,
-} from "./chart-shared";
+import { BarChartContent, HorizontalBarChartContent, PieChartContent } from "./chart-shared";
 import { HorizontalStackedBarAdhoc } from "./horizontal-stacked-bar-adhoc";
 import { MeanBarAdhoc } from "./mean-bar-adhoc";
 import { MetricsCards } from "./metrics-cards";

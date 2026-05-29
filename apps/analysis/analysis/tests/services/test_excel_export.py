@@ -227,7 +227,7 @@ def test_build_workbook_for_bar_chart_uses_light_gray_axis_and_plot_area_lines()
 
 
 def test_build_workbook_for_pie_chart_uses_light_gray_plot_area_line() -> None:
-    """Pie chart exports should use the same light-gray plot-area border."""
+    """Pie chart exports should keep the light-gray plot border and a top legend."""
     payload = {
         "file_name": "pie-export-2026-03-24.xlsx",
         "title": "Preferred contact",
@@ -255,6 +255,7 @@ def test_build_workbook_for_pie_chart_uses_light_gray_plot_area_line() -> None:
         r"<plotArea>.*?<spPr><a:solidFill[^>]*><a:srgbClr val=\"FFFFFF\"/></a:solidFill><a:ln[^>]*><a:solidFill><a:srgbClr val=\"999999\"/></a:solidFill>",
         chart_xml,
     )
+    assert 'legendPos val="t"' in chart_xml
 
 
 @pytest.mark.parametrize(
@@ -580,7 +581,7 @@ def test_build_workbook_omits_color_column_for_point_based_charts(
 
 
 def test_build_workbook_for_stacked_chart_uses_percent_format_and_legend() -> None:
-    """Stacked chart exports should use whole-percent labels and a bottom legend."""
+    """Stacked chart exports should use whole-percent labels and a top legend."""
     payload = {
         "file_name": "stacked-export-2026-03-17.xlsx",
         "title": "Awareness by segment",
@@ -613,7 +614,7 @@ def test_build_workbook_for_stacked_chart_uses_percent_format_and_legend() -> No
         chart_xml = archive.read("xl/charts/chart1.xml").decode("utf-8")
 
     assert 'grouping val="stacked"' in chart_xml
-    assert 'legendPos val="b"' in chart_xml
+    assert 'legendPos val="t"' in chart_xml
     assert 'formatCode="0&quot;%&quot;" sourceLinked="0"' in chart_xml
     assert 'formatCode="0&quot;%&quot;"' in chart_xml
     assert '<max val="100"/>' in chart_xml
