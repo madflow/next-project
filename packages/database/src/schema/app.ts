@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSchemaFactory, createUpdateSchema } from "drizzle-zod";
 import { z } from "zod";
-import { organization } from "./auth.js";
+import { organization } from "./auth.ts";
 
 const { createSelectSchema } = createSchemaFactory({
   // OpenAPI responses serialize timestamps as strings; select schemas need to accept both.

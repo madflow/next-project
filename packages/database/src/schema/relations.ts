@@ -7,8 +7,8 @@ import {
   datasetVariableset,
   datasetVariablesetContent,
   project,
-} from "./app.js";
-import { account, invitation, member, organization, session, user } from "./auth.js";
+} from "./app.ts";
+import { account, invitation, member, organization, session, user } from "./auth.ts";
 
 // User relations
 export const userRelations = relations(user, ({ many }) => ({
