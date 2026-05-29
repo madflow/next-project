@@ -65,6 +65,7 @@ function ChartContent({
   datasetId,
   isMultiResponseIndividual,
   countedValue,
+  disableAnimation = false,
 }: {
   chartType: AnalysisChartType;
   variable: DatasetVariableWithAttributes;
@@ -75,6 +76,7 @@ function ChartContent({
   datasetId?: string;
   isMultiResponseIndividual: boolean;
   countedValue: number;
+  disableAnimation?: boolean;
 }) {
   switch (chartType) {
     case "bar":
@@ -85,6 +87,7 @@ function ChartContent({
           chartRef={chartRef}
           chartConfig={percentageChartConfig}
           chartColors={chartColors}
+          disableAnimation={disableAnimation}
         />
       );
     case "horizontalBar":
@@ -97,6 +100,7 @@ function ChartContent({
           chartColors={chartColors}
           isMultiResponseIndividual={isMultiResponseIndividual}
           countedValue={countedValue}
+          disableAnimation={disableAnimation}
         />
       );
     case "horizontalStackedBar":
@@ -108,14 +112,31 @@ function ChartContent({
           chartColors={chartColors}
           isMultiResponseIndividual={isMultiResponseIndividual}
           countedValue={countedValue}
+          disableAnimation={disableAnimation}
         />
       );
     case "pie":
-      return <PieChartContent variable={variable} stats={stats} chartRef={chartRef} chartColors={chartColors} />;
+      return (
+        <PieChartContent
+          variable={variable}
+          stats={stats}
+          chartRef={chartRef}
+          chartColors={chartColors}
+          disableAnimation={disableAnimation}
+        />
+      );
     case "metrics":
       return <MetricsCards variable={variable} stats={stats} />;
     case "meanBar":
-      return <MeanBarAdhoc variable={variable} stats={stats} ref={chartRef} chartColors={chartColors} />;
+      return (
+        <MeanBarAdhoc
+          variable={variable}
+          stats={stats}
+          ref={chartRef}
+          chartColors={chartColors}
+          disableAnimation={disableAnimation}
+        />
+      );
     case "textExplorer":
       return <TextExplorerAdhoc variable={variable} datasetId={datasetId} />;
     default:
@@ -339,6 +360,7 @@ export function AdhocChart({
       datasetId={datasetId}
       isMultiResponseIndividual={isMultiResponseIndividual}
       countedValue={countedValue}
+      disableAnimation
     />
   );
 

@@ -33,6 +33,7 @@ type HorizontalStackedBarAdhocProps = {
   chartColors?: ThemeChartColors;
   isMultiResponseIndividual?: boolean;
   countedValue?: number;
+  disableAnimation?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 function PercentageLabelList({ dataKey }: { dataKey: string }) {
@@ -79,6 +80,7 @@ function HorizontalStackedBarChart({
   hideLegend = false,
   chartColors,
   tooltipContent,
+  disableAnimation = false,
 }: {
   model: HorizontalStackedBarModel;
   chartRef?: React.Ref<HTMLDivElement>;
@@ -86,6 +88,7 @@ function HorizontalStackedBarChart({
   hideLegend?: boolean;
   chartColors?: ThemeChartColors;
   tooltipContent?: React.ReactElement;
+  disableAnimation?: boolean;
 }) {
   return (
     <ChartContainer
@@ -116,7 +119,12 @@ function HorizontalStackedBarChart({
         />
         <ChartTooltip cursor={false} content={tooltipContent ?? defaultTooltipContent} />
         {model.segments.map((segment) => (
-          <Bar key={segment.key} dataKey={segment.key} stackId="categories" fill={`var(--color-${segment.key})`}>
+          <Bar
+            key={segment.key}
+            dataKey={segment.key}
+            stackId="categories"
+            fill={`var(--color-${segment.key})`}
+            isAnimationActive={disableAnimation ? false : undefined}>
             <PercentageLabelList dataKey={segment.key} />
           </Bar>
         ))}
@@ -132,7 +140,10 @@ function HorizontalStackedBarChart({
 }
 
 export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalStackedBarAdhocProps>(
-  ({ variable, stats, chartColors, isMultiResponseIndividual = false, countedValue = 1 }, ref) => {
+  (
+    { variable, stats, chartColors, isMultiResponseIndividual = false, countedValue = 1, disableAnimation = false },
+    ref
+  ) => {
     const hasSplitVariable = hasSplitVariableStatsForVariable(stats, variable.name);
 
     if (hasSplitVariable) {
@@ -150,6 +161,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
           exportFilename={variable.name}
           hideLegend={isMultiResponseIndividual}
           tooltipContent={isMultiResponseIndividual ? multiResponseTooltipContent : undefined}
+          disableAnimation={disableAnimation}
         />
       );
     }
@@ -163,6 +175,7 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
         chartColors={chartColors}
         chartRef={ref}
         exportFilename={variable.name}
+        disableAnimation={disableAnimation}
       />
     );
   }
