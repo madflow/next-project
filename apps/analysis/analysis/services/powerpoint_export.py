@@ -27,6 +27,7 @@ DEFAULT_LIGHT_TEXT_HEX = "#FFFFFF"
 DEFAULT_DARK_TEXT_HEX = "#000000"
 SLIDE_BACKGROUND_HEX = "#FFFFFF"
 PERCENT_NUMBER_FORMAT = '0"%"'
+PERCENT_AXIS_MAJOR_UNIT = 20.0
 EMPTY_SERIES_NAME = ""
 
 
@@ -173,10 +174,12 @@ def _style_value_axis(
     minimum: float | None = None,
     maximum: float | None = None,
     number_format: str = '0"%"',
+    major_unit: float | None = None,
 ) -> None:
     value_axis = chart.value_axis
     value_axis.minimum_scale = minimum
     value_axis.maximum_scale = maximum
+    value_axis.major_unit = major_unit
     tick_labels = value_axis.tick_labels
     tick_labels.number_format = number_format
     tick_labels.number_format_is_linked = False
@@ -230,7 +233,12 @@ def _add_distribution_chart(
     chart = slide.shapes.add_chart(
         chart_type, Inches(0.7), Inches(1.45), Inches(11.8), Inches(5.1), chart_data
     ).chart
-    _style_value_axis(chart, 0.0, 100.0)
+    _style_value_axis(
+        chart,
+        0.0,
+        100.0,
+        major_unit=PERCENT_AXIS_MAJOR_UNIT,
+    )
     _style_category_axis(chart, reverse_order=reverse_order)
     _apply_point_fills(chart.series[0], points)
     _configure_default_data_labels(
@@ -264,7 +272,12 @@ def _add_stacked_bar_chart(slide: Any, rows: Sequence[ExportStackedRow]) -> None
         Inches(5.1),
         chart_data,
     ).chart
-    _style_value_axis(chart, 0.0, 100.0)
+    _style_value_axis(
+        chart,
+        0.0,
+        100.0,
+        major_unit=PERCENT_AXIS_MAJOR_UNIT,
+    )
     _style_category_axis(chart, reverse_order=True)
     _configure_default_legend(chart)
     _configure_default_data_labels(

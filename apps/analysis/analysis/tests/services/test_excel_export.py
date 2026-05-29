@@ -52,6 +52,72 @@ def test_build_workbook_for_mean_bar_uses_numeric_axis_format() -> None:
     assert '<min val="1"/>' in chart_xml
 
 
+@pytest.mark.parametrize(
+    "chart",
+    [
+        {
+            "kind": "bar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "horizontalBar",
+            "points": [
+                {"label": "18-29", "value": 55, "color": "#ff0000"},
+                {"label": "30-44", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "multiResponse",
+            "points": [
+                {"label": "Email", "value": 55, "color": "#ff0000"},
+                {"label": "Phone", "value": 45, "color": "#00ff00"},
+            ],
+        },
+        {
+            "kind": "horizontalStackedBar",
+            "rows": [
+                {
+                    "label": "Group A",
+                    "segments": [
+                        {"label": "Yes", "value": 60, "color": "#1f2937"},
+                        {"label": "No", "value": 40, "color": "#e5e7eb"},
+                    ],
+                }
+            ],
+        },
+    ],
+    ids=["bar", "horizontal-bar", "multi-response", "stacked"],
+)
+def test_build_workbook_for_percentage_charts_uses_20_point_axis_ticks(
+    chart: dict[str, object],
+) -> None:
+    """Percentage-based chart exports should pin the axis to 20-point intervals."""
+    payload = {
+        "file_name": f"{chart['kind']}-export-2026-03-17.xlsx",
+        "title": "Chart export",
+        "meta_line": "Dataset: Survey 2026 | Exported: Mar 17, 2026",
+        "labels": {
+            "label": "Label",
+            "value": "Value",
+            "value_percent": "Value (%)",
+            "color": "Color",
+            "metric": "Metric",
+        },
+        "palette": ["#ff0000", "#00ff00"],
+        "chart": chart,
+    }
+
+    chart_xml = _chart_xml(build_workbook(payload))
+
+    assert re.search(
+        r"<valAx>.*?<majorUnit val=\"20\"/>.*?</valAx>",
+        chart_xml,
+    )
+
+
 def test_build_workbook_for_distribution_preserves_point_colors() -> None:
     """Distribution exports should keep each point color in the chart."""
     payload = {
