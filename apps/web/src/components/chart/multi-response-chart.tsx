@@ -44,12 +44,14 @@ function MultiResponseChartContent({
   chartData,
   chartRef,
   fileName,
+  disableAnimation = false,
 }: {
   chartConfig: ChartConfig;
   chartColors?: ThemeChartColors;
   chartData: ReturnType<typeof transformToMultiResponseData>;
   chartRef?: React.Ref<HTMLDivElement>;
   fileName: string;
+  disableAnimation?: boolean;
 }) {
   return (
     <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={fileName}>
@@ -82,7 +84,10 @@ function MultiResponseChartContent({
           fontSize={12}
           width={CHART_Y_AXIS_WIDTH}
         />
-        <Bar dataKey="percentage" fill="var(--color-percentage)">
+        <Bar
+          dataKey="percentage"
+          fill="var(--color-percentage)"
+          isAnimationActive={disableAnimation ? false : undefined}>
           {chartData.map((entry, index) => (
             <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
           ))}
@@ -230,6 +235,7 @@ export function MultiResponseChart({
           chartColors={chartColors}
           chartData={chartData}
           fileName={exportBaseName}
+          disableAnimation
         />
       </ChartExportSurface>
       <CardHeader>

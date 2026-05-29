@@ -63,12 +63,14 @@ export function BarChartContent({
   chartRef,
   chartConfig,
   chartColors,
+  disableAnimation = false,
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
   chartRef?: React.Ref<HTMLDivElement>;
   chartConfig: ChartConfig;
   chartColors?: ThemeChartColors;
+  disableAnimation?: boolean;
 }) {
   const chartData = transformToRechartsBarData(variable, stats);
 
@@ -87,7 +89,10 @@ export function BarChartContent({
           ticks={[0, 20, 40, 60, 80, 100]}
           tickFormatter={(value) => `${value}%`}
         />
-        <Bar dataKey="percentage" fill="var(--color-percentage)">
+        <Bar
+          dataKey="percentage"
+          fill="var(--color-percentage)"
+          isAnimationActive={disableAnimation ? false : undefined}>
           {chartData.map((entry, index) => (
             <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
           ))}
@@ -112,6 +117,7 @@ export function HorizontalBarChartContent({
   chartColors,
   isMultiResponseIndividual = false,
   countedValue = 1,
+  disableAnimation = false,
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
@@ -120,6 +126,7 @@ export function HorizontalBarChartContent({
   chartColors?: ThemeChartColors;
   isMultiResponseIndividual?: boolean;
   countedValue?: number;
+  disableAnimation?: boolean;
 }) {
   const chartData: Array<{
     label: string | number;
@@ -155,7 +162,10 @@ export function HorizontalBarChartContent({
           width={isMultiResponseIndividual ? 0 : CHART_Y_AXIS_WIDTH}
           hide={isMultiResponseIndividual}
         />
-        <Bar dataKey="percentage" fill="var(--color-percentage)">
+        <Bar
+          dataKey="percentage"
+          fill="var(--color-percentage)"
+          isAnimationActive={disableAnimation ? false : undefined}>
           {chartData.map((entry, index) => (
             <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
           ))}
@@ -178,11 +188,13 @@ export function PieChartContent({
   stats,
   chartRef,
   chartColors,
+  disableAnimation = false,
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
   chartRef?: React.Ref<HTMLDivElement>;
   chartColors?: ThemeChartColors;
+  disableAnimation?: boolean;
 }) {
   const pieData = transformToRechartsPieData(variable, stats);
   const pieChartConfig: ChartConfig = {};
@@ -213,7 +225,13 @@ export function PieChartContent({
       data-export-filename={variable.name}>
       <PieChart>
         <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
-        <Pie data={pieData} dataKey="percentage" nameKey="label" startAngle={90} endAngle={-270}>
+        <Pie
+          data={pieData}
+          dataKey="percentage"
+          nameKey="label"
+          startAngle={90}
+          endAngle={-270}
+          isAnimationActive={disableAnimation ? false : undefined}>
           {pieData.map((entry, index) => (
             <Cell key={`${entry.label}-${index}`} fill={entry.fill} />
           ))}
