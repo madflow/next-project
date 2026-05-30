@@ -1,7 +1,6 @@
 import { apiKey } from "@better-auth/api-key";
-import { betterAuth } from "better-auth";
+import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, organization as organizationPlugin } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { defaultClient as db } from "@repo/database/clients";
@@ -36,7 +35,7 @@ type SendInvitationEmail = (
   request?: Request
 ) => Promise<void>;
 
-export type CreateAuthOptions = {
+type BaseCreateAuthOptions = {
   authDisableSignup?: boolean;
   baseURL?: string;
   secret?: string;
@@ -44,6 +43,10 @@ export type CreateAuthOptions = {
   sendInvitationEmail?: SendInvitationEmail;
   sendResetPassword?: SendResetPassword;
   sendVerificationEmail?: SendVerificationEmail;
+};
+
+export type CreateAuthOptions = BaseCreateAuthOptions & {
+  plugins?: readonly BetterAuthPlugin[];
 };
 
 export function createAuth({
@@ -56,6 +59,7 @@ export function createAuth({
   sendInvitationEmail,
   sendResetPassword,
   sendVerificationEmail,
+  plugins,
 }: CreateAuthOptions = {}) {
   return betterAuth({
     telemetry: { enabled: false },
@@ -191,7 +195,7 @@ export function createAuth({
           return false;
         },
       }),
-      nextCookies(),
+      ...(plugins ?? []),
     ],
   });
 }

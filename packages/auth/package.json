@@ -23,8 +23,7 @@
     "@better-auth/api-key": "^1.6.11",
     "@repo/database": "workspace:*",
     "better-auth": "^1.6.11",
-    "drizzle-orm": "^0.45.2",
-    "next": "^16.2.6"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

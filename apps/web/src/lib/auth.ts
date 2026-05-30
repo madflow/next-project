@@ -1,3 +1,4 @@
+import { nextCookies } from "better-auth/next-js";
 import { eq } from "drizzle-orm";
 import { USER_ADMIN_ROLE, createAuth } from "@repo/auth/server";
 import { defaultClient as db } from "@repo/database/clients";
@@ -128,4 +129,5 @@ export const auth = createAuth({
       }),
     });
   },
+  plugins: [nextCookies()],
 });
