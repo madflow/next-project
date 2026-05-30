@@ -4,17 +4,15 @@ This directory contains the Python-based analysis application.
 
 ## Setup and Installation
 
-This project primarily uses [Poetry](https://python-poetry.org/) for dependency management. If you don't have Poetry installed, you can install it by following the instructions on their official website.
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management and command execution.
 
 Create a virtual environment and install dependencies:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-poetry install
+uv sync --dev
 ```
 
-### Using Poetry (Recommended)
+### Using uv (Recommended)
 
 1.  **Navigate to the application directory:**
 
@@ -24,18 +22,18 @@ poetry install
 
 2.  **Install dependencies and create a virtual environment:**
 
-    Poetry will automatically create a virtual environment and install all the project dependencies.
+    `uv` will create `.venv` automatically and install all project dependencies.
 
     ```bash
-    poetry install
+    uv sync --dev
     ```
 
-3.  **Activate the virtual environment (optional, Poetry manages it for you when running commands):**
+3.  **Activate the virtual environment (optional, `uv run` manages it for you):**
 
-    If you need to activate the virtual environment manually (e.g., for running scripts directly), you can do so:
+    If you need to activate the virtual environment manually, you can do so:
 
     ```bash
-    poetry shell
+    source .venv/bin/activate
     ```
 
 ## Running the Application
@@ -43,5 +41,5 @@ poetry install
 To start the analysis application, use the following command:
 
 ```bash
-poetry run python -m analysis
+uv run python -m analysis
 ```

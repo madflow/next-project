@@ -52,14 +52,18 @@ runs:
       with:
         python-version: "3.14"
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      with:
+        enable-cache: true
+        cache-dependency-glob: |
+          apps/analysis/pyproject.toml
+          apps/analysis/uv.lock
+
     - name: Install Python deps
       shell: bash
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        cd apps/analysis
-        python3 -m venv .venv
-        source .venv/bin/activate
-        poetry install
+      working-directory: apps/analysis
+      run: uv sync --locked --dev
 
     - name: Install e2e dependencies
       shell: bash

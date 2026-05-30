@@ -1,21 +1,20 @@
-FROM python:3.13.6-slim-bullseye AS prod
+FROM python:3.14-slim-bullseye AS prod
 
-RUN pip install --no-cache-dir poetry==1.8.2
+COPY --from=ghcr.io/astral-sh/uv:0.8.14 /uv /uvx /bin/
 
-# Configuring poetry
-RUN poetry config virtualenvs.create false
-RUN poetry config cache-dir /tmp/poetry_cache
+ENV UV_LINK_MODE=copy
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
 
 # Copying requirements of a project
-COPY pyproject.toml poetry.lock /app/src/
+COPY pyproject.toml uv.lock /app/src/
 WORKDIR /app/src
 
 # Installing requirements
-RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked --no-dev --no-install-project
 
 # Copying actuall application
 COPY . /app/src/
-RUN --mount=type=cache,target=/tmp/poetry_cache poetry install --only main
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked --no-dev
 
 # Don't run production as root
 RUN groupadd --system --gid 1001 appuser
@@ -28,6 +27,6 @@ CMD ["/usr/local/bin/python", "-m", "analysis"]
 FROM prod AS dev
 
 USER root
-RUN --mount=type=cache,target=/tmp/poetry_cache poetry install
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked --dev
 RUN chown -R appuser:appuser /app
 USER appuser
