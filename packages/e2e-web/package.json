@@ -25,14 +25,14 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.60.0",
     "@repo/eslint-config": "workspace:*",
-    "@types/node": "^24.11.0",
-    "eslint": "^9.39.3",
-    "eslint-plugin-playwright": "^2.9.0"
+    "@types/node": "^24.12.4",
+    "eslint": "^9.39.4",
+    "eslint-plugin-playwright": "^2.10.4"
   },
   "dependencies": {
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.2",
     "mailpit-api": "^2.0.0"
   }
 }

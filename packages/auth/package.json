@@ -23,14 +23,14 @@
     "@better-auth/api-key": "^1.6.11",
     "@repo/database": "workspace:*",
     "better-auth": "^1.6.11",
-    "drizzle-orm": "^0.45.1",
-    "next": "^16.1.6"
+    "drizzle-orm": "^0.45.2",
+    "next": "^16.2.6"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^24.12.0",
+    "@types/node": "^24.12.4",
     "eslint": "^9.39.4",
-    "typescript": "^6.0.0"
+    "typescript": "^6.0.3"
   }
 }

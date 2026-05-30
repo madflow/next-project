@@ -9,14 +9,14 @@
     "clean": "git clean -xdf .cache dist .turbo node_modules"
   },
   "dependencies": {
-    "nodemailer": "^8.0.4",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-email": "^6.0.5"
+    "nodemailer": "^8.0.10",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-email": "^6.5.0"
   },
   "devDependencies": {
+    "@react-email/ui": "^6.5.0",
     "@repo/typescript-config": "workspace:*",
-    "@react-email/ui": "^6.0.5",
     "@types/nodemailer": "^8.0.0",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3"
