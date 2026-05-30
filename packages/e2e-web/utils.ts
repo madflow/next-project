@@ -63,7 +63,9 @@ export async function inviteUser(page: Page, userEmail: string) {
   const getOrgResponsePromise = page.waitForResponse("api/auth/organization/get-full-organization");
   await page.getByTestId("app.organization-switcher").click();
   await getOrgResponsePromise;
-  await page.getByTestId("app.organization-switcher.invite").click();
+  const inviteTrigger = page.getByTestId("app.organization-switcher.invite");
+  await expect(inviteTrigger).toBeVisible();
+  await inviteTrigger.click();
   await page.getByTestId("admin.users.invite.form.email").fill(userEmail);
   const inviteResponsePromise = page.waitForResponse("api/auth/organization/invite-member");
   await page.getByTestId("admin.users.invite.form.submit").click();
