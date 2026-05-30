@@ -161,7 +161,7 @@ e2e-single:
 ## Create python virtual environment
 .PHONY: venv
 venv:
-	python3 -m venv ./apps/analysis/.venv
+	uv venv ./apps/analysis/.venv --python 3.14
 
 
 ## Production: Docker docker-up

@@ -9,13 +9,13 @@
 
 ## Tech Stack
 
-- **Language:** Python 3.13+
+- **Language:** Python 3.14+
 - **Framework:** FastAPI
 - **Server:** Uvicorn (dev), Gunicorn (prod)
 - **Database:** PostgreSQL 18
 - **ORM:** SQLAlchemy 2.0 with asyncio
 - **Data Processing:** Pandas, PyReadstat
-- **Dependency Management:** Poetry
+- **Dependency Management:** uv
 - **Linting:** Ruff
 - **Testing:** Pytest
 
