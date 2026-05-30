@@ -23,7 +23,7 @@ RUN corepack enable pnpm
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @repo/worker run build
+RUN pnpm turbo run build --filter=@repo/worker
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 appuser
