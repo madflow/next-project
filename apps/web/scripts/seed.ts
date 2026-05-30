@@ -384,16 +384,21 @@ await adminClient.delete(apikey).execute();
 await adminClient.delete(session).execute();
 await adminClient.delete(invitation).execute();
 await adminClient.delete(member).execute();
+const datasets = await adminClient.select().from(dataset);
+for (const dataset of datasets) {
+  if (!dataset.storageKey) {
+    continue;
+  }
+
+  await deleteDataset(dataset.storageKey);
+}
 await adminClient.delete(organization).execute();
 await adminClient.delete(account).execute();
 await adminClient.delete(user).execute();
 await adminClient.delete(rateLimit).execute();
 await adminClient.delete(job).execute();
-const datasets = await adminClient.select().from(dataset);
-for (const dataset of datasets) {
-  await deleteDataset(dataset.storageKey);
-}
 await adminClient.delete(dataset).execute();
+await adminClient.delete(job).execute();
 console.log("Tables truncated successfully\n");
 
 // Create seed data

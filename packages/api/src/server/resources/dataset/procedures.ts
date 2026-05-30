@@ -20,7 +20,6 @@ import {
   organization,
   project,
 } from "@repo/database/schema";
-import { deleteDataset as deleteStoredDataset } from "@repo/storage";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
 import { requireOrganizationMembership } from "../../auth/access";
 import { authVoter } from "../../auth/voter";
@@ -274,16 +273,6 @@ const remove = ds.delete.handler(async ({ context, input }) => {
       message: "Dataset not found",
       status: 404,
     });
-  }
-
-  if (deletedDataset.storageKey) {
-    try {
-      await deleteStoredDataset(deletedDataset.storageKey);
-    } catch (error) {
-      throw new Error("Dataset was deleted, but removing the stored file failed.", {
-        cause: error,
-      });
-    }
   }
 
   return deletedDataset;

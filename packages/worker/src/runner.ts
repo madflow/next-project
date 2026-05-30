@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import { run } from "graphile-worker";
 import "./instrument.js";
+import { deleteDatasetFiles } from "./tasks/delete-dataset-files.js";
 import { hello } from "./tasks/hello.js";
 
 config({ quiet: true });
@@ -16,6 +17,7 @@ async function main() {
     noHandleSignals: false,
     pollInterval: 1000,
     taskList: {
+      delete_dataset_files: deleteDatasetFiles,
       hello,
     },
   });
