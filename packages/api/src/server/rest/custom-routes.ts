@@ -2,6 +2,7 @@ import { ORPCError } from "@orpc/server";
 import { and, eq } from "drizzle-orm";
 import { dataset, datasetMetadataFile, member } from "@repo/database/schema";
 import { bodyToBuffer, getObject } from "@repo/storage";
+import { requireAdmin } from "../auth/guard";
 import { authVoter } from "../auth/voter";
 import { type Context, createORPCContext } from "../context";
 import { requireDatasetAccess } from "../resources/dataset/access";
@@ -514,6 +515,7 @@ async function handleDatasetMetadataFilesCreate({
 }) {
   const datasetId = getRequiredParam(params, "id");
   await requireDatasetRouteAccess(context, datasetId);
+  requireAdmin(context);
   const user = requireAuthenticatedUser(context);
 
   const [targetDataset] = await context.db.select().from(dataset).where(eq(dataset.id, datasetId)).limit(1);

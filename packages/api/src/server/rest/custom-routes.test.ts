@@ -65,7 +65,93 @@ function createMetadataDeleteDb(file: MetadataFileRow | null) {
   return { db: db as unknown as DatabaseInstance, state };
 }
 
+function createMetadataUploadDb() {
+  const state = {
+    datasetLookupCount: 0,
+  };
+
+  const db = {
+    async execute() {
+      return {
+        rows: [{ exists: true }],
+      };
+    },
+    select(selection?: unknown) {
+      if (selection && typeof selection === "object" && "organizationId" in selection) {
+        return {
+          from() {
+            return this;
+          },
+          where() {
+            return this;
+          },
+          async execute() {
+            return [{ organizationId }];
+          },
+        };
+      }
+
+      return {
+        from() {
+          return this;
+        },
+        where() {
+          return this;
+        },
+        async limit() {
+          state.datasetLookupCount += 1;
+          return [{ id: datasetId, organizationId }];
+        },
+      };
+    },
+  };
+
+  return { db: db as unknown as DatabaseInstance, state };
+}
+
 describe("createCustomRouteHandler", () => {
+  test("allows admins to reach metadata upload validation", async () => {
+    const { db, state } = createMetadataUploadDb();
+    const formData = new FormData();
+    formData.set("name", "Questionnaire");
+    const handler = createCustomRouteHandler({
+      auth: createMockAuth({ session: adminSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(`http://localhost/rpc/datasets/${datasetId}/metadata-files`, { method: "POST", body: formData })
+    );
+
+    assert.ok(response);
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { error: "No file provided" });
+    assert.equal(state.datasetLookupCount, 1);
+  });
+
+  test("returns 403 when a non-admin tries to upload a metadata file", async () => {
+    const { db, state } = createMetadataUploadDb();
+    const formData = new FormData();
+    formData.set("name", "Questionnaire");
+    const handler = createCustomRouteHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(`http://localhost/rpc/datasets/${datasetId}/metadata-files`, { method: "POST", body: formData })
+    );
+
+    assert.ok(response);
+    assert.equal(response.status, 403);
+    assert.deepEqual(await response.json(), {
+      error: "You do not have enough permission to perform this action.",
+    });
+    assert.equal(state.datasetLookupCount, 0);
+  });
+
   test("deletes metadata file rows for the original uploader", async () => {
     const { db, state } = createMetadataDeleteDb({
       datasetId,
