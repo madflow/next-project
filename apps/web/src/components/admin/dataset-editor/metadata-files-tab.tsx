@@ -2,7 +2,7 @@
 
 import { keepPreviousData as keepPreviousQueryData, useQuery } from "@tanstack/react-query";
 import { Download, FileText } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { MetadataFileDeleteDialog } from "@/components/admin/dataset-editor/metadata-file-delete-dialog";
 import { MetadataFileUploadForm } from "@/components/admin/dataset-editor/metadata-file-upload-form";
@@ -40,11 +40,6 @@ type MetadataFilesResponse = {
   rows: DatasetMetadataFile[];
 };
 
-const formatter = new Intl.DateTimeFormat("en", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
 const metadataTypeLabelKey = {
   documentation: "types.documentation",
   other: "types.other",
@@ -53,7 +48,16 @@ const metadataTypeLabelKey = {
 } as const;
 
 export function MetadataFilesTab({ datasetId }: MetadataFilesTabProps) {
+  const locale = useLocale();
   const t = useTranslations("adminDatasetEditor.metadata");
+  const formatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    [locale]
+  );
   const input = useMemo(
     () =>
       buildCollectionQueryInput({

@@ -24,6 +24,7 @@ export async function putDatasetMetadataFile({
 }: PutDatasetMetadataFileParams) {
   const fileKey = `${randomUUID()}.${extension.toLowerCase()}`;
   const s3Key = `datasets/${datasetId}/metadata/${fileKey}`;
+  const encodedOriginalFilename = encodeURIComponent(originalFilename);
 
   await putObject({
     Body: buffer,
@@ -35,7 +36,7 @@ export async function putDatasetMetadataFile({
       "dataset-id": datasetId,
       "file-hash": fileHash,
       "organization-id": organizationId,
-      "original-filename": originalFilename,
+      "original-filename": encodedOriginalFilename,
       "uploaded-by": userId,
     },
   });

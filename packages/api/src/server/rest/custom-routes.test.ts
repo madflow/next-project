@@ -12,7 +12,7 @@ type MetadataFileRow = {
   datasetId: string;
   id: string;
   storageKey: string;
-  uploadedBy: string;
+  uploadedBy: string | null;
 };
 
 function createMetadataDeleteDb(file: MetadataFileRow | null) {
@@ -196,6 +196,31 @@ describe("createCustomRouteHandler", () => {
     assert.equal(response.status, 403);
     assert.deepEqual(await response.json(), {
       error: "You can only delete files you uploaded",
+    });
+    assert.equal(state.deleteCalls, 0);
+  });
+
+  test("returns 403 when a non-admin tries to delete an orphaned metadata file", async () => {
+    const { db, state } = createMetadataDeleteDb({
+      datasetId,
+      id: fileId,
+      storageKey: "datasets/example/metadata/file.pdf",
+      uploadedBy: null,
+    });
+    const handler = createCustomRouteHandler({
+      auth: createMockAuth({ session: userSessionData }),
+      db,
+      pathPrefix: "/rpc",
+    });
+
+    const response = await handler(
+      new Request(`http://localhost/rpc/datasets/${datasetId}/metadata-files/${fileId}`, { method: "DELETE" })
+    );
+
+    assert.ok(response);
+    assert.equal(response.status, 403);
+    assert.deepEqual(await response.json(), {
+      error: "Only admins can delete orphaned files",
     });
     assert.equal(state.deleteCalls, 0);
   });
