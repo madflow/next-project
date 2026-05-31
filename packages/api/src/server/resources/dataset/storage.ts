@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { deleteObject, putObject } from "@repo/storage";
+import { deleteStorageObject, putObject } from "@repo/storage";
 
 type PutDatasetMetadataFileParams = {
   buffer: Buffer;
@@ -44,8 +44,5 @@ export async function putDatasetMetadataFile({
 }
 
 export async function deleteDatasetMetadataFile(storageKey: string) {
-  await deleteObject({
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: storageKey,
-  });
+  await deleteStorageObject(storageKey);
 }
