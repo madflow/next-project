@@ -104,9 +104,7 @@ export const datasetMetadataFile = pgTable(
     organizationId: uuid("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
-    uploadedBy: uuid("uploaded_by")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
+    uploadedBy: uuid("uploaded_by").references(() => user.id, { onDelete: "set null" }),
     name: text("name").notNull(),
     description: text("description"),
     fileType: text("file_type").notNull(),
@@ -124,9 +122,13 @@ export const datasetMetadataFile = pgTable(
   ]
 );
 
-export const insertDatasetMetadataFileSchema = createInsertSchema(datasetMetadataFile);
+export const insertDatasetMetadataFileSchema = createInsertSchema(datasetMetadataFile, {
+  uploadedBy: z.uuid().nullable().optional(),
+});
 export const selectDatasetMetadataFileSchema = createSelectSchema(datasetMetadataFile);
-export const updateDatasetMetadataFileSchema = createUpdateSchema(datasetMetadataFile);
+export const updateDatasetMetadataFileSchema = createUpdateSchema(datasetMetadataFile, {
+  uploadedBy: z.uuid().nullable().optional(),
+});
 
 export type CreateDatasetMetadataFileData = z.infer<typeof insertDatasetMetadataFileSchema>;
 export type DatasetMetadataFile = z.infer<typeof selectDatasetMetadataFileSchema>;

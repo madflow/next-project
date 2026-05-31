@@ -40,6 +40,7 @@ const acceptedExtensions = ".pdf,.docx,.xlsx,.pptx,.odt,.ods,.odp,.webp,.png,.jp
 export function MetadataFileUploadForm({ datasetId, onUploaded }: MetadataFileUploadFormProps) {
   const t = useTranslations("adminDatasetEditor.metadata");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const maxMetadataFileSizeMb = Math.round(MAX_METADATA_FILE_SIZE / (1024 * 1024));
 
   const form = useForm<FormValues>({
     resolver: zodResolver(
@@ -50,7 +51,7 @@ export function MetadataFileUploadForm({ datasetId, onUploaded }: MetadataFileUp
           .min(1, t("validation.file.required"))
           .max(1, t("validation.file.required"))
           .refine((files) => files.every((file) => file.size <= MAX_METADATA_FILE_SIZE), {
-            message: t("validation.file.sizeLimit", { size: 10 }),
+            message: t("validation.file.sizeLimit", { size: maxMetadataFileSizeMb }),
             path: ["file"],
           }),
         metadataType: z.enum(["documentation", "other", "questionnaire", "variable_descriptions"]),

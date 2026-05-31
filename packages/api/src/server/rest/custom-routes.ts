@@ -644,7 +644,7 @@ async function handleDatasetMetadataFileDelete({
 
   if (!authVoter.canAccessAdminOperations(context.principal) && file.uploadedBy !== user.id) {
     throw new ORPCError("FORBIDDEN", {
-      message: "You can only delete files you uploaded",
+      message: file.uploadedBy ? "You can only delete files you uploaded" : "Only admins can delete orphaned files",
       status: 403,
     });
   }

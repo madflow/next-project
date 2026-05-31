@@ -169,6 +169,13 @@
       "when": 1780218705050,
       "tag": "0023_metadata-file-delete-trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1780223339938,
+      "tag": "0024_wild_khan",
+      "breakpoints": true
     }
   ]
 }

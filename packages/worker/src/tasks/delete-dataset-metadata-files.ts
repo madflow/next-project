@@ -15,7 +15,7 @@ type DatasetMetadataFileRowPayload = {
   s3_key: string;
   updated_at: string | null;
   uploaded_at: string;
-  uploaded_by: string;
+  uploaded_by: string | null;
 };
 
 type DatasetMetadataFileDeleteJobPayload = {
