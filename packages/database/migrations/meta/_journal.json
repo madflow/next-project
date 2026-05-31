@@ -155,6 +155,13 @@
       "when": 1780137396673,
       "tag": "0021_goofy_zzzax",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1780175507056,
+      "tag": "0022_sad_energizer",
+      "breakpoints": true
     }
   ]
 }

@@ -186,9 +186,6 @@ importers:
 
   packages/api:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.1056.0
-        version: 3.1056.0
       '@orpc/client':
         specifier: ^1.14.4
         version: 1.14.4(@opentelemetry/api@1.9.1)
@@ -213,9 +210,15 @@ importers:
       '@repo/database':
         specifier: workspace:*
         version: link:../database
+      '@repo/storage':
+        specifier: workspace:*
+        version: link:../storage
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.28.17)(pg@8.21.0)
+      file-type:
+        specifier: ^22.0.0
+        version: 22.0.1
       zod:
         specifier: ^4.4.3
         version: 4.4.3

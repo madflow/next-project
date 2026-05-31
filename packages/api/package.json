@@ -29,7 +29,6 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1056.0",
     "@orpc/client": "^1.14.4",
     "@orpc/contract": "^1.14.4",
     "@orpc/openapi": "^1.14.4",

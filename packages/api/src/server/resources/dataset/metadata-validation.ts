@@ -1,7 +1,7 @@
 import { fileTypeFromBuffer } from "file-type";
 import { createHash } from "node:crypto";
 
-export const MAX_METADATA_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_METADATA_FILE_SIZE = 10 * 1024 * 1024;
 
 const metadataMimeTypes = {
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
