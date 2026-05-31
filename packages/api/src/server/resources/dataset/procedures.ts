@@ -1,6 +1,5 @@
 import { ORPCError } from "@orpc/server";
 import { and, eq, getTableColumns, notExists, sql } from "drizzle-orm";
-import { deleteDataset as deleteDatasetObject } from "@repo/storage";
 import {
   type CreateDatasetProjectData,
   type CreateDatasetSplitVariableData,
@@ -22,6 +21,7 @@ import {
   organization,
   project,
 } from "@repo/database/schema";
+import { deleteDataset as deleteDatasetObject } from "@repo/storage";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
 import { requireOrganizationMembership } from "../../auth/access";
 import { authVoter } from "../../auth/voter";
@@ -32,8 +32,8 @@ import { datasetSplitVariableQueryDefinition } from "../dataset-split-variable/q
 import { datasetVariableQueryDefinition } from "../dataset-variable/query-definition";
 import { datasetVariablesetQueryDefinition } from "../dataset-variableset/query-definition";
 import { requireDatasetAccess } from "./access";
-import { deleteDatasetMetadataFile } from "./storage";
 import { datasetQueryDefinition } from "./query-definition";
+import { deleteDatasetMetadataFile } from "./storage";
 
 const ds = adminApi.dataset;
 const authenticatedDatasetApi = authenticatedApi.dataset;

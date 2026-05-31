@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { and, eq } from "drizzle-orm";
-import { bodyToBuffer, getObject } from "@repo/storage";
 import { dataset, datasetMetadataFile, member } from "@repo/database/schema";
+import { bodyToBuffer, getObject } from "@repo/storage";
 import { authVoter } from "../auth/voter";
 import { type Context, createORPCContext } from "../context";
 import { requireDatasetAccess } from "../resources/dataset/access";
@@ -480,24 +480,26 @@ async function handleDatasetMetadataFilesList({
     .select()
     .from(datasetMetadataFile)
     .where(eq(datasetMetadataFile.datasetId, datasetId))
-    .orderBy(datasetMetadataFile.uploadedAt)
-    .limit(Number(limit))
-    .offset(Number(offset));
+    .orderBy(datasetMetadataFile.uploadedAt);
 
   const filteredRows =
     search && search.trim().length > 0
       ? rows.filter(
           (row) =>
-            row.name.toLowerCase().includes(search.toLowerCase()) || (row.description ?? "").toLowerCase().includes(search.toLowerCase())
+            row.name.toLowerCase().includes(search.toLowerCase()) ||
+            (row.description ?? "").toLowerCase().includes(search.toLowerCase())
         )
       : rows;
+
+  const sortedRows = [...filteredRows].sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
+  const paginatedRows = sortedRows.slice(Number(offset), Number(offset) + Number(limit));
 
   return Response.json({
     count: filteredRows.length,
     limit: Number(limit),
     offset: Number(offset),
     orderBy: [{ direction: "desc", field: "uploadedAt" }],
-    rows: [...filteredRows].sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime()),
+    rows: paginatedRows,
   });
 }
 
