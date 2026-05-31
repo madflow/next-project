@@ -18,7 +18,12 @@ import {
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
-import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import {
+  CHART_Y_AXIS_WIDTH,
+  HORIZONTAL_BAR_MAX_SIZE,
+  PERCENTAGE_CHART_DECIMALS,
+  formatChartValue,
+} from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { resolveSingleSeriesThemeChartColors } from "@/lib/organization-theme";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
@@ -61,6 +66,7 @@ function MultiResponseChartContent({
           left: 0,
         }}
         barCategoryGap={1}
+        maxBarSize={HORIZONTAL_BAR_MAX_SIZE}
         accessibilityLayer
         data={chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />

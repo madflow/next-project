@@ -9,6 +9,7 @@ export const METRICS_CARD_DECIMALS = 1;
  * Chart layout constants
  */
 export const CHART_Y_AXIS_WIDTH = 200;
+export const HORIZONTAL_BAR_MAX_SIZE = 40;
 
 /**
  * Format a chart value with the specified number of decimal places

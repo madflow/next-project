@@ -5,7 +5,12 @@ import { forwardRef } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { extractVariableStats } from "@/lib/analysis-bridge";
-import { CHART_Y_AXIS_WIDTH, MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import {
+  CHART_Y_AXIS_WIDTH,
+  HORIZONTAL_BAR_MAX_SIZE,
+  MEAN_BAR_DECIMALS,
+  formatChartValue,
+} from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type ThemeChartColors } from "@/types/organization";
@@ -50,7 +55,13 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
 
     return (
       <ChartContainer config={chartConfig} chartColors={chartColors} ref={ref} data-export-filename={variable.name}>
-        <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={1} accessibilityLayer data={chartData}>
+        <BarChart
+          layout="vertical"
+          margin={{ left: 0 }}
+          barCategoryGap={1}
+          maxBarSize={HORIZONTAL_BAR_MAX_SIZE}
+          accessibilityLayer
+          data={chartData}>
           <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
           <XAxis
             domain={[minValue, maxValue]}
