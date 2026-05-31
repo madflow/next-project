@@ -489,6 +489,9 @@ importers:
       tsdown:
         specifier: ^0.22.1
         version: 0.22.1(oxc-resolver@11.20.0)(tsx@4.22.3)(typescript@6.0.3)
+      tsx:
+        specifier: ^4.22.3
+        version: 4.22.3
       typescript:
         specifier: ^6.0.3
         version: 6.0.3

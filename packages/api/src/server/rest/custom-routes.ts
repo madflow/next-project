@@ -647,7 +647,6 @@ async function handleDatasetMetadataFileDelete({
     });
   }
 
-  await deleteDatasetMetadataFile(file.storageKey);
   await context.db.delete(datasetMetadataFile).where(eq(datasetMetadataFile.id, fileId));
 
   return Response.json({ success: true });

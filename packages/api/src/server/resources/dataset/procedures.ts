@@ -11,7 +11,6 @@ import {
   type Organization,
   type Project as ProjectRecord,
   type UpdateDatasetData,
-  datasetMetadataFile,
   datasetProject as datasetProjectTable,
   datasetSplitVariable as datasetSplitVariableTable,
   dataset as datasetTable,
@@ -21,7 +20,6 @@ import {
   organization,
   project,
 } from "@repo/database/schema";
-import { deleteDataset as deleteDatasetObject } from "@repo/storage";
 import { type CollectionInput, collectionInputSchema } from "../../../shared/contract/collection";
 import { requireOrganizationMembership } from "../../auth/access";
 import { authVoter } from "../../auth/voter";
@@ -33,7 +31,6 @@ import { datasetVariableQueryDefinition } from "../dataset-variable/query-defini
 import { datasetVariablesetQueryDefinition } from "../dataset-variableset/query-definition";
 import { requireDatasetAccess } from "./access";
 import { datasetQueryDefinition } from "./query-definition";
-import { deleteDatasetMetadataFile } from "./storage";
 
 const ds = adminApi.dataset;
 const authenticatedDatasetApi = authenticatedApi.dataset;
@@ -257,11 +254,6 @@ const update = ds.update.handler(async ({ context, input }) => {
 });
 
 const remove = ds.delete.handler(async ({ context, input }) => {
-  const metadataFiles = await context.db
-    .select({ storageKey: datasetMetadataFile.storageKey })
-    .from(datasetMetadataFile)
-    .where(eq(datasetMetadataFile.datasetId, input.id));
-
   let deletedDataset: DatasetRecord | undefined;
 
   try {
@@ -282,11 +274,6 @@ const remove = ds.delete.handler(async ({ context, input }) => {
       status: 404,
     });
   }
-
-  void Promise.allSettled([
-    deleteDatasetObject(deletedDataset.storageKey),
-    ...metadataFiles.map((metadataFile) => deleteDatasetMetadataFile(metadataFile.storageKey)),
-  ]);
 
   return deletedDataset;
 });

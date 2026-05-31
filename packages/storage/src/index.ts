@@ -96,11 +96,15 @@ export async function putDataset(file: File, contentType: string, organizationId
   };
 }
 
-export async function deleteDataset(storageKey: string) {
+export async function deleteStorageObject(storageKey: string) {
   await deleteObject({
     Bucket: process.env.S3_BUCKET_NAME,
     Key: storageKey,
   });
+}
+
+export async function deleteDataset(storageKey: string) {
+  await deleteStorageObject(storageKey);
 }
 
 export { S3ServiceException } from "@aws-sdk/client-s3";

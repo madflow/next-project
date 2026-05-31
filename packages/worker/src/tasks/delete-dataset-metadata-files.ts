@@ -1,27 +1,29 @@
 import type { Task } from "graphile-worker";
-import { deleteDataset } from "@repo/storage";
+import { deleteStorageObject } from "@repo/storage";
 
-type DatasetRowPayload = {
+type DatasetMetadataFileRowPayload = {
   created_at: string;
+  dataset_id: string;
   description: string | null;
   file_hash: string;
   file_size: number;
   file_type: string;
-  filename: string;
   id: string;
+  metadata_type: string;
   name: string;
   organization_id: string;
-  storage_key: string;
+  s3_key: string;
   updated_at: string | null;
   uploaded_at: string;
+  uploaded_by: string;
 };
 
-type DatasetDeleteJobPayload = {
-  data: DatasetRowPayload;
+type DatasetMetadataFileDeleteJobPayload = {
+  data: DatasetMetadataFileRowPayload;
   job_id: string;
 };
 
-function isDatasetDeleteJobPayload(value: unknown): value is DatasetDeleteJobPayload {
+function isDatasetMetadataFileDeleteJobPayload(value: unknown): value is DatasetMetadataFileDeleteJobPayload {
   if (typeof value !== "object" || value === null) {
     return false;
   }
@@ -38,24 +40,26 @@ function isDatasetDeleteJobPayload(value: unknown): value is DatasetDeleteJobPay
 
   const data = payload.data as Record<string, unknown>;
 
-  return typeof data.id === "string" && typeof data.storage_key === "string";
+  return typeof data.dataset_id === "string" && typeof data.id === "string" && typeof data.s3_key === "string";
 }
 
-export function createDeleteDatasetFilesTask(deleteDatasetObject: typeof deleteDataset = deleteDataset): Task {
+export function createDeleteDatasetMetadataFilesTask(
+  deleteMetadataObject: typeof deleteStorageObject = deleteStorageObject
+): Task {
   return async (payload, helpers) => {
-    if (!isDatasetDeleteJobPayload(payload)) {
-      throw new Error("Invalid delete_dataset_files payload");
+    if (!isDatasetMetadataFileDeleteJobPayload(payload)) {
+      throw new Error("Invalid delete_dataset_metadata_files payload");
     }
 
     const {
-      data: { id: datasetId, storage_key: storageKey },
+      data: { dataset_id: datasetId, id: metadataFileId, s3_key: storageKey },
       job_id,
     } = payload;
 
-    helpers.logger.info(`Deleting dataset file for dataset ${datasetId} (job_id: ${job_id})`);
+    helpers.logger.info(`Deleting metadata file ${metadataFileId} for dataset ${datasetId} (job_id: ${job_id})`);
 
     try {
-      await deleteDatasetObject(storageKey);
+      await deleteMetadataObject(storageKey);
       await helpers.withPgClient(async (client) => {
         await client.query("UPDATE public.jobs SET status = 'completed'::job_status, last_error = NULL WHERE id = $1", [
           job_id,
@@ -68,11 +72,13 @@ export function createDeleteDatasetFilesTask(deleteDatasetObject: typeof deleteD
         await client.query("UPDATE public.jobs SET last_error = $2 WHERE id = $1", [job_id, lastError]);
       });
 
-      helpers.logger.error(`Failed to delete dataset file for dataset ${datasetId} (job_id: ${job_id}): ${lastError}`);
+      helpers.logger.error(
+        `Failed to delete metadata file ${metadataFileId} for dataset ${datasetId} (job_id: ${job_id}): ${lastError}`
+      );
 
       throw error;
     }
   };
 }
 
-export const deleteDatasetFiles = createDeleteDatasetFilesTask();
+export const deleteDatasetMetadataFiles = createDeleteDatasetMetadataFilesTask();
