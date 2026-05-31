@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useMemo } from "react";
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { useThemeConfig } from "@/components/active-theme";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,7 @@ import {
   HORIZONTAL_BAR_MAX_SIZE,
   PERCENTAGE_CHART_DECIMALS,
   formatChartValue,
+  getHorizontalChartHeight,
 } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { resolveSingleSeriesThemeChartColors } from "@/lib/organization-theme";
@@ -58,8 +59,17 @@ function MultiResponseChartContent({
   fileName: string;
   disableAnimation?: boolean;
 }) {
+  const chartHeight = getHorizontalChartHeight(chartData.length);
+
   return (
-    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={fileName}>
+    <ChartContainer
+      config={chartConfig}
+      chartColors={chartColors}
+      ref={chartRef}
+      className="aspect-auto"
+      style={{ height: chartHeight }}
+      initialDimension={{ width: 320, height: chartHeight }}
+      data-export-filename={fileName}>
       <BarChart
         layout="vertical"
         margin={{
@@ -94,9 +104,6 @@ function MultiResponseChartContent({
           dataKey="percentage"
           fill="var(--color-percentage)"
           isAnimationActive={disableAnimation ? false : undefined}>
-          {chartData.map((entry, index) => (
-            <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
-          ))}
           <LabelList
             dataKey="percentage"
             position="right"

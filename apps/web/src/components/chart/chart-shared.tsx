@@ -12,6 +12,7 @@ import {
   HORIZONTAL_BAR_MAX_SIZE,
   PERCENTAGE_CHART_DECIMALS,
   formatChartValue,
+  getHorizontalChartHeight,
 } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates, getPlotAreaVerticalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariable } from "@/types/dataset-variable";
@@ -97,9 +98,17 @@ export function HorizontalBarChartContent({
   }> = isMultiResponseIndividual
     ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
     : transformToRechartsBarData(variable, stats);
+  const chartHeight = getHorizontalChartHeight(chartData.length);
 
   return (
-    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
+    <ChartContainer
+      config={chartConfig}
+      chartColors={chartColors}
+      ref={chartRef}
+      className="aspect-auto"
+      style={{ height: chartHeight }}
+      initialDimension={{ width: 320, height: chartHeight }}
+      data-export-filename={variable.name}>
       <BarChart
         layout="vertical"
         margin={{ left: 0 }}
@@ -133,9 +142,6 @@ export function HorizontalBarChartContent({
           dataKey="percentage"
           fill="var(--color-percentage)"
           isAnimationActive={disableAnimation ? false : undefined}>
-          {chartData.map((entry, index) => (
-            <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
-          ))}
           <LabelList
             dataKey="percentage"
             position="right"
