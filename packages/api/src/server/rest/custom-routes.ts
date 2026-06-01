@@ -8,6 +8,7 @@ import { type Context, createORPCContext } from "../context";
 import { requireDatasetAccess } from "../resources/dataset/access";
 import { validateMetadataFile } from "../resources/dataset/metadata-validation";
 import { deleteDatasetMetadataFile, putDatasetMetadataFile } from "../resources/dataset/storage";
+import { createAttachmentContentDisposition } from "./content-disposition";
 import type { CreateOpenAPIHandlerOptions } from "./create-openapi-handler";
 import type { RouteDefinition } from "./routes/types";
 import { variablesetRoutes } from "./routes/variableset";
@@ -434,10 +435,11 @@ async function handleDatasetDownload({ context, params }: { context: Context; pa
   }
 
   try {
+    const contentDisposition = createAttachmentContentDisposition(dataFile.filename);
     const response = await getObject({
       Bucket: bucket,
       Key: dataFile.storageKey,
-      ResponseContentDisposition: `attachment; filename="${dataFile.filename}"`,
+      ResponseContentDisposition: contentDisposition,
     });
 
     if (!response.Body) {
@@ -450,7 +452,7 @@ async function handleDatasetDownload({ context, params }: { context: Context; pa
     return new Response(new Uint8Array(buffer), {
       headers: {
         "Cache-Control": "private, max-age=0, must-revalidate",
-        "Content-Disposition": `attachment; filename="${dataFile.filename}"`,
+        "Content-Disposition": contentDisposition,
         "Content-Length": buffer.length.toString(),
         "Content-Type": dataFile.fileType || "application/octet-stream",
       },
@@ -600,10 +602,11 @@ async function handleDatasetMetadataFileDownload({
     return new Response("File not found", { status: 404 });
   }
 
+  const contentDisposition = createAttachmentContentDisposition(file.name);
   const response = await getObject({
     Bucket: getRequiredEnv("S3_BUCKET_NAME"),
     Key: file.storageKey,
-    ResponseContentDisposition: `attachment; filename="${file.name}"`,
+    ResponseContentDisposition: contentDisposition,
   });
 
   if (!response.Body) {
@@ -615,7 +618,7 @@ async function handleDatasetMetadataFileDownload({
   return new Response(new Uint8Array(buffer), {
     headers: {
       "Cache-Control": "private, max-age=0, must-revalidate",
-      "Content-Disposition": `attachment; filename="${file.name}"`,
+      "Content-Disposition": contentDisposition,
       "Content-Length": buffer.length.toString(),
       "Content-Type": file.fileType || "application/octet-stream",
     },

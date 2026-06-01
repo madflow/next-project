@@ -11,6 +11,7 @@ import { VariableSetExportFileSchema, VariableSetImportOptionsSchema } from "../
 import { authVoter } from "../../auth/voter";
 import type { Context } from "../../context";
 import { exportVariableSets, importVariableSets } from "../../resources/dataset-variableset/transfer-service";
+import { createAttachmentContentDisposition } from "../content-disposition";
 import type { RouteDefinition } from "./types";
 
 function jsonError(status: number, message: string) {
@@ -281,7 +282,7 @@ async function handleDatasetVariablesetExport({
   return new Response(JSON.stringify(exportData, null, 2), {
     headers: {
       "Cache-Control": "private, max-age=0, must-revalidate",
-      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Disposition": createAttachmentContentDisposition(filename),
       "Content-Type": "application/json",
     },
   });
