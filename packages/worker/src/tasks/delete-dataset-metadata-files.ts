@@ -40,7 +40,7 @@ function isDatasetMetadataFileDeleteJobPayload(value: unknown): value is Dataset
 
   const data = payload.data as Record<string, unknown>;
 
-  return typeof data.dataset_id === "string" && typeof data.id === "string" && typeof data.s3_key === "string";
+  return typeof data.dataset_id === "string" && typeof data.id === "string" && typeof data.storage_key === "string";
 }
 
 export function createDeleteDatasetMetadataFilesTask(
