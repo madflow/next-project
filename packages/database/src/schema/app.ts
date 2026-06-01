@@ -110,7 +110,7 @@ export const datasetMetadataFile = pgTable(
     fileType: text("file_type").notNull(),
     fileSize: bigint("file_size", { mode: "number" }).notNull(),
     fileHash: text("file_hash").notNull(),
-    storageKey: text("s3_key").notNull(),
+    storageKey: text("storage_key").notNull(), // S3/Storage object key/path
     metadataType: datasetMetadataFileTypeEnum("metadata_type").notNull().default("other"),
     uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
