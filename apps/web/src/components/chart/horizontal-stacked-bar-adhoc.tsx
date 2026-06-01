@@ -15,7 +15,12 @@ import {
   transformToRechartsStackedBarData,
   transformToSplitVariableStackedBarData,
 } from "@/lib/analysis-bridge";
-import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import {
+  HORIZONTAL_BAR_MAX_SIZE,
+  PERCENTAGE_CHART_DECIMALS,
+  formatChartValue,
+  getHorizontalChartHeight,
+} from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
@@ -90,13 +95,23 @@ function HorizontalStackedBarChart({
   tooltipContent?: React.ReactElement;
   disableAnimation?: boolean;
 }) {
+  const chartHeight = getHorizontalChartHeight(model.chartData.length, !hideLegend);
+
   return (
     <ChartContainer
       config={model.chartConfig}
       chartColors={chartColors}
       ref={chartRef}
+      className="aspect-auto"
+      style={{ height: chartHeight }}
+      initialDimension={{ width: 320, height: chartHeight }}
       data-export-filename={exportFilename}>
-      <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={model.chartData}>
+      <BarChart
+        layout="vertical"
+        margin={{ left: 0 }}
+        maxBarSize={HORIZONTAL_BAR_MAX_SIZE}
+        accessibilityLayer
+        data={model.chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis
           domain={[0, 100]}
