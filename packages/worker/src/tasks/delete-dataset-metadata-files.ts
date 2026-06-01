@@ -12,7 +12,7 @@ type DatasetMetadataFileRowPayload = {
   metadata_type: string;
   name: string;
   organization_id: string;
-  s3_key: string;
+  storage_key: string;
   updated_at: string | null;
   uploaded_at: string;
   uploaded_by: string | null;
@@ -52,7 +52,7 @@ export function createDeleteDatasetMetadataFilesTask(
     }
 
     const {
-      data: { dataset_id: datasetId, id: metadataFileId, s3_key: storageKey },
+      data: { dataset_id: datasetId, id: metadataFileId, storage_key: storageKey },
       job_id,
     } = payload;
 
