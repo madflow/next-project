@@ -7,7 +7,7 @@ type DatasetMetadataFileDeleteJobPayload = {
   data: {
     dataset_id: string;
     id: string;
-    s3_key: string;
+    storage_key: string;
   };
   job_id: string;
 };
@@ -28,7 +28,7 @@ function createPayload(jobId = "550e8400-e29b-41d4-a716-446655440100"): DatasetM
     data: {
       dataset_id: "550e8400-e29b-41d4-a716-446655440000",
       id: "550e8400-e29b-41d4-a716-446655440050",
-      s3_key: "datasets/example/metadata/file.pdf",
+      storage_key: "datasets/example/metadata/file.pdf",
     },
     job_id: jobId,
   };
@@ -73,7 +73,7 @@ describe("createDeleteDatasetMetadataFilesTask", () => {
 
     await task(payload, helpers);
 
-    assert.deepEqual(deletedKeys, [payload.data.s3_key]);
+    assert.deepEqual(deletedKeys, [payload.data.storage_key]);
     assert.deepEqual(queries, [
       {
         params: [payload.job_id],
