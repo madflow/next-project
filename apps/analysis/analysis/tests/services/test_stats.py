@@ -695,7 +695,9 @@ def test_describe_var_applies_missing_values_only_to_target_column(
     rows = 300
     wide_data = {f"c{i}": [float(i % 3) for _ in range(rows)] for i in range(220)}
     wide_data["text"] = ["A" if i % 2 == 0 else "B" for i in range(rows)]
-    wide_data["recv10_6"] = [(-999.0 if i % 17 == 0 else float(i % 2)) for i in range(rows)]
+    wide_data["recv10_6"] = [
+        (-999.0 if i % 17 == 0 else float(i % 2)) for i in range(rows)
+    ]
     df = pd.DataFrame(wide_data)
 
     result = stats_service.describe_var(
