@@ -11,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAppContext } from "@/context/app-context";
@@ -43,6 +45,8 @@ type ChartPanelCardProps = {
   isMultiResponseIndividual?: boolean;
   splitVariables?: DatasetVariableWithAttributes[];
   isSplitVariablesLoading?: boolean;
+  sortByCountDesc?: boolean;
+  onSortByCountDescChangeAction?: (value: boolean) => void;
 };
 
 export function ChartPanelCard({
@@ -66,13 +70,27 @@ export function ChartPanelCard({
   isMultiResponseIndividual = false,
   splitVariables,
   isSplitVariablesLoading,
+  sortByCountDesc,
+  onSortByCountDescChangeAction,
 }: ChartPanelCardProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const { debugMode } = useAppContext();
 
   const footerActions = footerContent ?? (
     <>
-      <div>
+      <div className="flex items-center gap-2">
+        {(selectedChartType === "horizontalBar" || selectedChartType === "pie") &&
+          onSortByCountDescChangeAction !== undefined && (
+            <div className="flex items-center gap-2">
+              <Switch
+                id="sort-by-count"
+                size="sm"
+                checked={sortByCountDesc ?? false}
+                onCheckedChange={onSortByCountDescChangeAction}
+              />
+              <Label htmlFor="sort-by-count">{t("sortByCount")}</Label>
+            </div>
+          )}
         {datasetId && onSplitVariableChangeAction && canUseSplitVariable && (
           <SplitVariableSelector
             datasetId={datasetId}

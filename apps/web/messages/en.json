@@ -1211,6 +1211,7 @@
         "previous": "Previous"
       }
     },
+    "sortByCount": "Sort by count",
     "variablePanel": {
       "hidePanel": "Hide variables",
       "showPanel": "Show variables",

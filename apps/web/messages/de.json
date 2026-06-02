@@ -1211,6 +1211,7 @@
         "previous": "Zurück"
       }
     },
+    "sortByCount": "Nach Anzahl sortieren",
     "variablePanel": {
       "hidePanel": "Variablen ausblenden",
       "showPanel": "Variablen anzeigen",
