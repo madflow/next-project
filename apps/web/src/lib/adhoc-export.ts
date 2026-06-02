@@ -140,6 +140,7 @@ type VariableChartExportOptions = {
   metaLine: string;
   metricsLabels: MetricLabels;
   palette: string[];
+  sortByCountDesc?: boolean;
   stats: StatsResponse;
   variable: DatasetVariableWithAttributes;
 };
@@ -506,6 +507,7 @@ export function createVariableChartExcelExportPayload({
   metaLine,
   metricsLabels,
   palette,
+  sortByCountDesc,
   stats,
   variable,
 }: VariableChartExcelExportOptions): AdhocExcelExportPayload {
@@ -517,6 +519,7 @@ export function createVariableChartExcelExportPayload({
     metaLine,
     metricsLabels,
     palette,
+    sortByCountDesc,
     stats,
     variable,
   });
@@ -563,11 +566,14 @@ export function createVariableChartPowerPointExportPayload({
   metaLine,
   metricsLabels,
   palette,
+  sortByCountDesc,
   stats,
   variable,
 }: VariableChartExportOptions): AdhocPowerPointExportPayload {
   const title = getVariableLabel(variable);
   const file_name = buildPowerPointFileName(fileBaseName ?? variable.name);
+
+  const chartSortConfig = sortByCountDesc ? { field: "counts" as const, direction: "desc" as const } : undefined;
 
   switch (chartType) {
     case "bar": {
@@ -578,14 +584,14 @@ export function createVariableChartPowerPointExportPayload({
         palette,
         chart: {
           kind: "bar",
-          points: mapDistributionPoints(transformToRechartsBarData(variable, stats), palette, true),
+          points: mapDistributionPoints(transformToRechartsBarData(variable, stats, chartSortConfig), palette, true),
         },
       };
     }
     case "horizontalBar": {
       const points = isMultiResponseIndividual
         ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
-        : transformToRechartsBarData(variable, stats);
+        : transformToRechartsBarData(variable, stats, chartSortConfig);
 
       return {
         file_name,
@@ -637,7 +643,7 @@ export function createVariableChartPowerPointExportPayload({
         palette,
         chart: {
           kind: "pie",
-          points: transformToRechartsPieData(variable, stats).map((point, index) => ({
+          points: transformToRechartsPieData(variable, stats, chartSortConfig).map((point, index) => ({
             label: String(point.label),
             value: roundExportValue(point.percentage),
             color: palette[index] ?? DEFAULT_EXPORT_PALETTE[index % DEFAULT_EXPORT_PALETTE.length]!,

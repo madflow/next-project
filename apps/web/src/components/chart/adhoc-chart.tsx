@@ -271,6 +271,7 @@ export function AdhocChart({
           stdev: tChart("stdev"),
         },
         palette,
+        sortByCountDesc,
         stats,
         variable,
       });
@@ -290,6 +291,7 @@ export function AdhocChart({
     exportMetaLine,
     fallbackChartColors,
     isMultiResponseIndividual,
+    sortByCountDesc,
     stats,
     t,
     tChart,
@@ -326,6 +328,7 @@ export function AdhocChart({
           stdev: tChart("stdev"),
         },
         palette,
+        sortByCountDesc,
         stats,
         variable,
       });
@@ -345,6 +348,7 @@ export function AdhocChart({
     exportMetaLine,
     fallbackChartColors,
     isMultiResponseIndividual,
+    sortByCountDesc,
     stats,
     t,
     tChart,
