@@ -104,7 +104,13 @@ function getSortedFrequencyTable(
   return copiedFrequencyTable.sort((a, b) => {
     let comparison: number;
     if (sortConfig.field === "value") {
-      comparison = parseFloat(a.value.toString()) - parseFloat(b.value.toString());
+      const numA = parseFloat(a.value.toString());
+      const numB = parseFloat(b.value.toString());
+      if (!isNaN(numA) && !isNaN(numB)) {
+        comparison = numA - numB;
+      } else {
+        comparison = String(a.value).localeCompare(String(b.value));
+      }
     } else {
       comparison = a.counts - b.counts;
     }
