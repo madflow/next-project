@@ -14,13 +14,13 @@ uv sync --dev
 
 ### Using uv (Recommended)
 
-1.  **Navigate to the application directory:**
+1. **Navigate to the application directory:**
 
     ```bash
     cd apps/analysis
     ```
 
-2.  **Install dependencies and create a virtual environment:**
+2. **Install dependencies and create a virtual environment:**
 
     `uv` will create `.venv` automatically and install all project dependencies.
 
@@ -28,7 +28,7 @@ uv sync --dev
     uv sync --dev
     ```
 
-3.  **Activate the virtual environment (optional, `uv run` manages it for you):**
+3. **Activate the virtual environment (optional, `uv run` manages it for you):**
 
     If you need to activate the virtual environment manually, you can do so:
 
@@ -43,3 +43,8 @@ To start the analysis application, use the following command:
 ```bash
 uv run python -m analysis
 ```
+
+## Resources
+
+- <https://github.com/scanny/python-pptx>
+- <https://github.com/CodeHalwell/power-pptx>
