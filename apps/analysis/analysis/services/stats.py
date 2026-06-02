@@ -419,7 +419,7 @@ class StatisticsService:
         def sort_key(item: Any) -> tuple[int, float | str]:
             try:
                 return (0, float(item))  # Numeric values get priority
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 return (1, str(item))  # String values come after numbers
 
         split_categories = sorted(split_categories, key=sort_key)
@@ -597,7 +597,7 @@ class StatisticsService:
                     value = row["value"]
                     try:
                         value_str = str(value) if pd.notna(value).item() else value
-                    except (AttributeError, ValueError):
+                    except AttributeError, ValueError:
                         value_str = str(value)
 
                     value_to_data[value_str] = {
@@ -633,7 +633,7 @@ class StatisticsService:
                     # (e.g., "1.0" stays "1.0")
                     try:
                         value = str(value) if pd.notna(value).item() else value
-                    except (AttributeError, ValueError):
+                    except AttributeError, ValueError:
                         value = str(value)
 
                     frequency_records.append(
@@ -651,7 +651,7 @@ class StatisticsService:
             def sort_key(item: dict[str, Any]) -> tuple[int, float | str]:
                 try:
                     return (0, float(item["value"]))  # Numeric values get priority
-                except (ValueError, TypeError):
+                except ValueError, TypeError:
                     return (1, str(item["value"]))  # String values come after numbers
 
             frequency_records.sort(key=sort_key)
