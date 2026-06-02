@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
-import { useSplitVariables } from "../chart/use-split-variables";
+import { useSplitVariables } from "../chart/split-variable/use-split-variables";
 
 type SplitVariableSelectorProps = {
   datasetId: string;

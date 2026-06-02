@@ -25,9 +25,9 @@ import {
   type HorizontalStackedBarModel,
   createSingleHorizontalStackedBarModel,
   createSplitHorizontalStackedBarModel,
-} from "./horizontal-stacked-bar-model";
+} from "./model";
 
-type HorizontalStackedBarAdhocProps = {
+type HorizontalStackedBarRendererProps = {
   variable: DatasetVariable;
   stats: StatsResponse;
   chartColors?: ThemeChartColors;
@@ -140,7 +140,7 @@ function HorizontalStackedBarChart({
   );
 }
 
-export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalStackedBarAdhocProps>(
+export const HorizontalStackedBarRenderer = forwardRef<HTMLDivElement, HorizontalStackedBarRendererProps>(
   (
     { variable, stats, chartColors, isMultiResponseIndividual = false, countedValue = 1, disableAnimation = false },
     ref
@@ -182,4 +182,4 @@ export const HorizontalStackedBarAdhoc = forwardRef<HTMLDivElement, HorizontalSt
   }
 );
 
-HorizontalStackedBarAdhoc.displayName = "HorizontalStackedBarAdhoc";
+HorizontalStackedBarRenderer.displayName = "HorizontalStackedBarRenderer";

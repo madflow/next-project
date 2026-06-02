@@ -23,7 +23,6 @@ export function UnsupportedChartPlaceholder({
   className,
   "data-testid": dataTestId,
 }: UnsupportedChartPlaceholderProps) {
-  // Determine the label to use
   const displayLabel = variable ? getVariableLabel(variable) : (variableLabel ?? variableName);
 
   return (
