@@ -433,13 +433,13 @@ export function AdhocChart({
         description={splitVariableDescription}
         chartContent={chartContent}
         exportable={actualSelectedChartType !== "textExplorer"}
-        onExportImage={exportPNG}
-        onExportExcel={handleExcelExport}
-        onExportPowerPoint={handlePowerPointExport}
+        onExportImageAction={exportPNG}
+        onExportExcelAction={handleExcelExport}
+        onExportPowerPointAction={handlePowerPointExport}
         exportDisabled={!datasetId}
         availableChartTypes={chartSelection.availableChartTypes}
         selectedChartType={actualSelectedChartType}
-        onChartTypeChange={(chartType) =>
+        onChartTypeChangeAction={(chartType) =>
           setChartSelectionState((prev) => ({
             ...prev,
             [chartStateKey]: chartType,
