@@ -1,7 +1,7 @@
 import {
   createSingleHorizontalStackedBarModel,
   createSplitHorizontalStackedBarModel,
-} from "@/components/chart/horizontal-stacked-bar-model";
+} from "@/components/chart/renderers/horizontal-stacked-bar/model";
 import {
   extractVariableStats,
   hasSplitVariableStatsForVariable,

@@ -16,7 +16,7 @@ import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 
 const PAGE_SIZE = 5;
 
-type TextExplorerAdhocProps = {
+type TextExplorerRendererProps = {
   variable: DatasetVariableWithAttributes;
   datasetId?: string;
 };
@@ -48,7 +48,7 @@ function buildPageNumbers(currentPage: number, totalPages: number): (number | "e
   return pages;
 }
 
-export function TextExplorerAdhoc({ variable, datasetId }: TextExplorerAdhocProps) {
+export function TextExplorerRenderer({ variable, datasetId }: TextExplorerRendererProps) {
   const t = useTranslations("projectAdhocAnalysis.textExplorer");
   const variableKey = `${datasetId}:${variable.name}`;
   const [pageByKey, setPageByKey] = useState<Record<string, number>>({});

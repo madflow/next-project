@@ -11,14 +11,14 @@ import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type ThemeChartColors } from "@/types/organization";
 import { type StatsResponse } from "@/types/stats";
 
-type MeanBarAdhocProps = {
+type MeanBarRendererProps = {
   variable: DatasetVariableWithAttributes;
   stats: StatsResponse;
   chartColors?: ThemeChartColors;
   disableAnimation?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
+export const MeanBarRenderer = forwardRef<HTMLDivElement, MeanBarRendererProps>(
   ({ variable, stats, chartColors, disableAnimation = false }, ref) => {
     const t = useTranslations("chartMetricsCard");
     const variableStats = extractVariableStats(variable, stats);
@@ -88,4 +88,4 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
   }
 );
 
-MeanBarAdhoc.displayName = "MeanBarAdhoc";
+MeanBarRenderer.displayName = "MeanBarRenderer";

@@ -19,15 +19,16 @@ import { useAppContext } from "@/context/app-context";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
-import { SplitVariableSelector } from "../project/split-variable-selector";
-import { Code } from "../ui/code";
-import { ChartExportMenu } from "./chart-export-menu";
-import { getChartIcon } from "./chart-helpers";
+import { SplitVariableSelector } from "../../project/split-variable-selector";
+import { Code } from "../../ui/code";
+import { ChartExportMenu } from "./export-menu";
+import { ChartTypeIcon } from "./type-icon";
 
 type ChartPanelCardProps = {
-  variable: DatasetVariableWithAttributes;
-  stats: StatsResponse;
-  description: string | null;
+  variable?: DatasetVariableWithAttributes;
+  stats?: StatsResponse;
+  title?: ReactNode;
+  description?: ReactNode;
   chartContent: ReactNode;
   footerContent?: ReactNode;
   exportable?: boolean;
@@ -52,6 +53,7 @@ type ChartPanelCardProps = {
 export function ChartPanelCard({
   variable,
   stats,
+  title,
   description,
   chartContent,
   footerContent,
@@ -75,6 +77,7 @@ export function ChartPanelCard({
 }: ChartPanelCardProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const { debugMode } = useAppContext();
+  const resolvedTitle = title ?? (variable ? getVariableLabel(variable) : null);
 
   const footerActions = footerContent ?? (
     <>
@@ -125,7 +128,7 @@ export function ChartPanelCard({
       <TabsContent value="chart">
         <Card className="shadow-xs">
           <CardHeader>
-            <CardTitle>{getVariableLabel(variable)}</CardTitle>
+            {resolvedTitle && <CardTitle>{resolvedTitle}</CardTitle>}
             {description && <CardDescription>{description}</CardDescription>}
             {availableChartTypes.length > 1 && !isMultiResponseIndividual && (
               <CardAction>
@@ -137,7 +140,7 @@ export function ChartPanelCard({
                   data-testid="chart-type-selector">
                   {availableChartTypes.map((chartType) => (
                     <ToggleGroupItem key={chartType} value={chartType} data-testid={`chart-type-${chartType}`}>
-                      {getChartIcon(chartType)}
+                      <ChartTypeIcon chartType={chartType} />
                     </ToggleGroupItem>
                   ))}
                 </ToggleGroup>
@@ -148,11 +151,11 @@ export function ChartPanelCard({
           <CardFooter className="flex items-center justify-between border-t">{footerActions}</CardFooter>
         </Card>
       </TabsContent>
-      {debugMode && (
+      {debugMode && variable && (
         <TabsContent value="variable">
           <Card className="shadow-xs">
             <CardHeader>
-              <CardTitle>{getVariableLabel(variable)}</CardTitle>
+              {resolvedTitle && <CardTitle>{resolvedTitle}</CardTitle>}
               {description && <CardDescription>{description}</CardDescription>}
             </CardHeader>
             <CardContent>
@@ -161,11 +164,11 @@ export function ChartPanelCard({
           </Card>
         </TabsContent>
       )}
-      {debugMode && (
+      {debugMode && stats && (
         <TabsContent value="stats">
           <Card className="shadow-xs">
             <CardHeader>
-              <CardTitle>{getVariableLabel(variable)}</CardTitle>
+              {resolvedTitle && <CardTitle>{resolvedTitle}</CardTitle>}
               {description && <CardDescription>{description}</CardDescription>}
             </CardHeader>
             <CardContent>

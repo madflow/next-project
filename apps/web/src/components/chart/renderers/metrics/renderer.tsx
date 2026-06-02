@@ -51,7 +51,7 @@ function MetricHelp({
   );
 }
 
-export function MetricsCards({ variable, stats }: MetricsCardsProps) {
+export function MetricsRenderer({ variable, stats }: MetricsCardsProps) {
   const t = useTranslations("chartMetricsCard");
   const variableStats = getVariableStats(variable, stats);
 
