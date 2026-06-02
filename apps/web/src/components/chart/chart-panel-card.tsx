@@ -31,13 +31,13 @@ type ChartPanelCardProps = {
   chartContent: ReactNode;
   footerContent?: ReactNode;
   exportable?: boolean;
-  onExportImage?: () => void;
-  onExportExcel?: () => void;
-  onExportPowerPoint?: () => void;
+  onExportImageAction?: () => void;
+  onExportExcelAction?: () => void;
+  onExportPowerPointAction?: () => void;
   exportDisabled?: boolean;
   availableChartTypes: AnalysisChartType[];
   selectedChartType: AnalysisChartType;
-  onChartTypeChange: (chartType: AnalysisChartType) => void;
+  onChartTypeChangeAction: (chartType: AnalysisChartType) => void;
   selectedSplitVariable?: string | null;
   onSplitVariableChangeAction?: (splitVariable: string | null) => void;
   canUseSplitVariable?: boolean;
@@ -56,13 +56,13 @@ export function ChartPanelCard({
   chartContent,
   footerContent,
   exportable = true,
-  onExportImage,
-  onExportExcel,
-  onExportPowerPoint,
+  onExportImageAction: onExportImage,
+  onExportExcelAction: onExportExcel,
+  onExportPowerPointAction: onExportPowerPoint,
   exportDisabled = false,
   availableChartTypes,
   selectedChartType,
-  onChartTypeChange,
+  onChartTypeChangeAction: onChartTypeChange,
   selectedSplitVariable,
   onSplitVariableChangeAction,
   canUseSplitVariable = false,
@@ -105,9 +105,9 @@ export function ChartPanelCard({
       {exportable && onExportImage && onExportExcel && onExportPowerPoint && (
         <ChartExportMenu
           disabled={exportDisabled}
-          onExportImage={onExportImage}
-          onExportExcel={onExportExcel}
-          onExportPowerPoint={onExportPowerPoint}
+          onExportImageAction={onExportImage}
+          onExportExcelAction={onExportExcel}
+          onExportPowerPointAction={onExportPowerPoint}
         />
       )}
     </>

@@ -50,7 +50,7 @@ export const MeanBarAdhoc = forwardRef<HTMLDivElement, MeanBarAdhocProps>(
 
     return (
       <ChartContainer config={chartConfig} chartColors={chartColors} ref={ref} data-export-filename={variable.name}>
-        <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={1} accessibilityLayer data={chartData}>
+        <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={4} accessibilityLayer data={chartData}>
           <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
           <XAxis
             domain={[minValue, maxValue]}

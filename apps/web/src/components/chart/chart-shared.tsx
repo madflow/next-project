@@ -98,7 +98,7 @@ export function HorizontalBarChartContent({
 
   return (
     <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
-      <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={1} accessibilityLayer data={chartData}>
+      <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={4} accessibilityLayer data={chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis
           domain={[0, 100]}

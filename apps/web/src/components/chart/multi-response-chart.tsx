@@ -62,7 +62,7 @@ function MultiResponseChartContent({
         margin={{
           left: 0,
         }}
-        barCategoryGap={1}
+        barCategoryGap={4}
         accessibilityLayer
         data={chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
@@ -268,9 +268,9 @@ export function MultiResponseChart({
           <Label htmlFor="sort-by-count-mr">{tAdhoc("sortByCount")}</Label>
         </div>
         <ChartExportMenu
-          onExportImage={exportPNG}
-          onExportExcel={handleExcelExport}
-          onExportPowerPoint={handlePowerPointExport}
+          onExportImageAction={exportPNG}
+          onExportExcelAction={handleExcelExport}
+          onExportPowerPointAction={handlePowerPointExport}
         />
       </CardFooter>
     </Card>

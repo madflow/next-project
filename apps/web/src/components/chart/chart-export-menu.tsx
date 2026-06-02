@@ -12,16 +12,16 @@ import {
 
 type ChartExportMenuProps = {
   disabled?: boolean;
-  onExportImage: () => void | Promise<void>;
-  onExportExcel: () => void | Promise<void>;
-  onExportPowerPoint: () => void | Promise<void>;
+  onExportImageAction: () => void | Promise<void>;
+  onExportExcelAction: () => void | Promise<void>;
+  onExportPowerPointAction: () => void | Promise<void>;
 };
 
 export function ChartExportMenu({
   disabled = false,
-  onExportImage,
-  onExportExcel,
-  onExportPowerPoint,
+  onExportImageAction: onExportImage,
+  onExportExcelAction: onExportExcel,
+  onExportPowerPointAction: onExportPowerPoint,
 }: ChartExportMenuProps) {
   const t = useTranslations("projectAdhocAnalysis.export");
 
