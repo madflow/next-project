@@ -3,6 +3,11 @@ import { getVariableLabel } from "@/lib/variable-helpers";
 import { DatasetVariable } from "@/types/dataset-variable";
 import { StatsResponse, VariableStats } from "@/types/stats";
 
+export type ChartSortConfig = {
+  field: "value" | "counts";
+  direction: "asc" | "desc";
+};
+
 type RechartsBarDataItem = {
   label: string | number;
   value: string | number;
@@ -88,21 +93,37 @@ export function extractVariableStats(variableConfig: DatasetVariable, statsData:
   return targetVariable.stats as VariableStats;
 }
 
-function getSortedFrequencyTable(variableConfig: DatasetVariable, statsData: StatsResponse) {
+function getSortedFrequencyTable(
+  variableConfig: DatasetVariable,
+  statsData: StatsResponse,
+  sortConfig: ChartSortConfig = { field: "value", direction: "asc" }
+) {
   const stats = extractVariableStats(variableConfig, statsData);
   if (!stats || !stats.frequency_table) return [];
   const copiedFrequencyTable = [...stats.frequency_table];
-  return copiedFrequencyTable.sort((a, b) => parseFloat(a.value.toString()) - parseFloat(b.value.toString()));
+  return copiedFrequencyTable.sort((a, b) => {
+    let comparison: number;
+    if (sortConfig.field === "value") {
+      comparison = parseFloat(a.value.toString()) - parseFloat(b.value.toString());
+    } else {
+      comparison = a.counts - b.counts;
+    }
+    return sortConfig.direction === "asc" ? comparison : -comparison;
+  });
 }
 
 export function getVariableStats(variableConfig: DatasetVariable, statsData: StatsResponse) {
   return extractVariableStats(variableConfig, statsData);
 }
 
-export function transformToRechartsBarData(variableConfig: DatasetVariable, statsData: StatsResponse) {
+export function transformToRechartsBarData(
+  variableConfig: DatasetVariable,
+  statsData: StatsResponse,
+  sortConfig?: ChartSortConfig
+) {
   const valueLabels = variableConfig.valueLabels ?? {};
 
-  const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
+  const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData, sortConfig);
 
   const rechartsData: RechartsBarDataItem[] = sortedFrequencyTable.map((item) => {
     const valueKey = item.value.toString() as keyof typeof valueLabels; // Convert to string to match valueLabels keys
@@ -119,10 +140,14 @@ export function transformToRechartsBarData(variableConfig: DatasetVariable, stat
   return rechartsData;
 }
 
-export function transformToRechartsPieData(variableConfig: DatasetVariable, statsData: StatsResponse) {
+export function transformToRechartsPieData(
+  variableConfig: DatasetVariable,
+  statsData: StatsResponse,
+  sortConfig?: ChartSortConfig
+) {
   const valueLabels = variableConfig.valueLabels ?? {};
 
-  const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData);
+  const sortedFrequencyTable = getSortedFrequencyTable(variableConfig, statsData, sortConfig);
   const rechartsData: RechartsPieDataItem[] = sortedFrequencyTable.map((item, index) => {
     const valueKey = item.value.toString() as keyof typeof valueLabels; // Convert to string to match valueLabels keys
     const label = valueLabels[valueKey] || item.value; // Fallback if label not found

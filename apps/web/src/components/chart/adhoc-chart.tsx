@@ -18,6 +18,7 @@ import {
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
 import {
+  type ChartSortConfig,
   getStackedBarSegmentCount,
   hasSplitVariableStatsForVariable,
   transformToRechartsPieData,
@@ -62,6 +63,7 @@ function ChartContent({
   isMultiResponseIndividual,
   countedValue,
   disableAnimation = false,
+  sortConfig,
 }: {
   chartType: AnalysisChartType;
   variable: DatasetVariableWithAttributes;
@@ -73,6 +75,7 @@ function ChartContent({
   isMultiResponseIndividual: boolean;
   countedValue: number;
   disableAnimation?: boolean;
+  sortConfig?: ChartSortConfig;
 }) {
   switch (chartType) {
     case "bar":
@@ -97,6 +100,7 @@ function ChartContent({
           isMultiResponseIndividual={isMultiResponseIndividual}
           countedValue={countedValue}
           disableAnimation={disableAnimation}
+          sortConfig={sortConfig}
         />
       );
     case "horizontalStackedBar":
@@ -119,6 +123,7 @@ function ChartContent({
           chartRef={chartRef}
           chartColors={chartColors}
           disableAnimation={disableAnimation}
+          sortConfig={sortConfig}
         />
       );
     case "metrics":
@@ -158,6 +163,7 @@ export function AdhocChart({
   const { resolveTheme } = useOrganizationTheme();
   const { displayRef, exportRef, isExportRendering, exportPNG } = useChartExport();
   const [chartSelectionState, setChartSelectionState] = useState<Record<string, AnalysisChartType | null>>({});
+  const [sortByCountDescState, setSortByCountDescState] = useState<Record<string, boolean>>({});
 
   const hasSplitVariable = useMemo(
     () => hasSplitVariableStatsForVariable(stats, variable.name),
@@ -183,6 +189,19 @@ export function AdhocChart({
 
   const chartStateKey = `${variable.id}-${hasSplitVariable}`;
   const actualSelectedChartType = chartSelectionState[chartStateKey] ?? chartSelection.defaultChartType;
+  const sortByCountDesc = sortByCountDescState[chartStateKey] ?? false;
+  const chartSortConfig: ChartSortConfig | undefined = sortByCountDesc
+    ? { field: "counts", direction: "desc" }
+    : undefined;
+  const handleSortByCountDescChange = useCallback(
+    (value: boolean) => {
+      setSortByCountDescState((prev) => ({
+        ...prev,
+        [chartStateKey]: value,
+      }));
+    },
+    [chartStateKey]
+  );
   const shouldLoadSplitVariables = Boolean(datasetId) && (chartSelection.canUseSplitVariable || hasSplitVariable);
   const { splitVariables, isLoading: isSplitVariablesLoading } = useSplitVariables(datasetId, shouldLoadSplitVariables);
   const splitVariableDescription = useSplitVariableDescription(variable, stats, splitVariables);
@@ -343,6 +362,7 @@ export function AdhocChart({
       datasetId={datasetId}
       isMultiResponseIndividual={isMultiResponseIndividual}
       countedValue={countedValue}
+      sortConfig={chartSortConfig}
     />
   );
 
@@ -357,6 +377,7 @@ export function AdhocChart({
       isMultiResponseIndividual={isMultiResponseIndividual}
       countedValue={countedValue}
       disableAnimation
+      sortConfig={chartSortConfig}
     />
   );
 
@@ -427,6 +448,8 @@ export function AdhocChart({
         isMultiResponseIndividual={isMultiResponseIndividual}
         splitVariables={splitVariables}
         isSplitVariablesLoading={isSplitVariablesLoading}
+        sortByCountDesc={sortByCountDesc}
+        onSortByCountDescChangeAction={handleSortByCountDescChange}
       />
     </div>
   );

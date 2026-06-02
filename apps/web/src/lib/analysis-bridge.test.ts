@@ -3,9 +3,11 @@ import { describe, test } from "node:test";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { StatsResponse } from "@/types/stats";
 import {
+  type ChartSortConfig,
   getStackedBarSegmentCount,
   transformToMultiResponseData,
   transformToMultiResponseIndividualBarData,
+  transformToRechartsBarData,
   transformToSplitVariableStackedBarData,
 } from "./analysis-bridge";
 
@@ -192,6 +194,68 @@ describe("analysis-bridge transforms", () => {
     assert.throws(
       () => transformToMultiResponseData([variable], statsData, 1),
       /must not receive split variable stats/
+    );
+  });
+
+  test("transformToRechartsBarData sorts by value ascending by default", () => {
+    const variable = createVariable();
+    const stats = createBaseStats("q1", [
+      { value: 3, counts: 10, percentages: 10 },
+      { value: 1, counts: 50, percentages: 50 },
+      { value: 2, counts: 40, percentages: 40 },
+    ]);
+
+    const result = transformToRechartsBarData(variable, stats);
+
+    assert.deepStrictEqual(
+      result.map((item) => item.value),
+      [1, 2, 3]
+    );
+    assert.deepStrictEqual(
+      result.map((item) => item.count),
+      [50, 40, 10]
+    );
+  });
+
+  test("transformToRechartsBarData sorts by counts ascending", () => {
+    const variable = createVariable();
+    const stats = createBaseStats("q1", [
+      { value: 3, counts: 10, percentages: 10 },
+      { value: 1, counts: 50, percentages: 50 },
+      { value: 2, counts: 40, percentages: 40 },
+    ]);
+    const sortConfig: ChartSortConfig = { field: "counts", direction: "asc" };
+
+    const result = transformToRechartsBarData(variable, stats, sortConfig);
+
+    assert.deepStrictEqual(
+      result.map((item) => item.value),
+      [3, 2, 1]
+    );
+    assert.deepStrictEqual(
+      result.map((item) => item.count),
+      [10, 40, 50]
+    );
+  });
+
+  test("transformToRechartsBarData sorts by counts descending", () => {
+    const variable = createVariable();
+    const stats = createBaseStats("q1", [
+      { value: 3, counts: 10, percentages: 10 },
+      { value: 1, counts: 50, percentages: 50 },
+      { value: 2, counts: 40, percentages: 40 },
+    ]);
+    const sortConfig: ChartSortConfig = { field: "counts", direction: "desc" };
+
+    const result = transformToRechartsBarData(variable, stats, sortConfig);
+
+    assert.deepStrictEqual(
+      result.map((item) => item.value),
+      [1, 2, 3]
+    );
+    assert.deepStrictEqual(
+      result.map((item) => item.count),
+      [50, 40, 10]
     );
   });
 });

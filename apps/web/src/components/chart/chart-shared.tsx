@@ -3,6 +3,7 @@
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, XAxis, YAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
+  type ChartSortConfig,
   transformToMultiResponseIndividualBarData,
   transformToRechartsBarData,
   transformToRechartsPieData,
@@ -74,6 +75,7 @@ export function HorizontalBarChartContent({
   isMultiResponseIndividual = false,
   countedValue = 1,
   disableAnimation = false,
+  sortConfig,
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
@@ -83,6 +85,7 @@ export function HorizontalBarChartContent({
   isMultiResponseIndividual?: boolean;
   countedValue?: number;
   disableAnimation?: boolean;
+  sortConfig?: ChartSortConfig;
 }) {
   const chartData: Array<{
     label: string | number;
@@ -91,7 +94,7 @@ export function HorizontalBarChartContent({
     percentage: number;
   }> = isMultiResponseIndividual
     ? transformToMultiResponseIndividualBarData(variable, stats, countedValue)
-    : transformToRechartsBarData(variable, stats);
+    : transformToRechartsBarData(variable, stats, sortConfig);
 
   return (
     <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
@@ -145,14 +148,16 @@ export function PieChartContent({
   chartRef,
   chartColors,
   disableAnimation = false,
+  sortConfig,
 }: {
   variable: DatasetVariable;
   stats: StatsResponse;
   chartRef?: React.Ref<HTMLDivElement>;
   chartColors?: ThemeChartColors;
   disableAnimation?: boolean;
+  sortConfig?: ChartSortConfig;
 }) {
-  const pieData = transformToRechartsPieData(variable, stats);
+  const pieData = transformToRechartsPieData(variable, stats, sortConfig);
   const pieChartConfig: ChartConfig = {};
 
   pieData.forEach((item, index) => {
