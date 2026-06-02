@@ -352,7 +352,6 @@ def _add_mean_bar_chart(
     plot = chart.plots[0]
     plot.has_data_labels = True
     data_labels = plot.data_labels
-    data_labels.position = XL_LABEL_POSITION.RIGHT
     data_labels.number_format = "0.0"
     data_labels.number_format_is_linked = False
     data_labels.show_value = True
