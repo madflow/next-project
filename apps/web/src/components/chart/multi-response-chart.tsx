@@ -1,11 +1,13 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { useThemeConfig } from "@/components/active-theme";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useChartExport } from "@/hooks/use-chart-export";
 import {
@@ -121,6 +123,7 @@ export function MultiResponseChart({
   const { activeTheme } = useThemeConfig();
   const { resolveTheme } = useOrganizationTheme();
   const { displayRef, exportRef, isExportRendering, exportPNG } = useChartExport();
+  const [sortByCountDesc, setSortByCountDesc] = useState(false);
 
   const chartConfig = {
     percentage: {
@@ -129,10 +132,13 @@ export function MultiResponseChart({
     },
   } satisfies ChartConfig;
 
-  const chartData = useMemo(
-    () => transformToMultiResponseData(variables, statsData, countedValue),
-    [countedValue, statsData, variables]
-  );
+  const chartData = useMemo(() => {
+    const data = transformToMultiResponseData(variables, statsData, countedValue);
+    if (sortByCountDesc) {
+      return [...data].sort((a, b) => b.percentage - a.percentage);
+    }
+    return data;
+  }, [countedValue, sortByCountDesc, statsData, variables]);
   const exportBaseName = useMemo(() => sanitizeExportBaseName(`${variablesetName}-multi-response`), [variablesetName]);
   const exportMetaLine = useMemo(
     () =>
@@ -163,6 +169,7 @@ export function MultiResponseChart({
         fileBaseName: exportBaseName,
         metaLine: exportMetaLine,
         palette,
+        sortByCountDesc,
         statsData,
         title: variablesetName,
         variables,
@@ -181,6 +188,7 @@ export function MultiResponseChart({
     exportRef,
     exportMetaLine,
     fallbackChartColors,
+    sortByCountDesc,
     statsData,
     tAdhoc,
     variables,
@@ -203,6 +211,7 @@ export function MultiResponseChart({
         fileBaseName: exportBaseName,
         metaLine: exportMetaLine,
         palette,
+        sortByCountDesc,
         statsData,
         title: variablesetName,
         variables,
@@ -221,6 +230,7 @@ export function MultiResponseChart({
     exportRef,
     exportMetaLine,
     fallbackChartColors,
+    sortByCountDesc,
     statsData,
     tAdhoc,
     variables,
@@ -252,7 +262,11 @@ export function MultiResponseChart({
         />
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Switch id="sort-by-count-mr" size="sm" checked={sortByCountDesc} onCheckedChange={setSortByCountDesc} />
+          <Label htmlFor="sort-by-count-mr">{tAdhoc("sortByCount")}</Label>
+        </div>
         <ChartExportMenu
           onExportImage={exportPNG}
           onExportExcel={handleExcelExport}

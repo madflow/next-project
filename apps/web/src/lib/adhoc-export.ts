@@ -154,6 +154,7 @@ type MultiResponseChartExportOptions = {
   fileBaseName?: string;
   metaLine: string;
   palette: string[];
+  sortByCountDesc?: boolean;
   statsData: Record<string, StatsResponse>;
   title: string;
   variables: DatasetVariableWithAttributes[];
@@ -537,6 +538,7 @@ export function createMultiResponseExcelExportPayload({
   fileBaseName,
   metaLine,
   palette,
+  sortByCountDesc,
   statsData,
   title,
   variables,
@@ -546,6 +548,7 @@ export function createMultiResponseExcelExportPayload({
     fileBaseName,
     metaLine,
     palette,
+    sortByCountDesc,
     statsData,
     title,
     variables,
@@ -712,11 +715,13 @@ export function createMultiResponsePowerPointExportPayload({
   fileBaseName,
   metaLine,
   palette,
+  sortByCountDesc,
   statsData,
   title,
   variables,
 }: MultiResponseChartExportOptions): AdhocPowerPointExportPayload {
-  const points = transformToMultiResponseData(variables, statsData, countedValue);
+  const data = transformToMultiResponseData(variables, statsData, countedValue);
+  const points = sortByCountDesc ? [...data].sort((a, b) => b.percentage - a.percentage) : data;
 
   return {
     file_name: buildPowerPointFileName(fileBaseName ?? `${title}-multi-response`),
