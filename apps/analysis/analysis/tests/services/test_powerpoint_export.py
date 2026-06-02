@@ -184,7 +184,7 @@ def test_build_presentation_uses_arial_for_slide_and_chart_text() -> None:
     assert chart.category_axis.tick_labels.font.name == EXPORT_FONT_NAME
     assert chart.legend.font.name == EXPORT_FONT_NAME
     assert chart.legend.position == XL_LEGEND_POSITION.TOP
-    assert chart.legend.include_in_layout is True
+    assert chart.legend.include_in_layout is False
     assert chart.plots[0].data_labels.font.name == EXPORT_FONT_NAME
     assert chart.series[0].points[0].data_label.font.name == EXPORT_FONT_NAME
 
@@ -210,7 +210,7 @@ def test_build_presentation_for_pie_chart_places_legend_above_chart() -> None:
 
     chart = cast(Any, presentation.slides[0].shapes[2]).chart
     assert chart.legend.position == XL_LEGEND_POSITION.TOP
-    assert chart.legend.include_in_layout is True
+    assert chart.legend.include_in_layout is False
 
 
 def test_build_presentation_for_stacked_chart_uses_contrast_label_color() -> None:
