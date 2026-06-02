@@ -243,9 +243,7 @@ def _add_distribution_chart(
     _apply_point_fills(chart.series[0], points)
     _configure_default_data_labels(
         chart.plots[0],
-        position=XL_LABEL_POSITION.RIGHT
-        if reverse_order
-        else XL_LABEL_POSITION.OUTSIDE_END,
+        position=XL_LABEL_POSITION.OUTSIDE_END,
         text_color=_best_text_color(SLIDE_BACKGROUND_HEX),
     )
 
