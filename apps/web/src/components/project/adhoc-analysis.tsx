@@ -23,8 +23,8 @@ import { apiClient } from "@/lib/api-client";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
-import { BarSkeleton } from "../chart/bar-skeleton";
-import { MultiVariableCharts } from "../chart/multi-variable-charts";
+import { ChartSelectionSection } from "../chart/section/chart-selection-section";
+import { BarSkeleton } from "../chart/shared/bar-skeleton";
 import { Button } from "../ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
@@ -582,7 +582,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       <div className="min-w-0 flex-1">
         {selectedDataset && effectiveCurrentSelection && selectedVariables.length > 0 && (
           <Suspense fallback={<BarSkeleton />}>
-            <MultiVariableCharts
+            <ChartSelectionSection
               variables={selectedVariables}
               baseStatsData={baseStatsData}
               splitStatsData={splitStatsData}

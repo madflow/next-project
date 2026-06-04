@@ -8,23 +8,9 @@ import {
   SheetIcon,
   TextIcon,
 } from "lucide-react";
-import { type ChartConfig } from "@/components/ui/chart";
 import { type AnalysisChartType } from "@/types/stats";
 
-type PercentageChartConfigTranslations = {
-  percentLabel: string;
-};
-
-export function createPercentageChartConfig({ percentLabel }: PercentageChartConfigTranslations) {
-  return {
-    percentage: {
-      label: percentLabel,
-      color: "var(--chart-1)",
-    },
-  } satisfies ChartConfig;
-}
-
-export function getChartIcon(chartType: AnalysisChartType) {
+export function ChartTypeIcon({ chartType }: { chartType: AnalysisChartType }) {
   switch (chartType) {
     case "bar":
       return <ChartColumnBigIcon className="size-4" />;
