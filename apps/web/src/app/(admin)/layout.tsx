@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { USER_ADMIN_ROLE, auth } from "@repo/auth/web/server";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { SidebarLayout } from "@/components/sidebar-layout";
 import { SiteHeader } from "@/components/site-header";
-import { USER_ADMIN_ROLE, auth } from "@/lib/auth";
 
 type SessionWithImpersonation = {
   impersonatedBy?: string | null;

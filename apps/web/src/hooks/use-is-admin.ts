@@ -1,4 +1,4 @@
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@repo/auth/web/client";
 
 export function useIsAdmin() {
   const session = useSession();

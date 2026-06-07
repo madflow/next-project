@@ -125,6 +125,18 @@ async function createAPIKeyForUser(userId: string, name: string) {
     },
   });
 
+  if (createdKey instanceof Response) {
+    const createdKeyBody = (await createdKey.json()) as { key?: string };
+
+    if (!createdKeyBody.key) {
+      throw new Error(`Failed to create API key: ${name}`);
+    }
+
+    console.log(`API key created: ${name}`);
+
+    return createdKeyBody;
+  }
+
   console.log(`API key created: ${name}`);
 
   return createdKey;

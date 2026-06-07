@@ -2,9 +2,9 @@
 
 import { type Organization } from "better-auth/plugins";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
+import { useActiveOrganization } from "@repo/auth/web/client";
 import { useActiveProject } from "@/hooks/use-active-project";
 import { useDebugMode } from "@/hooks/use-debug-mode";
-import { useActiveOrganization } from "@/lib/auth-client";
 import { type Project } from "@/types/project";
 
 type AppContextType = {

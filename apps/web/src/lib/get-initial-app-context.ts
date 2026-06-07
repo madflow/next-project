@@ -1,9 +1,9 @@
 import "server-only";
 import { Organization } from "better-auth/plugins";
 import { headers } from "next/headers";
+import { auth } from "@repo/auth/web/server";
 import { type Project } from "@/types/project";
 import { isNotFoundAPIError } from "./api-errors";
-import { auth } from "./auth";
 import { getServerAPIClient } from "./server-api-client";
 
 type InitialAppContext = {

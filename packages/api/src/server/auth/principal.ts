@@ -5,8 +5,9 @@ import { type AuthUser, user as userTable } from "@repo/database/schema";
 
 type SessionData = NonNullable<Awaited<ReturnType<AuthInstance["api"]["getSession"]>>>;
 type VerifyApiKeyResult = Awaited<ReturnType<AuthInstance["api"]["verifyApiKey"]>>;
+type VerifyApiKeyData = Exclude<VerifyApiKeyResult, Response>;
 
-type ApiKeyRecord = Exclude<VerifyApiKeyResult["key"], null>;
+type ApiKeyRecord = Exclude<VerifyApiKeyData["key"], null>;
 type ApiKeyUser = Pick<AuthUser, "id" | "role">;
 
 export type AnonymousPrincipal = {
@@ -57,7 +58,10 @@ async function resolveAPIKeyPrincipal({
     },
   });
 
-  if (!result.valid || result.error !== null || result.key === null) {
+  const data: VerifyApiKeyData =
+    result instanceof Response ? ((await result.json()) as VerifyApiKeyData) : (result as VerifyApiKeyData);
+
+  if (!data.valid || data.error !== null || data.key === null) {
     return null;
   }
 
@@ -67,7 +71,7 @@ async function resolveAPIKeyPrincipal({
       role: userTable.role,
     })
     .from(userTable)
-    .where(eq(userTable.id, result.key.referenceId))
+    .where(eq(userTable.id, data.key.referenceId))
     .limit(1);
 
   if (user === undefined) {
@@ -75,7 +79,7 @@ async function resolveAPIKeyPrincipal({
   }
 
   return {
-    apiKey: result.key,
+    apiKey: data.key,
     kind: "api-key",
     user,
   };

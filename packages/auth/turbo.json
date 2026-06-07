@@ -3,13 +3,13 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL"]
+      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL", "BASE_URL", "MAIL_DEFAULT_SENDER", "SITE_NAME"]
     },
     "check-types": {
-      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL"]
+      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL", "BASE_URL", "MAIL_DEFAULT_SENDER", "SITE_NAME"]
     },
     "lint": {
-      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL"]
+      "env": ["AUTH_DISABLE_SIGNUP", "AUTH_SECRET", "AUTH_URL", "BASE_URL", "MAIL_DEFAULT_SENDER", "SITE_NAME"]
     }
   }
 }
