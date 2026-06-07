@@ -1,4 +1,4 @@
-import { useSession } from "@repo/auth/web/client";
+import { useSession } from "@repo/auth/nextjs/client";
 
 type SessionWithImpersonation = {
   impersonatedBy?: string;

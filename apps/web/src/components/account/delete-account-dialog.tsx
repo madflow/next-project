@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { deleteUser } from "@repo/auth/web/client";
+import { deleteUser } from "@repo/auth/nextjs/client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

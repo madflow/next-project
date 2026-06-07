@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies, headers } from "next/headers";
-import { auth } from "@repo/auth/web/server";
+import { auth } from "@repo/auth/nextjs/server";
 import { COOKIE_NAME, Locale, defaultLocale } from "@/i18n/config";
 
 // In this example the locale is read from a cookie. You could alternatively

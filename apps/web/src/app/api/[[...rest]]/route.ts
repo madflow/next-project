@@ -1,5 +1,5 @@
 import { createApi } from "@repo/api/server";
-import { auth } from "@repo/auth/web/server";
+import { auth } from "@repo/auth/nextjs/server";
 import { defaultClient as db } from "@repo/database/clients";
 
 const handler = createApi({ auth, db, pathPrefix: "/api" });

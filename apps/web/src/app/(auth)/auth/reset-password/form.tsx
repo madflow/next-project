@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { resetPassword } from "@repo/auth/web/client";
+import { resetPassword } from "@repo/auth/nextjs/client";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";

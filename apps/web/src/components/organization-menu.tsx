@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { organization } from "@repo/auth/web/client";
+import { organization } from "@repo/auth/nextjs/client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

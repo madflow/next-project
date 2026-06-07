@@ -1,7 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { auth } from "@repo/auth/web/server";
+import { auth } from "@repo/auth/nextjs/server";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   type CreateUserData as CreateData,

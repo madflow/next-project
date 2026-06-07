@@ -1,6 +1,6 @@
 import "server-only";
 import { headers } from "next/headers";
-import { USER_ADMIN_ROLE, auth } from "@repo/auth/web/server";
+import { USER_ADMIN_ROLE, auth } from "@repo/auth/nextjs/server";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 
 /**

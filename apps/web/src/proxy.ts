@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { middleware as authMiddleware } from "@repo/auth/web/middleware";
+import { middleware as authMiddleware } from "@repo/auth/nextjs/middleware";
 
 export async function proxy(request: NextRequest) {
   return authMiddleware(request);

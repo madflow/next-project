@@ -1,7 +1,7 @@
 import "server-only";
 import { Organization } from "better-auth/plugins";
 import { headers } from "next/headers";
-import { auth } from "@repo/auth/web/server";
+import { auth } from "@repo/auth/nextjs/server";
 import { type Project } from "@/types/project";
 import { isNotFoundAPIError } from "./api-errors";
 import { getServerAPIClient } from "./server-api-client";

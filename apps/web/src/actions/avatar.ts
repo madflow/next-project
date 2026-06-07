@@ -2,7 +2,7 @@
 
 import { randomUUID } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
-import { USER_ADMIN_ROLE } from "@repo/auth/web/server";
+import { USER_ADMIN_ROLE } from "@repo/auth/nextjs/server";
 import { S3ServiceException } from "@repo/storage";
 import { deleteObject, putObject } from "@repo/storage";
 import { env } from "@/env";

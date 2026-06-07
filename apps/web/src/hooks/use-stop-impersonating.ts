@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { admin } from "@repo/auth/web/client";
+import { admin } from "@repo/auth/nextjs/client";
 
 export function useStopImpersonating() {
   const [isLoading, setIsLoading] = useState(false);

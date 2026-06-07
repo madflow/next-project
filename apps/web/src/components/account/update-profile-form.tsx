@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { updateUser, useSession } from "@repo/auth/web/client";
+import { updateUser, useSession } from "@repo/auth/nextjs/client";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";

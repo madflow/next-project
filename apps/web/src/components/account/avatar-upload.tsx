@@ -4,7 +4,7 @@ import { Loader2, Trash2, Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { updateUser, useSession } from "@repo/auth/web/client";
+import { updateUser, useSession } from "@repo/auth/nextjs/client";
 import { deleteAvatar, uploadAvatar } from "@/actions/avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
