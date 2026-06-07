@@ -1,6 +1,6 @@
 import { adminClient, inferAdditionalFields, organizationClient } from "better-auth/client/plugins";
 import { createAuthClient as createBetterAuthClient } from "better-auth/react";
-import type { AuthInstance } from "../server/index.js";
+import type { AuthInstance } from "../server";
 
 export type CreateAuthClientOptions = {
   baseURL?: string;
