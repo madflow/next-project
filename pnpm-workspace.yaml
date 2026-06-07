@@ -3,8 +3,7 @@ publicHoistPattern:
   - "*import-in-the-middle*"
   - "*require-in-the-middle*"
 overrides:
-  "@types/react": "19.2.15"
-  "@types/react-dom": "19.2.3"
+  "kysely": "^0.28.17"
 allowedDeprecatedVersions:
   "@esbuild-kit/core-utils": "*"
   "@esbuild-kit/esm-loader": "*"
