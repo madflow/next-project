@@ -10,7 +10,7 @@ import {
   getEmailTranslations,
   sendEmail,
 } from "@repo/email";
-import { USER_ADMIN_ROLE, createAuth } from "../server/index.js";
+import { USER_ADMIN_ROLE, createAuth } from "../server";
 
 type Locale = "en" | "de";
 

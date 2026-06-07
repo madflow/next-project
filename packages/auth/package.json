@@ -15,9 +15,9 @@
       "types": "./dist/src/web/client.d.ts",
       "default": "./src/web/client.ts"
     },
-    "./web/proxy": {
-      "types": "./dist/src/web/proxy.d.ts",
-      "default": "./src/web/proxy.ts"
+    "./web/middleware": {
+      "types": "./dist/src/web/middleware.d.ts",
+      "default": "./src/web/middleware.ts"
     },
     "./web/route": {
       "types": "./dist/src/web/route.d.ts",

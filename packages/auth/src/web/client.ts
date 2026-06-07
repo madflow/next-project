@@ -1,6 +1,6 @@
 "use client";
 
-import { type AuthClient, createAuthClient } from "../client/index.js";
+import { type AuthClient, createAuthClient } from "../client";
 
 const authClient: AuthClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL ?? "",
