@@ -3,7 +3,7 @@ publicHoistPattern:
   - "*import-in-the-middle*"
   - "*require-in-the-middle*"
 overrides:
-  "kysely": "^0.28.17"
+  "kysely": "^0.29.0"
 allowedDeprecatedVersions:
   "@esbuild-kit/core-utils": "*"
   "@esbuild-kit/esm-loader": "*"
