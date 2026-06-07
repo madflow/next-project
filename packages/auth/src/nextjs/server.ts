@@ -26,7 +26,7 @@ type EnvConfig = {
   siteName: string;
 };
 
-type WebAuthOptions = {
+type NextJsAuthOptions = {
   env?: Partial<EnvConfig>;
 };
 
@@ -76,7 +76,7 @@ function resolveRequestLocale(request: Request | undefined, userLocale?: string)
   return requestedLocale ?? DEFAULT_LOCALE;
 }
 
-export function createWebAuth({ env: envOverrides }: WebAuthOptions = {}) {
+export function createNextJsAuth({ env: envOverrides }: NextJsAuthOptions = {}) {
   const env = getEnvConfig(envOverrides);
 
   return createAuth({
@@ -183,6 +183,6 @@ export function createWebAuth({ env: envOverrides }: WebAuthOptions = {}) {
   });
 }
 
-export const auth = createWebAuth();
+export const auth = createNextJsAuth();
 
 export { USER_ADMIN_ROLE };
