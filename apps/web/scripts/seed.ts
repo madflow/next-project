@@ -91,6 +91,23 @@ type ResolvedDatasetVariablesetFixture = z.infer<typeof datasetVariablesetFixtur
 };
 type DatasetVariablesetContentInsert = typeof datasetVariablesetContent.$inferInsert;
 
+type CreatedApiKey =
+  Awaited<ReturnType<typeof auth.api.createApiKey>> extends Response
+    ? {
+        key: string;
+      }
+    : Awaited<ReturnType<typeof auth.api.createApiKey>>;
+
+async function unwrapEndpointResponse<T>(value: Promise<T | Response> | T | Response): Promise<T> {
+  const resolvedValue = await value;
+
+  if (resolvedValue instanceof Response) {
+    return (await resolvedValue.json()) as T;
+  }
+
+  return resolvedValue;
+}
+
 const DEFAULT_VARIABLESET_CONTENT_ATTRIBUTES = {
   allowedStatistics: {
     distribution: true,
@@ -118,12 +135,14 @@ interface CreateUserParams {
 }
 
 async function createAPIKeyForUser(userId: string, name: string) {
-  const createdKey = await auth.api.createApiKey({
-    body: {
-      name,
-      userId,
-    },
-  });
+  const createdKey = await unwrapEndpointResponse<CreatedApiKey>(
+    auth.api.createApiKey({
+      body: {
+        name,
+        userId,
+      },
+    })
+  );
 
   console.log(`API key created: ${name}`);
 
