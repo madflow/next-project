@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "nodemailer": "^8.0.10",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "react-email": "^6.5.0"
   },
   "devDependencies": {

@@ -27,7 +27,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@repo/eslint-config": "workspace:*",
-    "@types/node": "^24.12.4",
+    "@types/node": "^24.13.1",
     "eslint": "^9.39.4",
     "eslint-plugin-playwright": "^2.10.4"
   },
