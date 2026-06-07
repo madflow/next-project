@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { resetPassword } from "@repo/auth/web/client";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Locale } from "@/i18n/config";
-import { resetPassword } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { ResetPasswordFormData, ResetPasswordSchema } from "./schema";
 

@@ -24,7 +24,6 @@
     "@repo/api": "workspace:*",
     "@repo/auth": "workspace:*",
     "@repo/database": "workspace:*",
-    "@repo/email": "workspace:*",
     "@repo/storage": "workspace:*",
     "@sentry/nextjs": "^10.43.0",
     "@t3-oss/env-nextjs": "^0.13.10",

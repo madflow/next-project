@@ -2,10 +2,10 @@
 
 import { randomUUID } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
+import { USER_ADMIN_ROLE } from "@repo/auth/web/server";
 import { S3ServiceException } from "@repo/storage";
 import { deleteObject, putObject } from "@repo/storage";
 import { env } from "@/env";
-import { USER_ADMIN_ROLE } from "@/lib/auth";
 import { canDeleteAvatarForUser } from "@/lib/avatar-authorization";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { getSessionOrThrow, withAuth } from "@/lib/server-action-utils";

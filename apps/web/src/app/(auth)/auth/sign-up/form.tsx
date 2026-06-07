@@ -6,6 +6,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import { signUp } from "@repo/auth/web/client";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { env } from "@/env";
 import { Locale } from "@/i18n/config";
-import { signUp } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { type SignUpSchema, signUpSchema } from "./schema";
 

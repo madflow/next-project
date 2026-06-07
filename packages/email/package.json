@@ -23,9 +23,11 @@
   },
   "exports": {
     ".": {
+      "types": "./src/index.ts",
       "import": "./src/index.ts"
     },
     "./templates": {
+      "types": "./src/templates/index.ts",
       "import": "./src/templates/index.ts"
     }
   }

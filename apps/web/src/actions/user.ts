@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { auth } from "@repo/auth/web/server";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   type CreateUserData as CreateData,
@@ -8,7 +9,6 @@ import {
   invitation,
 } from "@repo/database/schema";
 import { env } from "@/env";
-import { auth } from "@/lib/auth";
 import { ServerActionNotAuthorizedException } from "@/lib/exception";
 import { withAdminAuth } from "@/lib/server-action-utils";
 import { getServerAPIClient } from "@/lib/server-api-client";
