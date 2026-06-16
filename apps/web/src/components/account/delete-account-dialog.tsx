@@ -7,7 +7,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { deleteUser } from "@repo/auth/web/client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PasswordInput } from "@/components/ui/password-input";
+import { deleteUser } from "@/lib/auth/client";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 
 export function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {

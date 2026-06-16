@@ -1,9 +1,9 @@
-import type { AuthInstance } from "@repo/auth/server";
+import type { PrincipalAuth } from "@repo/auth/server";
 import type { DatabaseInstance } from "@repo/database/clients";
 import { type Principal, resolvePrincipal } from "./auth/principal";
 
 type CreateORPCContextOptions = {
-  auth: AuthInstance;
+  auth: PrincipalAuth;
   db: DatabaseInstance;
   headers: Headers;
 };

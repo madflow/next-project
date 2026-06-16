@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { signOut, useSession } from "@repo/auth/web/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,6 +18,7 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { useIsImpersonating } from "@/hooks/use-is-impersonating";
 import { useStopImpersonating } from "@/hooks/use-stop-impersonating";
+import { signOut, useSession } from "@/lib/auth/client";
 
 export function NavUser() {
   const isMobile = useSidebar();

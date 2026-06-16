@@ -5,10 +5,10 @@ import { useTranslations } from "next-intl";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { changeEmail, useSession } from "@repo/auth/web/client";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { changeEmail, useSession } from "@/lib/auth/client";
 
 const emailFormSchema = z.object({
   email: z.email({

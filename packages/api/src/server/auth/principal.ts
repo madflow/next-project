@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
-import type { AuthInstance } from "@repo/auth/server";
+import type { AuthSession, AuthVerifyApiKeyResult, PrincipalAuth } from "@repo/auth/server";
 import type { DatabaseInstance } from "@repo/database/clients";
 import { type AuthUser, user as userTable } from "@repo/database/schema";
 
-type SessionData = NonNullable<Awaited<ReturnType<AuthInstance["api"]["getSession"]>>>;
-type VerifyApiKeyResult = Awaited<ReturnType<AuthInstance["api"]["verifyApiKey"]>>;
+type SessionData = AuthSession;
+type VerifyApiKeyResult = AuthVerifyApiKeyResult;
 type VerifyApiKeyData = Exclude<VerifyApiKeyResult, Response>;
 
 type ApiKeyRecord = Exclude<VerifyApiKeyData["key"], null>;
@@ -42,7 +42,7 @@ async function resolveAPIKeyPrincipal({
   db,
   headers,
 }: {
-  auth: AuthInstance;
+  auth: PrincipalAuth;
   db: DatabaseInstance;
   headers: Headers;
 }): Promise<ApiKeyPrincipal | null> {
@@ -89,7 +89,7 @@ async function resolveSessionPrincipal({
   auth,
   headers,
 }: {
-  auth: AuthInstance;
+  auth: PrincipalAuth;
   headers: Headers;
 }): Promise<SessionPrincipal | null> {
   const result = await auth.api.getSession({ headers });
@@ -110,7 +110,7 @@ export async function resolvePrincipal({
   db,
   headers,
 }: {
-  auth: AuthInstance;
+  auth: PrincipalAuth;
   db: DatabaseInstance;
   headers: Headers;
 }): Promise<Principal> {

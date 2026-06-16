@@ -7,11 +7,11 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { updateUser, useSession } from "@repo/auth/web/client";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Locale, locales } from "@/i18n/config";
+import { updateUser, useSession } from "@/lib/auth/client";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 
 const nameFormSchema = z.object({

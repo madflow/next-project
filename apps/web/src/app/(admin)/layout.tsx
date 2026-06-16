@@ -1,30 +1,22 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { USER_ADMIN_ROLE, auth } from "@repo/auth/web/server";
+import { isAdminUser, isImpersonatingSession } from "@repo/auth/server";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { SidebarLayout } from "@/components/sidebar-layout";
 import { SiteHeader } from "@/components/site-header";
-
-type SessionWithImpersonation = {
-  impersonatedBy?: string | null;
-};
+import { getSession } from "@/lib/auth/session";
 
 export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSession();
 
   if (!session?.user) {
     redirect("/auth/login");
   }
 
-  const isImpersonating = Boolean((session.session as SessionWithImpersonation | undefined)?.impersonatedBy);
-
-  if (isImpersonating || session.user.role !== USER_ADMIN_ROLE) {
+  if (isImpersonatingSession(session.session) || !isAdminUser(session.user)) {
     redirect("/");
   }
 

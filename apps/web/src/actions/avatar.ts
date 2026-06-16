@@ -2,7 +2,7 @@
 
 import { randomUUID } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
-import { USER_ADMIN_ROLE } from "@repo/auth/web/server";
+import { isAdminUser } from "@repo/auth/server";
 import { S3ServiceException } from "@repo/storage";
 import { deleteObject, putObject } from "@repo/storage";
 import { env } from "@/env";
@@ -165,7 +165,7 @@ export async function deleteAvatar(userId: string, filename: string) {
     !canDeleteAvatarForUser({
       sessionUserId: session.user.id,
       targetUserId: userId,
-      isAdmin: session.user.role === USER_ADMIN_ROLE,
+      isAdmin: isAdminUser(session.user),
     })
   ) {
     throw new ServerActionNotAuthorizedException("User ID mismatch");

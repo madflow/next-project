@@ -1,6 +1,6 @@
 "use client";
 
-import { type AuthClient, createAuthClient } from "../client";
+import { type AuthClient, createAuthClient } from "@repo/auth/client";
 
 const authClient: AuthClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL ?? "",
@@ -19,5 +19,3 @@ export const organization: AuthClient["organization"] = authClient.organization;
 export const updateUser: AuthClient["updateUser"] = authClient.updateUser;
 export const deleteUser: AuthClient["deleteUser"] = authClient.deleteUser;
 export const changeEmail: AuthClient["changeEmail"] = authClient.changeEmail;
-
-export { authClient };

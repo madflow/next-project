@@ -1,13 +1,7 @@
 import { apiKey } from "@better-auth/api-key";
-import { type BetterAuthPlugin, betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { type BetterAuthOptions, type BetterAuthPlugin, betterAuth } from "better-auth";
 import { admin as adminPlugin, organization as organizationPlugin } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
-import { defaultClient as db } from "@repo/database/clients";
-import { authSchema } from "@repo/database/schema";
-
-export const USER_ADMIN_ROLE = "admin";
-const USER_ROLE = "user";
+import { AUTH_COOKIE_PREFIX, authSessionAdditionalFields, authUserAdditionalFields } from "../shared";
 
 type EmailChangeUser = {
   email: string;
@@ -38,6 +32,9 @@ type SendInvitationEmail = (
 type BaseCreateAuthOptions = {
   authDisableSignup?: boolean;
   baseURL?: string;
+  cookiePrefix?: string;
+  database: BetterAuthOptions["database"];
+  databaseHooks?: BetterAuthOptions["databaseHooks"];
   secret?: string;
   sendChangeEmailConfirmation?: SendChangeEmailConfirmation;
   sendInvitationEmail?: SendInvitationEmail;
@@ -46,84 +43,88 @@ type BaseCreateAuthOptions = {
 };
 
 export type CreateAuthOptions = BaseCreateAuthOptions & {
-  plugins?: readonly BetterAuthPlugin[];
+  serverPlugins?: BetterAuthPlugin[];
 };
 
+function parseBoolean(value: string | undefined, fallback: boolean) {
+  if (value === undefined) {
+    return fallback;
+  }
+
+  return ["1", "true", "yes"].includes(value.toLowerCase());
+}
+
+function createAPIKeyPlugin() {
+  return apiKey({
+    references: "user",
+    defaultPrefix: "uak_",
+    enableMetadata: true,
+    rateLimit: {
+      enabled: true,
+      maxRequests: 300,
+      timeWindow: 60 * 1000,
+    },
+  });
+}
+
+function createAdminPlugin() {
+  return adminPlugin();
+}
+
+function createOrganizationPlugin(sendInvitationEmail?: SendInvitationEmail) {
+  return organizationPlugin({
+    schema: {
+      organization: {
+        additionalFields: {
+          settings: {
+            type: "string",
+            required: false,
+            input: false,
+          },
+        },
+      },
+    },
+    ...(sendInvitationEmail ? { sendInvitationEmail } : {}),
+    allowUserToCreateOrganization: async () => {
+      return false;
+    },
+  });
+}
+
 export function createAuth({
-  authDisableSignup = process.env.AUTH_DISABLE_SIGNUP === undefined
-    ? true
-    : ["1", "true", "yes"].includes(process.env.AUTH_DISABLE_SIGNUP.toLowerCase()),
+  authDisableSignup = parseBoolean(process.env.AUTH_DISABLE_SIGNUP, true),
   baseURL = process.env.AUTH_URL ?? "",
+  cookiePrefix = AUTH_COOKIE_PREFIX,
+  database,
+  databaseHooks,
   secret = process.env.AUTH_SECRET ?? "",
   sendChangeEmailConfirmation,
   sendInvitationEmail,
   sendResetPassword,
   sendVerificationEmail,
-  plugins,
-}: CreateAuthOptions = {}) {
+  serverPlugins,
+}: CreateAuthOptions) {
   return betterAuth({
     telemetry: { enabled: false },
     secret,
     baseURL,
-    database: drizzleAdapter(db, {
-      provider: "pg",
-      schema: authSchema,
-    }),
-    databaseHooks: {
-      user: {
-        create: {
-          after: async () => {
-            // Check for invitation ID in headers to auto-accept invitation
-            // This would be set during signup with invitation
-          },
-        },
-      },
-      session: {
-        create: {
-          before: async (session) => {
-            const memberships = await db
-              .select()
-              .from(authSchema.member)
-              .where(eq(authSchema.member.userId, session.userId));
-            const singleMembership = memberships.length === 1 && memberships[0];
-            const activeOrganizationId = singleMembership ? singleMembership.organizationId : null;
-
-            return {
-              data: {
-                ...session,
-                activeOrganizationId,
-              },
-            };
-          },
-        },
-      },
-    },
+    database,
+    ...(databaseHooks ? { databaseHooks } : {}),
     session: {
+      additionalFields: authSessionAdditionalFields,
       cookieCache: {
         enabled: true,
         maxAge: 5 * 60,
       },
     },
     advanced: {
-      cookiePrefix: "auth",
+      cookiePrefix,
       database: {
         generateId: false,
       },
     },
     user: {
-      additionalFields: {
-        locale: {
-          type: "string",
-          required: false,
-          input: true,
-        },
-        role: {
-          type: "string",
-          required: true,
-          defaultValue: USER_ROLE,
-          input: false,
-        },
-      },
+      additionalFields: authUserAdditionalFields,
       deleteUser: {
         enabled: true,
       },
@@ -167,37 +168,41 @@ export function createAuth({
       ...(sendResetPassword ? { sendResetPassword } : {}),
     },
     plugins: [
-      apiKey({
-        references: "user",
-        defaultPrefix: "uak_",
-        enableMetadata: true,
-        rateLimit: {
-          enabled: true,
-          maxRequests: 300,
-          timeWindow: 60 * 1000,
-        },
-      }),
-      adminPlugin(),
-      organizationPlugin({
-        schema: {
-          organization: {
-            additionalFields: {
-              settings: {
-                type: "string",
-                required: false,
-                input: false,
-              },
-            },
-          },
-        },
-        ...(sendInvitationEmail ? { sendInvitationEmail } : {}),
-        allowUserToCreateOrganization: async () => {
-          return false;
-        },
-      }),
-      ...(plugins ?? []),
+      createAPIKeyPlugin(),
+      createAdminPlugin(),
+      createOrganizationPlugin(sendInvitationEmail),
+      ...(serverPlugins ?? []),
     ],
   });
 }
 
 export type AuthInstance = ReturnType<typeof createAuth>;
+export type AuthSessionResult = Awaited<ReturnType<AuthInstance["api"]["getSession"]>>;
+export type AuthSession = NonNullable<AuthSessionResult>;
+export type AuthSessionData = AuthSession["session"];
+export type AuthUser = AuthSession["user"];
+export type AuthVerifyApiKeyResult = Awaited<ReturnType<AuthInstance["api"]["verifyApiKey"]>>;
+
+export type InferAuthSession<TAuth extends { api: { getSession: (...args: never[]) => Promise<unknown> } }> =
+  NonNullable<Awaited<ReturnType<TAuth["api"]["getSession"]>>>;
+
+export type InferAuthSessionData<TAuth extends { api: { getSession: (...args: never[]) => Promise<unknown> } }> =
+  InferAuthSession<TAuth>["session"];
+
+export type InferAuthUser<TAuth extends { api: { getSession: (...args: never[]) => Promise<unknown> } }> =
+  InferAuthSession<TAuth>["user"];
+
+export type PrincipalAuth = {
+  api: Pick<AuthInstance["api"], "getSession" | "verifyApiKey">;
+};
+
+export type RouteHandlerAuth = Pick<AuthInstance, "handler">;
+export {
+  AUTH_COOKIE_PREFIX,
+  USER_ADMIN_ROLE,
+  getImpersonatedBy,
+  isAdminRole,
+  isAdminUser,
+  isImpersonatingSession,
+} from "../shared";
+export type { AuthRole } from "../shared";

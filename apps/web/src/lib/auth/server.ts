@@ -1,5 +1,8 @@
+import "server-only";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { eq } from "drizzle-orm";
+import { createAuth } from "@repo/auth/server";
 import { defaultClient as db } from "@repo/database/clients";
 import { authSchema } from "@repo/database/schema";
 import {
@@ -10,7 +13,7 @@ import {
   getEmailTranslations,
   sendEmail,
 } from "@repo/email";
-import { USER_ADMIN_ROLE, createAuth } from "../server";
+import { env } from "@/env";
 
 type Locale = "en" | "de";
 
@@ -30,22 +33,14 @@ type WebAuthOptions = {
   env?: Partial<EnvConfig>;
 };
 
-function parseBoolean(value: string | undefined, fallback: boolean) {
-  if (value === undefined) {
-    return fallback;
-  }
-
-  return ["1", "true", "yes"].includes(value.toLowerCase());
-}
-
 function getEnvConfig(overrides?: Partial<EnvConfig>): EnvConfig {
   return {
-    authDisableSignup: overrides?.authDisableSignup ?? parseBoolean(process.env.AUTH_DISABLE_SIGNUP, true),
-    authSecret: overrides?.authSecret ?? process.env.AUTH_SECRET ?? "",
-    authUrl: overrides?.authUrl ?? process.env.AUTH_URL ?? "",
-    baseUrl: overrides?.baseUrl ?? process.env.BASE_URL ?? "",
-    mailDefaultSender: overrides?.mailDefaultSender ?? process.env.MAIL_DEFAULT_SENDER ?? "",
-    siteName: overrides?.siteName ?? process.env.SITE_NAME ?? "",
+    authDisableSignup: overrides?.authDisableSignup ?? env.AUTH_DISABLE_SIGNUP,
+    authSecret: overrides?.authSecret ?? env.AUTH_SECRET,
+    authUrl: overrides?.authUrl ?? env.AUTH_URL,
+    baseUrl: overrides?.baseUrl ?? env.BASE_URL,
+    mailDefaultSender: overrides?.mailDefaultSender ?? env.MAIL_DEFAULT_SENDER,
+    siteName: overrides?.siteName ?? env.SITE_NAME,
   };
 }
 
@@ -76,12 +71,43 @@ function resolveRequestLocale(request: Request | undefined, userLocale?: string)
   return requestedLocale ?? DEFAULT_LOCALE;
 }
 
-export function createWebAuth({ env: envOverrides }: WebAuthOptions = {}) {
+function createWebAuth({ env: envOverrides }: WebAuthOptions = {}) {
   const env = getEnvConfig(envOverrides);
 
   return createAuth({
     authDisableSignup: env.authDisableSignup,
     baseURL: env.authUrl,
+    database: drizzleAdapter(db, {
+      provider: "pg",
+      schema: authSchema,
+    }),
+    databaseHooks: {
+      user: {
+        create: {
+          after: async () => {
+            // Placeholder for invitation-aware signup hooks.
+          },
+        },
+      },
+      session: {
+        create: {
+          before: async (session) => {
+            const memberships = await db
+              .select()
+              .from(authSchema.member)
+              .where(eq(authSchema.member.userId, session.userId));
+            const singleMembership = memberships.length === 1 ? memberships[0] : null;
+
+            return {
+              data: {
+                ...session,
+                activeOrganizationId: singleMembership?.organizationId ?? null,
+              },
+            };
+          },
+        },
+      },
+    },
     secret: env.authSecret,
     sendChangeEmailConfirmation: async ({ user, newEmail, url }, request) => {
       const locale = resolveRequestLocale(request, user.locale);
@@ -179,10 +205,8 @@ export function createWebAuth({ env: envOverrides }: WebAuthOptions = {}) {
         }),
       });
     },
-    plugins: [nextCookies()],
+    serverPlugins: [nextCookies()],
   });
 }
 
 export const auth = createWebAuth();
-
-export { USER_ADMIN_ROLE };

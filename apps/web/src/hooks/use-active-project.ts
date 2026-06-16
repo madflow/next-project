@@ -1,10 +1,10 @@
 "use client";
-import { type Organization } from "better-auth/plugins";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import type { AuthOrganization } from "@/lib/auth/types";
 import { useProjectsByOrg } from "./use-projects-by-org";
 
-export function useActiveProject(activeOrganization?: Organization | null) {
+export function useActiveProject(activeOrganization?: AuthOrganization | null) {
   const pathname = usePathname();
 
   // Derive project slug directly from pathname

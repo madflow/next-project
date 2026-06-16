@@ -1,6 +1,5 @@
 "use client";
 
-import { Organization } from "better-auth/plugins";
 import { PieChart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
@@ -10,10 +9,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import type { AuthOrganization } from "@/lib/auth/types";
 import { type Project } from "@/types/project";
 
 type NavProjectProps = {
-  activeOrganization: Organization | null;
+  activeOrganization: AuthOrganization | null;
   activeProject: Project | null;
 };
 export function NavProject({ activeOrganization, activeProject }: NavProjectProps) {

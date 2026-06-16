@@ -1,13 +1,12 @@
 import "server-only";
-import { Organization } from "better-auth/plugins";
-import { headers } from "next/headers";
-import { auth } from "@repo/auth/web/server";
+import { getActiveOrganizationId, getSession } from "@/lib/auth/session";
+import type { AuthOrganization } from "@/lib/auth/types";
 import { type Project } from "@/types/project";
 import { isNotFoundAPIError } from "./api-errors";
 import { getServerAPIClient } from "./server-api-client";
 
 type InitialAppContext = {
-  organization: Organization | null;
+  organization: AuthOrganization | null;
   project: Project | null;
 };
 
@@ -18,17 +17,13 @@ type InitialAppContext = {
  */
 export async function getInitialAppContext(projectSlug?: string): Promise<InitialAppContext> {
   try {
-    const requestHeaders = await headers();
-    const session = await auth.api.getSession({
-      headers: requestHeaders,
-    });
+    const session = await getSession();
 
     if (!session?.user) {
       return { organization: null, project: null };
     }
 
-    // Get active organization from session
-    const activeOrganizationId = session.session.activeOrganizationId;
+    const activeOrganizationId = getActiveOrganizationId(session.session);
 
     if (!activeOrganizationId) {
       return { organization: null, project: null };
@@ -52,7 +47,7 @@ export async function getInitialAppContext(projectSlug?: string): Promise<Initia
       return { organization: null, project: null };
     }
 
-    const organization: Organization = {
+    const organization: AuthOrganization = {
       id: org.id,
       name: org.name,
       slug: org.slug,

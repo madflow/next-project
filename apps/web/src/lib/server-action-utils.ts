@@ -1,21 +1,11 @@
 import "server-only";
-import { headers } from "next/headers";
-import { USER_ADMIN_ROLE, auth } from "@repo/auth/web/server";
-import { ServerActionNotAuthorizedException } from "@/lib/exception";
+import { requireAdminSession, requireSession } from "@/lib/auth/session";
 
 /**
  * Gets the current session or throws ServerActionNotAuthorizedException
  */
 export async function getSessionOrThrow() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    throw new ServerActionNotAuthorizedException("Authentication required");
-  }
-
-  return session;
+  return requireSession();
 }
 
 /**
@@ -24,12 +14,7 @@ export async function getSessionOrThrow() {
  */
 export function withAdminAuth<TArgs extends unknown[], TReturn>(fn: (...args: TArgs) => Promise<TReturn>) {
   return async (...args: TArgs): Promise<TReturn> => {
-    const session = await getSessionOrThrow();
-
-    if (session.user.role !== USER_ADMIN_ROLE) {
-      throw new ServerActionNotAuthorizedException("Admin access required");
-    }
-
+    await requireAdminSession();
     return fn(...args);
   };
 }

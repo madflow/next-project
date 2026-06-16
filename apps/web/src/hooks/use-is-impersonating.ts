@@ -1,22 +1,13 @@
-import { useSession } from "@repo/auth/web/client";
-
-type SessionWithImpersonation = {
-  impersonatedBy?: string;
-};
+import { getImpersonatedBy } from "@repo/auth/shared";
+import { useSession } from "@/lib/auth/client";
 
 export function useIsImpersonating() {
-  const session = useSession();
-
-  // Check if we have session data and if there's an impersonatedBy field
-  // Better-auth adds impersonation metadata to the session
-  const sessionData = session.data?.session as SessionWithImpersonation | undefined;
-  const isImpersonating = Boolean(sessionData && "impersonatedBy" in sessionData && sessionData.impersonatedBy);
-
-  const originalUserId = isImpersonating ? sessionData?.impersonatedBy : null;
+  const { data } = useSession();
+  const originalUserId = getImpersonatedBy(data?.session);
 
   return {
-    isImpersonating,
+    isImpersonating: originalUserId !== null,
     originalUserId,
-    currentUser: session.data?.user,
+    currentUser: data?.user,
   };
 }

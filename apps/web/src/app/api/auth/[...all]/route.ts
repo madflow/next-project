@@ -1,1 +1,1 @@
-export { GET, POST } from "@repo/auth/web/route";
+export { GET, POST } from "@/lib/auth/route";
