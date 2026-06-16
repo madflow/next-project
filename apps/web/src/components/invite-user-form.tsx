@@ -6,12 +6,12 @@ import { useTranslations } from "next-intl";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { organization } from "@repo/auth/web/client";
 import { OrganizationSelect } from "@/components/form/organization-select";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { organization } from "@/lib/auth/client";
 import { User } from "@/types/user";
 
 type InviteFormTranslations = {

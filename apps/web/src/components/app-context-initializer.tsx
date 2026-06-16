@@ -1,12 +1,12 @@
 "use client";
 
-import { Organization } from "better-auth/plugins";
 import { useEffect } from "react";
 import { useAppContext } from "@/context/app-context";
+import type { AuthOrganization } from "@/lib/auth/types";
 import { Project } from "@/types/project";
 
 type AppContextInitializerProps = {
-  organization: Organization | null;
+  organization: AuthOrganization | null;
   project: Project | null;
 };
 

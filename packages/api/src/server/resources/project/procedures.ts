@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { and, eq, exists, getTableColumns, sql } from "drizzle-orm";
+import { isAdminRole } from "@repo/auth/server";
 import {
   type CreateProjectData,
   type Dataset,
@@ -193,7 +194,7 @@ function getProjectAccessWhere(context: ProcedureContextInput) {
     });
   }
 
-  if (procedureContext.principal.user.role === "admin") {
+  if (isAdminRole(procedureContext.principal.user.role)) {
     return undefined;
   }
 

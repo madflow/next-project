@@ -1,13 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Organization } from "better-auth/plugins";
 import { Building2, ChevronsUpDown, CirclePlusIcon, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { organization } from "@repo/auth/web/client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,12 +17,14 @@ import {
 import { useAppContext } from "@/context/app-context";
 import { useCurrentuserOrganizations } from "@/hooks/use-currentuser-organizations";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { organization } from "@/lib/auth/client";
+import type { AuthOrganization } from "@/lib/auth/types";
 import { cn } from "@/lib/utils";
 import { InviteUserModal } from "./invite-user-modal";
 import { SidebarMenu, SidebarMenuItem } from "./ui/sidebar";
 
 type OrganizationMenuProps = {
-  activeOrganization: Organization | null;
+  activeOrganization: AuthOrganization | null;
 };
 
 export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) {

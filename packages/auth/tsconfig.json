@@ -1,7 +1,12 @@
 {
   "extends": "@repo/typescript-config/internal-package.json",
   "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
     "jsx": "react-jsx",
+    "noEmit": true,
     "types": ["node"]
   },
   "exclude": ["dist", "node_modules"],

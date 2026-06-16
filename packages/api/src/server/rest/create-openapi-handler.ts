@@ -1,13 +1,13 @@
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { ORPCError, ValidationError, onError } from "@orpc/server";
 import { z } from "zod";
-import type { AuthInstance } from "@repo/auth/server";
+import type { PrincipalAuth } from "@repo/auth/server";
 import { DatabaseInstance } from "@repo/database/clients";
 import { createORPCContext } from "../context";
 import { appRouter } from "../router";
 
 export type CreateOpenAPIHandlerOptions = {
-  auth: AuthInstance;
+  auth: PrincipalAuth;
   db: DatabaseInstance;
   pathPrefix: `/${string}`;
 };

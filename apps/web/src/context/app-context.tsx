@@ -1,17 +1,17 @@
 "use client";
 
-import { type Organization } from "better-auth/plugins";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { useActiveOrganization } from "@repo/auth/web/client";
 import { useActiveProject } from "@/hooks/use-active-project";
 import { useDebugMode } from "@/hooks/use-debug-mode";
+import { useActiveOrganization } from "@/lib/auth/client";
+import type { AuthOrganization } from "@/lib/auth/types";
 import { type Project } from "@/types/project";
 
 type AppContextType = {
-  activeOrganization: Organization | null;
+  activeOrganization: AuthOrganization | null;
   activeProject: Project | null;
   debugMode: boolean;
-  setActiveOrganization: (org: Organization | null) => void;
+  setActiveOrganization: (org: AuthOrganization | null) => void;
   setActiveProject: (project: Project | null) => void;
   setDebugMode: (enabled: boolean) => void;
 };
@@ -19,7 +19,7 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [activeOrganization, setActiveOrganization] = useState<Organization | null>(null);
+  const [activeOrganization, setActiveOrganization] = useState<AuthOrganization | null>(null);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const { data: activeOrganizationSession } = useActiveOrganization();
   const { activeProject: activeProjectDetected } = useActiveProject(activeOrganization);

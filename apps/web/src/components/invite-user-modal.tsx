@@ -1,6 +1,5 @@
 "use client";
 
-import { Organization } from "better-auth/plugins";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,12 +12,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { AuthOrganization } from "@/lib/auth/types";
 import { User } from "@/types/user";
 import { InviteUserForm } from "./invite-user-form";
 
 type InfoUserModalProps = {
   user?: User;
-  organization?: Organization;
+  organization?: AuthOrganization;
   children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;

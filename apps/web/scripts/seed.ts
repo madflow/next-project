@@ -1,3 +1,4 @@
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { hashPassword } from "better-auth/crypto";
 import { eq } from "drizzle-orm";
 import { readFile } from "node:fs/promises";
@@ -10,6 +11,7 @@ import { adminClient, adminPool } from "@repo/database/clients";
 import {
   account,
   apikey,
+  authSchema,
   dataset,
   datasetProject,
   datasetSplitVariable,
@@ -32,7 +34,12 @@ import { createDataset as createDatasetService } from "@/lib/dataset-service";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const auth = createAuth();
+const auth = createAuth({
+  database: drizzleAdapter(adminClient, {
+    provider: "pg",
+    schema: authSchema,
+  }),
+});
 
 const ADMIN_USER_UID = "0198e599-eab0-7cb8-861f-72a8f6d7abb1";
 const REGULAR_USER_UID = "0198e59c-e576-78d2-8606-61f0275aca5a";

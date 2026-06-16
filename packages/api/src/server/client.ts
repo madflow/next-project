@@ -1,10 +1,10 @@
 import { type RouterClient, createRouterClient } from "@orpc/server";
-import type { AuthInstance } from "@repo/auth/server";
+import type { PrincipalAuth } from "@repo/auth/server";
 import type { DatabaseInstance } from "@repo/database/clients";
 import { appRouter } from "./router";
 
 type CreateServerAPIClientOptions = {
-  auth: AuthInstance;
+  auth: PrincipalAuth;
   db: DatabaseInstance;
   headers: Headers;
 };

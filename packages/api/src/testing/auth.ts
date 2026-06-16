@@ -1,4 +1,4 @@
-import type { AuthInstance } from "@repo/auth/server";
+import type { AuthSessionResult, AuthVerifyApiKeyResult, PrincipalAuth } from "@repo/auth/server";
 import {
   type ApiKeyPrincipal,
   type Principal,
@@ -7,8 +7,8 @@ import {
 } from "../server/auth/principal";
 import type { ProcedureContextInput } from "../server/base";
 
-type SessionData = NonNullable<Awaited<ReturnType<AuthInstance["api"]["getSession"]>>>;
-type VerifyApiKeyResult = Awaited<ReturnType<AuthInstance["api"]["verifyApiKey"]>>;
+type SessionData = NonNullable<AuthSessionResult>;
+type VerifyApiKeyResult = AuthVerifyApiKeyResult;
 
 const adminUserId = "550e8400-e29b-41d4-a716-446655440001";
 const userUserId = "550e8400-e29b-41d4-a716-446655440010";
@@ -122,14 +122,14 @@ export function createMockAuth({
   session = null,
 }: {
   apiKeyResult?: VerifyApiKeyResult;
-  session?: Awaited<ReturnType<AuthInstance["api"]["getSession"]>>;
-} = {}): AuthInstance {
+  session?: AuthSessionResult;
+} = {}): PrincipalAuth {
   return {
     api: {
-      getSession: async () => session,
-      verifyApiKey: async () => apiKeyResult,
+      getSession: (async () => session) as PrincipalAuth["api"]["getSession"],
+      verifyApiKey: (async () => apiKeyResult) as PrincipalAuth["api"]["verifyApiKey"],
     },
-  } as AuthInstance;
+  };
 }
 
 function createProcedureContext(db: ProcedureContextInput["db"], principal: Principal): ProcedureContextInput {

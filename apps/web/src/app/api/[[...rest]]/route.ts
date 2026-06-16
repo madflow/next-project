@@ -1,6 +1,6 @@
 import { createApi } from "@repo/api/server";
-import { auth } from "@repo/auth/web/server";
 import { defaultClient as db } from "@repo/database/clients";
+import { auth } from "@/lib/auth/server";
 
 const handler = createApi({ auth, db, pathPrefix: "/api" });
 
