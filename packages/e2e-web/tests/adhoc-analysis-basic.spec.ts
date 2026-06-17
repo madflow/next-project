@@ -45,6 +45,22 @@ test.describe("Adhoc Analysis - Basic Functionality", () => {
     await expect(page.getByTestId("variable-item-marital")).toBeVisible();
   });
 
+  test("should open the variableset tree when clicking the group name", async ({ page }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/project/test-project/adhoc");
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
+    await page.getByText("SPSS Beispielumfrage").click();
+
+    const demografischeGroup = page.getByTestId("variable-group-Demografische Daten");
+    await expect(demografischeGroup).toBeVisible();
+    await demografischeGroup.click();
+
+    await expect(page.getByTestId("variable-item-age")).toBeVisible();
+    await expect(page.getByTestId("variable-item-sex")).toBeVisible();
+    await expect(page.getByTestId("variable-item-marital")).toBeVisible();
+  });
+
   test("should select Geschlecht variable and display analysis chart", async ({ page }) => {
     // Setup: Login, select dataset, expand group
     await page.goto("/");
