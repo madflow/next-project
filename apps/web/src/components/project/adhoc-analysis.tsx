@@ -597,6 +597,18 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             />
           </Suspense>
         )}
+        {selectedDataset && effectiveCurrentSelection && selectedVariables.length === 0 && (
+          <Empty className="flex max-w-lg flex-col gap-4" data-testid="adhoc-empty-set">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <FolderXIcon />
+              </EmptyMedia>
+              <EmptyTitle>{t("emptySet.title")}</EmptyTitle>
+              <EmptyDescription>{t("emptySet.description")}</EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent></EmptyContent>
+          </Empty>
+        )}
         {selectedDataset && !effectiveCurrentSelection && (
           <Empty className="flex max-w-lg flex-col gap-4">
             <EmptyHeader>

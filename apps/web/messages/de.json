@@ -1160,6 +1160,10 @@
       "description": "Bitte wählen Sie eine Variable oder ein Variablen-Set aus der Liste aus, um mit der Analyse zu beginnen.",
       "title": "Keine Auswahl getroffen"
     },
+    "emptySet": {
+      "description": "Dieses Variablen-Set enthält keine direkt anzeigbaren Variablen.",
+      "title": "Keine Diagramme anzuzeigen"
+    },
     "errors": {
       "fetchStats": "Fehler beim Laden der Statistiken"
     },
