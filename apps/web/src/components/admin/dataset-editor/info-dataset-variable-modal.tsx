@@ -32,7 +32,7 @@ export const InfoDatasetVariableModal = ({ datasetVariable }: InfoDatasetVariabl
           <DialogTitle>{datasetVariable.name}</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        <Code>{JSON.stringify(datasetVariable, null, 2)}</Code>
+        <Code scrollAreaClassName="max-h-[60vh]">{JSON.stringify(datasetVariable, null, 2)}</Code>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">{t("buttons.close")}</Button>
