@@ -123,12 +123,6 @@ function VariablesetNode({
           data-testid={`variable-group-${node.name}`}>
           {node.name}
         </button>
-
-        <span className="text-muted-foreground text-xs">
-          {"("}
-          {node.variableCount}
-          {")"}
-        </span>
       </div>
 
       {isExpanded && (
