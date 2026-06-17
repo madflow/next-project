@@ -31,7 +31,7 @@ export const InfoDatasetModal = ({ dataset }: InfoDatasetModalProps) => {
           <DialogTitle>{dataset.name}</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        <Code>{JSON.stringify(dataset, null, 2)}</Code>
+        <Code scrollAreaClassName="max-h-[60vh]">{JSON.stringify(dataset, null, 2)}</Code>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">{t("buttons.close")}</Button>

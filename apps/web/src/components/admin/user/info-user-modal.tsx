@@ -31,7 +31,7 @@ export const InfoUserModal = ({ user }: InfoUserModalProps) => {
           <DialogTitle>{user.name}</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-        <Code>{JSON.stringify(user, null, 2)}</Code>
+        <Code scrollAreaClassName="max-h-[60vh]">{JSON.stringify(user, null, 2)}</Code>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">{t("close")}</Button>
