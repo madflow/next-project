@@ -1160,6 +1160,10 @@
       "description": "Please select a variable or variable set from the list to begin your analysis.",
       "title": "No Selection Made"
     },
+    "emptySet": {
+      "description": "This variable set does not contain any directly displayable variables.",
+      "title": "No Charts to Display"
+    },
     "errors": {
       "fetchStats": "Error loading dataset statistics"
     },
