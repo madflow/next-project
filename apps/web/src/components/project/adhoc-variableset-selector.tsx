@@ -243,16 +243,31 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
   };
 
   const handleToggleExpand = (nodeId: string) => {
-    const newExpanded = new Set(expandedNodes);
-    if (newExpanded.has(nodeId)) {
-      newExpanded.delete(nodeId);
-    } else {
-      newExpanded.add(nodeId);
-    }
-    setExpandedNodes(newExpanded);
+    setExpandedNodes((currentExpanded) => {
+      const nextExpanded = new Set(currentExpanded);
+      if (nextExpanded.has(nodeId)) {
+        nextExpanded.delete(nodeId);
+      } else {
+        nextExpanded.add(nodeId);
+      }
+      return nextExpanded;
+    });
+  };
+
+  const handleExpandNode = (nodeId: string) => {
+    setExpandedNodes((currentExpanded) => {
+      if (currentExpanded.has(nodeId)) {
+        return currentExpanded;
+      }
+
+      const nextExpanded = new Set(currentExpanded);
+      nextExpanded.add(nodeId);
+      return nextExpanded;
+    });
   };
 
   const handleSelectSet = async (node: VariablesetTreeNode) => {
+    handleExpandNode(node.id);
     const data = await apiClient.variableset.variables.list({ id: node.id });
     onSelectionChangeAction({
       type: "set",
