@@ -2,6 +2,7 @@
 
 import { CircleHelpIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useId } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -27,6 +28,7 @@ export function SplitVariableSelector({
   isLoading: isLoadingProp,
 }: SplitVariableSelectorProps) {
   const t = useTranslations("projectAdhocAnalysis.splitVariable");
+  const splitVariableSelectId = `${useId()}-split-variable-select`;
   const shouldFetch = splitVariablesProp === undefined || isLoadingProp === undefined;
   const queryResult = useSplitVariables(datasetId, shouldFetch);
   const splitVariables = splitVariablesProp ?? queryResult.splitVariables;
@@ -50,7 +52,7 @@ export function SplitVariableSelector({
   return (
     <div className={compact ? "flex items-center gap-2" : "space-y-1"}>
       <div className="flex items-center gap-2">
-        <Label htmlFor="split-variable-select" className="min-w-fit text-sm font-medium">
+        <Label htmlFor={splitVariableSelectId} className="min-w-fit text-sm font-medium">
           {t("label")}
         </Label>
         <Tooltip>
@@ -63,7 +65,7 @@ export function SplitVariableSelector({
         </Tooltip>
         <Select value={selectedSplitVariable || "none"} onValueChange={handleValueChange}>
           <SelectTrigger
-            id="split-variable-select"
+            id={splitVariableSelectId}
             className={compact ? "h-8 w-auto max-w-[250px] min-w-[180px]" : "h-8 flex-1"}>
             <SelectValue placeholder={t("placeholder")}>
               <span className="truncate">{getSelectedLabel()}</span>

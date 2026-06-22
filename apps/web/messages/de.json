@@ -1193,6 +1193,8 @@
       "description": "Für diese Variable sind keine Diagrammtypen aktiviert. Bitte kontaktieren Sie einen Administrator, um die erlaubten Statistiken zu konfigurieren.",
       "title": "Keine Diagramme verfügbar"
     },
+    "noVariableSelected": "Keine Variable ausgewählt",
+    "noVariablesSelected": "Keine Variablen ausgewählt",
     "splitBy": "aufgeteilt nach: {variable}",
     "splitVariable": {
       "label": "Teilungsvariable:",

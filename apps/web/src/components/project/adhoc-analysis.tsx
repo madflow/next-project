@@ -36,6 +36,11 @@ type AdHocAnalysisProps = {
   project: Project;
 };
 
+type SplitStatsEntry = {
+  splitVariable: string;
+  stats: StatsResponse;
+};
+
 type VariablesResponse = {
   rows: DatasetVariableWithAttributes[];
 };
@@ -106,7 +111,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
   }>({ datasetId: initialSelectedDataset, name: null });
   const [currentSelection, setCurrentSelection] = useState<SelectionItem | null>(null);
   const [baseStatsData, setBaseStatsData] = useState<Record<string, StatsResponse>>({});
-  const [splitStatsData, setSplitStatsData] = useState<Record<string, StatsResponse>>({});
+  const [splitStatsData, setSplitStatsData] = useState<Record<string, SplitStatsEntry>>({});
   const syncedStoredDatasetRef = useRef(false);
   const pendingUrlQueryRef = useRef<string | null>(null);
   const clearedUrlSelectionRef = useRef<string | null>(null);
@@ -452,7 +457,10 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
             if (splitVariable) {
               setSplitStatsData((prev) => ({
                 ...prev,
-                [variableName]: [responseItem],
+                [variableName]: {
+                  splitVariable,
+                  stats: [responseItem],
+                },
               }));
             } else {
               setSplitStatsData((prev) => {

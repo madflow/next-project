@@ -86,6 +86,8 @@ export function VariableChartCard({
     />
   );
 
+  const exportable = selectedChartType !== "textExplorer";
+
   const exportChartContent = (
     <ChartRendererContent
       chartType={selectedChartType}
@@ -140,15 +142,17 @@ export function VariableChartCard({
 
   return (
     <div {...props}>
-      <ChartExportSurface exportRef={exportRef} fileName={exportBaseName} isRendering={isExportRendering}>
-        {exportChartContent}
-      </ChartExportSurface>
+      {exportable && (
+        <ChartExportSurface exportRef={exportRef} fileName={exportBaseName} isRendering={isExportRendering}>
+          {exportChartContent}
+        </ChartExportSurface>
+      )}
       <ChartPanelCard
         variable={variable}
         stats={stats}
         description={splitVariableDescription}
         chartContent={chartContent}
-        exportable={selectedChartType !== "textExplorer"}
+        exportable={exportable}
         onExportImageAction={exportPNG}
         onExportExcelAction={handleExcelExport}
         onExportPowerPointAction={handlePowerPointExport}

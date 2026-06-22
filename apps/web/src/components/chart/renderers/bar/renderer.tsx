@@ -2,7 +2,7 @@
 
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { transformToRechartsBarData } from "@/lib/analysis-bridge";
+import { type ChartSortConfig, transformToRechartsBarData } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaVerticalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariable } from "@/types/dataset-variable";
@@ -16,6 +16,7 @@ type BarChartRendererProps = {
   chartConfig: ChartConfig;
   chartColors?: ThemeChartColors;
   disableAnimation?: boolean;
+  sortConfig?: ChartSortConfig;
 };
 
 export function BarChartRenderer({
@@ -25,8 +26,9 @@ export function BarChartRenderer({
   chartConfig,
   chartColors,
   disableAnimation = false,
+  sortConfig,
 }: BarChartRendererProps) {
-  const chartData = transformToRechartsBarData(variable, stats);
+  const chartData = transformToRechartsBarData(variable, stats, sortConfig);
 
   return (
     <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
