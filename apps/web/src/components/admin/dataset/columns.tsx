@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Download, Pencil } from "lucide-react";
+import { Download, Pencil, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -49,9 +49,9 @@ export const columns: ColumnDef<DatasetWithEmbeddedOrganization>[] = [
     cell: ({ row }) => formatFileSize(row.original.fileSize),
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "uploadedAt",
     header: ({ column }) => <DataTableColumnHeader column={column} title="adminDataset.columns.uploaded" />,
-    cell: ({ row }) => formatDate(row.original.createdAt),
+    cell: ({ row }) => formatDate(row.original.uploadedAt),
   },
   {
     id: "actions",
@@ -88,6 +88,15 @@ export const columns: ColumnDef<DatasetWithEmbeddedOrganization>[] = [
             render={<a href={`/api/datasets/${dataset.id}/download`} target="_blank" rel="noopener noreferrer" />}>
             <Download className="h-4 w-4" />
             <span className="sr-only">{t("tableActions.download")}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            title={t("tableActions.replaceFile")}
+            nativeButton={false}
+            render={<Link href={`/admin/datasets/${dataset.id}/update-file`} />}>
+            <RefreshCw className="h-4 w-4" />
+            <span className="sr-only">{t("tableActions.replaceFile")}</span>
           </Button>
           <DeleteDatasetDialog datasetId={dataset.id} datasetName={dataset.name} onDelete={handleDelete} />
           <InfoDatasetModal dataset={row.original} />

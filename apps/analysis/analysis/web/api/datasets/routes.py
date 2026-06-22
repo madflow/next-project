@@ -1,9 +1,11 @@
+import tempfile
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import pyreadstat
-from fastapi import Depends, HTTPException, Security, status
+from fastapi import Depends, File, HTTPException, Security, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import Response
 from fastapi.routing import APIRouter
@@ -36,6 +38,9 @@ from analysis.web.api.schemas.datasets import (
     PowerPointExportRequest,
 )
 from analysis.web.api.security import get_api_key
+
+DATASET_PREVIEW_MAX_FILE_SIZE = 100 * 1024 * 1024
+UPLOAD_CHUNK_SIZE = 1024 * 1024
 
 router = APIRouter(tags=["datasets"])
 
@@ -181,18 +186,10 @@ def _get_cached_dataset_file_path(dataset: Dataset) -> str:
     )
 
 
-def _read_sav_from_dataset(dataset: Dataset) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    """
-    Read a cached SAV file and return data and metadata.
-
-    Args:
-        dataset: Dataset containing the file hash and S3 object key/path
-
-    Returns:
-        Tuple containing (data, metadata) from the SAV file
-    """
-    dataset_file_path = _get_cached_dataset_file_path(dataset)
-
+def _read_sav_from_path(
+    dataset_file_path: str,
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """Read metadata from a local SAV file path."""
     try:
         df, meta = pyreadstat.read_sav(
             dataset_file_path,
@@ -216,6 +213,19 @@ def _read_sav_from_dataset(dataset: Dataset) -> Tuple[Dict[str, Any], Dict[str, 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error reading SAV file: {e!s}",
         ) from e
+
+
+def _read_sav_from_dataset(dataset: Dataset) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """
+    Read a cached SAV file and return data and metadata.
+
+    Args:
+        dataset: Dataset containing the file hash and S3 object key/path
+
+    Returns:
+        Tuple containing (data, metadata) from the SAV file
+    """
+    return _read_sav_from_path(_get_cached_dataset_file_path(dataset))
 
 
 def _read_dataframe_from_dataset(dataset: Dataset) -> pd.DataFrame:
@@ -267,6 +277,54 @@ async def get_dataset_metadata(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error importing dataset: {e!s}",
         ) from e
+
+
+@router.post("/datasets/metadata/preview", response_model=MetadataResponse)
+async def preview_dataset_metadata(
+    file: UploadFile = File(...),
+    _api_key: str = Security(get_api_key),
+) -> MetadataResponse:
+    """Read metadata from an uploaded SAV file without mutating a dataset."""
+    temp_path: Optional[Path] = None
+    try:
+        suffix = Path(file.filename or "").suffix.lower()
+        if suffix != ".sav":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only .sav files are supported",
+            )
+
+        total_size = 0
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as temp_file:
+            temp_path = Path(temp_file.name)
+            while chunk := await file.read(UPLOAD_CHUNK_SIZE):
+                total_size += len(chunk)
+                if total_size > DATASET_PREVIEW_MAX_FILE_SIZE:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+                        detail="Dataset file exceeds the 100 MB limit",
+                    )
+                temp_file.write(chunk)
+
+        if total_size == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Dataset file is empty",
+            )
+
+        data, metadata = await run_in_threadpool(_read_sav_from_path, str(temp_path))
+
+        return MetadataResponse(
+            status="success",
+            message="Successfully read dataset metadata preview",
+            dataset_id="preview",
+            data=data,
+            metadata=metadata,
+        )
+    finally:
+        await file.close()
+        if temp_path is not None:
+            temp_path.unlink(missing_ok=True)
 
 
 @router.post("/datasets/{dataset_id}/stats")

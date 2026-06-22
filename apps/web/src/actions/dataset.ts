@@ -1,7 +1,14 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { UpdateDatasetData } from "@repo/database/schema";
-import { CreateDatasetResult, createDataset } from "@/lib/dataset-service";
+import {
+  CreateDatasetResult,
+  type DatasetFileUpdateResult,
+  createDataset,
+  previewDatasetFileUpdate,
+  updateDatasetFile,
+} from "@/lib/dataset-service";
 import { getSessionOrThrow, withAdminAuth } from "@/lib/server-action-utils";
 import { getServerAPIClient } from "@/lib/server-api-client";
 
@@ -61,3 +68,99 @@ export const update = withAdminAuth(async (datasetId: string, values: UpdateData
     params: { id: datasetId },
   });
 });
+
+export const previewDatasetFileUpdateWithFormData = withAdminAuth(
+  async (formData: FormData): Promise<DatasetFileUpdateResult> => {
+    const file = formData.get("file") as File | null;
+    const datasetId = formData.get("datasetId") as string | null;
+    const contentType = (formData.get("contentType") as string | null) ?? "application/octet-stream";
+
+    if (!file) {
+      return {
+        success: false,
+        error: "No file provided",
+      };
+    }
+
+    if (!datasetId) {
+      return {
+        success: false,
+        error: "No dataset provided",
+      };
+    }
+
+    return previewDatasetFileUpdate({
+      contentType,
+      datasetId,
+      file,
+    });
+  }
+);
+
+export const confirmDatasetFileUpdateWithFormData = withAdminAuth(
+  async (formData: FormData): Promise<DatasetFileUpdateResult> => {
+    const session = await getSessionOrThrow();
+    const file = formData.get("file") as File | null;
+    const datasetId = formData.get("datasetId") as string | null;
+    const contentType = (formData.get("contentType") as string | null) ?? "application/octet-stream";
+    const missingValuesJson = formData.get("missingValues") as string | null;
+    const expectedFileHash = formData.get("expectedFileHash") as string | null;
+    const expectedStateHash = formData.get("expectedStateHash") as string | null;
+
+    if (!file) {
+      return {
+        success: false,
+        error: "No file provided",
+      };
+    }
+
+    if (!datasetId) {
+      return {
+        success: false,
+        error: "No dataset provided",
+      };
+    }
+
+    if (!expectedFileHash || !expectedStateHash) {
+      return {
+        success: false,
+        error: "Preview is missing or stale. Preview the replacement again.",
+      };
+    }
+
+    let missingValues: string[] | null = null;
+    try {
+      const parsedMissingValues: unknown = missingValuesJson ? JSON.parse(missingValuesJson) : null;
+      if (
+        parsedMissingValues !== null &&
+        (!Array.isArray(parsedMissingValues) || parsedMissingValues.some((value) => typeof value !== "string"))
+      ) {
+        throw new Error("Invalid missing values");
+      }
+      missingValues = parsedMissingValues;
+    } catch {
+      return {
+        success: false,
+        error: "Invalid missing values",
+      };
+    }
+
+    const result = await updateDatasetFile({
+      contentType,
+      datasetId,
+      expectedFileHash,
+      expectedStateHash,
+      file,
+      missingValues,
+      userId: session.user.id,
+    });
+
+    if (result.success) {
+      revalidatePath("/admin/datasets");
+      revalidatePath(`/admin/datasets/${datasetId}/editor`);
+      revalidatePath(`/admin/datasets/${datasetId}/update-file`);
+    }
+
+    return result;
+  }
+);

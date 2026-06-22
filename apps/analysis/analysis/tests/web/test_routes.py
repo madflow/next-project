@@ -1,7 +1,12 @@
+from io import BytesIO
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
 import pandas as pd
 import pytest
+from fastapi import HTTPException, UploadFile
 
 from analysis.web.api.datasets.routes import (
     RawDataRequest,
@@ -14,15 +19,83 @@ from analysis.web.api.datasets.routes import (
     export_dataset_powerpoint,
     get_dataset_raw_data,
     get_dataset_stats,
+    preview_dataset_metadata,
 )
 from analysis.web.api.schemas.datasets import (
     ExcelExportRequest,
     PowerPointExportRequest,
 )
 
-
 # Since the actual integration tests are complex to set up without full app context,
 # let's create unit tests that test the logic functions directly
+
+
+@pytest.mark.anyio
+async def test_dataset_metadata_preview_closes_rejected_file() -> None:
+    """Close uploads rejected before a temporary file is created."""
+    upload = UploadFile(filename="dataset.csv", file=BytesIO(b"not-a-sav"))
+
+    with pytest.raises(HTTPException) as error:
+        await preview_dataset_metadata(file=upload, _api_key="test-key")
+
+    assert error.value.status_code == 400
+    assert upload.file.closed
+
+
+@pytest.mark.anyio
+async def test_dataset_metadata_preview_rejects_oversized_upload(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Reject oversized previews before invoking the SAV parser and remove temp data."""
+    monkeypatch.setattr(
+        "analysis.web.api.datasets.routes.DATASET_PREVIEW_MAX_FILE_SIZE", 3
+    )
+
+    def create_temp_file(*, suffix: str, delete: bool) -> Any:
+        return NamedTemporaryFile(suffix=suffix, delete=delete, dir=tmp_path)
+
+    upload = UploadFile(filename="large.sav", file=BytesIO(b"1234"))
+    with (
+        patch(
+            "analysis.web.api.datasets.routes.tempfile.NamedTemporaryFile",
+            side_effect=create_temp_file,
+        ),
+        patch("analysis.web.api.datasets.routes._read_sav_from_path") as read_sav,
+        pytest.raises(HTTPException) as error,
+    ):
+        await preview_dataset_metadata(file=upload, _api_key="test-key")
+
+    assert error.value.status_code == 413
+    read_sav.assert_not_called()
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.anyio
+async def test_dataset_metadata_preview_removes_temp_file_after_parser_failure(
+    tmp_path: Path,
+) -> None:
+    """Remove the uploaded temporary file even when SAV parsing fails."""
+
+    def create_temp_file(*, suffix: str, delete: bool) -> Any:
+        return NamedTemporaryFile(suffix=suffix, delete=delete, dir=tmp_path)
+
+    upload = UploadFile(filename="broken.sav", file=BytesIO(b"not-a-sav"))
+    with (
+        patch(
+            "analysis.web.api.datasets.routes.tempfile.NamedTemporaryFile",
+            side_effect=create_temp_file,
+        ),
+        patch(
+            "analysis.web.api.datasets.routes._read_sav_from_path",
+            side_effect=ValueError("invalid SAV"),
+        ),
+        pytest.raises(ValueError, match="invalid SAV"),
+    ):
+        await preview_dataset_metadata(file=upload, _api_key="test-key")
+
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_stats_request_model_with_split_variables() -> None:
     """Test that the StatsRequest and StatsVariable models work correctly."""
     # Test per-variable split variable
