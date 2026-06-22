@@ -1,10 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
@@ -104,7 +101,6 @@ export function MultiResponseAggregateCard({
   datasetName,
   ...props
 }: MultiResponseAggregateCardProps) {
-  const tAdhoc = useTranslations("projectAdhocAnalysis");
   const [sortByCountDesc, setSortByCountDesc] = useState(false);
 
   const chartData = useMemo(() => {
@@ -134,14 +130,6 @@ export function MultiResponseAggregateCard({
     variablesetName,
   });
   const chartConfig = useMemo(() => createPercentageChartConfig({ percentLabel: percentageLabel }), [percentageLabel]);
-  const footerContent = (
-    <div className="flex w-full items-center justify-between gap-4">
-      <div className="flex items-center gap-2">
-        <Switch id="sort-by-count-mr" size="sm" checked={sortByCountDesc} onCheckedChange={setSortByCountDesc} />
-        <Label htmlFor="sort-by-count-mr">{tAdhoc("sortByCount")}</Label>
-      </div>
-    </div>
-  );
   const chartContent = (
     <MultiResponseAggregateChartContent
       chartConfig={chartConfig}
@@ -167,7 +155,6 @@ export function MultiResponseAggregateCard({
         title={variablesetName}
         description={variablesetDescription ?? null}
         chartContent={chartContent}
-        footerContent={footerContent}
         exportable
         onExportImageAction={exportPNG}
         onExportExcelAction={handleExcelExport}
@@ -176,6 +163,8 @@ export function MultiResponseAggregateCard({
         availableChartTypes={[]}
         selectedChartType="horizontalBar"
         onChartTypeChangeAction={() => {}}
+        sortByCountDesc={sortByCountDesc}
+        onSortByCountDescChangeAction={setSortByCountDesc}
       />
     </div>
   );
