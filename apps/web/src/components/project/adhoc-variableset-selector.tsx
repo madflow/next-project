@@ -25,8 +25,109 @@ export type SelectionItem = {
   variable?: DatasetVariableWithAttributes;
   variableset?: VariablesetTreeNode;
   variables?: DatasetVariableWithAttributes[];
+  renderSections?: SelectionRenderSection[];
   parentVariableset?: VariablesetTreeNode; // Add this for individual variable selections from a variableset
 };
+
+export type SelectionRenderSection = {
+  id: string;
+  variables: DatasetVariableWithAttributes[];
+  variableset?: VariablesetTreeNode;
+  multiResponseAggregateOnly?: boolean;
+};
+
+type VariablesResponse = {
+  rows: DatasetVariableWithAttributes[];
+};
+
+type VariablesetContentsResponse = {
+  contents: Array<{
+    id: string;
+    contentType: "variable" | "subset";
+    variableId: string | null;
+    subsetId: string | null;
+  }>;
+};
+
+function findChildVariableset(node: VariablesetTreeNode, variablesetId: string): VariablesetTreeNode | null {
+  for (const child of node.children) {
+    if (child.id === variablesetId) {
+      return child;
+    }
+
+    const nestedChild = findChildVariableset(child, variablesetId);
+    if (nestedChild) {
+      return nestedChild;
+    }
+  }
+
+  return null;
+}
+
+export async function buildVariablesetSelection(node: VariablesetTreeNode): Promise<SelectionItem> {
+  const [variablesData, contentsData] = (await Promise.all([
+    apiClient.variableset.variables.list({ id: node.id }),
+    apiClient.variableset.contents.get({ id: node.id }),
+  ])) as [VariablesResponse, VariablesetContentsResponse];
+  const variablesById = new Map(variablesData.rows.map((variable) => [variable.id, variable]));
+  const renderSections: SelectionRenderSection[] = [];
+  let directVariables: DatasetVariableWithAttributes[] = [];
+  let directSectionIndex = 0;
+
+  const flushDirectVariables = () => {
+    if (directVariables.length === 0) {
+      return;
+    }
+
+    renderSections.push({
+      id: `${node.id}:variables:${directSectionIndex}`,
+      variableset: node,
+      variables: directVariables,
+    });
+    directSectionIndex += 1;
+    directVariables = [];
+  };
+
+  for (const content of contentsData.contents) {
+    if (content.contentType === "variable" && content.variableId) {
+      const variable = variablesById.get(content.variableId);
+      if (variable) {
+        directVariables.push(variable);
+      }
+      continue;
+    }
+
+    if (content.contentType !== "subset" || !content.subsetId) {
+      continue;
+    }
+
+    const childVariableset = findChildVariableset(node, content.subsetId);
+    if (childVariableset?.category !== "multi_response") {
+      continue;
+    }
+
+    flushDirectVariables();
+
+    const childVariablesData = (await apiClient.variableset.variables.list({
+      id: childVariableset.id,
+    })) as VariablesResponse;
+    renderSections.push({
+      id: childVariableset.id,
+      variableset: childVariableset,
+      variables: childVariablesData.rows,
+      multiResponseAggregateOnly: true,
+    });
+  }
+
+  flushDirectVariables();
+
+  return {
+    type: "set",
+    variableset: node,
+    variables: variablesData.rows,
+    renderSections: renderSections.length > 0 ? renderSections : undefined,
+  };
+}
 
 type AdHocVariablesetSelectorProps = {
   datasetId: string;
@@ -268,12 +369,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
 
   const handleSelectSet = async (node: VariablesetTreeNode) => {
     handleExpandNode(node.id);
-    const data = await apiClient.variableset.variables.list({ id: node.id });
-    onSelectionChangeAction({
-      type: "set",
-      variableset: node,
-      variables: data.rows,
-    });
+    onSelectionChangeAction(await buildVariablesetSelection(node));
   };
 
   const handleSelectVariable = (variable: DatasetVariableWithAttributes, parentVariableset?: VariablesetTreeNode) => {

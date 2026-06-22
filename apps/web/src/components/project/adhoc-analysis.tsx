@@ -30,7 +30,12 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { AdHocVariablesetSelector, SelectionItem } from "./adhoc-variableset-selector";
+import {
+  AdHocVariablesetSelector,
+  type SelectionItem,
+  type SelectionRenderSection,
+  buildVariablesetSelection,
+} from "./adhoc-variableset-selector";
 
 type AdHocAnalysisProps = {
   project: Project;
@@ -44,6 +49,46 @@ type SplitStatsEntry = {
 type VariablesResponse = {
   rows: DatasetVariableWithAttributes[];
 };
+
+function getSelectionRenderSections(selection: SelectionItem): SelectionRenderSection[] {
+  if (selection.type === "variable" && selection.variable) {
+    return [
+      {
+        id: selection.variable.id,
+        variableset: selection.parentVariableset,
+        variables: [selection.variable],
+      },
+    ];
+  }
+
+  if (selection.type === "set" && selection.renderSections?.length) {
+    return selection.renderSections;
+  }
+
+  if (selection.type === "set" && selection.variables?.length) {
+    return [
+      {
+        id: selection.variableset?.id ?? selection.variables.map((variable) => variable.id).join(","),
+        variableset: selection.variableset,
+        variables: selection.variables,
+      },
+    ];
+  }
+
+  return [];
+}
+
+function getSelectionVariables(selection: SelectionItem) {
+  const variablesByName = new Map<string, DatasetVariableWithAttributes>();
+
+  for (const section of getSelectionRenderSections(selection)) {
+    for (const variable of section.variables) {
+      variablesByName.set(variable.name, variable);
+    }
+  }
+
+  return Array.from(variablesByName.values());
+}
 
 /**
  * Content of the variable selector panel -- reused across desktop inline,
@@ -173,12 +218,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
           return null;
         }
 
-        const data = (await apiClient.variableset.variables.list({ id: selection.variablesetId })) as VariablesResponse;
-        return {
-          type: "set" as const,
-          variableset,
-          variables: data.rows,
-        };
+        return buildVariablesetSelection(variableset);
       }
 
       const parentVariableset = selection.parentVariablesetId
@@ -383,10 +423,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
 
   useEffect(() => {
     if (effectiveCurrentSelection) {
-      const variables =
-        effectiveCurrentSelection.type === "variable" && effectiveCurrentSelection.variable
-          ? [effectiveCurrentSelection.variable]
-          : effectiveCurrentSelection.variables || [];
+      const variables = getSelectionVariables(effectiveCurrentSelection);
 
       if (variables.length > 0) {
         const request: StatsRequest = {
@@ -475,10 +512,9 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
     }
   };
 
-  const selectedVariables =
-    effectiveCurrentSelection?.type === "variable" && effectiveCurrentSelection.variable
-      ? [effectiveCurrentSelection.variable]
-      : effectiveCurrentSelection?.variables || [];
+  const selectedVariables = effectiveCurrentSelection === null ? [] : getSelectionVariables(effectiveCurrentSelection);
+  const selectedRenderSections =
+    effectiveCurrentSelection === null ? [] : getSelectionRenderSections(effectiveCurrentSelection);
 
   return (
     <div className="theme-container flex flex-col gap-4 lg:flex-row">
@@ -590,19 +626,21 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       <div className="min-w-0 flex-1">
         {selectedDataset && effectiveCurrentSelection && selectedVariables.length > 0 && (
           <Suspense fallback={<BarSkeleton />}>
-            <ChartSelectionSection
-              variables={selectedVariables}
-              baseStatsData={baseStatsData}
-              splitStatsData={splitStatsData}
-              variableset={
-                effectiveCurrentSelection?.type === "set"
-                  ? effectiveCurrentSelection.variableset
-                  : effectiveCurrentSelection?.parentVariableset
-              }
-              datasetId={selectedDataset}
-              datasetName={selectedDatasetName ?? ""}
-              onStatsRequestAction={handleStatsRequest}
-            />
+            <div className="flex flex-col gap-4">
+              {selectedRenderSections.map((section) => (
+                <ChartSelectionSection
+                  key={section.id}
+                  variables={section.variables}
+                  baseStatsData={baseStatsData}
+                  splitStatsData={splitStatsData}
+                  variableset={section.variableset}
+                  datasetId={selectedDataset}
+                  datasetName={selectedDatasetName ?? ""}
+                  onStatsRequestAction={handleStatsRequest}
+                  multiResponseAggregateOnly={section.multiResponseAggregateOnly}
+                />
+              ))}
+            </div>
           </Suspense>
         )}
         {selectedDataset && effectiveCurrentSelection && selectedVariables.length === 0 && (
