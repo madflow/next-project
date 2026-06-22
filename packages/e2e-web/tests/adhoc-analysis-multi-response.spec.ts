@@ -3,6 +3,27 @@ import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
+  test("should render child multi-response summary charts when selecting their parent variableset", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+
+    await page.goto("/project/test-project/adhoc");
+    await expect(page.getByTestId("app.project.adhoc")).toBeVisible();
+
+    await page.getByTestId("app.dropdown.dataset.trigger").click();
+    await page.getByText("Test Dataset").click();
+    await expect(page.getByTestId("app.dropdown.dataset.trigger")).toContainText("Test Dataset");
+
+    await page.getByTestId("variable-group-Technology and Communication").click();
+
+    const multiResponseCharts = page.getByTestId("multi-response-chart");
+    await expect(multiResponseCharts).toHaveCount(2, { timeout: 5000 });
+    await expect(multiResponseCharts.nth(0)).toContainText("Communication Services");
+    await expect(multiResponseCharts.nth(1)).toContainText("Home Technology Ownership");
+  });
+
   test("should select Informationsquellen variableset and display aggregated multi-response chart", async ({
     page,
   }) => {

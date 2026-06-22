@@ -89,8 +89,19 @@
       ]
     },
     {
+      "id": "0198e639-3e96-734b-b0db-af0c4350a2e0",
+      "name": "Technology and Communication",
+      "description": "Communication services and home technology ownership",
+      "contents": [
+        { "type": "subset", "subsetId": "0198e639-3e96-734b-b0db-af0c4350a2e1" },
+        { "type": "subset", "subsetId": "0198e639-3e96-734b-b0db-af0c4350a2e2" }
+      ]
+    },
+    {
+      "id": "0198e639-3e96-734b-b0db-af0c4350a2e1",
       "name": "Communication Services",
       "description": "Adoption of telecom services and calling features",
+      "parentId": "0198e639-3e96-734b-b0db-af0c4350a2e0",
       "category": "multi_response",
       "attributes": {
         "multiResponse": {
@@ -137,8 +148,10 @@
       ]
     },
     {
+      "id": "0198e639-3e96-734b-b0db-af0c4350a2e2",
       "name": "Home Technology Ownership",
       "description": "Ownership of home electronics and computing devices",
+      "parentId": "0198e639-3e96-734b-b0db-af0c4350a2e0",
       "category": "multi_response",
       "attributes": {
         "multiResponse": {

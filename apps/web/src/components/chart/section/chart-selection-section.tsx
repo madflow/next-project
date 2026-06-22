@@ -23,6 +23,7 @@ type ChartSelectionSectionProps = {
   datasetId: string;
   datasetName: string;
   onStatsRequestAction: (variableName: string, splitVariable?: string) => void;
+  multiResponseAggregateOnly?: boolean;
 };
 
 export function ChartSelectionSection({
@@ -33,6 +34,7 @@ export function ChartSelectionSection({
   datasetId,
   datasetName,
   onStatsRequestAction,
+  multiResponseAggregateOnly = false,
 }: ChartSelectionSectionProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const {
@@ -58,6 +60,21 @@ export function ChartSelectionSection({
 
   if (!hasAllStats) {
     return <BarSkeleton />;
+  }
+
+  if (multiResponseAggregateOnly && showMultiResponseAggregate && variableset) {
+    return (
+      <MultiResponseAggregateCard
+        variables={variables}
+        statsData={baseStatsData}
+        variablesetName={variableset.name}
+        variablesetDescription={variableset.description}
+        countedValue={countedValue}
+        datasetId={datasetId}
+        datasetName={datasetName}
+        className="w-full max-w-4xl"
+      />
+    );
   }
 
   if (variables.length === 1) {
