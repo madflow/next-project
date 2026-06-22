@@ -45,7 +45,7 @@ export function useMultiResponseAggregateCardExport({
   const { displayRef, exportRef, isExportRendering, exportPNG } = useChartExport();
 
   const exportBaseName = useMemo(() => sanitizeExportBaseName(`${variablesetName}-multi-response`), [variablesetName]);
-  const exportMetaLine = useMemo(
+  const createExportMetaLine = useCallback(
     () =>
       createChartExportMetaLine({
         datasetName,
@@ -74,7 +74,7 @@ export function useMultiResponseAggregateCardExport({
       const payload = createMultiResponsePowerPointExportPayload({
         countedValue,
         fileBaseName: exportBaseName,
-        metaLine: exportMetaLine,
+        metaLine: createExportMetaLine(),
         palette: getExportPalette(),
         sortByCountDesc,
         statsData,
@@ -89,9 +89,9 @@ export function useMultiResponseAggregateCardExport({
     }
   }, [
     countedValue,
+    createExportMetaLine,
     datasetId,
     exportBaseName,
-    exportMetaLine,
     getExportPalette,
     sortByCountDesc,
     statsData,
@@ -112,7 +112,7 @@ export function useMultiResponseAggregateCardExport({
           valuePercent: tAdhoc("export.excelHeaders.valuePercent"),
         },
         fileBaseName: exportBaseName,
-        metaLine: exportMetaLine,
+        metaLine: createExportMetaLine(),
         palette: getExportPalette(),
         sortByCountDesc,
         statsData,
@@ -127,9 +127,9 @@ export function useMultiResponseAggregateCardExport({
     }
   }, [
     countedValue,
+    createExportMetaLine,
     datasetId,
     exportBaseName,
-    exportMetaLine,
     getExportPalette,
     sortByCountDesc,
     statsData,

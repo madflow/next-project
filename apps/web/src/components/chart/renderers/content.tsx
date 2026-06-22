@@ -50,6 +50,7 @@ export function ChartRendererContent({
           chartConfig={percentageChartConfig}
           chartColors={chartColors}
           disableAnimation={disableAnimation}
+          sortConfig={sortConfig}
         />
       );
     case "horizontalBar":

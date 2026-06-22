@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { ReactNode } from "react";
+import { type ReactNode, useId } from "react";
 import {
   Card,
   CardAction,
@@ -78,6 +78,7 @@ export function ChartPanelCard({
   const t = useTranslations("projectAdhocAnalysis");
   const { debugMode } = useAppContext();
   const resolvedTitle = title ?? (variable ? getVariableLabel(variable) : null);
+  const sortByCountId = `${useId()}-sort-by-count`;
 
   const footerActions = footerContent ?? (
     <>
@@ -86,12 +87,12 @@ export function ChartPanelCard({
           onSortByCountDescChangeAction !== undefined && (
             <div className="flex items-center gap-2">
               <Switch
-                id="sort-by-count"
+                id={sortByCountId}
                 size="sm"
                 checked={sortByCountDesc ?? false}
                 onCheckedChange={onSortByCountDescChangeAction}
               />
-              <Label htmlFor="sort-by-count">{t("sortByCount")}</Label>
+              <Label htmlFor={sortByCountId}>{t("sortByCount")}</Label>
             </div>
           )}
         {datasetId && onSplitVariableChangeAction && canUseSplitVariable && (
@@ -121,8 +122,8 @@ export function ChartPanelCard({
       {debugMode && (
         <TabsList>
           <TabsTrigger value="chart">{t("tabs.chart")}</TabsTrigger>
-          <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>
-          <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>
+          {variable && <TabsTrigger value="variable">{t("tabs.variable")}</TabsTrigger>}
+          {stats && <TabsTrigger value="stats">{t("tabs.stats")}</TabsTrigger>}
         </TabsList>
       )}
       <TabsContent value="chart">

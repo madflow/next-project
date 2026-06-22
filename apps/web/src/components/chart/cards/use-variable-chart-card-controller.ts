@@ -105,7 +105,7 @@ export function useVariableChartCardController({
     [splitVariables, stats, variable]
   );
 
-  const exportMetaLine = useMemo(
+  const createExportMetaLine = useCallback(
     () =>
       createChartExportMetaLine({
         datasetId,
@@ -175,7 +175,7 @@ export function useVariableChartCardController({
         countedValue,
         fileBaseName: exportBaseName,
         isMultiResponseIndividual,
-        metaLine: exportMetaLine,
+        metaLine: createExportMetaLine(),
         metricsLabels: metricLabels,
         palette: getExportPalette(),
         sortByCountDesc,
@@ -190,9 +190,9 @@ export function useVariableChartCardController({
     }
   }, [
     countedValue,
+    createExportMetaLine,
     datasetId,
     exportBaseName,
-    exportMetaLine,
     getExportPalette,
     isMultiResponseIndividual,
     metricLabels,
@@ -221,7 +221,7 @@ export function useVariableChartCardController({
         },
         fileBaseName: exportBaseName,
         isMultiResponseIndividual,
-        metaLine: exportMetaLine,
+        metaLine: createExportMetaLine(),
         metricsLabels: metricLabels,
         palette: getExportPalette(),
         sortByCountDesc,
@@ -236,9 +236,9 @@ export function useVariableChartCardController({
     }
   }, [
     countedValue,
+    createExportMetaLine,
     datasetId,
     exportBaseName,
-    exportMetaLine,
     getExportPalette,
     isMultiResponseIndividual,
     metricLabels,
@@ -259,7 +259,6 @@ export function useVariableChartCardController({
     splitVariables,
     isSplitVariablesLoading,
     splitVariableDescription,
-    exportMetaLine,
     exportBaseName,
     chartColors,
     displayRef,

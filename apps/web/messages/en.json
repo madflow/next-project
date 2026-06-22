@@ -1193,6 +1193,8 @@
       "description": "No chart types are enabled for this variable. Please contact an administrator to configure allowed statistics.",
       "title": "No Charts Available"
     },
+    "noVariableSelected": "No variable selected",
+    "noVariablesSelected": "No variables selected",
     "splitBy": "Split by {variable}",
     "splitVariable": {
       "label": "Split Variable:",

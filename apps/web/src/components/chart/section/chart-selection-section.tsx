@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
@@ -9,10 +10,15 @@ import { BarSkeleton } from "../shared/bar-skeleton";
 import { useChartSelectionSectionController } from "./use-chart-selection-section-controller";
 import { VariablesetHeader } from "./variableset-header";
 
+type SplitStatsEntry = {
+  splitVariable: string;
+  stats: StatsResponse;
+};
+
 type ChartSelectionSectionProps = {
   variables: DatasetVariableWithAttributes[];
   baseStatsData: Record<string, StatsResponse>;
-  splitStatsData: Record<string, StatsResponse>;
+  splitStatsData: Record<string, SplitStatsEntry>;
   variableset?: VariablesetTreeNode;
   datasetId: string;
   datasetName: string;
@@ -28,6 +34,7 @@ export function ChartSelectionSection({
   datasetName,
   onStatsRequestAction,
 }: ChartSelectionSectionProps) {
+  const t = useTranslations("projectAdhocAnalysis");
   const {
     countedValue,
     getStatsForVariable,
@@ -46,7 +53,7 @@ export function ChartSelectionSection({
   });
 
   if (variables.length === 0) {
-    return <div className="text-muted-foreground">{"No variables selected"}</div>;
+    return <div className="text-muted-foreground">{t("noVariablesSelected")}</div>;
   }
 
   if (!hasAllStats) {
@@ -56,7 +63,7 @@ export function ChartSelectionSection({
   if (variables.length === 1) {
     const variable = variables[0];
     if (!variable) {
-      return <div className="text-muted-foreground">{"No variable selected"}</div>;
+      return <div className="text-muted-foreground">{t("noVariableSelected")}</div>;
     }
 
     const stats = getStatsForVariable(variable.name);
