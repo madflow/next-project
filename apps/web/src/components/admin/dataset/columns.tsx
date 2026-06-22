@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Download, Pencil } from "lucide-react";
+import { Download, Pencil, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -82,6 +82,12 @@ export const columns: ColumnDef<DatasetWithEmbeddedOrganization>[] = [
               <Download className="h-4 w-4" />
               <span className="sr-only">{t("tableActions.download")}</span>
             </a>
+          </Button>
+          <Button variant="outline" size="icon" asChild title={t("tableActions.replaceFile")}>
+            <Link href={`/admin/datasets/${dataset.id}/update-file`}>
+              <RefreshCw className="h-4 w-4" />
+              <span className="sr-only">{t("tableActions.replaceFile")}</span>
+            </Link>
           </Button>
           <DeleteDatasetDialog datasetId={dataset.id} datasetName={dataset.name} onDelete={handleDelete} />
           <InfoDatasetModal dataset={row.original} />

@@ -30,6 +30,52 @@ test.describe("Admin Datasets", () => {
     await page.getByRole("button", { name: "Add to project" }).click();
   });
 
+  test("should preview and replace a dataset file with added and deleted variables", async ({ page }) => {
+    const datasetName = `Replace Dataset ${Date.now().toLocaleString()}`;
+
+    await page.goto("/");
+    await loginUser(page, testUsers.admin.email, testUsers.admin.password);
+    await page.goto("/admin/datasets");
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+
+    await page.getByTestId("admin.datasets.create.upload").click();
+    const uploadFile = page.getByTestId("file-upload-input").locator('input[type="file"]');
+    await uploadFile.setInputFiles("testdata/spss/demo.sav");
+    await page.getByTestId("app.admin.dataset.selected-file").waitFor({ timeout: 5000 });
+    await page.getByTestId("app.admin.dataset.name-input").fill(datasetName);
+    await page.getByTestId("app.admin.dataset.organization-trigger").click();
+    await page.getByTestId("org-option-test-organization").click();
+    await page.getByTestId("app.admin.dataset.upload-button").click();
+
+    await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
+    await page.getByTestId("app.datatable.search-input").fill(datasetName);
+    await page.getByRole("link", { name: datasetName }).click();
+    await page.waitForURL(/\/admin\/datasets\/[^/]+\/editor/);
+
+    const [, , , datasetId] = new URL(page.url()).pathname.split("/");
+    expect(datasetId).toBeTruthy();
+
+    await page.goto(`/admin/datasets/${datasetId}/update-file`);
+    const replacementFile = page.getByTestId("app.admin.dataset.update-file.input").locator('input[type="file"]');
+    await replacementFile.setInputFiles("testdata/spss/demo-variable-deleted-added.sav");
+    await page.getByTestId("app.admin.dataset.update-file.selected-file").waitFor({ timeout: 5000 });
+    await page.getByTestId("app.admin.dataset.update-file.preview").click();
+
+    await expect(page.getByText("Deleted variables (1)")).toBeVisible();
+    await expect(page.getByText("New variables (1)")).toBeVisible();
+    await expect(page.getByText("owncd")).toBeVisible();
+    await expect(page.getByText("Var0001").first()).toBeVisible();
+
+    await page.getByTestId("app.admin.dataset.update-file.confirm").click();
+    await page.waitForURL(/\/admin\/datasets\/[^/]+\/editor/);
+
+    await page.getByTestId("app.datatable.search-input").fill("Var0001");
+    await expect(page.getByTestId("app.admin.dataset-variable.edit-Var0001")).toBeVisible();
+
+    await page.getByTestId("app.datatable.search-input").fill("owncd");
+    await expect(page.getByTestId("app.admin.dataset-variable.edit-owncd")).toHaveCount(0);
+  });
+
   test("should upload and delete a metadata file from the dataset editor", async ({ page }) => {
     const datasetName = `Metadata Dataset ${Date.now().toLocaleString()}`;
 

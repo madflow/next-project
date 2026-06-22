@@ -191,7 +191,8 @@
       "delete": "Löschen",
       "deleteConfirm": "Möchten Sie diesen Datensatz wirklich löschen?",
       "download": "Herunterladen",
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "replaceFile": "Datei ersetzen"
     },
     "title": "Datensätze",
     "upload": {
@@ -430,6 +431,60 @@
       },
       "organizationId": {
         "required": "Die Auswahl einer Organisation ist erforderlich"
+      }
+    }
+  },
+  "adminDatasetUpdateFile": {
+    "buttons": {
+      "cancel": "Abbrechen",
+      "changeFile": "Datei ändern",
+      "confirm": "Ersetzung bestätigen",
+      "confirming": "Wird ersetzt...",
+      "preview": "Aktualisierung prüfen",
+      "previewing": "Vorschau wird erstellt..."
+    },
+    "currentFile": {
+      "description": "Diese Datei wird aktuell vom Datensatz verwendet.",
+      "filename": "Dateiname",
+      "size": "Größe",
+      "title": "Aktuelle Datei"
+    },
+    "description": "Laden Sie eine Ersatzdatei hoch, prüfen Sie die Variablenänderungen und bestätigen Sie die Aktualisierung.",
+    "messages": {
+      "confirmError": "Die Datensatzdatei konnte nicht ersetzt werden.",
+      "confirmSuccess": "Datensatzdatei erfolgreich ersetzt.",
+      "previewError": "Die Aktualisierung der Datensatzdatei konnte nicht geprüft werden.",
+      "previewSuccess": "Die Vorschau für die Aktualisierung ist bereit."
+    },
+    "preview": {
+      "addedVariables": "Neue Variablen ({count})",
+      "deleteWarningDescription": "Gelöschte Variablen werden aus dem Datensatz entfernt. Zugehörige Einträge in Variablen-Sets und Split-Variablen-Zuweisungen werden ebenfalls entfernt.",
+      "deleteWarningTitle": "Diese Aktualisierung löscht Variablen",
+      "deletedVariables": "Gelöschte Variablen ({count})",
+      "description": "Prüfen Sie die erkannten Änderungen, bevor die Datensatzdatei ersetzt wird.",
+      "newFilename": "Neuer Dateiname",
+      "newSize": "Neue Größe",
+      "noAddedVariables": "Keine neuen Variablen erkannt.",
+      "noDeletedVariables": "Keine gelöschten Variablen erkannt.",
+      "preservedFields": "Bestehende Variablen behalten benutzerdefinierte Übersetzungen, fehlende Werte und fehlende Bereiche. Aus der Datei importierte Labels, Typen, Niveaus und Wertelabels werden aktualisiert.",
+      "title": "Aktualisierungsvorschau",
+      "unchangedVariables": "Bestehende Variablen ({count})",
+      "variableCount": "Variablen"
+    },
+    "replacement": {
+      "clickToUpload": "Zum Hochladen klicken",
+      "description": "Wählen Sie die neue .sav-Datei aus, die die aktuelle Datensatzdatei ersetzen soll.",
+      "fileLabel": "Ersatzdatei",
+      "missingValues": "Standardwerte für neue fehlende Werte",
+      "missingValuesHelp": "Bestehende Variablen behalten ihre aktuellen fehlenden Werte. Diese Standardwerte werden nur auf Variablen angewendet, die durch die Ersatzdatei hinzukommen.",
+      "orDragAndDrop": "oder per Drag & Drop ablegen",
+      "supportedFormats": "Unterstützte Formate: .sav (SPSS) (max. 100 MB)",
+      "title": "Ersatzdatei"
+    },
+    "title": "Datei für {name} ersetzen",
+    "validation": {
+      "file": {
+        "required": "Bitte wählen Sie genau eine Datei aus"
       }
     }
   },

@@ -18,6 +18,7 @@ dependencies = [
   "pydantic-settings>=2.7.0,<3.0.0",
   "pymongo>=4.10.1,<5.0.0",
   "pyreadstat>=1.3.0,<2.0.0",
+  "python-multipart>=0.0.20,<0.1.0",
   "python-pptx>=1.0.2,<2.0.0",
   "sentry-sdk[fastapi]>=2.32.0,<3.0.0",
   "sqlalchemy[asyncio]>=2.0.36,<3.0.0",
@@ -101,8 +102,8 @@ lint.ignore = [
   "D106",    # Missing docstring in public nested class
   "E501",    # Line too long - ignore line length checks
 ]
-exclude = ["analysis/db/migrations", ".venv/"]
 lint.mccabe = { max-complexity = 10 }
+exclude = ["analysis/db/migrations", ".venv/"]
 line-length = 88
 
 [tool.ruff.lint.per-file-ignores]

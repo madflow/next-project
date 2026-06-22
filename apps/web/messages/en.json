@@ -191,7 +191,8 @@
       "delete": "Delete",
       "deleteConfirm": "Are you sure you want to delete this dataset?",
       "download": "Download",
-      "edit": "Edit"
+      "edit": "Edit",
+      "replaceFile": "Replace file"
     },
     "title": "Datasets",
     "upload": {
@@ -430,6 +431,60 @@
       },
       "organizationId": {
         "required": "Organization selection is required"
+      }
+    }
+  },
+  "adminDatasetUpdateFile": {
+    "buttons": {
+      "cancel": "Cancel",
+      "changeFile": "Change file",
+      "confirm": "Confirm replacement",
+      "confirming": "Replacing...",
+      "preview": "Preview update",
+      "previewing": "Preparing preview..."
+    },
+    "currentFile": {
+      "description": "This file is currently used by the dataset.",
+      "filename": "Filename",
+      "size": "Size",
+      "title": "Current file"
+    },
+    "description": "Upload a replacement file, review variable changes, and confirm the update.",
+    "messages": {
+      "confirmError": "Failed to replace dataset file.",
+      "confirmSuccess": "Dataset file replaced successfully.",
+      "previewError": "Failed to preview dataset file update.",
+      "previewSuccess": "Dataset file update preview is ready."
+    },
+    "preview": {
+      "addedVariables": "New variables ({count})",
+      "deleteWarningDescription": "Deleted variables will be removed from the dataset. Related variable-set entries and split-variable assignments will also be removed.",
+      "deleteWarningTitle": "This update deletes variables",
+      "deletedVariables": "Deleted variables ({count})",
+      "description": "Review the detected changes before replacing the dataset file.",
+      "newFilename": "New filename",
+      "newSize": "New size",
+      "noAddedVariables": "No new variables detected.",
+      "noDeletedVariables": "No deleted variables detected.",
+      "preservedFields": "Existing variables keep custom translations, missing values, and missing ranges. File-derived labels, types, measures, and value labels will be refreshed.",
+      "title": "Update preview",
+      "unchangedVariables": "Existing variables ({count})",
+      "variableCount": "Variables"
+    },
+    "replacement": {
+      "clickToUpload": "Click to upload",
+      "description": "Select the new .sav file that should replace the current dataset file.",
+      "fileLabel": "Replacement file",
+      "missingValues": "Default missing values for new variables",
+      "missingValuesHelp": "Existing variables keep their current missing values. These defaults are only applied to variables added by the replacement file.",
+      "orDragAndDrop": "or drag and drop",
+      "supportedFormats": "Supported formats: .sav (SPSS) (max 100MB)",
+      "title": "Replacement file"
+    },
+    "title": "Replace file for {name}",
+    "validation": {
+      "file": {
+        "required": "Please select exactly one file"
       }
     }
   },
