@@ -34,6 +34,7 @@ export type SelectionRenderSection = {
   variables: DatasetVariableWithAttributes[];
   variableset?: VariablesetTreeNode;
   multiResponseAggregateOnly?: boolean;
+  hideVariablesetHeader?: boolean;
 };
 
 type VariablesResponse = {
@@ -83,6 +84,7 @@ export async function buildVariablesetSelection(node: VariablesetTreeNode): Prom
       id: `${node.id}:variables:${directSectionIndex}`,
       variableset: node,
       variables: directVariables,
+      hideVariablesetHeader: directSectionIndex > 0,
     });
     directSectionIndex += 1;
     directVariables = [];

@@ -24,6 +24,7 @@ type ChartSelectionSectionProps = {
   datasetName: string;
   onStatsRequestAction: (variableName: string, splitVariable?: string) => void;
   multiResponseAggregateOnly?: boolean;
+  hideVariablesetHeader?: boolean;
 };
 
 export function ChartSelectionSection({
@@ -35,6 +36,7 @@ export function ChartSelectionSection({
   datasetName,
   onStatsRequestAction,
   multiResponseAggregateOnly = false,
+  hideVariablesetHeader = false,
 }: ChartSelectionSectionProps) {
   const t = useTranslations("projectAdhocAnalysis");
   const {
@@ -90,7 +92,7 @@ export function ChartSelectionSection({
 
     return (
       <div className="flex flex-col gap-4">
-        {variableset && <VariablesetHeader variableset={variableset} />}
+        {variableset && !hideVariablesetHeader && <VariablesetHeader variableset={variableset} />}
         <VariableChartCardItem
           variable={variable}
           stats={stats}
@@ -120,7 +122,9 @@ export function ChartSelectionSection({
         />
       )}
 
-      {showVariablesetHeader && variableset && <VariablesetHeader variableset={variableset} />}
+      {showVariablesetHeader && variableset && !hideVariablesetHeader && (
+        <VariablesetHeader variableset={variableset} />
+      )}
 
       {variables.map((variable) => {
         const stats = getStatsForVariable(variable.name);
