@@ -1,9 +1,11 @@
+import tempfile
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import pyreadstat
-from fastapi import Depends, HTTPException, Security, status
+from fastapi import Depends, File, HTTPException, Security, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import Response
 from fastapi.routing import APIRouter
@@ -181,18 +183,8 @@ def _get_cached_dataset_file_path(dataset: Dataset) -> str:
     )
 
 
-def _read_sav_from_dataset(dataset: Dataset) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    """
-    Read a cached SAV file and return data and metadata.
-
-    Args:
-        dataset: Dataset containing the file hash and S3 object key/path
-
-    Returns:
-        Tuple containing (data, metadata) from the SAV file
-    """
-    dataset_file_path = _get_cached_dataset_file_path(dataset)
-
+def _read_sav_from_path(dataset_file_path: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """Read metadata from a local SAV file path."""
     try:
         df, meta = pyreadstat.read_sav(
             dataset_file_path,
@@ -216,6 +208,19 @@ def _read_sav_from_dataset(dataset: Dataset) -> Tuple[Dict[str, Any], Dict[str, 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error reading SAV file: {e!s}",
         ) from e
+
+
+def _read_sav_from_dataset(dataset: Dataset) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """
+    Read a cached SAV file and return data and metadata.
+
+    Args:
+        dataset: Dataset containing the file hash and S3 object key/path
+
+    Returns:
+        Tuple containing (data, metadata) from the SAV file
+    """
+    return _read_sav_from_path(_get_cached_dataset_file_path(dataset))
 
 
 def _read_dataframe_from_dataset(dataset: Dataset) -> pd.DataFrame:
@@ -267,6 +272,31 @@ async def get_dataset_metadata(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error importing dataset: {e!s}",
         ) from e
+
+
+@router.post("/datasets/metadata/preview", response_model=MetadataResponse)
+async def preview_dataset_metadata(
+    file: UploadFile = File(...),
+    _api_key: str = Security(get_api_key),
+) -> MetadataResponse:
+    """Read metadata from an uploaded SAV file without mutating a dataset."""
+    suffix = Path(file.filename or "").suffix or ".sav"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as temp_file:
+        temp_path = Path(temp_file.name)
+        temp_file.write(await file.read())
+
+    try:
+        data, metadata = await run_in_threadpool(_read_sav_from_path, str(temp_path))
+
+        return MetadataResponse(
+            status="success",
+            message="Successfully read dataset metadata preview",
+            dataset_id="preview",
+            data=data,
+            metadata=metadata,
+        )
+    finally:
+        temp_path.unlink(missing_ok=True)
 
 
 @router.post("/datasets/{dataset_id}/stats")
