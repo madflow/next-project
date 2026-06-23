@@ -638,6 +638,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
                   datasetName={selectedDatasetName ?? ""}
                   onStatsRequestAction={handleStatsRequest}
                   multiResponseAggregateOnly={section.multiResponseAggregateOnly}
+                  hideVariablesetHeader={section.hideVariablesetHeader}
                 />
               ))}
             </div>
