@@ -24,16 +24,14 @@ export function BarChartRenderer({
   stats,
   chartRef,
   chartConfig,
-  chartColors: _chartColors,
+  chartColors,
   disableAnimation = false,
   sortConfig,
 }: BarChartRendererProps) {
-  void _chartColors;
-
   const chartData = transformToRechartsBarData(variable, stats, sortConfig);
 
   return (
-    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={variable.name}>
+    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
       <BarChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical verticalCoordinatesGenerator={getPlotAreaVerticalBorderCoordinates} />
         <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} fontSize={12} />

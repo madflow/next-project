@@ -30,14 +30,12 @@ export function HorizontalBarChartRenderer({
   stats,
   chartRef,
   chartConfig,
-  chartColors: _chartColors,
+  chartColors,
   isMultiResponseIndividual = false,
   countedValue = 1,
   disableAnimation = false,
   sortConfig,
 }: HorizontalBarChartRendererProps) {
-  void _chartColors;
-
   const chartData: Array<{
     label: string | number;
     value: string | number;
@@ -48,7 +46,7 @@ export function HorizontalBarChartRenderer({
     : transformToRechartsBarData(variable, stats, sortConfig);
 
   return (
-    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={variable.name}>
+    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
       <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={4} accessibilityLayer data={chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis
