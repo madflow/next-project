@@ -13,19 +13,19 @@ importers:
     devDependencies:
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.2
-        version: 6.0.2(prettier@3.8.3)
+        version: 6.0.2(prettier@3.9.4)
       knip:
         specifier: ^6.16.0
         version: 6.16.1
       prettier:
-        specifier: 3.8.3
-        version: 3.8.3
+        specifier: 3.9.4
+        version: 3.9.4
       prettier-plugin-sort-json:
         specifier: 4.2.0
-        version: 4.2.0(prettier@3.8.3)
+        version: 4.2.0(prettier@3.9.4)
       prettier-plugin-tailwindcss:
         specifier: 0.8.0
-        version: 0.8.0(@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.8.3))(prettier@3.8.3)
+        version: 0.8.0(@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.9.4))(prettier@3.9.4)
       turbo:
         specifier: ^2.9.16
         version: 2.9.16
@@ -5889,8 +5889,8 @@ packages:
       prettier-plugin-svelte:
         optional: true
 
-  prettier@3.8.3:
-    resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
+  prettier@3.9.4:
+    resolution: {integrity: sha512-yWG/o/4oJfo036EKAfK6ACAoDOfHeRHx4tuxkfBZiauURiaSmYwlpOr5LQqKtIkRD2z1PLteme2WoxEnj4tHTg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -8979,7 +8979,7 @@ snapshots:
   '@react-email/render@2.0.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       html-to-text: 9.0.5
-      prettier: 3.8.3
+      prettier: 3.9.4
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
@@ -9542,7 +9542,7 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.8.3)':
+  '@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.9.4)':
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
@@ -9552,7 +9552,7 @@ snapshots:
       lodash-es: 4.18.1
       minimatch: 9.0.9
       parse-imports-exports: 0.2.4
-      prettier: 3.8.3
+      prettier: 3.9.4
     transitivePeerDependencies:
       - supports-color
 
@@ -11717,17 +11717,17 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-sort-json@4.2.0(prettier@3.8.3):
+  prettier-plugin-sort-json@4.2.0(prettier@3.9.4):
     dependencies:
-      prettier: 3.8.3
+      prettier: 3.9.4
 
-  prettier-plugin-tailwindcss@0.8.0(@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.8.3))(prettier@3.8.3):
+  prettier-plugin-tailwindcss@0.8.0(@trivago/prettier-plugin-sort-imports@6.0.2(prettier@3.9.4))(prettier@3.9.4):
     dependencies:
-      prettier: 3.8.3
+      prettier: 3.9.4
     optionalDependencies:
-      '@trivago/prettier-plugin-sort-imports': 6.0.2(prettier@3.8.3)
+      '@trivago/prettier-plugin-sort-imports': 6.0.2(prettier@3.9.4)
 
-  prettier@3.8.3: {}
+  prettier@3.9.4: {}
 
   prismjs@1.30.0: {}
 
