@@ -62,8 +62,12 @@ export function VerifyEmailCard() {
                 {t("verifyEmail.messages.success.description")}
               </AlertDescription>
             </Alert>
-            <Button asChild className="w-full" data-testid="verify-email.login">
-              <Link href="/auth/login">{t("verifyEmail.actions.signIn")}</Link>
+            <Button
+              className="w-full"
+              data-testid="verify-email.login"
+              nativeButton={false}
+              render={<Link href="/auth/login" />}>
+              {t("verifyEmail.actions.signIn")}
             </Button>
           </div>
         );
@@ -76,8 +80,12 @@ export function VerifyEmailCard() {
               <AlertTitle>{t("verifyEmail.messages.alreadyVerified.title")}</AlertTitle>
               <AlertDescription>{t("verifyEmail.messages.alreadyVerified.description")}</AlertDescription>
             </Alert>
-            <Button asChild className="w-full" data-testid="verify-email.login">
-              <Link href="/auth/login">{t("verifyEmail.actions.signIn")}</Link>
+            <Button
+              className="w-full"
+              data-testid="verify-email.login"
+              nativeButton={false}
+              render={<Link href="/auth/login" />}>
+              {t("verifyEmail.actions.signIn")}
             </Button>
           </div>
         );
@@ -91,11 +99,21 @@ export function VerifyEmailCard() {
               <AlertDescription>{errorMessage || t("verifyEmail.messages.error.description")}</AlertDescription>
             </Alert>
             <div className="flex flex-col gap-2">
-              <Button asChild className="w-full" variant="default" data-testid="verify-email.signup">
-                <Link href="/auth/sign-up">{t("verifyEmail.actions.signUpAgain")}</Link>
+              <Button
+                className="w-full"
+                variant="default"
+                data-testid="verify-email.signup"
+                nativeButton={false}
+                render={<Link href="/auth/sign-up" />}>
+                {t("verifyEmail.actions.signUpAgain")}
               </Button>
-              <Button asChild className="w-full" variant="outline" data-testid="verify-email.login">
-                <Link href="/auth/login">{t("verifyEmail.actions.backToLogin")}</Link>
+              <Button
+                className="w-full"
+                variant="outline"
+                data-testid="verify-email.login"
+                nativeButton={false}
+                render={<Link href="/auth/login" />}>
+                {t("verifyEmail.actions.backToLogin")}
               </Button>
             </div>
           </div>

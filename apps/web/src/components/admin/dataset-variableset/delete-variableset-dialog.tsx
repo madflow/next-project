@@ -46,17 +46,19 @@ export function DeleteVariablesetDialog({ variablesetId, variablesetName, onSucc
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          title={t("deleteSet")}
-          className="cursor-pointer"
-          type="button"
-          data-testid="admin.dataset.variableset.delete.trigger">
-          <Trash className="h-4 w-4" />
-          <span className="sr-only">{t("deleteSet")}</span>
-        </Button>
+      <AlertDialogTrigger
+        render={
+          <Button
+            variant="outline"
+            size="icon"
+            title={t("deleteSet")}
+            className="cursor-pointer"
+            type="button"
+            data-testid="admin.dataset.variableset.delete.trigger"
+          />
+        }>
+        <Trash className="h-4 w-4" />
+        <span className="sr-only">{t("deleteSet")}</span>
       </AlertDialogTrigger>
       <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>

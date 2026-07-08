@@ -545,20 +545,22 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
       {/* Desktop panel toggle button -- only visible on lg+ */}
       <div className="hidden lg:flex lg:items-start">
         <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={variablePanel.toggle}
-              data-testid="variable-panel-toggle"
-              aria-label={variablePanel.isOpen ? t("variablePanel.hidePanel") : t("variablePanel.showPanel")}>
-              {variablePanel.isOpen ? (
-                <PanelLeftCloseIcon className="h-4 w-4" />
-              ) : (
-                <PanelLeftOpenIcon className="h-4 w-4" />
-              )}
-            </Button>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={variablePanel.toggle}
+                data-testid="variable-panel-toggle"
+                aria-label={variablePanel.isOpen ? t("variablePanel.hidePanel") : t("variablePanel.showPanel")}
+              />
+            }>
+            {variablePanel.isOpen ? (
+              <PanelLeftCloseIcon className="h-4 w-4" />
+            ) : (
+              <PanelLeftOpenIcon className="h-4 w-4" />
+            )}
           </TooltipTrigger>
           <TooltipContent side="right">
             {variablePanel.isOpen ? t("variablePanel.hidePanel") : t("variablePanel.showPanel")}

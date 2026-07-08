@@ -129,15 +129,17 @@ export function AllowedStatisticsSelector({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-6 px-2 text-xs"
-          data-testid="admin.dataset.variableset.allowed-statistics.open">
-          <Settings className="mr-1 h-3 w-3" />
-          {t("configure")}
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-2 text-xs"
+            data-testid="admin.dataset.variableset.allowed-statistics.open"
+          />
+        }>
+        <Settings className="mr-1 h-3 w-3" />
+        {t("configure")}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

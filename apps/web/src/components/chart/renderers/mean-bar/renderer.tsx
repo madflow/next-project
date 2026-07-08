@@ -19,7 +19,9 @@ type MeanBarRendererProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const MeanBarRenderer = forwardRef<HTMLDivElement, MeanBarRendererProps>(
-  ({ variable, stats, chartColors, disableAnimation = false }, ref) => {
+  ({ variable, stats, chartColors: _chartColors, disableAnimation = false }, ref) => {
+    void _chartColors;
+
     const t = useTranslations("chartMetricsCard");
     const variableStats = extractVariableStats(variable, stats);
     if (!variableStats) {
@@ -49,7 +51,7 @@ export const MeanBarRenderer = forwardRef<HTMLDivElement, MeanBarRendererProps>(
     } satisfies ChartConfig;
 
     return (
-      <ChartContainer config={chartConfig} chartColors={chartColors} ref={ref} data-export-filename={variable.name}>
+      <ChartContainer config={chartConfig} ref={ref} data-export-filename={variable.name}>
         <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={4} accessibilityLayer data={chartData}>
           <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
           <XAxis

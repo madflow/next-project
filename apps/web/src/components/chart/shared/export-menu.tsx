@@ -27,17 +27,19 @@ export function ChartExportMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          className="cursor-pointer"
-          variant="outline"
-          size="icon-sm"
-          disabled={disabled}
-          data-testid="chart-export-trigger"
-          aria-label={t("buttonLabel")}
-          title={t("buttonLabel")}>
-          <DownloadIcon className="h-4 w-4" />
-        </Button>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            className="cursor-pointer"
+            variant="outline"
+            size="icon-sm"
+            disabled={disabled}
+            data-testid="chart-export-trigger"
+            aria-label={t("buttonLabel")}
+            title={t("buttonLabel")}
+          />
+        }>
+        <DownloadIcon className="h-4 w-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem data-testid="chart-export-image" onClick={() => void onExportImage()} disabled={disabled}>

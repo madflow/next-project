@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { isValidElement } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,7 +29,7 @@ export const InviteUserModal = ({ children, user, onOpenChange, open, organizati
   const t = useTranslations("inviteUserModal");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
+      {isValidElement(children) ? <DialogTrigger render={children} /> : null}
       <DialogContent className="sm:max-w-[768px]">
         <DialogHeader>
           <DialogTitle>{user ? t("titleUser", { name: user.name }) : t("title")}</DialogTitle>
@@ -40,10 +41,8 @@ export const InviteUserModal = ({ children, user, onOpenChange, open, organizati
         </DialogHeader>
         <InviteUserForm user={user} organizationId={organization?.id} />
         <DialogFooter>
-          <DialogClose asChild>
-            <Button data-testid="invite-user-modal.close" variant="outline">
-              {t("close")}
-            </Button>
+          <DialogClose render={<Button data-testid="invite-user-modal.close" variant="outline" />}>
+            {t("close")}
           </DialogClose>
         </DialogFooter>
       </DialogContent>

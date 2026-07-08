@@ -14,8 +14,8 @@ export default async function GoodbyePage() {
           <CardDescription>{t("account.delete.successMessage")}</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center">
-          <Button asChild>
-            <Link href="/">{t("account.delete.returnHome")}</Link>
+          <Button nativeButton={false} render={<Link href="/" />}>
+            {t("account.delete.returnHome")}
           </Button>
         </CardContent>
       </Card>

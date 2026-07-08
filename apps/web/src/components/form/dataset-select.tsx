@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Select as SelectPrimitive } from "radix-ui";
 import * as React from "react";
 import {
   Select,
@@ -19,7 +18,7 @@ type DatasetSelectProps = {
   onValueChange: (value: string) => void;
   onDatasetLabelChange?: (label: string | null) => void;
   defaultValue?: string;
-  triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
+  triggerProps?: React.ComponentProps<typeof SelectTrigger>;
 };
 
 export function DatasetSelect({
@@ -91,7 +90,9 @@ export function DatasetSelect({
   return (
     <Select
       onValueChange={(value) => {
-        onValueChange(value);
+        if (value) {
+          onValueChange(value);
+        }
       }}
       value={selectedValue}>
       <SelectTrigger data-testid="app.dropdown.dataset.trigger" className="w-full">

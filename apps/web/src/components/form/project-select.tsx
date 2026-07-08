@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Select as SelectPrimitive } from "radix-ui";
 import * as React from "react";
 import {
   Select,
@@ -18,7 +17,7 @@ type ProjectSelectProps = {
   organizationId: string;
   onValueChange: (value: string) => void;
   defaultValue?: string;
-  triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
+  triggerProps?: React.ComponentProps<typeof SelectTrigger>;
 };
 
 export function ProjectSelect({ organizationId, onValueChange, defaultValue, triggerProps }: ProjectSelectProps) {
@@ -59,8 +58,10 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
   return (
     <Select
       onValueChange={(value) => {
-        setSelectedValue(value);
-        onValueChange(value);
+        if (value) {
+          setSelectedValue(value);
+          onValueChange(value);
+        }
       }}
       value={selectedValue}>
       <SelectTrigger {...triggerProps} className="w-[180px]" data-testid="project-dropdown">

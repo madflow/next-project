@@ -54,16 +54,15 @@ export const columns: ColumnDef<AuthUser>[] = [
           <InfoUserModal user={row.original} />
           <ImpersonateUserButton userId={id} userRole={row.original.role as string} />
           <Button
-            asChild
             variant="outline"
             title={t("actions.edit")}
             role="button"
             className="cursor-pointer"
-            data-testid={`admin.users.list.edit-${email}`}>
-            <Link href={`/admin/users/edit/${id}`}>
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">{t("actions.edit")}</span>
-            </Link>
+            data-testid={`admin.users.list.edit-${email}`}
+            nativeButton={false}
+            render={<Link href={`/admin/users/edit/${id}`} />}>
+            <Pencil className="h-4 w-4" />
+            <span className="sr-only">{t("actions.edit")}</span>
           </Button>
           <DeleteUserDialog userId={id} userName={row.original.name || row.original.email} onDelete={remove} />
         </div>

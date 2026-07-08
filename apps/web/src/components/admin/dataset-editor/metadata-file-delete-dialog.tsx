@@ -52,17 +52,19 @@ export function MetadataFileDeleteDialog({ datasetId, fileId, fileName, onDelete
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          type="button"
-          data-testid={`admin.dataset.metadata-file.delete.${fileId}`}
-          title={t("confirm")}
-          className="cursor-pointer">
-          <Trash className="h-4 w-4" />
-          <span className="sr-only">{t("confirm")}</span>
-        </Button>
+      <AlertDialogTrigger
+        render={
+          <Button
+            variant="outline"
+            size="icon"
+            type="button"
+            data-testid={`admin.dataset.metadata-file.delete.${fileId}`}
+            title={t("confirm")}
+            className="cursor-pointer"
+          />
+        }>
+        <Trash className="h-4 w-4" />
+        <span className="sr-only">{t("confirm")}</span>
       </AlertDialogTrigger>
       <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Select as SelectPrimitive } from "radix-ui";
 import * as React from "react";
 import {
   Select,
@@ -17,7 +16,7 @@ import { useOrganizations } from "@/hooks/use-organizations";
 type OrganizationSelectProps = {
   onValueChange: (value: string) => void;
   defaultValue?: string;
-  triggerProps?: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" };
+  triggerProps?: React.ComponentProps<typeof SelectTrigger>;
 };
 
 export function OrganizationSelect({ onValueChange, defaultValue, triggerProps }: OrganizationSelectProps) {
@@ -58,8 +57,10 @@ export function OrganizationSelect({ onValueChange, defaultValue, triggerProps }
   return (
     <Select
       onValueChange={(value) => {
-        setSelectedValue(value);
-        onValueChange(value);
+        if (value) {
+          setSelectedValue(value);
+          onValueChange(value);
+        }
       }}
       value={selectedValue}>
       <SelectTrigger {...triggerProps} className="w-[180px]" data-testid="organization-dropdown">

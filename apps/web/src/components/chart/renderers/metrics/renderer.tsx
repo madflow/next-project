@@ -35,10 +35,9 @@ function MetricHelp({
     <div className="flex items-center gap-1">
       {children}
       <Popover>
-        <PopoverTrigger asChild>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">
-            <CircleHelp className="h-3 w-3" />
-          </button>
+        <PopoverTrigger
+          render={<button type="button" className="text-muted-foreground hover:text-foreground transition-colors" />}>
+          <CircleHelp className="h-3 w-3" />
         </PopoverTrigger>
         <PopoverContent className="w-80" align="start">
           <div className="space-y-2">

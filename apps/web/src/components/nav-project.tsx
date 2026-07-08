@@ -34,11 +34,9 @@ export function NavProject({ activeOrganization, activeProject }: NavProjectProp
         {/*   </SidebarMenuButton> */}
         {/* </SidebarMenuItem> */}
         <SidebarMenuItem>
-          <SidebarMenuButton asChild>
-            <a href={`/project/${activeProject.slug}/adhoc`}>
-              <PieChart />
-              <span>{t("navItems.adhoc")}</span>
-            </a>
+          <SidebarMenuButton render={<a href={`/project/${activeProject.slug}/adhoc`} />}>
+            <PieChart />
+            <span>{t("navItems.adhoc")}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

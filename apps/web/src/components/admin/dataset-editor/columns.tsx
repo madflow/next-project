@@ -47,12 +47,13 @@ export function useDatasetVariableColumns() {
             <Button
               variant="outline"
               size="icon"
-              asChild
-              data-testid={`app.admin.dataset-variable.edit-${datasetVariable.name}`}>
-              <Link href={`/admin/datasets/${datasetVariable.datasetId}/variables/${datasetVariable.id}/edit`}>
-                <Pencil className="h-4 w-4" />
-                <span className="sr-only">{t("tableActions.edit")}</span>
-              </Link>
+              data-testid={`app.admin.dataset-variable.edit-${datasetVariable.name}`}
+              nativeButton={false}
+              render={
+                <Link href={`/admin/datasets/${datasetVariable.datasetId}/variables/${datasetVariable.id}/edit`} />
+              }>
+              <Pencil className="h-4 w-4" />
+              <span className="sr-only">{t("tableActions.edit")}</span>
             </Button>
             <DeleteDatasetVariableDialog
               datasetVariableId={datasetVariable.id}

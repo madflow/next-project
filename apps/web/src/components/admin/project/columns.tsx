@@ -49,16 +49,15 @@ export const columns: ColumnDef<ProjectWithOrganization>[] = [
       return (
         <div className="flex flex-row gap-2">
           <Button
-            asChild
             variant="outline"
             title={t("project.actions.edit")}
             role="button"
             className="cursor-pointer"
-            data-testid={`admin.projects.list.edit-${project.slug}`}>
-            <Link href={`/admin/projects/edit/${project.id}`}>
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">{t("project.actions.edit")}</span>
-            </Link>
+            data-testid={`admin.projects.list.edit-${project.slug}`}
+            nativeButton={false}
+            render={<Link href={`/admin/projects/edit/${project.id}`} />}>
+            <Pencil className="h-4 w-4" />
+            <span className="sr-only">{t("project.actions.edit")}</span>
           </Button>
           <DeleteProjectDialog projectId={project.id} projectName={project.name} onDelete={remove} />
         </div>

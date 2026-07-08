@@ -58,15 +58,14 @@ export const columns: ColumnDef<Organization>[] = [
       return (
         <div className="flex flex-row gap-2">
           <Button
-            asChild
             variant={"outline"}
             title={t("organization.actions.edit")}
             role="button"
             className="cursor-pointer"
-            data-testid={`admin.organizations.list.edit-${slug}`}>
-            <Link href={`/admin/organizations/edit/${id}`}>
-              <Pencil className="h-4 w-4" />
-            </Link>
+            data-testid={`admin.organizations.list.edit-${slug}`}
+            nativeButton={false}
+            render={<Link href={`/admin/organizations/edit/${id}`} />}>
+            <Pencil className="h-4 w-4" />
           </Button>
           <DeleteOrganizationDialog organizationId={id} organizationName={row.original.name} onDelete={remove} />
         </div>

@@ -2,7 +2,6 @@
 
 import { ChevronDown, ChevronRight, Palette } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Select as SelectPrimitive } from "radix-ui";
 import { useState } from "react";
 import { useThemeConfig } from "@/components/active-theme";
 import { useOrganizationTheme } from "@/context/organization-theme-context";
@@ -17,7 +16,15 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import { ScrollArea } from "../ui/scroll-area";
 import { SearchInput } from "../ui/search-input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+} from "../ui/select";
 import { Spinner } from "../ui/spinner";
 
 export type SelectionItem = {
@@ -383,7 +390,7 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
   };
 
   return (
-    <Card className="shadow-xs">
+    <Card className="border-border border shadow-xs ring-0">
       <CardHeader className="px-3">
         <SearchInput
           placeholder={t("search")}
@@ -416,18 +423,19 @@ export function AdHocVariablesetSelector({ datasetId, onSelectionChangeAction }:
         </ScrollArea>
       </CardContent>
       <CardFooter className="flex justify-end px-2">
-        <Select value={activeTheme} onValueChange={setActiveTheme}>
-          <SelectPrimitive.Trigger asChild>
-            <Button
-              data-testid="theme-selector"
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0"
-              title={tTheme("changeTheme")}>
-              <Palette className="h-4 w-4" />
-            </Button>
-          </SelectPrimitive.Trigger>
-          <SelectContent align="end" position="popper" side="top">
+        <Select
+          value={activeTheme}
+          onValueChange={(value) => {
+            if (value) {
+              setActiveTheme(value);
+            }
+          }}>
+          <SelectTrigger
+            data-testid="theme-selector"
+            render={<Button variant="ghost" size="sm" className="h-8 w-8 p-0" title={tTheme("changeTheme")} />}>
+            <Palette className="h-4 w-4" />
+          </SelectTrigger>
+          <SelectContent align="end" side="top">
             <SelectGroup>
               {DEFAULT_THEMES.map((theme) => (
                 <SelectItem key={theme.name} value={theme.value} className="data-[state=checked]:opacity-50">

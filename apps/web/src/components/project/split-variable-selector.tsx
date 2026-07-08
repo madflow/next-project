@@ -56,14 +56,20 @@ export function SplitVariableSelector({
           {t("label")}
         </Label>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <CircleHelpIcon className="text-muted-foreground h-4 w-4 cursor-help" />
+          <TooltipTrigger render={<button type="button" className="cursor-help" />}>
+            <CircleHelpIcon className="text-muted-foreground h-4 w-4" />
           </TooltipTrigger>
           <TooltipContent>
             <p>{t("tooltip")}</p>
           </TooltipContent>
         </Tooltip>
-        <Select value={selectedSplitVariable || "none"} onValueChange={handleValueChange}>
+        <Select
+          value={selectedSplitVariable || "none"}
+          onValueChange={(value) => {
+            if (value) {
+              handleValueChange(value);
+            }
+          }}>
           <SelectTrigger
             id={splitVariableSelectId}
             className={compact ? "h-8 w-auto max-w-[250px] min-w-[180px]" : "h-8 flex-1"}>
