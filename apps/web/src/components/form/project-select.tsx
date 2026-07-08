@@ -27,7 +27,7 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
 
   if (isLoading) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger {...triggerProps} data-testid="project-dropdown-loading">
           <SelectValue placeholder={t("loadingProjects")} />
         </SelectTrigger>
@@ -37,7 +37,7 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
 
   if (isError) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger {...triggerProps} data-testid="project-dropdown-error">
           <SelectValue placeholder={t("errorLoading")} />
         </SelectTrigger>
@@ -47,7 +47,7 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
 
   if (!projects || projects.length === 0) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger {...triggerProps} data-testid="project-dropdown-empty">
           <SelectValue placeholder={t("noProjects")} />
         </SelectTrigger>
