@@ -37,7 +37,7 @@ test.describe("Admin Dataset Split Variables", () => {
 
   test("should navigate to split variables tab and display assignment interface", async ({ page }) => {
     // Verify the split variables tab is active and content is visible
-    await expect(page.getByTestId("app.admin.editor.splitvariables.tab")).toHaveAttribute("data-state", "active");
+    await expect(page.getByTestId("app.admin.editor.splitvariables.tab")).toHaveAttribute("aria-selected", "true");
 
     // Verify the main title and description are displayed using specific test IDs
     await expect(page.getByTestId("admin.dataset.splitvariables.title")).toBeVisible();
