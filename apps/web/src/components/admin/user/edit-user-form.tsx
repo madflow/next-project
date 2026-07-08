@@ -145,7 +145,11 @@ export function EditUserForm({ user }: FormEditProps) {
                   className="w-full sm:w-1/2 lg:w-1/3"
                   aria-invalid={fieldState.invalid}
                   data-testid="admin.users.edit.form.role">
-                  <SelectValue placeholder={t("formPlaceholders.selectRole")} />
+                  <SelectValue placeholder={t("formPlaceholders.selectRole")}>
+                    {(value) =>
+                      getRoles(t as unknown as EditUserTranslations).find((role) => role.value === value)?.label ?? null
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {getRoles(t as unknown as EditUserTranslations).map((role) => (
@@ -173,7 +177,9 @@ export function EditUserForm({ user }: FormEditProps) {
                   className="w-full sm:w-1/2 lg:w-1/3"
                   aria-invalid={fieldState.invalid}
                   data-testid="admin.users.edit.form.locale">
-                  <SelectValue placeholder={t("formPlaceholders.selectLanguage")} />
+                  <SelectValue placeholder={t("formPlaceholders.selectLanguage")}>
+                    {(value) => languages.find((language) => language.value === value)?.label ?? null}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {languages.map((language) => (

@@ -177,7 +177,19 @@ export function MetadataFileUploadForm({ datasetId, onUploaded }: MetadataFileUp
               <FieldGroup>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id={field.name} data-testid="admin.dataset.metadata-file.type-trigger">
-                    <SelectValue placeholder={t("upload.typeLabel")} />
+                    <SelectValue placeholder={t("upload.typeLabel")}>
+                      {(value) =>
+                        value === "questionnaire"
+                          ? t("types.questionnaire")
+                          : value === "variable_descriptions"
+                            ? t("types.variable_descriptions")
+                            : value === "documentation"
+                              ? t("types.documentation")
+                              : value === "other"
+                                ? t("types.other")
+                                : null
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="questionnaire">{t("types.questionnaire")}</SelectItem>

@@ -136,7 +136,9 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
             <FieldGroup>
               <Select onValueChange={field.onChange} value={field.value} data-testid="organization-select">
                 <SelectTrigger id={field.name} className="w-full sm:max-w-[50%]">
-                  <SelectValue placeholder={t("form.organization.placeholder")} />
+                  <SelectValue placeholder={t("form.organization.placeholder")}>
+                    {organizations.find((org) => org.id === field.value)?.name ?? null}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {isLoading ? (

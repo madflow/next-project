@@ -100,7 +100,15 @@ export function UpdateProfileForm() {
                     id={field.name}
                     aria-invalid={fieldState.invalid}
                     data-testid="app.user.account.profile.locale">
-                    <SelectValue placeholder={t("localeSwitcher.selectLanguage")} />
+                    <SelectValue placeholder={t("localeSwitcher.selectLanguage")}>
+                      {(value) =>
+                        value === "de"
+                          ? t("localeSwitcher.languages.de")
+                          : value === "en"
+                            ? t("localeSwitcher.languages.en")
+                            : null
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>

@@ -64,7 +64,9 @@ export function OrganizationSelect({ onValueChange, defaultValue, triggerProps }
       }}
       value={selectedValue}>
       <SelectTrigger {...triggerProps} className="w-[180px]" data-testid="organization-dropdown">
-        <SelectValue placeholder={t("formOrganizationSelect.selectOrganization")} />
+        <SelectValue placeholder={t("formOrganizationSelect.selectOrganization")}>
+          {organizations.find((organization) => organization.id === selectedValue)?.name ?? null}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent data-testid="organization-dropdown-content">
         <SelectGroup key="organization-group">

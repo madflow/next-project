@@ -121,7 +121,17 @@ export function AddMemberForm({ organizationId }: AddMemberFormProps) {
               <FieldGroup>
                 <Select onValueChange={field.onChange} value={field.value} disabled={!userId}>
                   <SelectTrigger id={field.name}>
-                    <SelectValue placeholder={t("role.placeholder")} />
+                    <SelectValue placeholder={t("role.placeholder")}>
+                      {(value) =>
+                        value === "admin"
+                          ? t("role.options.admin")
+                          : value === "owner"
+                            ? t("role.options.owner")
+                            : value === "member"
+                              ? t("role.options.member")
+                              : null
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">{t("role.options.admin")}</SelectItem>

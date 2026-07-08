@@ -96,7 +96,9 @@ export function DatasetSelect({
       }}
       value={selectedValue}>
       <SelectTrigger data-testid="app.dropdown.dataset.trigger" className="w-full">
-        <SelectValue placeholder={t("selectDataset")} />
+        <SelectValue placeholder={t("selectDataset")}>
+          {data.rows.find((item) => item.dataset?.id === selectedValue)?.dataset?.name ?? null}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent data-testid="app.dropdown.dataset.content">
         <SelectGroup key="dataset-group">
