@@ -71,17 +71,23 @@ export const columns: ColumnDef<DatasetWithEmbeddedOrganization>[] = [
 
       return (
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="icon" asChild title={t("tableActions.edit")}>
-            <Link href={`/admin/datasets/edit/${dataset.id}`}>
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">{t("tableActions.edit")}</span>
-            </Link>
+          <Button
+            variant="outline"
+            size="icon"
+            title={t("tableActions.edit")}
+            nativeButton={false}
+            render={<Link href={`/admin/datasets/edit/${dataset.id}`} />}>
+            <Pencil className="h-4 w-4" />
+            <span className="sr-only">{t("tableActions.edit")}</span>
           </Button>
-          <Button variant="outline" size="icon" asChild title={t("tableActions.download")}>
-            <a href={`/api/datasets/${dataset.id}/download`} target="_blank" rel="noopener noreferrer">
-              <Download className="h-4 w-4" />
-              <span className="sr-only">{t("tableActions.download")}</span>
-            </a>
+          <Button
+            variant="outline"
+            size="icon"
+            title={t("tableActions.download")}
+            nativeButton={false}
+            render={<a href={`/api/datasets/${dataset.id}/download`} target="_blank" rel="noopener noreferrer" />}>
+            <Download className="h-4 w-4" />
+            <span className="sr-only">{t("tableActions.download")}</span>
           </Button>
           <DeleteDatasetDialog datasetId={dataset.id} datasetName={dataset.name} onDelete={handleDelete} />
           <InfoDatasetModal dataset={row.original} />

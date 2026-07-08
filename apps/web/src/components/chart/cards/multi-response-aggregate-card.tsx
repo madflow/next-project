@@ -26,7 +26,7 @@ type MultiResponseAggregateCardProps = {
 
 function MultiResponseAggregateChartContent({
   chartConfig,
-  chartColors,
+  chartColors: _chartColors,
   chartData,
   chartRef,
   fileName,
@@ -39,8 +39,10 @@ function MultiResponseAggregateChartContent({
   fileName: string;
   disableAnimation?: boolean;
 }) {
+  void _chartColors;
+
   return (
-    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={fileName}>
+    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={fileName}>
       <BarChart
         layout="vertical"
         margin={{

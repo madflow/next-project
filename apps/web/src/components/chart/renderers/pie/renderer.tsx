@@ -21,10 +21,12 @@ export function PieChartRenderer({
   variable,
   stats,
   chartRef,
-  chartColors,
+  chartColors: _chartColors,
   disableAnimation = false,
   sortConfig,
 }: PieChartRendererProps) {
+  void _chartColors;
+
   const pieData = transformToRechartsPieData(variable, stats, sortConfig);
   const pieChartConfig: ChartConfig = {};
 
@@ -47,11 +49,7 @@ export function PieChartRenderer({
   );
 
   return (
-    <ChartContainer
-      config={pieChartConfig}
-      chartColors={chartColors}
-      ref={chartRef}
-      data-export-filename={variable.name}>
+    <ChartContainer config={pieChartConfig} ref={chartRef} data-export-filename={variable.name}>
       <PieChart>
         <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="label" />} />
         <Pie

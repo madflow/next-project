@@ -83,18 +83,21 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild disabled={isTriggerDisabled}>
-              <Button
-                variant="ghost"
-                size="sm"
-                data-testid="app.organization-switcher"
-                className={cn("w-full justify-between px-3", "hover:bg-accent hover:text-accent-foreground")}>
-                <div className="flex items-center gap-2">
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}
-                  <span className="max-w-[140px] truncate">{displayName}</span>
-                </div>
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
+            <DropdownMenuTrigger
+              disabled={isTriggerDisabled}
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  data-testid="app.organization-switcher"
+                  className={cn("w-full justify-between px-3", "hover:bg-accent hover:text-accent-foreground")}
+                />
+              }>
+              <div className="flex items-center gap-2">
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}
+                <span className="max-w-[140px] truncate">{displayName}</span>
+              </div>
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"

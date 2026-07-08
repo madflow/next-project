@@ -21,18 +21,25 @@ type LocaleSwitcherProps = {
 
 export function LocaleSwitcher({ defaultValue }: LocaleSwitcherProps) {
   const [isPending, startTransition] = useTransition();
-  function onChange(value: string) {
+  const t = useTranslations("localeSwitcher");
+
+  const selectedLabel = defaultValue === "de" ? t("languages.de") : t("languages.en");
+
+  function onChange(value: string | null) {
+    if (!value) {
+      return;
+    }
+
     const locale = value as Locale;
     startTransition(() => {
       setUserLocale(locale);
     });
   }
-  const t = useTranslations("localeSwitcher");
 
   return (
-    <Select defaultValue={defaultValue} onValueChange={onChange}>
+    <Select value={defaultValue} onValueChange={onChange}>
       <SelectTrigger data-testid="app.locale-switcher">
-        <SelectValue placeholder={t("selectLanguage")} />
+        <SelectValue placeholder={t("selectLanguage")}>{selectedLabel}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup className={isPending ? "pointer-events-none opacity-60" : ""}>

@@ -6,6 +6,11 @@ const nextConfig = {
   output: "standalone",
   transpilePackages: ["@repo/api", "@t3-oss/env-nextjs", "@t3-oss/env-core"],
   typedRoutes: true,
+  turbopack: {
+    resolveAlias: {
+      "zod/v4/core": "./src/lib/zod-v4-core-shim.js",
+    },
+  },
   experimental: {
     proxyClientMaxBodySize: "100mb",
     serverActions: {

@@ -39,8 +39,12 @@ export default async function OrganisationMembersPage({ params }: OrganisationMe
       title={t("title", { name: organization.name })}
       description={t("description")}
       data-testid="admin.organization-members.page">
-      <Button asChild data-testid="admin.organizations.members.add.button" className="self-start">
-        <Link href={`/admin/organizations/${id}/members/add`}>{t("addMember")}</Link>
+      <Button
+        data-testid="admin.organizations.members.add.button"
+        className="self-start"
+        nativeButton={false}
+        render={<Link href={`/admin/organizations/${id}/members/add`} />}>
+        {t("addMember")}
       </Button>
       <OrganisationMembersDataTable columns={columns} organizationId={id} />
     </PageLayout>

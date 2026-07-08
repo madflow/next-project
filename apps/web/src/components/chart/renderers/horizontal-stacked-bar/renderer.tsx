@@ -78,7 +78,7 @@ function HorizontalStackedBarChart({
   chartRef,
   exportFilename,
   hideLegend = false,
-  chartColors,
+  chartColors: _chartColors,
   tooltipContent,
   disableAnimation = false,
 }: {
@@ -90,12 +90,10 @@ function HorizontalStackedBarChart({
   tooltipContent?: React.ReactElement;
   disableAnimation?: boolean;
 }) {
+  void _chartColors;
+
   return (
-    <ChartContainer
-      config={model.chartConfig}
-      chartColors={chartColors}
-      ref={chartRef}
-      data-export-filename={exportFilename}>
+    <ChartContainer config={model.chartConfig} ref={chartRef} data-export-filename={exportFilename}>
       <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={model.chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis

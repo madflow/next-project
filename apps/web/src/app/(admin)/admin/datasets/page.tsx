@@ -11,8 +11,12 @@ export default async function DatasetsPage() {
   return (
     <PageLayout title={t("title")} description={t("description")} data-testid="admin.datasets.page">
       <div className="space-y-4">
-        <Button asChild data-testid="admin.datasets.create.upload" className="self-start">
-          <Link href="/admin/datasets/upload">{t("uploadButton")}</Link>
+        <Button
+          data-testid="admin.datasets.create.upload"
+          className="self-start"
+          nativeButton={false}
+          render={<Link href="/admin/datasets/upload" />}>
+          {t("uploadButton")}
         </Button>
 
         <DatasetsDataTable columns={columns} />

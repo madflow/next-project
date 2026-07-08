@@ -21,10 +21,8 @@ export const InfoUserModal = ({ user }: InfoUserModalProps) => {
   const t = useTranslations("adminUserInfoModal");
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="cursor-pointer">
-          <InfoIcon />
-        </Button>
+      <DialogTrigger render={<Button variant="outline" className="cursor-pointer" />}>
+        <InfoIcon />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[768px]">
         <DialogHeader>
@@ -33,9 +31,7 @@ export const InfoUserModal = ({ user }: InfoUserModalProps) => {
         </DialogHeader>
         <Code scrollAreaClassName="max-h-[60vh]">{JSON.stringify(user, null, 2)}</Code>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">{t("close")}</Button>
-          </DialogClose>
+          <DialogClose render={<Button variant="outline" />}>{t("close")}</DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

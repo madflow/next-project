@@ -35,8 +35,12 @@ export function SignUpSuccessfulCard() {
               {t("signUpSuccessful.messages.success.description")}
             </AlertDescription>
           </Alert>
-          <Button asChild className="w-full" data-testid="auth.sign-up-successful.login">
-            <Link href="/auth/login">{t("signUpSuccessful.actions.signIn")}</Link>
+          <Button
+            className="w-full"
+            data-testid="auth.sign-up-successful.login"
+            nativeButton={false}
+            render={<Link href="/auth/login" />}>
+            {t("signUpSuccessful.actions.signIn")}
           </Button>
         </div>
       </CardContent>

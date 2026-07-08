@@ -22,10 +22,8 @@ export const InfoDatasetVariableModal = ({ datasetVariable }: InfoDatasetVariabl
   const t = useTranslations("adminDatasetInfoModal");
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="cursor-pointer">
-          <InfoIcon />
-        </Button>
+      <DialogTrigger render={<Button variant="outline" className="cursor-pointer" />}>
+        <InfoIcon />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[768px]">
         <DialogHeader>
@@ -34,9 +32,7 @@ export const InfoDatasetVariableModal = ({ datasetVariable }: InfoDatasetVariabl
         </DialogHeader>
         <Code scrollAreaClassName="max-h-[60vh]">{JSON.stringify(datasetVariable, null, 2)}</Code>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">{t("buttons.close")}</Button>
-          </DialogClose>
+          <DialogClose render={<Button variant="outline" />}>{t("buttons.close")}</DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

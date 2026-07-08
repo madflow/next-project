@@ -154,16 +154,18 @@ function SortableSubsetItem({ entry, onDetach, isDetaching, detachTooltip }: Sor
           </div>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => entry.subsetId && onDetach(entry.subsetId)}
-                  disabled={isDetaching}
-                  className="h-6 w-6 shrink-0 p-0"
-                  data-testid="admin.dataset.variableset.assignment.detach-subset">
-                  {isDetaching ? "..." : <Unlink className="h-3 w-3" />}
-                </Button>
+              <TooltipTrigger
+                render={
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => entry.subsetId && onDetach(entry.subsetId)}
+                    disabled={isDetaching}
+                    className="h-6 w-6 shrink-0 p-0"
+                    data-testid="admin.dataset.variableset.assignment.detach-subset"
+                  />
+                }>
+                {isDetaching ? "..." : <Unlink className="h-3 w-3" />}
               </TooltipTrigger>
               <TooltipContent side="top">{detachTooltip}</TooltipContent>
             </Tooltip>

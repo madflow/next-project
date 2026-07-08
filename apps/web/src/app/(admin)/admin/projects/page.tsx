@@ -9,8 +9,12 @@ export default async function Projects() {
   const t = await getTranslations("project");
   return (
     <PageLayout title={t("title")} description={t("description")} data-testid="admin.projects.page">
-      <Button asChild data-testid="admin.projects.create.button" className="self-start">
-        <Link href="/admin/projects/new">{t("createButton")}</Link>
+      <Button
+        data-testid="admin.projects.create.button"
+        className="self-start"
+        nativeButton={false}
+        render={<Link href="/admin/projects/new" />}>
+        {t("createButton")}
       </Button>
       <ProjectsDataTable columns={columns} />
     </PageLayout>

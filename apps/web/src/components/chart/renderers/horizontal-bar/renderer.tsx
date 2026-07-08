@@ -1,6 +1,6 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
   type ChartSortConfig,
@@ -30,12 +30,14 @@ export function HorizontalBarChartRenderer({
   stats,
   chartRef,
   chartConfig,
-  chartColors,
+  chartColors: _chartColors,
   isMultiResponseIndividual = false,
   countedValue = 1,
   disableAnimation = false,
   sortConfig,
 }: HorizontalBarChartRendererProps) {
+  void _chartColors;
+
   const chartData: Array<{
     label: string | number;
     value: string | number;
@@ -46,7 +48,7 @@ export function HorizontalBarChartRenderer({
     : transformToRechartsBarData(variable, stats, sortConfig);
 
   return (
-    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
+    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={variable.name}>
       <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={4} accessibilityLayer data={chartData}>
         <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
         <XAxis
@@ -74,9 +76,6 @@ export function HorizontalBarChartRenderer({
           dataKey="percentage"
           fill="var(--color-percentage)"
           isAnimationActive={disableAnimation ? false : undefined}>
-          {chartData.map((entry, index) => (
-            <Cell key={`${entry.label}-${index}`} fill={`var(--chart-${(index % 6) + 1})`} />
-          ))}
           <LabelList
             dataKey="percentage"
             position="right"

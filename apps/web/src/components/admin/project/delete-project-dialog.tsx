@@ -45,17 +45,19 @@ export function DeleteProjectDialog({ projectId, projectName, onDelete }: Props)
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          data-testid={`admin.projects.list.delete-${projectName?.toLowerCase().replace(/\s+/g, "-")}`}
-          title={t("deleteDialog.deleteButton.title")}
-          className="cursor-pointer"
-          type="button">
-          <Trash className="h-4 w-4" />
-          <span className="sr-only">{t("deleteDialog.deleteButton.title")}</span>
-        </Button>
+      <AlertDialogTrigger
+        render={
+          <Button
+            variant="outline"
+            size="icon"
+            data-testid={`admin.projects.list.delete-${projectName?.toLowerCase().replace(/\s+/g, "-")}`}
+            title={t("deleteDialog.deleteButton.title")}
+            className="cursor-pointer"
+            type="button"
+          />
+        }>
+        <Trash className="h-4 w-4" />
+        <span className="sr-only">{t("deleteDialog.deleteButton.title")}</span>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -10,8 +10,12 @@ export default async function Page() {
 
   return (
     <PageLayout title={t("title")} description={t("description")} data-testid="admin.organizations.page">
-      <Button asChild data-testid="admin.organizations.create.button" className="self-start">
-        <Link href="/admin/organizations/new">{t("createButton")}</Link>
+      <Button
+        data-testid="admin.organizations.create.button"
+        className="self-start"
+        nativeButton={false}
+        render={<Link href="/admin/organizations/new" />}>
+        {t("createButton")}
       </Button>
       <OrganizationsDataTable columns={columns} />
     </PageLayout>

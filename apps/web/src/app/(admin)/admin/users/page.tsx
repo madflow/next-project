@@ -10,8 +10,12 @@ export default async function AdminUsersPage() {
 
   return (
     <PageLayout title={t("title")} description={t("description")} data-testid="admin.users.page">
-      <Button asChild data-testid="admin.users.create.button" className="self-start">
-        <Link href="/admin/users/new">{t("createButton")}</Link>
+      <Button
+        data-testid="admin.users.create.button"
+        className="self-start"
+        nativeButton={false}
+        render={<Link href="/admin/users/new" />}>
+        {t("createButton")}
       </Button>
       <UsersDataTable columns={columns} />
     </PageLayout>

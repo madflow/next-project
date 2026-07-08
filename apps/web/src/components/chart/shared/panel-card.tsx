@@ -134,9 +134,14 @@ export function ChartPanelCard({
             {availableChartTypes.length > 1 && !isMultiResponseIndividual && (
               <CardAction>
                 <ToggleGroup
-                  type="single"
-                  value={selectedChartType}
-                  onValueChange={(value) => value && onChartTypeChange(value as AnalysisChartType)}
+                  value={[selectedChartType]}
+                  onValueChange={(value) => {
+                    const nextChartType = value[0];
+
+                    if (nextChartType) {
+                      onChartTypeChange(nextChartType as AnalysisChartType);
+                    }
+                  }}
                   size="sm"
                   data-testid="chart-type-selector">
                   {availableChartTypes.map((chartType) => (

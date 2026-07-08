@@ -153,14 +153,20 @@ export function MetadataFilesTab({ datasetId }: MetadataFilesTabProps) {
                       <TableCell>{formatter.format(new Date(file.uploadedAt))}</TableCell>
                       <TableCell>
                         <div className="flex justify-end gap-2">
-                          <Button asChild variant="outline" size="icon" type="button">
-                            <a
-                              href={`/api/datasets/${datasetId}/metadata-files/${file.id}`}
-                              download
-                              data-testid={`admin.dataset.metadata-file.download.${file.id}`}>
-                              <Download className="h-4 w-4" />
-                              <span className="sr-only">{t("files.download")}</span>
-                            </a>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            type="button"
+                            nativeButton={false}
+                            render={
+                              <a
+                                href={`/api/datasets/${datasetId}/metadata-files/${file.id}`}
+                                download
+                                data-testid={`admin.dataset.metadata-file.download.${file.id}`}
+                              />
+                            }>
+                            <Download className="h-4 w-4" />
+                            <span className="sr-only">{t("files.download")}</span>
                           </Button>
                           <MetadataFileDeleteDialog
                             datasetId={datasetId}

@@ -138,11 +138,9 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-            <EllipsisVertical className="h-4 w-4" />
-            <span className="sr-only">{"Open menu"}</span>
-          </Button>
+        <DropdownMenuTrigger render={<Button variant="ghost" size="sm" className="h-8 w-8 p-0" />}>
+          <EllipsisVertical className="h-4 w-4" />
+          <span className="sr-only">{"Open menu"}</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleExport} disabled={isExporting} className="flex items-center gap-2">
@@ -182,9 +180,11 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
                   <Label htmlFor="conflict-resolution">{t("importDialog.conflictResolution")}</Label>
                   <Select
                     value={conflictResolution}
-                    onValueChange={(value: VariableSetImportOptions["conflictResolution"]) =>
-                      setConflictResolution(value)
-                    }>
+                    onValueChange={(value) => {
+                      if (value) {
+                        setConflictResolution(value);
+                      }
+                    }}>
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
