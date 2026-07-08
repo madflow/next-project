@@ -122,7 +122,9 @@ export function InviteUserForm({ user, organizationId }: InviteUserFormProps) {
                     id="role"
                     className="w-full sm:w-1/2 lg:w-1/3"
                     data-testid="admin.users.invite.form.role">
-                    <SelectValue placeholder={t("formPlaceholders.selectRole")} />
+                    <SelectValue placeholder={t("formPlaceholders.selectRole")}>
+                      {(value) => roles.find((role) => role.value === value)?.label ?? null}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (

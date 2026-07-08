@@ -186,7 +186,17 @@ export function ExportImportActions({ datasetId, onImportSuccess }: ExportImport
                       }
                     }}>
                     <SelectTrigger className="w-full">
-                      <SelectValue />
+                      <SelectValue>
+                        {(value) =>
+                          value === "skip"
+                            ? t("importDialog.conflictOptions.skip")
+                            : value === "overwrite"
+                              ? t("importDialog.conflictOptions.overwrite")
+                              : value === "rename"
+                                ? t("importDialog.conflictOptions.rename")
+                                : null
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="skip">{t("importDialog.conflictOptions.skip")}</SelectItem>

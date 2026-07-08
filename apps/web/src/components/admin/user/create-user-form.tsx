@@ -48,6 +48,10 @@ export function CreateUserForm() {
   const t = useTranslations("adminUserCreateForm");
   const tLocale = useTranslations("localeSwitcher");
   const roles = getRoles(t as unknown as CreateUserTranslations);
+  const languages = locales.map((locale) => ({
+    value: locale,
+    label: tLocale(`languages.${locale}`),
+  }));
 
   const form = useForm<FormValues>({
     resolver: zodResolver(createFormSchema(t as unknown as CreateUserTranslations)) as unknown as Resolver<FormValues>,
@@ -138,7 +142,9 @@ export function CreateUserForm() {
                     className="w-full sm:w-1/2 lg:w-1/3"
                     aria-invalid={fieldState.invalid}
                     data-testid="admin.users.new.form.locale">
-                    <SelectValue placeholder={tLocale("selectLanguage")} />
+                    <SelectValue placeholder={tLocale("selectLanguage")}>
+                      {(value) => languages.find((language) => language.value === value)?.label ?? null}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {locales.map((locale) => (
@@ -166,7 +172,9 @@ export function CreateUserForm() {
                     className="w-full sm:w-1/2 lg:w-1/3"
                     aria-invalid={fieldState.invalid}
                     data-testid="admin.users.new.form.role">
-                    <SelectValue placeholder={t("formPlaceholders.selectRole")} />
+                    <SelectValue placeholder={t("formPlaceholders.selectRole")}>
+                      {(value) => roles.find((role) => role.value === value)?.label ?? null}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((role) => (

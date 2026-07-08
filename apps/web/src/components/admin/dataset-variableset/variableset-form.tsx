@@ -226,7 +226,15 @@ export function VariablesetForm({
                       id={field.name}
                       className="w-full"
                       data-testid="admin.dataset.variableset.form.parent">
-                      <SelectValue placeholder={t("form.selectParent")} />
+                      <SelectValue placeholder={t("form.selectParent")}>
+                        {(value) => {
+                          if (value === NO_PARENT_VALUE) {
+                            return t("form.noParent");
+                          }
+
+                          return filteredParents.find((parent) => parent.id === value)?.name ?? null;
+                        }}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={NO_PARENT_VALUE}>{t("form.noParent")}</SelectItem>
@@ -255,7 +263,13 @@ export function VariablesetForm({
                       id={field.name}
                       className="w-full"
                       data-testid="admin.dataset.variableset.form.category">
-                      <SelectValue placeholder={t("form.selectCategory")} />
+                      <SelectValue placeholder={t("form.selectCategory")}>
+                        {(value) =>
+                          typeof value === "string" && value in CATEGORY_LABEL_KEYS
+                            ? t(CATEGORY_LABEL_KEYS[value as keyof typeof CATEGORY_LABEL_KEYS])
+                            : null
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {CATEGORY_OPTIONS.map((category) => (

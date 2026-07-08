@@ -161,7 +161,13 @@ export function EditDatasetVariableForm({ datasetVariable }: EditDatasetVariable
                 <FieldGroup>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id="measure" className="w-full">
-                      <SelectValue />
+                      <SelectValue>
+                        {(value) =>
+                          typeof value === "string"
+                            ? t(`editVariable.form.measure.options.${value as (typeof MEASURE_OPTIONS)[number]}`)
+                            : null
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {MEASURE_OPTIONS.map((option) => (

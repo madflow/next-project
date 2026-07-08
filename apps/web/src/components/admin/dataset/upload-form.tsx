@@ -232,7 +232,9 @@ export function DatasetUploadForm() {
                     id={field.name}
                     className="w-full"
                     data-testid="app.admin.dataset.organization-trigger">
-                    <SelectValue placeholder={t("formLabels.organization")} />
+                    <SelectValue placeholder={t("formLabels.organization")}>
+                      {organizations.find((org) => org.id === field.value)?.name ?? null}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {isLoading ? (

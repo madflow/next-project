@@ -65,7 +65,9 @@ export function ProjectSelect({ organizationId, onValueChange, defaultValue, tri
       }}
       value={selectedValue}>
       <SelectTrigger {...triggerProps} className="w-[180px]" data-testid="project-dropdown">
-        <SelectValue placeholder={t("selectProject")} />
+        <SelectValue placeholder={t("selectProject")}>
+          {projects.find((project) => project.id === selectedValue)?.name ?? null}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent data-testid="project-dropdown-content">
         <SelectGroup key="project-group">

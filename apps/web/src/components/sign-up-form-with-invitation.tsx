@@ -187,7 +187,11 @@ export function SignUpFormWithInvitation({ hasVerifyEmail, invitation }: SignUpF
                       <FieldGroup>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <SelectTrigger id="locale" data-testid="auth.sign-up.form.language">
-                            <SelectValue placeholder={t("localeSwitcher.selectLanguage")} />
+                            <SelectValue placeholder={t("localeSwitcher.selectLanguage")}>
+                              {(value) =>
+                                typeof value === "string" ? t(`localeSwitcher.languages.${value as Locale}`) : null
+                              }
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
                             {locales.map((lang) => (
