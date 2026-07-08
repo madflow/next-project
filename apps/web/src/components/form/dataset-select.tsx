@@ -59,7 +59,7 @@ export function DatasetSelect({
 
   if (isLoading) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger {...triggerProps} data-testid="app.dropdown.dataset.loading">
           <SelectValue placeholder={t("loadingDatasets")} />
         </SelectTrigger>
@@ -69,7 +69,7 @@ export function DatasetSelect({
 
   if (isError) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger data-testid="app.dropdown.dataset.error">
           <SelectValue placeholder={t("errorLoading")} />
         </SelectTrigger>
@@ -79,7 +79,7 @@ export function DatasetSelect({
 
   if (!data?.rows || data.rows.length === 0) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger data-testid="app.dropdown.dataset.empty">
           <SelectValue placeholder={t("noDatasets")} />
         </SelectTrigger>

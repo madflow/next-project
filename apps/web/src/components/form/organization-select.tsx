@@ -26,7 +26,7 @@ export function OrganizationSelect({ onValueChange, defaultValue, triggerProps }
 
   if (isLoading) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger {...triggerProps} data-testid="organization-dropdown-loading">
           <SelectValue placeholder={t("formOrganizationSelect.loadingOrganizations")} />
         </SelectTrigger>
@@ -36,7 +36,7 @@ export function OrganizationSelect({ onValueChange, defaultValue, triggerProps }
 
   if (isError) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger {...triggerProps} data-testid="organization-dropdown-error">
           <SelectValue placeholder={t("formOrganizationSelect.errorLoading")} />
         </SelectTrigger>
@@ -46,7 +46,7 @@ export function OrganizationSelect({ onValueChange, defaultValue, triggerProps }
 
   if (!organizations || organizations.length === 0) {
     return (
-      <Select disabled value={selectedValue}>
+      <Select disabled value="">
         <SelectTrigger {...triggerProps} data-testid="organization-dropdown-empty">
           <SelectValue placeholder={t("formOrganizationSelect.noOrganizations")} />
         </SelectTrigger>
