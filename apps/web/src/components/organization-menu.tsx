@@ -139,7 +139,7 @@ export function OrganizationMenu({ activeOrganization }: OrganizationMenuProps) 
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     data-testid="app.organization-switcher.invite"
-                    onSelect={() => setOpenInvitationModal(true)}
+                    onClick={() => setOpenInvitationModal(true)}
                     className={cn("cursor-pointer text-sm", "focus:bg-accent focus:text-accent-foreground")}>
                     <CirclePlusIcon className="h-4 w-4" />
                     {t("organizationSwitcher.invite")}
