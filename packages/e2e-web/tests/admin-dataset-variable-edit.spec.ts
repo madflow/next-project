@@ -1,8 +1,23 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
 
 const DATASET_NAME = "SPSS Beispielumfrage";
+const DATASET_EDITOR_URL_PATTERN = /\/admin\/datasets\/[^/]+\/editor$/;
+
+async function openDatasetEditor(page: Page) {
+  await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
+  await page.getByRole("link", { name: DATASET_NAME }).click();
+  await expect(page).toHaveURL(DATASET_EDITOR_URL_PATTERN);
+  await expect(page.getByTestId("app.admin.editor.variables.tab")).toBeVisible();
+}
+
+async function openVariableEditor(page: Page, variableName: string) {
+  await expect(page).toHaveURL(DATASET_EDITOR_URL_PATTERN);
+  await expect(page.getByTestId("app.admin.editor.variables.tab")).toBeVisible();
+  await page.getByTestId("app.datatable.search-input").fill(variableName);
+  await page.getByTestId(`app.admin.dataset-variable.edit-${variableName}`).click();
+}
 
 test.describe("Admin Dataset Variable Edit", () => {
   test.slow();
@@ -12,12 +27,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
     const missingValuesGroup = page.getByRole("group").filter({ hasText: "Missing Values" });
     const missingValueInput = missingValuesGroup.getByRole("spinbutton").first();
     await missingValueInput.fill("9");
@@ -26,22 +37,22 @@ test.describe("Admin Dataset Variable Edit", () => {
     await missingValueInput.fill("99");
     await missingValuesGroup.getByRole("button").first().click();
 
-    await expect(missingValuesGroup.locator('input[readonly][value="9"]')).toBeVisible();
-    await expect(missingValuesGroup.locator('input[readonly][value="99"]')).toBeVisible();
+    await expect(missingValuesGroup.locator('input[readonly][value="9"]').first()).toBeVisible();
+    await expect(missingValuesGroup.locator('input[readonly][value="99"]').first()).toBeVisible();
 
     const missingRangesGroup = page.getByRole("group").filter({ hasText: "Missing Ranges" });
     const rangeInputs = missingRangesGroup.getByRole("spinbutton");
     await rangeInputs.nth(0).fill("100");
     await rangeInputs.nth(1).fill("200");
     await missingRangesGroup.getByRole("button").first().click();
-    await expect(missingRangesGroup.locator('input[readonly][value="100"]')).toBeVisible();
-    await expect(missingRangesGroup.locator('input[readonly][value="200"]')).toBeVisible();
+    await expect(missingRangesGroup.locator('input[readonly][value="100"]').first()).toBeVisible();
+    await expect(missingRangesGroup.locator('input[readonly][value="200"]').first()).toBeVisible();
 
     await rangeInputs.nth(0).fill("300");
     await rangeInputs.nth(1).fill("400");
     await missingRangesGroup.getByRole("button").first().click();
-    await expect(missingRangesGroup.locator('input[readonly][value="300"]')).toBeVisible();
-    await expect(missingRangesGroup.locator('input[readonly][value="400"]')).toBeVisible();
+    await expect(missingRangesGroup.locator('input[readonly][value="300"]').first()).toBeVisible();
+    await expect(missingRangesGroup.locator('input[readonly][value="400"]').first()).toBeVisible();
 
     const measureSelect = page.getByRole("combobox", { name: "Measure" });
     await measureSelect.click();
@@ -49,21 +60,18 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
 
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openVariableEditor(page, "age");
 
     const missingValuesGroupRecheck = page.getByRole("group").filter({ hasText: "Missing Values" });
-    await expect(missingValuesGroupRecheck.locator('input[readonly][value="9"]')).toBeVisible();
-    await expect(missingValuesGroupRecheck.locator('input[readonly][value="99"]')).toBeVisible();
+    await expect(missingValuesGroupRecheck.locator('input[readonly][value="9"]').first()).toBeVisible();
+    await expect(missingValuesGroupRecheck.locator('input[readonly][value="99"]').first()).toBeVisible();
 
     const missingRangesGroupRecheck = page.getByRole("group").filter({ hasText: "Missing Ranges" });
-    await expect(missingRangesGroupRecheck.locator('input[readonly][value="100"]')).toBeVisible();
-    await expect(missingRangesGroupRecheck.locator('input[readonly][value="200"]')).toBeVisible();
-    await expect(missingRangesGroupRecheck.locator('input[readonly][value="300"]')).toBeVisible();
-    await expect(missingRangesGroupRecheck.locator('input[readonly][value="400"]')).toBeVisible();
-    await expect(page.getByRole("combobox", { name: "Measure" })).toHaveText("Ordinal");
+    await expect(missingRangesGroupRecheck.locator('input[readonly][value="100"]').first()).toBeVisible();
+    await expect(missingRangesGroupRecheck.locator('input[readonly][value="200"]').first()).toBeVisible();
+    await expect(missingRangesGroupRecheck.locator('input[readonly][value="300"]').first()).toBeVisible();
+    await expect(missingRangesGroupRecheck.locator('input[readonly][value="400"]').first()).toBeVisible();
+    await expect(page.getByRole("combobox", { name: "Measure" })).toContainText("Ordinal");
 
     const missingValuesGroupCleanup = page.getByRole("group").filter({ hasText: "Missing Values" });
     while ((await missingValuesGroupCleanup.locator("input[readonly]").count()) > 0) {
@@ -86,13 +94,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-    await page.waitForURL("**/admin/datasets/**");
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
 
     const missingRangesGroup = page.getByRole("group").filter({ hasText: "Missing Ranges" });
     const rangeInputs = missingRangesGroup.getByRole("spinbutton");
@@ -112,37 +115,31 @@ test.describe("Admin Dataset Variable Edit", () => {
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
 
     // Search for and click on the test dataset
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-
-    await page.waitForURL("**/admin/datasets/**");
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
 
     const missingValuesGroup = page.getByRole("group").filter({ hasText: "Missing Values" });
     const missingValueInput = missingValuesGroup.getByRole("spinbutton").first();
     await missingValueInput.fill("999");
     await missingValuesGroup.getByRole("button").first().click();
-    await expect(missingValuesGroup.locator('input[readonly][value="999"]')).toBeVisible();
+    await expect(missingValuesGroup.locator('input[readonly][value="999"]').first()).toBeVisible();
 
     const missingRangesGroup = page.getByRole("group").filter({ hasText: "Missing Ranges" });
     const rangeInputs = missingRangesGroup.getByRole("spinbutton");
     await rangeInputs.nth(0).fill("500");
     await rangeInputs.nth(1).fill("600");
     await missingRangesGroup.getByRole("button").first().click();
-    await expect(missingRangesGroup.locator('input[readonly][value="500"]')).toBeVisible();
-    await expect(missingRangesGroup.locator('input[readonly][value="600"]')).toBeVisible();
+    await expect(missingRangesGroup.locator('input[readonly][value="500"]').first()).toBeVisible();
+    await expect(missingRangesGroup.locator('input[readonly][value="600"]').first()).toBeVisible();
 
     const removeMissingValueButton = missingValuesGroup.getByRole("button").last();
     await removeMissingValueButton.click();
-    await expect(missingValuesGroup.locator('input[readonly][value="999"]')).toBeHidden();
+    await expect(missingValuesGroup.locator('input[readonly][value="999"]').first()).toBeHidden();
 
     const removeMissingRangeButton = missingRangesGroup.getByRole("button").last();
     await removeMissingRangeButton.click();
-    await expect(missingRangesGroup.locator('input[readonly][value="500"]')).toBeHidden();
-    await expect(missingRangesGroup.locator('input[readonly][value="600"]')).toBeHidden();
+    await expect(missingRangesGroup.locator('input[readonly][value="500"]').first()).toBeHidden();
+    await expect(missingRangesGroup.locator('input[readonly][value="600"]').first()).toBeHidden();
   });
 
   test("should add and edit variable labels with translations", async ({ page }) => {
@@ -150,13 +147,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-    await page.waitForURL("**/admin/datasets/**");
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
@@ -173,10 +165,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
 
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroupRecheck = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInputRecheck = variableLabelsGroupRecheck.getByRole("textbox", { name: /Default Label/i });
@@ -198,13 +187,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-    await page.waitForURL("**/admin/datasets/**");
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
@@ -220,13 +204,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-    await page.waitForURL("**/admin/datasets/**");
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
@@ -243,10 +222,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
 
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup2 = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const germanInput2 = variableLabelsGroup2.getByRole("textbox", { name: /German/i });
@@ -260,10 +236,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
 
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup3 = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInput3 = variableLabelsGroup3.getByRole("textbox", { name: /Default Label/i });
@@ -285,13 +258,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-    await page.waitForURL("**/admin/datasets/**");
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInput = variableLabelsGroup.getByRole("textbox", { name: /Default Label/i });
@@ -305,10 +273,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
 
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup2 = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInput2 = variableLabelsGroup2.getByRole("textbox", { name: /Default Label/i });
@@ -320,10 +285,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
 
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup3 = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const defaultLabelInput3 = variableLabelsGroup3.getByRole("textbox", { name: /Default Label/i });
@@ -336,10 +298,7 @@ test.describe("Admin Dataset Variable Edit", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByTestId("app.datatable.search-input")).toBeVisible();
 
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openVariableEditor(page, "age");
 
     const variableLabelsGroup4 = page.getByRole("group").filter({ hasText: "Variable Labels" });
     const germanInput4 = variableLabelsGroup4.getByRole("textbox", { name: /German/i });
@@ -359,13 +318,8 @@ test.describe("Admin Dataset Variable Edit", () => {
     await loginUser(page, testUsers.admin.email, testUsers.admin.password);
     await page.goto("/admin/datasets");
     await expect(page.getByTestId("admin.datasets.page")).toBeVisible();
-    await page.getByTestId("app.datatable.search-input").fill(DATASET_NAME);
-    await page.getByRole("link", { name: DATASET_NAME }).click();
-    await page.waitForURL("**/admin/datasets/**");
-    await page.getByTestId("app.datatable.search-input").click();
-    await page.getByTestId("app.datatable.search-input").fill("age");
-    await page.getByTestId("app.admin.dataset-variable.edit-age").waitFor({ state: "visible", timeout: 5000 });
-    await page.getByTestId("app.admin.dataset-variable.edit-age").click();
+    await openDatasetEditor(page);
+    await openVariableEditor(page, "age");
 
     const labelInput = page.getByTestId("app.admin.dataset-variable.label-input");
     await expect(labelInput).toBeDisabled();
