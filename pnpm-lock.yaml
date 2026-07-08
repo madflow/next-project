@@ -344,7 +344,7 @@ importers:
         version: 17.4.2
       mailpit-api:
         specifier: ^2.0.0
-        version: 2.0.0
+        version: 2.1.0
     devDependencies:
       '@playwright/test':
         specifier: ^1.60.0
@@ -5439,8 +5439,8 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
-  mailpit-api@2.0.0:
-    resolution: {integrity: sha512-zK68B0CRVZaJS1PaX7omFhKUKSLp4JMMpAUTRYbCmcrgJ9nguIh4sS+RRUyFeW1nykDNH8PVlRz/WSXsq9ZqlQ==}
+  mailpit-api@2.1.0:
+    resolution: {integrity: sha512-ZZG5ShQS2E5QH9p1xeD2U2sfahKEEgRvtzIlJXsLUtLSUbYjmxPeuvciwayj0oxA+hn85xzIEt1v8FsXtwqKCA==}
     engines: {node: '>=18.0.0'}
 
   marked@15.0.12:
@@ -11321,7 +11321,7 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  mailpit-api@2.0.0: {}
+  mailpit-api@2.1.0: {}
 
   marked@15.0.12: {}
 
