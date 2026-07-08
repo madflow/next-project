@@ -470,8 +470,8 @@ importers:
         specifier: ^17.4.2
         version: 17.4.2
       graphile-worker:
-        specifier: ^0.16.6
-        version: 0.16.6(typescript@6.0.3)
+        specifier: ^0.17.0
+        version: 0.17.2(typescript@6.0.3)
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -5067,9 +5067,9 @@ packages:
     resolution: {integrity: sha512-uMdF9Rt8/NwT1wVXNleYgM5ro2hHDodHiKA3efJhgdU8iP+r/hksnghOHreMva0sF5tV73f4TpiELPUR0g7O9w==}
     engines: {node: '>=16'}
 
-  graphile-worker@0.16.6:
-    resolution: {integrity: sha512-e7gGYDmGqzju2l83MpzX8vNG/lOtVJiSzI3eZpAFubSxh/cxs7sRrRGBGjzBP1kNG0H+c95etPpNRNlH65PYhw==}
-    engines: {node: '>=14.0.0'}
+  graphile-worker@0.17.2:
+    resolution: {integrity: sha512-zRM6797XNltD9+b0W7R49b5tcYEtlJmVembygjnvyc3kgo+qu4GURLUaFYg8gclxgRNETw0eByuUx+7N3IWyNg==}
+    engines: {node: '>=14.0.0', yarn: ^1.22.22}
     hasBin: true
 
   has-bigints@1.1.0:
@@ -9732,7 +9732,7 @@ snapshots:
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 26.1.0
+      '@types/node': 24.13.2
 
   '@types/d3-array@3.2.2': {}
 
@@ -9766,7 +9766,7 @@ snapshots:
 
   '@types/interpret@1.1.4':
     dependencies:
-      '@types/node': 22.20.0
+      '@types/node': 24.13.2
 
   '@types/jsesc@2.5.1': {}
 
@@ -9818,7 +9818,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 26.1.0
+      '@types/node': 24.13.2
 
   '@typescript-eslint/eslint-plugin@8.60.1(@typescript-eslint/parser@8.60.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
@@ -11072,7 +11072,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  graphile-worker@0.16.6(typescript@6.0.3):
+  graphile-worker@0.17.2(typescript@6.0.3):
     dependencies:
       '@graphile/logger': 0.2.0
       '@types/debug': 4.1.13
