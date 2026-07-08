@@ -38,10 +38,14 @@ This project uses the following technologies:
 
 ### Key directories in `packages/`
 
+- `api/` - Shared API contracts, server procedures, and generated client entrypoints.
+- `auth/` - Shared Better Auth configuration and auth helpers for client, server, and Next.js usage.
 - `cli/` - Command-line interface utilities and admin commands.
 - `database/` - Database ORM configuration, schema, and migrations.
 - `e2e-web/` - End-to-end testing suite using Playwright.
 - `email/` - Email template components and utilities.
 - `eslint-config/` - Shared ESLint configuration.
 - `prettier-config/` - Shared Prettier configuration.
+- `storage/` - Shared storage utilities, including S3 integration.
 - `typescript-config/` - Shared TypeScript configuration.
+- `worker/` - Background job worker and runner built on Graphile Worker.
