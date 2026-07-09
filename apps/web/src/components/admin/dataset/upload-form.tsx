@@ -182,10 +182,8 @@ export function DatasetUploadForm() {
                       <FileUploadItem key={index} value={file} data-testid="app.admin.dataset.selected-file">
                         <FileUploadItemPreview />
                         <FileUploadItemMetadata />
-                        <FileUploadItemDelete asChild>
-                          <Button variant="ghost" size="icon" className="size-7">
-                            <X />
-                          </Button>
+                        <FileUploadItemDelete render={<Button variant="ghost" size="icon" className="size-7" />}>
+                          <X />
                         </FileUploadItemDelete>
                       </FileUploadItem>
                     ))}

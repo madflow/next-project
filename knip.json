@@ -3,7 +3,6 @@
   "ignore": [
     "apps/web/src/global.ts",
     "apps/web/src/types/**",
-    "next-monorepo/**",
     "packages/database/**",
     "packages/typescript-config/nextjs.json"
   ],
