@@ -153,10 +153,8 @@ export function MetadataFileUploadForm({ datasetId, onUploaded }: MetadataFileUp
                         data-testid="admin.dataset.metadata-file.selected-file">
                         <FileUploadItemPreview />
                         <FileUploadItemMetadata />
-                        <FileUploadItemDelete asChild>
-                          <Button variant="ghost" size="icon" className="size-7">
-                            <X />
-                          </Button>
+                        <FileUploadItemDelete render={<Button variant="ghost" size="icon" className="size-7" />}>
+                          <X />
                         </FileUploadItemDelete>
                       </FileUploadItem>
                     ))}

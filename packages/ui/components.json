@@ -1,27 +1,27 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "base-vega",
+  "aliases": {
+    "components": "@repo/ui/components",
+    "hooks": "@repo/ui/hooks",
+    "lib": "@repo/ui/lib",
+    "ui": "@repo/ui/components",
+    "utils": "@repo/ui/lib/utils"
+  },
+  "iconLibrary": "lucide",
+  "menuAccent": "subtle",
+  "menuColor": "default",
+  "registries": {
+    "@diceui": "https://diceui.com/r/styles/{style}/{name}.json"
+  },
   "rsc": true,
-  "tsx": true,
+  "rtl": false,
+  "style": "base-vega",
   "tailwind": {
+    "baseColor": "zinc",
     "config": "",
     "css": "../../apps/web/src/app/globals.css",
-    "baseColor": "zinc",
     "cssVariables": true,
     "prefix": ""
   },
-  "iconLibrary": "lucide",
-  "rtl": false,
-  "aliases": {
-    "components": "@repo/ui/components",
-    "utils": "@repo/ui/lib/utils",
-    "ui": "@repo/ui/components",
-    "lib": "@repo/ui/lib",
-    "hooks": "@repo/ui/hooks"
-  },
-  "menuColor": "default",
-  "menuAccent": "subtle",
-  "registries": {
-    "@diceui": "https://diceui.com/r/{name}.json"
-  }
+  "tsx": true
 }
