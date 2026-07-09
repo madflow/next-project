@@ -7,11 +7,11 @@ import { useRouter } from "next/navigation";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Button } from "@repo/ui/components/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@repo/ui/components/field";
+import { Input } from "@repo/ui/components/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/components/select";
 import { create } from "@/actions/user";
-import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { locales } from "@/i18n/config";
 
 type CreateUserTranslations = {

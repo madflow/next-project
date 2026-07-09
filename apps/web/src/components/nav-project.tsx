@@ -8,7 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from "@repo/ui/components/sidebar";
 import type { AuthOrganization } from "@/lib/auth/types";
 import { type Project } from "@/types/project";
 

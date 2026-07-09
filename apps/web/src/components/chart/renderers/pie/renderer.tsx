@@ -1,7 +1,7 @@
 "use client";
 
 import { Cell, LabelList, Pie, PieChart } from "recharts";
-import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartConfig, ChartContainer, ChartLegend, ChartTooltip, ChartTooltipContent } from "@repo/ui/components/chart";
 import { type ChartSortConfig, transformToRechartsPieData } from "@/lib/analysis-bridge";
 import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariable } from "@/types/dataset-variable";

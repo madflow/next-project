@@ -2,9 +2,9 @@
 
 import { Terminal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { LocaleSwitcher } from "@/components/locale-switcher";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Locale } from "@/i18n/config";
 
 export function CheckEmailCard() {

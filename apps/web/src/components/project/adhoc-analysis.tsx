@@ -4,6 +4,11 @@ import { FolderXIcon, PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react
 import { useTranslations } from "next-intl";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@repo/ui/components/button";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@repo/ui/components/drawer";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@repo/ui/components/empty";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@repo/ui/components/sheet";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@repo/ui/components/tooltip";
 import { useThemeConfig } from "@/components/active-theme";
 import { DatasetSelect } from "@/components/form/dataset-select";
 import { OrganizationThemeStyleInjector } from "@/context/organization-theme-context";
@@ -25,11 +30,6 @@ import { type Project } from "@/types/project";
 import { StatsRequest, StatsResponse } from "@/types/stats";
 import { ChartSelectionSection } from "../chart/section/chart-selection-section";
 import { BarSkeleton } from "../chart/shared/bar-skeleton";
-import { Button } from "../ui/button";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import {
   AdHocVariablesetSelector,
   type SelectionItem,

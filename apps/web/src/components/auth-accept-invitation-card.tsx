@@ -5,11 +5,11 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
+import { Button } from "@repo/ui/components/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { Spinner } from "@repo/ui/components/spinner";
 import { organization, useSession } from "@/lib/auth/client";
-import { Spinner } from "./ui/spinner";
 
 export function AuthAcceptInvitationCard({ invitationId, userId }: { invitationId: string; userId?: string }) {
   const t = useTranslations("authAcceptInvitation");

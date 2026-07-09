@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
+import { Input } from "@repo/ui/components/input";
 
 export type DatasetVariableLabel = {
   default: string;

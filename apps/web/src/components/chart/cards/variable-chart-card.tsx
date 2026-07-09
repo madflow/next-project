@@ -3,11 +3,11 @@
 import { BanIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@repo/ui/components/empty";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type StatsResponse } from "@/types/stats";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../../ui/empty";
 import { ChartRendererContent } from "../renderers/content";
 import { ChartExportSurface } from "../shared/export-surface";
 import { ChartPanelCard } from "../shared/panel-card";

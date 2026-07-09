@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { Button } from "@repo/ui/components/button";
 import { columns } from "@/components/admin/dataset/columns";
 import { DatasetsDataTable } from "@/components/admin/dataset/data-table";
 import { PageLayout } from "@/components/page/page-layout";
-import { Button } from "@/components/ui/button";
 
 export default async function DatasetsPage() {
   const t = await getTranslations("adminDataset");

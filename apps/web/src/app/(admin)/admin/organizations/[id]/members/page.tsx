@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Button } from "@repo/ui/components/button";
 import { columns } from "@/components/admin/organization-members/columns";
 import { OrganisationMembersDataTable } from "@/components/admin/organization-members/data-table";
 import { PageLayout } from "@/components/page/page-layout";
-import { Button } from "@/components/ui/button";
 import { isNotFoundAPIError } from "@/lib/api-errors";
 import { getServerAPIClient } from "@/lib/server-api-client";
 

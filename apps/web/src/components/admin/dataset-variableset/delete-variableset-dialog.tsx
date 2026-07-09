@@ -4,7 +4,6 @@ import { Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteVariableset } from "@/actions/dataset-variableset";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@repo/ui/components/alert-dialog";
+import { Button } from "@repo/ui/components/button";
+import { deleteVariableset } from "@/actions/dataset-variableset";
 
 interface DeleteVariablesetDialogProps {
   variablesetId: string;

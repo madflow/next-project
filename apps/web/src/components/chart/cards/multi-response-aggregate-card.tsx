@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@repo/ui/components/chart";
 import { transformToMultiResponseData } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type ThemeChartColors } from "@/types/organization";
 import { type StatsResponse } from "@/types/stats";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../../ui/chart";
 import { ChartExportSurface } from "../shared/export-surface";
 import { ChartPanelCard } from "../shared/panel-card";
 import { createPercentageChartConfig } from "../shared/percentage-chart-config";

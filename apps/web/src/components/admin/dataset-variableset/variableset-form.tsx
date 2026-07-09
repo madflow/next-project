@@ -6,8 +6,7 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createVariableset, updateVariableset } from "@/actions/dataset-variableset";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -15,11 +14,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from "@repo/ui/components/dialog";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@repo/ui/components/field";
+import { Input } from "@repo/ui/components/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/components/select";
+import { Textarea } from "@repo/ui/components/textarea";
+import { createVariableset, updateVariableset } from "@/actions/dataset-variableset";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 
 const CATEGORY_OPTIONS = ["general", "multi_response"] as const;

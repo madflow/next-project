@@ -2,9 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import type { RouterOutput } from "@repo/api/client";
+import { Badge } from "@repo/ui/components/badge";
 import { removeMember } from "@/actions/member";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
-import { Badge } from "@/components/ui/badge";
 import { RemoveMemberDialog } from "./remove-member-dialog";
 
 type OrganizationMemberRow = RouterOutput["member"]["list"]["rows"][number];

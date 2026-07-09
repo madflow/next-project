@@ -1,6 +1,6 @@
 import { type ComponentProps, type ReactNode } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Item, ItemActions, ItemContent, ItemTitle } from "@/components/ui/item";
+import { Badge } from "@repo/ui/components/badge";
+import { Item, ItemActions, ItemContent, ItemTitle } from "@repo/ui/components/item";
 import { cn } from "@/lib/utils";
 
 type AdminVariableRowProps = Omit<ComponentProps<typeof Item>, "children" | "role" | "size"> & {

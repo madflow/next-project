@@ -6,14 +6,15 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@repo/ui/components/dropdown-menu";
+import { SidebarMenu, SidebarMenuItem } from "@repo/ui/components/sidebar";
 import { useAppContext } from "@/context/app-context";
 import { useCurrentuserOrganizations } from "@/hooks/use-currentuser-organizations";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -21,7 +22,6 @@ import { organization } from "@/lib/auth/client";
 import type { AuthOrganization } from "@/lib/auth/types";
 import { cn } from "@/lib/utils";
 import { InviteUserModal } from "./invite-user-modal";
-import { SidebarMenu, SidebarMenuItem } from "./ui/sidebar";
 
 type OrganizationMenuProps = {
   activeOrganization: AuthOrganization | null;

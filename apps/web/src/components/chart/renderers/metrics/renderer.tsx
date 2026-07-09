@@ -2,8 +2,8 @@
 
 import { CircleHelp } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/components/popover";
 import { getVariableStats } from "@/lib/analysis-bridge";
 import { METRICS_CARD_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";

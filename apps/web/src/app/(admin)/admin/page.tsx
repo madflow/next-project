@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { PageLayout } from "@/components/page/page-layout";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function Page() {
   const t = await getTranslations("adminDashboard");

@@ -17,6 +17,14 @@ import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { DatasetVariableMeasure, DatasetVariableType, VariablesetContentAttributes } from "@repo/database/schema";
+import { Badge } from "@repo/ui/components/badge";
+import { Button } from "@repo/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@repo/ui/components/item";
+import { ScrollArea } from "@repo/ui/components/scroll-area";
+import { SearchInput } from "@repo/ui/components/search-input";
+import { Separator } from "@repo/ui/components/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@repo/ui/components/tooltip";
 import {
   addContentToVariablesetAction,
   detachSubsetAction,
@@ -24,14 +32,6 @@ import {
   reorderContentsAction,
 } from "@/actions/dataset-variableset";
 import { AdminVariableRow } from "@/components/admin/variable-row";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { SearchInput } from "@/components/ui/search-input";
-import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { type VariablesetContentEntry, useVariablesetContents } from "@/hooks/use-variableset-contents";
 import { apiQuery } from "@/lib/api-client";
 import { buildCollectionQueryInput } from "@/lib/collection-query";

@@ -1,7 +1,7 @@
 import { InfoIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { Code } from "@/components/ui/code";
+import { Button } from "@repo/ui/components/button";
+import { Code } from "@repo/ui/components/code";
 import {
   Dialog,
   DialogClose,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@repo/ui/components/dialog";
 import { User } from "@/types/user";
 
 type InfoUserModalProps = {

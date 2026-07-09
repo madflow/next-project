@@ -1,8 +1,8 @@
 "use client";
 
 import { ColumnDef, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
-import { SearchInput } from "@/components/ui/search-input";
-import { Table } from "@/components/ui/table";
+import { SearchInput } from "@repo/ui/components/search-input";
+import { Table } from "@repo/ui/components/table";
 import type { PaginationState, SortingState } from "@/types";
 import { ErrorDisplay } from "./components/error-display";
 import { LoadingDisplay } from "./components/loading-display";

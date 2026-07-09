@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { Button } from "@repo/ui/components/button";
 import { columns } from "@/components/admin/organization/columns";
 import { OrganizationsDataTable } from "@/components/admin/organization/data-table";
 import { PageLayout } from "@/components/page/page-layout";
-import { Button } from "@/components/ui/button";
 
 export default async function Page() {
   const t = await getTranslations("organization");

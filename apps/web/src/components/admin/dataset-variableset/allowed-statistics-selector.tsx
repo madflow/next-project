@@ -5,9 +5,8 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { DatasetVariableMeasure, VariablesetContentAttributes } from "@repo/database/schema";
-import { updateContentAttributesAction } from "@/actions/dataset-variableset";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@repo/ui/components/button";
+import { Checkbox } from "@repo/ui/components/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -16,9 +15,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@repo/ui/components/dialog";
+import { Input } from "@repo/ui/components/input";
+import { Label } from "@repo/ui/components/label";
+import { updateContentAttributesAction } from "@/actions/dataset-variableset";
 
 interface AllowedStatisticsSelectorProps {
   variablesetId: string;

@@ -1,7 +1,7 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@repo/ui/components/separator";
+import { SidebarTrigger } from "@repo/ui/components/sidebar";
 import { DebugToggle } from "./debug-toggle";
 import { ImpersonationBanner } from "./impersonation-banner";
 import { ThemeToggle } from "./theme-toggle";

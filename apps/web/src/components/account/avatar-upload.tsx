@@ -4,9 +4,9 @@ import { Loader2, Trash2, Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/components/avatar";
+import { Button } from "@repo/ui/components/button";
 import { deleteAvatar, uploadAvatar } from "@/actions/avatar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { updateUser, useSession } from "@/lib/auth/client";
 
 export function AvatarUpload() {

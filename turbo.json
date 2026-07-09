@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "concurrency": "11",
   "globalEnv": [
     "ANALYSIS_API_KEY",
     "ANALYSIS_API_URL",

@@ -8,7 +8,7 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@repo/ui/components/chart";
 import {
   hasSplitVariableStatsForVariable,
   transformToMultiResponseIndividualStackedBarData,

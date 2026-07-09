@@ -1,7 +1,7 @@
 "use client";
 
 import { Bug, BugOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/button";
 import { useAppContext } from "@/context/app-context";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { cn } from "@/lib/utils";

@@ -10,7 +10,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@repo/ui/components/select";
 import { useDatasetsByProject } from "@/hooks/use-datasets-by-project";
 
 type DatasetSelectProps = {

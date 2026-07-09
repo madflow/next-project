@@ -5,10 +5,10 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
+import { Button } from "@repo/ui/components/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { LocaleSwitcher } from "@/components/locale-switcher";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Locale } from "@/i18n/config";
 
 type VerificationState = "success" | "already-verified" | "error";

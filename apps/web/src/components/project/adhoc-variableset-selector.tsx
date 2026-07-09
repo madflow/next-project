@@ -3,6 +3,20 @@
 import { ChevronDown, ChevronRight, Palette } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Button } from "@repo/ui/components/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@repo/ui/components/card";
+import { ScrollArea } from "@repo/ui/components/scroll-area";
+import { SearchInput } from "@repo/ui/components/search-input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+} from "@repo/ui/components/select";
+import { Spinner } from "@repo/ui/components/spinner";
 import { useThemeConfig } from "@/components/active-theme";
 import { useOrganizationTheme } from "@/context/organization-theme-context";
 import { useDatasetVariablesets } from "@/hooks/use-dataset-variablesets";
@@ -12,20 +26,6 @@ import { apiClient } from "@/lib/api-client";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
-import { ScrollArea } from "../ui/scroll-area";
-import { SearchInput } from "../ui/search-input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-} from "../ui/select";
-import { Spinner } from "../ui/spinner";
 
 export type SelectionItem = {
   type: "variable" | "set";
