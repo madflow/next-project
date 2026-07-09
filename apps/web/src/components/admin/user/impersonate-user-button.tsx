@@ -2,7 +2,7 @@
 
 import { UserCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/button";
 import { useImpersonateUser } from "@/hooks/use-impersonate-user";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 

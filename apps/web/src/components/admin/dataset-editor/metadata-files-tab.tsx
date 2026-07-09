@@ -4,13 +4,13 @@ import { keepPreviousData as keepPreviousQueryData, useQuery } from "@tanstack/r
 import { Download, FileText } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
+import { Badge } from "@repo/ui/components/badge";
+import { Button } from "@repo/ui/components/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@repo/ui/components/empty";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui/components/table";
 import { MetadataFileDeleteDialog } from "@/components/admin/dataset-editor/metadata-file-delete-dialog";
 import { MetadataFileUploadForm } from "@/components/admin/dataset-editor/metadata-file-upload-form";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { buildCollectionQueryInput } from "@/lib/collection-query";
 
 type MetadataFilesTabProps = {

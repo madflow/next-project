@@ -84,11 +84,7 @@ type MetricsChartSpec = {
 };
 
 type AdhocPowerPointChartSpec =
-  | DistributionChartSpec
-  | HorizontalStackedBarChartSpec
-  | PieChartSpec
-  | MeanBarChartSpec
-  | MetricsChartSpec;
+  DistributionChartSpec | HorizontalStackedBarChartSpec | PieChartSpec | MeanBarChartSpec | MetricsChartSpec;
 
 type AdhocExcelChartSpec = AdhocPowerPointChartSpec;
 

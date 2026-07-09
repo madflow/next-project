@@ -10,7 +10,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@repo/ui/components/select";
 import { useOrganizations } from "@/hooks/use-organizations";
 
 type OrganizationSelectProps = {

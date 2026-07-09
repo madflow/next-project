@@ -2,13 +2,13 @@
 
 import { DownloadIcon, FileImageIcon, PresentationIcon, SheetIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@repo/ui/components/dropdown-menu";
 
 type ChartExportMenuProps = {
   disabled?: boolean;

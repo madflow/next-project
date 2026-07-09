@@ -4,8 +4,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ChevronDown, ChevronRight, Edit, Folder, FolderOpen, GripVertical } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@repo/ui/components/badge";
+import { Button } from "@repo/ui/components/button";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 import { DeleteVariablesetDialog } from "./delete-variableset-dialog";
 

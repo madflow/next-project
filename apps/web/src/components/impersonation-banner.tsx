@@ -2,8 +2,8 @@
 
 import { AlertTriangle, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@repo/ui/components/alert";
+import { Button } from "@repo/ui/components/button";
 import { useIsImpersonating } from "@/hooks/use-is-impersonating";
 import { useStopImpersonating } from "@/hooks/use-stop-impersonating";
 

@@ -1,5 +1,5 @@
 import { HeaderGroup, flexRender } from "@tanstack/react-table";
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TableHead, TableHeader, TableRow } from "@repo/ui/components/table";
 
 interface TableHeaderProps<TData> {
   headerGroups: HeaderGroup<TData>[];

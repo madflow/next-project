@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { AvatarUpload } from "@/components/account/avatar-upload";
 import { DeleteAccountSection } from "@/components/account/delete-account-section";
 import { UpdateEmailForm } from "@/components/account/update-email-form";
 import { UpdatePasswordForm } from "@/components/account/update-password-form";
 import { UpdateProfileForm } from "@/components/account/update-profile-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AccountPage() {
   const t = await getTranslations();

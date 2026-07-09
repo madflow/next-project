@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@repo/ui/components/sonner";
 
 export default async function AppLayout({
   children,

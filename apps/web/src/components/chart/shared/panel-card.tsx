@@ -10,17 +10,17 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+} from "@repo/ui/components/card";
+import { Code } from "@repo/ui/components/code";
+import { Label } from "@repo/ui/components/label";
+import { Switch } from "@repo/ui/components/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
 import { useAppContext } from "@/context/app-context";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { type AnalysisChartType, type StatsResponse } from "@/types/stats";
 import { SplitVariableSelector } from "../../project/split-variable-selector";
-import { Code } from "../../ui/code";
 import { ChartExportMenu } from "./export-menu";
 import { ChartTypeIcon } from "./type-icon";
 

@@ -10,7 +10,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@repo/ui/components/pagination";
 import { useDatasetRawData } from "@/hooks/use-dataset-raw-data";
 import { type DatasetVariableWithAttributes } from "@/types/dataset-variable";
 

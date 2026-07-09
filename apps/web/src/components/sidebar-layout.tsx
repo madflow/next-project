@@ -1,5 +1,5 @@
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/sonner";
+import { SidebarInset, SidebarProvider } from "@repo/ui/components/sidebar";
+import { Toaster } from "@repo/ui/components/sonner";
 
 interface SidebarLayoutProps {
   children: React.ReactNode;

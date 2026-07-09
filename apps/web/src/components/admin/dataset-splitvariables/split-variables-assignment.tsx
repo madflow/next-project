@@ -5,13 +5,13 @@ import { Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@repo/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/components/card";
+import { ItemGroup } from "@repo/ui/components/item";
+import { ScrollArea } from "@repo/ui/components/scroll-area";
+import { SearchInput } from "@repo/ui/components/search-input";
 import { addSplitVariableAction, removeSplitVariableAction } from "@/actions/dataset-splitvariable";
 import { AdminVariableRow } from "@/components/admin/variable-row";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ItemGroup } from "@/components/ui/item";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { SearchInput } from "@/components/ui/search-input";
 import { apiQuery } from "@/lib/api-client";
 import { buildCollectionQueryInput } from "@/lib/collection-query";
 

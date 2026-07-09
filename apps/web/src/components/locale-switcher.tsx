@@ -11,7 +11,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@repo/ui/components/select";
 import { Locale } from "@/i18n/config";
 import { setUserLocale } from "@/i18n/locale";
 

@@ -4,9 +4,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { Button } from "@repo/ui/components/button";
 import { remove } from "@/actions/project";
 import { DataTableColumnHeader } from "@/components/datatable/components/column-header";
-import { Button } from "@/components/ui/button";
 import type { ProjectWithOrganization } from "@/types/project";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 

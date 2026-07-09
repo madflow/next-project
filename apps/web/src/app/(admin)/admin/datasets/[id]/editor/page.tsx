@@ -1,12 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/components/tabs";
 import { DatasetVariablesDataTable } from "@/components/admin/dataset-editor/data-table";
 import { DatasetProjects } from "@/components/admin/dataset-editor/dataset-projects";
 import { MetadataFilesTab } from "@/components/admin/dataset-editor/metadata-files-tab";
 import { SplitVariablesTab } from "@/components/admin/dataset-editor/splitvariables-tab";
 import { VariablesetTab } from "@/components/admin/dataset-editor/variableset-tab";
 import { PageLayout } from "@/components/page/page-layout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isNotFoundAPIError } from "@/lib/api-errors";
 import { getServerAPIClient } from "@/lib/server-api-client";
 

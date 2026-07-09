@@ -4,7 +4,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
-  transpilePackages: ["@repo/api", "@t3-oss/env-nextjs", "@t3-oss/env-core"],
+  transpilePackages: ["@repo/api", "@repo/ui", "@t3-oss/env-nextjs", "@t3-oss/env-core"],
   typedRoutes: true,
   turbopack: {
     resolveAlias: {

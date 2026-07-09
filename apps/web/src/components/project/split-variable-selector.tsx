@@ -3,9 +3,9 @@
 import { CircleHelpIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useId } from "react";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Label } from "@repo/ui/components/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/ui/components/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@repo/ui/components/tooltip";
 import { getVariableLabel } from "@/lib/variable-helpers";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import { useSplitVariables } from "../chart/split-variable/use-split-variables";

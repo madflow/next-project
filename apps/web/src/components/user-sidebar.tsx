@@ -3,8 +3,6 @@
 import { HouseIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +10,9 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from "@repo/ui/components/sidebar";
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getNavData = (t: (t: any) => string) => ({

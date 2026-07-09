@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@repo/ui/components/chart";
 import { extractVariableStats } from "@/lib/analysis-bridge";
 import { CHART_Y_AXIS_WIDTH, MEAN_BAR_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";

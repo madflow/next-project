@@ -4,18 +4,18 @@ import { ChevronsUpDown, Folder, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@repo/ui/components/dropdown-menu";
+import { SidebarMenu, SidebarMenuItem } from "@repo/ui/components/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useProjectsByOrg } from "@/hooks/use-projects-by-org";
 import { cn } from "@/lib/utils";
 import { type Project } from "@/types/project";
-import { SidebarMenu, SidebarMenuItem } from "./ui/sidebar";
 
 type ProjectSwitcherProps = {
   activeProject: Project | null;

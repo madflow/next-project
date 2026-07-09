@@ -1,4 +1,4 @@
-import { type ChartConfig } from "@/components/ui/chart";
+import { type ChartConfig } from "@repo/ui/components/chart";
 import type { RechartsStackedBarDataItem, SplitVariableStackedBarDataItem } from "@/lib/analysis-bridge";
 
 type HorizontalStackedBarSegment = {
