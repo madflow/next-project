@@ -1,4 +1,3 @@
-import type { BetterAuthClientPlugin } from "better-auth";
 import {
   type Organization as BetterAuthOrganization,
   type SessionWithImpersonatedBy,
@@ -7,51 +6,31 @@ import {
   organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient as createBetterAuthClient } from "better-auth/react";
-import { authSessionAdditionalFields, authUserAdditionalFields } from "../shared";
+import type { AuthInstance } from "../server";
 
-export type AuthClientPlugin = BetterAuthClientPlugin;
 export type AuthOrganization = BetterAuthOrganization;
 export type AuthImpersonatedSession = SessionWithImpersonatedBy;
 
 export type CreateAuthClientOptions = {
   baseURL?: string;
-  clientPlugins?: BetterAuthClientPlugin[];
 };
 
 function createAdditionalFieldsPlugin() {
-  return inferAdditionalFields({
-    session: authSessionAdditionalFields,
-    user: authUserAdditionalFields,
-  });
+  return inferAdditionalFields<AuthInstance>();
 }
 
-type DefaultAuthClientPlugins = [
-  // Better Auth uses an empty options object for the default client plugin typings.
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  ReturnType<typeof adminClient<{}>>,
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  ReturnType<typeof organizationClient<{}>>,
-  ReturnType<typeof createAdditionalFieldsPlugin>,
-];
-
-type AuthClientPlugins = [...DefaultAuthClientPlugins, ...BetterAuthClientPlugin[]];
+const defaultAuthClientPlugins = [adminClient({}), organizationClient({}), createAdditionalFieldsPlugin()];
 
 type AuthClientConfig = {
   baseURL?: string;
-  plugins: AuthClientPlugins;
+  plugins: typeof defaultAuthClientPlugins;
 };
 
 export type AuthClient = ReturnType<typeof createBetterAuthClient<AuthClientConfig>>;
 
-function createDefaultAuthClientPlugins(): DefaultAuthClientPlugins {
-  return [adminClient(), organizationClient(), createAdditionalFieldsPlugin()];
-}
-
-export function createAuthClient({ baseURL, clientPlugins }: CreateAuthClientOptions = {}): AuthClient {
-  const plugins = [...createDefaultAuthClientPlugins(), ...(clientPlugins ?? [])] as AuthClientPlugins;
-
+export function createAuthClient({ baseURL }: CreateAuthClientOptions = {}): AuthClient {
   return createBetterAuthClient({
     ...(baseURL ? { baseURL } : {}),
-    plugins,
+    plugins: defaultAuthClientPlugins,
   });
 }
