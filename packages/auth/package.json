@@ -28,14 +28,14 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@better-auth/api-key": "^1.6.14",
-    "better-auth": "^1.6.14",
-    "next": "^16.2.7"
+    "@better-auth/api-key": "^1.6.23",
+    "better-auth": "^1.6.23",
+    "next": "^16.2.10"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^24.13.1",
+    "@types/node": "^24.13.3",
     "eslint": "^9.39.4",
     "typescript": "^6.0.3"
   }

@@ -32,7 +32,7 @@
     "@tailwindcss/postcss": "^4.3.0",
     "@tanstack/react-query": "^5.101.0",
     "@tanstack/react-table": "^8.21.3",
-    "better-auth": "^1.6.14",
+    "better-auth": "^1.6.23",
     "clsx": "2.1.1",
     "drizzle-orm": "^0.45.2",
     "file-type": "^22.0.1",
