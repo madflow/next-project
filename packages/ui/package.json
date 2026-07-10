@@ -37,12 +37,15 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
     "eslint": "^9.39.4",
     "prettier": "3.9.4",
     "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "typescript": "^6.0.3"
   },
   "peerDependencies": {
-    "react": "^19.2.7"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   }
 }
