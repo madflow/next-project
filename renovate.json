@@ -7,7 +7,7 @@
     "automerge": true,
     "enabled": true
   },
-  "minimumReleaseAge": "7 days",
+  "minimumReleaseAge": "2 days",
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
