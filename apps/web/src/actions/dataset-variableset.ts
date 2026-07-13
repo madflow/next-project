@@ -71,14 +71,26 @@ export const addContentToVariablesetAction = withAdminAuth(
   ) => {
     const api = await getServerAPIClient();
 
-    return api.variableset.contents.create({
-      body: {
-        attributes,
-        contentType,
-        referenceId,
-      },
-      params: { id: variablesetId },
-    });
+    try {
+      await api.variableset.contents.create({
+        body: {
+          attributes,
+          contentType,
+          referenceId,
+        },
+        params: { id: variablesetId },
+      });
+
+      return { success: true as const };
+    } catch (error) {
+      console.error("Failed to add content to variableset", error);
+
+      if (error instanceof Error && "status" in error && typeof error.status === "number" && error.status < 500) {
+        return { success: false as const, error: error.message };
+      }
+
+      return { success: false as const };
+    }
   }
 );
 

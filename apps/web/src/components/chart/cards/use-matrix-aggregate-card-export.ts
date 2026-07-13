@@ -13,7 +13,6 @@ import {
   exportPowerPointForDataset,
   sanitizeExportBaseName,
 } from "@/lib/adhoc-export";
-import { transformToMatrixData } from "@/lib/analysis-bridge";
 import { resolveThemePaletteForCount } from "@/lib/organization-theme";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { StatsResponse } from "@/types/stats";
@@ -22,6 +21,7 @@ import { createChartExportMetaLine, resolveChartExportPalette } from "../shared/
 type UseMatrixAggregateCardExportParams = {
   datasetId: string;
   datasetName: string;
+  segmentCount: number;
   statsData: Record<string, StatsResponse>;
   variables: DatasetVariableWithAttributes[];
   variablesetName: string;
@@ -30,6 +30,7 @@ type UseMatrixAggregateCardExportParams = {
 export function useMatrixAggregateCardExport({
   datasetId,
   datasetName,
+  segmentCount,
   statsData,
   variables,
   variablesetName,
@@ -41,10 +42,6 @@ export function useMatrixAggregateCardExport({
   const { displayRef, exportRef, isExportRendering, exportPNG } = useChartExport();
   const exportBaseName = useMemo(() => sanitizeExportBaseName(`${variablesetName}-matrix`), [variablesetName]);
   const resolvedTheme = useMemo(() => resolveTheme(activeTheme).theme, [activeTheme, resolveTheme]);
-  const segmentCount = useMemo(
-    () => transformToMatrixData(variables, statsData)[0]?.segments.length ?? 0,
-    [statsData, variables]
-  );
   const chartColors = useMemo(
     () => resolveThemePaletteForCount(resolvedTheme, segmentCount),
     [resolvedTheme, segmentCount]

@@ -41,7 +41,14 @@ export function MatrixAggregateCard({
     handleExcelExport,
     handlePowerPointExport,
     isExportRendering,
-  } = useMatrixAggregateCardExport({ datasetId, datasetName, statsData, variables, variablesetName });
+  } = useMatrixAggregateCardExport({
+    datasetId,
+    datasetName,
+    segmentCount: model.segments.length,
+    statsData,
+    variables,
+    variablesetName,
+  });
 
   const chartContent = (
     <HorizontalStackedBarChart
