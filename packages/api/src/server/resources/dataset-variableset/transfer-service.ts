@@ -15,6 +15,7 @@ import type {
   VariableSetImportOptions,
   VariableSetImportResult,
 } from "../../../shared/exchange/dataset-variableset-transfer";
+import { getMatrixValueLabelsError } from "../../../shared/matrix-variableset";
 
 export async function exportVariableSets(db: DatabaseInstance, datasetId: string): Promise<VariableSetExportFile> {
   const datasetInfo = await db
@@ -166,14 +167,12 @@ export async function importVariableSets(
       .select({
         id: datasetVariable.id,
         name: datasetVariable.name,
+        valueLabels: datasetVariable.valueLabels,
       })
       .from(datasetVariable)
       .where(eq(datasetVariable.datasetId, datasetId));
 
-    const variableNameToIdMap = new Map<string, string>();
-    existingVariables.forEach((variable) => {
-      variableNameToIdMap.set(variable.name, variable.id);
-    });
+    const existingVariablesByName = new Map(existingVariables.map((variable) => [variable.name, variable]));
 
     const existingVariableSets = await db
       .select({
@@ -211,19 +210,25 @@ export async function importVariableSets(
           }
         }
 
-        const validVariables: { attributes?: VariablesetContentAttributes; id: string; position: number }[] = [];
+        const validVariables: {
+          attributes?: VariablesetContentAttributes;
+          id: string;
+          position: number;
+          valueLabels: unknown;
+        }[] = [];
         const unmatchedVariables: string[] = [];
         const hasContents = importSet.contents !== undefined && importSet.contents.length > 0;
 
         if (hasContents) {
           for (const contentItem of importSet.contents ?? []) {
             if (contentItem.contentType === "variable") {
-              const variableId = variableNameToIdMap.get(contentItem.variableName);
-              if (variableId) {
+              const variable = existingVariablesByName.get(contentItem.variableName);
+              if (variable) {
                 validVariables.push({
-                  id: variableId,
+                  id: variable.id,
                   position: contentItem.position,
                   attributes: contentItem.variableAttributes,
+                  valueLabels: variable.valueLabels,
                 });
               } else {
                 unmatchedVariables.push(contentItem.variableName);
@@ -232,12 +237,13 @@ export async function importVariableSets(
           }
         } else {
           for (const variableItem of importSet.variables) {
-            const variableId = variableNameToIdMap.get(variableItem.name);
-            if (variableId) {
+            const variable = existingVariablesByName.get(variableItem.name);
+            if (variable) {
               validVariables.push({
-                id: variableId,
+                id: variable.id,
                 position: variableItem.orderIndex * 100,
                 attributes: variableItem.attributes,
+                valueLabels: variable.valueLabels,
               });
             } else {
               unmatchedVariables.push(variableItem.name);
@@ -254,6 +260,20 @@ export async function importVariableSets(
             unmatchedVariables,
           });
           continue;
+        }
+
+        if (importSet.category === "matrix") {
+          if (importSet.contents?.some((content) => content.contentType === "subset")) {
+            throw new Error("A matrix variableset cannot contain child subsets");
+          }
+
+          const valueLabelsError = getMatrixValueLabelsError(
+            validVariables.sort((left, right) => left.position - right.position).map((variable) => variable.valueLabels)
+          );
+
+          if (valueLabelsError) {
+            throw new Error(valueLabelsError);
+          }
         }
 
         const createdSetResult = await db
@@ -335,6 +355,7 @@ export async function importVariableSets(
 
       const setId = createdSetsMap.get(importSet.name);
       const parentId = createdSetsMap.get(importSet.parentName);
+      const parentSet = importData.variableSets.find((set) => set.name === importSet.parentName);
 
       if (!setId) {
         continue;
@@ -342,6 +363,11 @@ export async function importVariableSets(
 
       if (!parentId) {
         result.warnings.push(`Parent "${importSet.parentName}" not found for variable set "${importSet.name}"`);
+        continue;
+      }
+
+      if (parentSet?.category === "matrix") {
+        result.warnings.push(`Matrix variable set "${importSet.parentName}" cannot contain child subsets`);
         continue;
       }
 

@@ -73,7 +73,7 @@ function MultiResponseTooltip() {
 const defaultTooltipContent = <ChartTooltipContent />;
 const multiResponseTooltipContent = <MultiResponseTooltip />;
 
-function HorizontalStackedBarChart({
+export function HorizontalStackedBarChart({
   model,
   chartRef,
   exportFilename,

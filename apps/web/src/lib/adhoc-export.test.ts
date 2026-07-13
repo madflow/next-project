@@ -6,6 +6,8 @@ import {
   buildExcelFileName,
   buildExportMetaLine,
   buildPowerPointFileName,
+  createMatrixExcelExportPayload,
+  createMatrixPowerPointExportPayload,
   createMultiResponseExcelExportPayload,
   createMultiResponsePowerPointExportPayload,
   createVariableChartExcelExportPayload,
@@ -52,6 +54,28 @@ function createStatsResponse(percentages: number[] = [55, 45]): StatsResponse {
           counts: percentage,
           percentages: percentage,
         })),
+      },
+    },
+  ];
+}
+
+function createNamedStatsResponse(
+  variable: string,
+  frequencyTable: Array<{ value: string | number; counts: number; percentages: number }>
+): StatsResponse {
+  return [
+    {
+      variable,
+      stats: {
+        count: frequencyTable.reduce((sum, item) => sum + item.counts, 0),
+        mode: [1],
+        mean: 1,
+        std: 0.1,
+        min: 1,
+        max: 10,
+        median: 2,
+        range: 9,
+        frequency_table: frequencyTable,
       },
     },
   ];
@@ -395,5 +419,71 @@ describe("adhoc export helpers", () => {
       value_percent: "Value (%)",
     });
     assert.deepStrictEqual(payload.chart.points, [{ label: "Awareness", value: 60, color: "#123456" }]);
+  });
+
+  test("matrix exports use normalized horizontal stacked rows and the canonical legend", () => {
+    const variables = [
+      createVariable({ name: "q1", label: "Service", valueLabels: { 1: "Poor", 2: "Good", 10: "Excellent" } }),
+      createVariable({
+        name: "q2",
+        label: "Support",
+        valueLabels: { 1: "Poor", 2: "Good", 10: "Excellent" },
+      }),
+    ];
+    const statsData = {
+      q1: createNamedStatsResponse("q1", [
+        { value: 1, counts: 20, percentages: 20 },
+        { value: 2, counts: 30, percentages: 30 },
+        { value: 10, counts: 50, percentages: 50 },
+      ]),
+      q2: createNamedStatsResponse("q2", [
+        { value: 1, counts: 25, percentages: 25 },
+        { value: 10, counts: 75, percentages: 75 },
+      ]),
+    };
+    const options = {
+      metaLine: "Dataset: Survey",
+      palette: ["#111111", "#222222", "#333333"],
+      statsData,
+      title: "Satisfaction",
+      variables,
+    };
+
+    const powerpoint = createMatrixPowerPointExportPayload(options);
+    const excel = createMatrixExcelExportPayload({
+      ...options,
+      excelLabels: {
+        color: "Color",
+        label: "Label",
+        metric: "Metric",
+        value: "Value",
+        valuePercent: "Value (%)",
+      },
+    });
+
+    assert.strictEqual(powerpoint.chart.kind, "horizontalStackedBar");
+    if (powerpoint.chart.kind !== "horizontalStackedBar") {
+      throw new Error("Expected horizontalStackedBar chart kind");
+    }
+    assert.deepStrictEqual(powerpoint.chart.rows, [
+      {
+        label: "Service",
+        segments: [
+          { label: "Poor", value: 20, color: "#111111" },
+          { label: "Good", value: 30, color: "#222222" },
+          { label: "Excellent", value: 50, color: "#333333" },
+        ],
+      },
+      {
+        label: "Support",
+        segments: [
+          { label: "Poor", value: 25, color: "#111111" },
+          { label: "Good", value: 0, color: "#222222" },
+          { label: "Excellent", value: 75, color: "#333333" },
+        ],
+      },
+    ]);
+    assert.strictEqual(excel.chart.kind, "horizontalStackedBar");
+    assert.match(excel.file_name, /^satisfaction-matrix-\d{4}-\d{2}-\d{2}\.xlsx$/);
   });
 });

@@ -22,7 +22,7 @@ import { Textarea } from "@repo/ui/components/textarea";
 import { createVariableset, updateVariableset } from "@/actions/dataset-variableset";
 import type { DatasetVariableset, VariablesetTreeNode } from "@/types/dataset-variableset";
 
-const CATEGORY_OPTIONS = ["general", "multi_response"] as const;
+const CATEGORY_OPTIONS = ["general", "multi_response", "matrix"] as const;
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
@@ -35,6 +35,7 @@ const formSchema = z.object({
 const CATEGORY_LABEL_KEYS = {
   general: "form.categoryGeneral",
   multi_response: "form.categoryMultiResponse",
+  matrix: "form.categoryMatrix",
 } as const satisfies Record<(typeof CATEGORY_OPTIONS)[number], string>;
 
 const NO_PARENT_VALUE = "__NO_PARENT__";
@@ -105,14 +106,15 @@ export function VariablesetForm({
         description: data.description || null,
         parentId,
         category: data.category,
-        ...(data.category === "multi_response" && {
-          attributes: {
-            multiResponse: {
-              type: "dichotomies" as const,
-              countedValue: data.countedValue ?? 1,
-            },
-          },
-        }),
+        attributes:
+          data.category === "multi_response"
+            ? {
+                multiResponse: {
+                  type: "dichotomies" as const,
+                  countedValue: data.countedValue ?? 1,
+                },
+              }
+            : null,
       };
 
       if (isEditing) {

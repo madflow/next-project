@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { VariablesetTreeNode } from "@/types/dataset-variableset";
 import type { StatsResponse } from "@/types/stats";
+import { MatrixAggregateCard } from "../cards/matrix-aggregate-card";
 import { MultiResponseAggregateCard } from "../cards/multi-response-aggregate-card";
 import { VariableChartCardItem } from "../cards/variable-chart-card-item";
 import { BarSkeleton } from "../shared/bar-skeleton";
@@ -24,6 +25,7 @@ type ChartSelectionSectionProps = {
   datasetName: string;
   onStatsRequestAction: (variableName: string, splitVariable?: string) => void;
   multiResponseAggregateOnly?: boolean;
+  matrixAggregateOnly?: boolean;
   hideVariablesetHeader?: boolean;
 };
 
@@ -36,6 +38,7 @@ export function ChartSelectionSection({
   datasetName,
   onStatsRequestAction,
   multiResponseAggregateOnly = false,
+  matrixAggregateOnly = false,
   hideVariablesetHeader = false,
 }: ChartSelectionSectionProps) {
   const t = useTranslations("projectAdhocAnalysis");
@@ -72,6 +75,20 @@ export function ChartSelectionSection({
         variablesetName={variableset.name}
         variablesetDescription={variableset.description}
         countedValue={countedValue}
+        datasetId={datasetId}
+        datasetName={datasetName}
+        className="w-full max-w-4xl"
+      />
+    );
+  }
+
+  if (matrixAggregateOnly && variableset) {
+    return (
+      <MatrixAggregateCard
+        variables={variables}
+        statsData={baseStatsData}
+        variablesetName={variableset.name}
+        variablesetDescription={variableset.description}
         datasetId={datasetId}
         datasetName={datasetName}
         className="w-full max-w-4xl"

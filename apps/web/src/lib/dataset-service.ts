@@ -1,11 +1,14 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
+import { getMatrixValueLabelsError } from "@repo/api/shared/matrix-variableset";
 import { defaultClient as db } from "@repo/database/clients";
 import {
   CreateDatasetVariableData,
   DatasetVariableValueLabel,
   dataset,
   datasetVariable,
+  datasetVariableset,
+  datasetVariablesetContent,
   insertDatasetVariableSchema,
   job,
 } from "@repo/database/schema";
@@ -467,6 +470,47 @@ export async function updateDatasetFile({
               .map((variable) => variable.id);
             const addedVariables = insertValues.filter((variable) => !currentByName.has(variable.name));
             const sharedVariables = lockedVariables.filter((variable) => newNames.has(variable.name));
+
+            const matrixContents = await tx
+              .select({
+                position: datasetVariablesetContent.position,
+                setId: datasetVariableset.id,
+                setName: datasetVariableset.name,
+                variableId: datasetVariablesetContent.variableId,
+              })
+              .from(datasetVariablesetContent)
+              .innerJoin(datasetVariableset, eq(datasetVariablesetContent.variablesetId, datasetVariableset.id))
+              .where(
+                and(
+                  eq(datasetVariableset.datasetId, datasetId),
+                  eq(datasetVariableset.category, "matrix"),
+                  eq(datasetVariablesetContent.contentType, "variable")
+                )
+              )
+              .orderBy(datasetVariableset.id, datasetVariablesetContent.position);
+            const currentVariablesById = new Map(lockedVariables.map((variable) => [variable.id, variable]));
+            const matrixLabels = new Map<string, { name: string; valueLabels: unknown[] }>();
+
+            for (const content of matrixContents) {
+              if (!content.variableId) continue;
+
+              const currentVariable = currentVariablesById.get(content.variableId);
+              if (!currentVariable || !newNames.has(currentVariable.name)) continue;
+
+              const proposedVariable = insertByName.get(currentVariable.name);
+              if (!proposedVariable) continue;
+
+              const matrix = matrixLabels.get(content.setId) ?? { name: content.setName, valueLabels: [] };
+              matrix.valueLabels.push(proposedVariable.valueLabels);
+              matrixLabels.set(content.setId, matrix);
+            }
+
+            for (const matrix of matrixLabels.values()) {
+              const matrixError = getMatrixValueLabelsError(matrix.valueLabels);
+              if (matrixError) {
+                throw new ServerActionValidationException(`Matrix variable set "${matrix.name}": ${matrixError}`);
+              }
+            }
 
             const updatedDatasets = await tx
               .update(dataset)

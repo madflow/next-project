@@ -61,6 +61,22 @@ function createMockCreateDatasetVariablesetWithParentDb(
   };
 
   const db = {
+    select() {
+      return {
+        from() {
+          return this;
+        },
+        limit() {
+          return this;
+        },
+        where() {
+          return this;
+        },
+        async execute() {
+          return [{ category: "general" }];
+        },
+      };
+    },
     async transaction(
       callback: (tx: {
         insert: (table: unknown) => {
@@ -84,6 +100,59 @@ function createMockCreateDatasetVariablesetWithParentDb(
     db: db as unknown as DatabaseInstance,
     state,
   };
+}
+
+function createMockMatrixConversionDb(contents: Array<{ contentType: "subset" | "variable"; valueLabels: unknown }>) {
+  const state = { updateCalled: false };
+  const row = {
+    attributes: null,
+    category: "matrix",
+    createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    datasetId: "550e8400-e29b-41d4-a716-446655440000",
+    description: null,
+    id: "550e8400-e29b-41d4-a716-446655440010",
+    name: "Matrix",
+    orderIndex: 0,
+    parentId: null,
+    updatedAt: null,
+  };
+  const db = {
+    select() {
+      return {
+        execute: async () => contents,
+        from() {
+          return this;
+        },
+        leftJoin() {
+          return this;
+        },
+        orderBy() {
+          return this;
+        },
+        where() {
+          return this;
+        },
+      };
+    },
+    update() {
+      state.updateCalled = true;
+      return {
+        set() {
+          return {
+            where() {
+              return {
+                async returning() {
+                  return [row];
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  return { db: db as unknown as DatabaseInstance, row, state };
 }
 
 function createMockReorderDatasetVariablesetsDb(existingIds: string[]) {
@@ -251,6 +320,131 @@ describe("dataset variableset mutations", () => {
     assert.equal(state.table, datasetVariablesetTable);
     assert.deepEqual(state.set, input.body);
     assert.notEqual(state.where, undefined);
+  });
+
+  test("converts a compatible variableset to matrix", async () => {
+    const { db, row, state } = createMockMatrixConversionDb([
+      { contentType: "variable", valueLabels: { "10": "High", "2": "Low" } },
+      { contentType: "variable", valueLabels: { "2": "Low", "10": "High" } },
+    ]);
+
+    const result = await updateDatasetVariableset(createAdminProcedureContext(db), {
+      body: { category: "matrix" },
+      params: { id: row.id },
+    });
+
+    assert.deepEqual(result, row);
+    assert.equal(state.updateCalled, true);
+  });
+
+  test("rejects converting a variableset with incompatible labels to matrix", async () => {
+    const { db, row, state } = createMockMatrixConversionDb([
+      { contentType: "variable", valueLabels: { "1": "No", "2": "Yes" } },
+      { contentType: "variable", valueLabels: { "1": "No", "2": "Maybe" } },
+    ]);
+
+    await assert.rejects(
+      () =>
+        updateDatasetVariableset(createAdminProcedureContext(db), {
+          body: { category: "matrix" },
+          params: { id: row.id },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.message === 'Matrix response label for code "2" must match: expected "Yes", received "Maybe"'
+    );
+    assert.equal(state.updateCalled, false);
+  });
+
+  test("rejects converting a variableset with subsets to matrix", async () => {
+    const { db, row, state } = createMockMatrixConversionDb([{ contentType: "subset", valueLabels: null }]);
+
+    await assert.rejects(
+      () =>
+        updateDatasetVariableset(createAdminProcedureContext(db), {
+          body: { category: "matrix" },
+          params: { id: row.id },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.message === "A matrix variableset cannot contain child subsets"
+    );
+    assert.equal(state.updateCalled, false);
+  });
+
+  test("rejects creating a child under a matrix parent", async () => {
+    const db = {
+      select() {
+        return {
+          from() {
+            return this;
+          },
+          limit() {
+            return this;
+          },
+          where() {
+            return this;
+          },
+          async execute() {
+            return [{ category: "matrix" }];
+          },
+        };
+      },
+    } as unknown as DatabaseInstance;
+
+    await assert.rejects(
+      () =>
+        createDatasetVariableset(createAdminProcedureContext(db), {
+          category: "general",
+          datasetId: "550e8400-e29b-41d4-a716-446655440000",
+          name: "Child",
+          parentId: "550e8400-e29b-41d4-a716-446655440011",
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.message === "A matrix variableset cannot contain child subsets"
+    );
+  });
+
+  test("rejects moving a variableset under a matrix parent", async () => {
+    let updateCalled = false;
+    const db = {
+      select() {
+        return {
+          from() {
+            return this;
+          },
+          limit() {
+            return this;
+          },
+          where() {
+            return this;
+          },
+          async execute() {
+            return [{ category: "matrix" }];
+          },
+        };
+      },
+      update() {
+        updateCalled = true;
+      },
+    } as unknown as DatabaseInstance;
+
+    await assert.rejects(
+      () =>
+        updateDatasetVariableset(createAdminProcedureContext(db), {
+          body: { parentId: "550e8400-e29b-41d4-a716-446655440011" },
+          params: { id: "550e8400-e29b-41d4-a716-446655440010" },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.message === "A matrix variableset cannot contain child subsets"
+    );
+    assert.equal(updateCalled, false);
   });
 
   test("maps missing dataset variablesets on update to not found errors", async () => {

@@ -63,7 +63,7 @@ const PROJECT_TEST_4_UID = "0198e5ac-7a6c-7d0c-bedd-6a74ff7bfe59";
 const DATASET_TEST_UID = "0198e639-3e96-734b-b0db-af0c4350a2c4";
 const DATASET_TEST_2_UID = "0198e639-3e96-734b-b0db-af0c4350a2c5";
 
-const datasetVariablesetCategorySchema = z.enum(["general", "multi_response"]);
+const datasetVariablesetCategorySchema = z.enum(["general", "matrix", "multi_response"]);
 
 const datasetVariablesetFixtureContentSchema = z.discriminatedUnion("type", [
   z.object({

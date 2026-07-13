@@ -183,6 +183,13 @@
       "when": 1780319245994,
       "tag": "0025_fair_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1783932261786,
+      "tag": "0026_cultured_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }

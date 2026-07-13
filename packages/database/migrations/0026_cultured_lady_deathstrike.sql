@@ -1,0 +1,1 @@
+ALTER TYPE "public"."dataset_variableset_category" ADD VALUE 'matrix' BEFORE 'multi_response';

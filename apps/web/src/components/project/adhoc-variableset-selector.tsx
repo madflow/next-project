@@ -41,6 +41,7 @@ export type SelectionRenderSection = {
   variables: DatasetVariableWithAttributes[];
   variableset?: VariablesetTreeNode;
   multiResponseAggregateOnly?: boolean;
+  matrixAggregateOnly?: boolean;
   hideVariablesetHeader?: boolean;
 };
 
@@ -92,6 +93,7 @@ export async function buildVariablesetSelection(node: VariablesetTreeNode): Prom
       variableset: node,
       variables: directVariables,
       hideVariablesetHeader: directSectionIndex > 0,
+      matrixAggregateOnly: node.category === "matrix",
     });
     directSectionIndex += 1;
     directVariables = [];
@@ -111,7 +113,7 @@ export async function buildVariablesetSelection(node: VariablesetTreeNode): Prom
     }
 
     const childVariableset = findChildVariableset(node, content.subsetId);
-    if (childVariableset?.category !== "multi_response") {
+    if (childVariableset?.category !== "multi_response" && childVariableset?.category !== "matrix") {
       continue;
     }
 
@@ -124,7 +126,8 @@ export async function buildVariablesetSelection(node: VariablesetTreeNode): Prom
       id: childVariableset.id,
       variableset: childVariableset,
       variables: childVariablesData.rows,
-      multiResponseAggregateOnly: true,
+      multiResponseAggregateOnly: childVariableset.category === "multi_response",
+      matrixAggregateOnly: childVariableset.category === "matrix",
     });
   }
 

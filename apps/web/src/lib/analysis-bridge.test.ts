@@ -5,6 +5,7 @@ import type { StatsResponse } from "@/types/stats";
 import {
   type ChartSortConfig,
   getStackedBarSegmentCount,
+  transformToMatrixData,
   transformToMultiResponseData,
   transformToMultiResponseIndividualBarData,
   transformToRechartsBarData,
@@ -163,6 +164,81 @@ describe("analysis-bridge transforms", () => {
         percentage: 0,
       },
     ]);
+  });
+
+  test("transformToMatrixData uses the first variable scale, aligns codes, and preserves variable order", () => {
+    const firstVariable = createVariable({
+      id: "first",
+      name: "q1",
+      label: "Service",
+      valueLabels: { 10: "Excellent", 2: "Good", 1: "Poor" },
+    });
+    const secondVariable = createVariable({
+      id: "second",
+      name: "q2",
+      label: "Support",
+      valueLabels: { 1: "Poor", 2: "Good", 10: "Excellent" },
+    });
+    const result = transformToMatrixData([firstVariable, secondVariable], {
+      q1: createBaseStats("q1", [
+        { value: 1, counts: 20, percentages: 20 },
+        { value: 2, counts: 30, percentages: 30 },
+        { value: 10, counts: 50, percentages: 50 },
+      ]),
+      q2: createBaseStats("q2", [
+        { value: "1.0", counts: 25, percentages: 25 },
+        { value: 10, counts: 75, percentages: 75 },
+      ]),
+    });
+
+    assert.deepStrictEqual(
+      result.map((row) => row.category),
+      ["Service", "Support"]
+    );
+    assert.deepStrictEqual(
+      result[0]?.segments.map((segment) => segment.label),
+      ["Poor", "Good", "Excellent"]
+    );
+    assert.deepStrictEqual(
+      result[1]?.segments.map((segment) => segment.value),
+      [25, 0, 75]
+    );
+    assert.deepStrictEqual(
+      result[1]?.segments.map((segment) => segment.count),
+      [25, 0, 75]
+    );
+  });
+
+  test("transformToMatrixData excludes missing values and ranges from the shared scale", () => {
+    const firstVariable = createVariable({
+      name: "q1",
+      valueLabels: {
+        0: "NZ",
+        1: "Very satisfied",
+        2: "Fairly satisfied",
+        3: "Not very satisfied",
+        8: "KA",
+        9: "NA",
+      },
+      missingRanges: {
+        q1: [
+          { lo: 0, hi: 0 },
+          { lo: 8, hi: 9 },
+        ],
+      },
+    });
+    const result = transformToMatrixData([firstVariable], {
+      q1: createBaseStats("q1", [
+        { value: 1, counts: 20, percentages: 20 },
+        { value: 2, counts: 30, percentages: 30 },
+        { value: 3, counts: 50, percentages: 50 },
+      ]),
+    });
+
+    assert.deepStrictEqual(
+      result[0]?.segments.map((segment) => segment.label),
+      ["Very satisfied", "Fairly satisfied", "Not very satisfied"]
+    );
   });
 
   test("transformToMultiResponseData throws when split stats leak into aggregate chart", () => {

@@ -5,6 +5,7 @@ import {
 import {
   extractVariableStats,
   hasSplitVariableStatsForVariable,
+  transformToMatrixData,
   transformToMultiResponseData,
   transformToMultiResponseIndividualBarData,
   transformToMultiResponseIndividualStackedBarData,
@@ -157,6 +158,19 @@ type MultiResponseChartExportOptions = {
 };
 
 type MultiResponseExcelChartExportOptions = MultiResponseChartExportOptions & {
+  excelLabels: ExcelExportLabels;
+};
+
+type MatrixChartExportOptions = {
+  fileBaseName?: string;
+  metaLine: string;
+  palette: string[];
+  statsData: Record<string, StatsResponse>;
+  title: string;
+  variables: DatasetVariableWithAttributes[];
+};
+
+type MatrixExcelChartExportOptions = MatrixChartExportOptions & {
   excelLabels: ExcelExportLabels;
 };
 
@@ -557,6 +571,19 @@ export function createMultiResponseExcelExportPayload({
   };
 }
 
+export function createMatrixExcelExportPayload({
+  excelLabels,
+  ...options
+}: MatrixExcelChartExportOptions): AdhocExcelExportPayload {
+  const powerpointPayload = createMatrixPowerPointExportPayload(options);
+
+  return {
+    ...powerpointPayload,
+    labels: serializeExcelLabels(excelLabels),
+    file_name: buildExcelFileName(options.fileBaseName ?? `${options.title}-matrix`),
+  };
+}
+
 export function createVariableChartPowerPointExportPayload({
   chartType,
   countedValue = 1,
@@ -727,6 +754,35 @@ export function createMultiResponsePowerPointExportPayload({
     chart: {
       kind: "multiResponse",
       points: mapDistributionPoints(points, palette, true),
+    },
+  };
+}
+
+export function createMatrixPowerPointExportPayload({
+  fileBaseName,
+  metaLine,
+  palette,
+  statsData,
+  title,
+  variables,
+}: MatrixChartExportOptions): AdhocPowerPointExportPayload {
+  const model = createSplitHorizontalStackedBarModel(transformToMatrixData(variables, statsData));
+
+  return {
+    file_name: buildPowerPointFileName(fileBaseName ?? `${title}-matrix`),
+    title,
+    meta_line: metaLine,
+    palette,
+    chart: {
+      kind: "horizontalStackedBar",
+      rows: model.chartData.map((row) => ({
+        label: String(row.label),
+        segments: model.segments.map((segment, index) => ({
+          label: segment.label,
+          value: roundExportValue(Number(row[segment.key] ?? 0)),
+          color: palette[index] ?? DEFAULT_EXPORT_PALETTE[index % DEFAULT_EXPORT_PALETTE.length]!,
+        })),
+      })),
     },
   };
 }
