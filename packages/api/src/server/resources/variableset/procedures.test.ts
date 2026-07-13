@@ -71,7 +71,11 @@ function createMockMatrixVariablesetContentDb(options: {
   const variablesetId = "550e8400-e29b-41d4-a716-446655440005";
   const variableId = "550e8400-e29b-41d4-a716-446655440010";
   let selectIndex = 0;
+  const state = { lockCount: 0, transactionCount: 0 };
   const db = {
+    async execute() {
+      state.lockCount += 1;
+    },
     insert() {
       return {
         values() {
@@ -127,9 +131,13 @@ function createMockMatrixVariablesetContentDb(options: {
         },
       };
     },
+    async transaction<T>(callback: (tx: DatabaseInstance) => Promise<T>) {
+      state.transactionCount += 1;
+      return callback(db as unknown as DatabaseInstance);
+    },
   };
 
-  return { db: db as unknown as DatabaseInstance, variableId, variablesetId };
+  return { db: db as unknown as DatabaseInstance, state, variableId, variablesetId };
 }
 
 function createMockReorderVariablesetContentsDb(existingIds: string[]) {
@@ -450,7 +458,7 @@ describe("variableset", () => {
   });
 
   test("assigns variables with identical numeric-aware labels to a matrix", async () => {
-    const { db, variableId, variablesetId } = createMockMatrixVariablesetContentDb({
+    const { db, state, variableId, variablesetId } = createMockMatrixVariablesetContentDb({
       assignedValueLabels: { "2": "Low", "10": "High" },
       existingValueLabels: [{ "10": "High", "2": "Low" }],
     });
@@ -461,6 +469,8 @@ describe("variableset", () => {
     });
 
     assert.equal(result.variableId, variableId);
+    assert.equal(state.transactionCount, 1);
+    assert.equal(state.lockCount, 1);
   });
 
   test("rejects assigning incompatible variable labels to a matrix", async () => {

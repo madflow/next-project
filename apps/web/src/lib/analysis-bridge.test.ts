@@ -241,7 +241,7 @@ describe("analysis-bridge transforms", () => {
     );
   });
 
-  test("transformToMultiResponseData throws when split stats leak into aggregate chart", () => {
+  test("aggregate transforms throw when split stats leak into aggregate charts", () => {
     const variable = createVariable({ name: "q1", label: "Question 1" });
     const statsData = {
       q1: [
@@ -271,6 +271,7 @@ describe("analysis-bridge transforms", () => {
       () => transformToMultiResponseData([variable], statsData, 1),
       /must not receive split variable stats/
     );
+    assert.throws(() => transformToMatrixData([variable], statsData), /must not receive split variable stats/);
   });
 
   test("transformToRechartsBarData sorts by value ascending by default", () => {

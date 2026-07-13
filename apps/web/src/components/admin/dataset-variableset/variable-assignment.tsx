@@ -287,10 +287,14 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
 
     setIsAssigning(variableId);
     try {
-      await addContentToVariablesetAction(selectedSetId, "variable", variableId);
+      const result = await addContentToVariablesetAction(selectedSetId, "variable", variableId);
+      if (!result.success) {
+        toast.error(result.error ?? t("assignment.addError"));
+        return;
+      }
+
       toast.success(t("assignment.addToSet"));
-      refetchUnassigned();
-      refetchContents();
+      await Promise.all([refetchUnassigned(), refetchContents()]);
       onRefresh();
     } catch (error) {
       console.error(error);

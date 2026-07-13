@@ -259,37 +259,63 @@ async function addContentToVariableset(
   }
 
   if (variableset.category === "matrix") {
-    const existingVariables = await context.db
-      .select({ valueLabels: datasetVariableTable.valueLabels })
-      .from(datasetVariablesetContent)
-      .innerJoin(datasetVariableTable, eq(datasetVariablesetContent.variableId, datasetVariableTable.id))
-      .where(
-        and(
-          eq(datasetVariablesetContent.variablesetId, variablesetId),
-          eq(datasetVariablesetContent.contentType, "variable")
+    return context.db.transaction(async (tx) => {
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${variablesetId}, 0))`);
+
+      const existingVariables = await tx
+        .select({ valueLabels: datasetVariableTable.valueLabels })
+        .from(datasetVariablesetContent)
+        .innerJoin(datasetVariableTable, eq(datasetVariablesetContent.variableId, datasetVariableTable.id))
+        .where(
+          and(
+            eq(datasetVariablesetContent.variablesetId, variablesetId),
+            eq(datasetVariablesetContent.contentType, "variable")
+          )
         )
-      )
-      .orderBy(datasetVariablesetContent.position)
-      .execute();
-    const [assignedVariable] = await context.db
-      .select({ valueLabels: datasetVariableTable.valueLabels })
-      .from(datasetVariableTable)
-      .where(and(eq(datasetVariableTable.id, referenceId), eq(datasetVariableTable.datasetId, variableset.datasetId)))
-      .limit(1)
-      .execute();
+        .orderBy(datasetVariablesetContent.position)
+        .execute();
+      const [assignedVariable] = await tx
+        .select({ valueLabels: datasetVariableTable.valueLabels })
+        .from(datasetVariableTable)
+        .where(and(eq(datasetVariableTable.id, referenceId), eq(datasetVariableTable.datasetId, variableset.datasetId)))
+        .limit(1)
+        .execute();
 
-    if (!assignedVariable) {
-      throw notFoundError("Dataset variable not found");
-    }
+      if (!assignedVariable) {
+        throw notFoundError("Dataset variable not found");
+      }
 
-    const valueLabelsError = getMatrixValueLabelsError([
-      ...existingVariables.map((variable) => variable.valueLabels),
-      assignedVariable.valueLabels,
-    ]);
+      const valueLabelsError = getMatrixValueLabelsError([
+        ...existingVariables.map((variable) => variable.valueLabels),
+        assignedVariable.valueLabels,
+      ]);
 
-    if (valueLabelsError) {
-      throw new ORPCError("BAD_REQUEST", { message: valueLabelsError, status: 400 });
-    }
+      if (valueLabelsError) {
+        throw new ORPCError("BAD_REQUEST", { message: valueLabelsError, status: 400 });
+      }
+
+      const maxPosition = await tx
+        .select({ maxPos: sql<number>`COALESCE(MAX(${datasetVariablesetContent.position}), -100)` })
+        .from(datasetVariablesetContent)
+        .where(eq(datasetVariablesetContent.variablesetId, variablesetId));
+      const [created] = await tx
+        .insert(datasetVariablesetContent)
+        .values({
+          attributes: attributes ?? { allowedStatistics: { distribution: true, mean: false } },
+          contentType,
+          position: (maxPosition[0]?.maxPos ?? -100) + 100,
+          subsetId: null,
+          variableId: referenceId,
+          variablesetId,
+        })
+        .returning();
+
+      if (!created) {
+        throw new Error("Failed to add content to variableset");
+      }
+
+      return created;
+    });
   }
 
   const maxPosition = await context.db

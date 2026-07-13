@@ -373,7 +373,7 @@ export async function importVariableSets(
 
       await db.update(datasetVariableset).set({ parentId }).where(eq(datasetVariableset.id, setId));
 
-      const parentContents = importData.variableSets.find((set) => set.name === importSet.parentName)?.contents;
+      const parentContents = parentSet?.contents;
       const subsetInContents = parentContents?.some(
         (content) => content.contentType === "subset" && content.subsetName === importSet.name
       );
