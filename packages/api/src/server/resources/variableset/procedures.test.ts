@@ -64,6 +64,74 @@ function createMockCreateVariablesetContentDb(row: Record<string, unknown> & { v
   return { db: db as unknown as DatabaseInstance, state };
 }
 
+function createMockMatrixVariablesetContentDb(options: {
+  assignedValueLabels: unknown;
+  existingValueLabels?: unknown[];
+}) {
+  const variablesetId = "550e8400-e29b-41d4-a716-446655440005";
+  const variableId = "550e8400-e29b-41d4-a716-446655440010";
+  let selectIndex = 0;
+  const db = {
+    insert() {
+      return {
+        values() {
+          return {
+            async returning() {
+              return [
+                {
+                  attributes: { allowedStatistics: { distribution: true, mean: false } },
+                  contentType: "variable",
+                  createdAt: new Date("2024-01-01T00:00:00.000Z"),
+                  id: "550e8400-e29b-41d4-a716-446655440020",
+                  position: 100,
+                  subsetId: null,
+                  updatedAt: null,
+                  variableId,
+                  variablesetId,
+                },
+              ];
+            },
+          };
+        },
+      };
+    },
+    select() {
+      const index = selectIndex++;
+      return {
+        execute: async () => {
+          if (index === 0) {
+            return [{ category: "matrix", datasetId: "550e8400-e29b-41d4-a716-446655440000", id: variablesetId }];
+          }
+          if (index === 1) {
+            return (options.existingValueLabels ?? []).map((valueLabels) => ({ valueLabels }));
+          }
+          if (index === 2) {
+            return [{ valueLabels: options.assignedValueLabels }];
+          }
+          return [{ maxPos: 0 }];
+        },
+        from() {
+          return this;
+        },
+        innerJoin() {
+          return this;
+        },
+        limit() {
+          return this;
+        },
+        orderBy() {
+          return this;
+        },
+        where() {
+          return this;
+        },
+      };
+    },
+  };
+
+  return { db: db as unknown as DatabaseInstance, variableId, variablesetId };
+}
+
 function createMockReorderVariablesetContentsDb(existingIds: string[]) {
   const state = {
     selectWhere: undefined as unknown,
@@ -379,6 +447,96 @@ describe("variableset", () => {
       variablesetId: row.variablesetId,
     });
     assert.notEqual(state.where, undefined);
+  });
+
+  test("assigns variables with identical numeric-aware labels to a matrix", async () => {
+    const { db, variableId, variablesetId } = createMockMatrixVariablesetContentDb({
+      assignedValueLabels: { "2": "Low", "10": "High" },
+      existingValueLabels: [{ "10": "High", "2": "Low" }],
+    });
+
+    const result = await createVariablesetContent(createAdminProcedureContext(db), {
+      body: { contentType: "variable", referenceId: variableId },
+      params: { id: variablesetId },
+    });
+
+    assert.equal(result.variableId, variableId);
+  });
+
+  test("rejects assigning incompatible variable labels to a matrix", async () => {
+    const { db, variableId, variablesetId } = createMockMatrixVariablesetContentDb({
+      assignedValueLabels: { "1": "No", "2": "Maybe" },
+      existingValueLabels: [{ "1": "No", "2": "Yes" }],
+    });
+
+    await assert.rejects(
+      () =>
+        createVariablesetContent(createAdminProcedureContext(db), {
+          body: { contentType: "variable", referenceId: variableId },
+          params: { id: variablesetId },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.status === 400 &&
+        error.message === 'Matrix response label for code "2" must match: expected "Yes", received "Maybe"'
+    );
+  });
+
+  test("reports incompatible matrix response codes", async () => {
+    const { db, variableId, variablesetId } = createMockMatrixVariablesetContentDb({
+      assignedValueLabels: { "1": "No", "3": "Yes" },
+      existingValueLabels: [{ "1": "No", "2": "Yes" }],
+    });
+
+    await assert.rejects(
+      () =>
+        createVariablesetContent(createAdminProcedureContext(db), {
+          body: { contentType: "variable", referenceId: variableId },
+          params: { id: variablesetId },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.message === "Matrix response codes must match: expected [1, 2], received [1, 3]"
+    );
+  });
+
+  test("rejects a first matrix variable with fewer than two labels", async () => {
+    const { db, variableId, variablesetId } = createMockMatrixVariablesetContentDb({
+      assignedValueLabels: { "1": "Only option" },
+    });
+
+    await assert.rejects(
+      () =>
+        createVariablesetContent(createAdminProcedureContext(db), {
+          body: { contentType: "variable", referenceId: variableId },
+          params: { id: variablesetId },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.message === "Each matrix variable must have at least two value labels with string labels"
+    );
+  });
+
+  test("rejects subset content under a matrix", async () => {
+    const variablesetId = "550e8400-e29b-41d4-a716-446655440005";
+    const { db } = createMockSequentialSelectDb([
+      [{ category: "matrix", datasetId: "550e8400-e29b-41d4-a716-446655440000", id: variablesetId }],
+    ]);
+
+    await assert.rejects(
+      () =>
+        createVariablesetContent(createAdminProcedureContext(db), {
+          body: { contentType: "subset", referenceId: "550e8400-e29b-41d4-a716-446655440099" },
+          params: { id: variablesetId },
+        }),
+      (error: unknown) =>
+        error instanceof ORPCError &&
+        error.code === "BAD_REQUEST" &&
+        error.message === "A matrix variableset cannot contain child subsets"
+    );
   });
 
   test("rejects self-referential subset content creation", async () => {

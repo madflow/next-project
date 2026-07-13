@@ -9,6 +9,7 @@ import {
   datasetVariablesetContent,
   datasetVariableset as datasetVariablesetTable,
 } from "@repo/database/schema";
+import { getMatrixValueLabelsError } from "../../../shared/matrix-variableset";
 import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
 import { requireDatasetAccess } from "../dataset/access";
 
@@ -84,6 +85,7 @@ function paginateRows<T>(rows: T[], limit: number, offset: number) {
 async function getVariablesetRecord(context: ProcedureContextInput, id: string) {
   const [variableset] = await context.db
     .select({
+      category: datasetVariablesetTable.category,
       datasetId: datasetVariablesetTable.datasetId,
       id: datasetVariablesetTable.id,
     })
@@ -240,11 +242,54 @@ async function addContentToVariableset(
   referenceId: string,
   attributes?: VariablesetContentAttributes | null
 ): Promise<DatasetVariablesetContentRecord> {
+  const variableset = await getVariablesetRecord(context, variablesetId);
+
+  if (variableset.category === "matrix" && contentType === "subset") {
+    throw new ORPCError("BAD_REQUEST", {
+      message: "A matrix variableset cannot contain child subsets",
+      status: 400,
+    });
+  }
+
   if (contentType === "subset" && referenceId === variablesetId) {
     throw new ORPCError("BAD_REQUEST", {
       message: "A variableset cannot include itself as a subset",
       status: 400,
     });
+  }
+
+  if (variableset.category === "matrix") {
+    const existingVariables = await context.db
+      .select({ valueLabels: datasetVariableTable.valueLabels })
+      .from(datasetVariablesetContent)
+      .innerJoin(datasetVariableTable, eq(datasetVariablesetContent.variableId, datasetVariableTable.id))
+      .where(
+        and(
+          eq(datasetVariablesetContent.variablesetId, variablesetId),
+          eq(datasetVariablesetContent.contentType, "variable")
+        )
+      )
+      .orderBy(datasetVariablesetContent.position)
+      .execute();
+    const [assignedVariable] = await context.db
+      .select({ valueLabels: datasetVariableTable.valueLabels })
+      .from(datasetVariableTable)
+      .where(and(eq(datasetVariableTable.id, referenceId), eq(datasetVariableTable.datasetId, variableset.datasetId)))
+      .limit(1)
+      .execute();
+
+    if (!assignedVariable) {
+      throw notFoundError("Dataset variable not found");
+    }
+
+    const valueLabelsError = getMatrixValueLabelsError([
+      ...existingVariables.map((variable) => variable.valueLabels),
+      assignedVariable.valueLabels,
+    ]);
+
+    if (valueLabelsError) {
+      throw new ORPCError("BAD_REQUEST", { message: valueLabelsError, status: 400 });
+    }
   }
 
   const maxPosition = await context.db
@@ -337,8 +382,6 @@ const contentsGet = authenticatedVariablesetApi.contents.get.handler(async ({ co
 });
 
 const contentsCreate = adminVariablesetApi.contents.create.handler(async ({ context, input }) => {
-  await getVariablesetRecord(context, input.params.id);
-
   return addContentToVariableset(
     context,
     input.params.id,

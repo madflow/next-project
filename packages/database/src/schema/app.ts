@@ -250,6 +250,7 @@ export type UpdateDatasetProjectData = z.infer<typeof updateDatasetProjectSchema
 
 export const datasetVariablesetCategoryEnum = pgEnum("dataset_variableset_category", [
   "general",
+  "matrix",
   "multi_response",
 ] as const);
 

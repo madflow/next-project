@@ -59,6 +59,7 @@
     {
       "name": "Vertrauen in Institutionen",
       "description": "Vertrauen in verschiedene gesellschaftliche Institutionen",
+      "category": "matrix",
       "contents": [
         { "type": "variable", "variable": "confinan" },
         { "type": "variable", "variable": "conbus" },
@@ -72,10 +73,17 @@
       "name": "Lebensstil",
       "description": "Lebensstil und persönliche Einstellungen",
       "contents": [
-        { "type": "variable", "variable": "happy" },
-        { "type": "variable", "variable": "hapmar" },
         { "type": "variable", "variable": "postlife" },
         { "type": "variable", "variable": "owngun" }
+      ]
+    },
+    {
+      "name": "Zufriedenheit",
+      "description": "Allgemeine Zufriedenheit und Zufriedenheit in der Ehe",
+      "category": "matrix",
+      "contents": [
+        { "type": "variable", "variable": "happy" },
+        { "type": "variable", "variable": "hapmar" }
       ]
     },
     {

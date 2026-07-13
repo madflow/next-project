@@ -44,7 +44,7 @@ export type DatasetVariablesetWithDetails = DatasetVariableset & {
 };
 
 export type VariablesetTreeNode = {
-  category: "general" | "multi_response";
+  category: "general" | "multi_response" | "matrix";
   children: VariablesetTreeNode[];
   description?: string | null;
   id: string;

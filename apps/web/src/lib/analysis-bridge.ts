@@ -39,6 +39,40 @@ export type SplitVariableStackedBarDataItem = {
   segments: StackedBarSegment[];
 };
 
+function responseCodesEqual(left: string | number, right: string | number) {
+  const leftString = String(left);
+  const rightString = String(right);
+  const leftNumber = Number(leftString);
+  const rightNumber = Number(rightString);
+
+  if (
+    leftString.trim() !== "" &&
+    rightString.trim() !== "" &&
+    Number.isFinite(leftNumber) &&
+    Number.isFinite(rightNumber)
+  ) {
+    return leftNumber === rightNumber;
+  }
+
+  return leftString === rightString;
+}
+
+function isMissingResponseCode(variable: DatasetVariable, code: string) {
+  if (
+    Array.isArray(variable.missingValues) &&
+    variable.missingValues.some((missingValue) => responseCodesEqual(missingValue, code))
+  ) {
+    return true;
+  }
+
+  const numericCode = Number(code);
+  if (!Number.isFinite(numericCode)) {
+    return false;
+  }
+
+  return (variable.missingRanges?.[variable.name] ?? []).some(({ lo, hi }) => numericCode >= lo && numericCode <= hi);
+}
+
 // Helper function to sort categories in ascending order (numeric if possible, otherwise alphabetic)
 function sortCategoriesAscending(categories: string[]): string[] {
   return [...categories].sort((a, b) => {
@@ -310,6 +344,51 @@ export function transformToMultiResponseData(
     .sort((a, b) => a.orderIndex - b.orderIndex);
 
   return rechartsData;
+}
+
+export function transformToMatrixData(
+  variables: DatasetVariable[],
+  statsData: Record<string, StatsResponse>
+): SplitVariableStackedBarDataItem[] {
+  const firstVariable = variables[0];
+  if (!firstVariable) {
+    return [];
+  }
+
+  const firstValueLabels = firstVariable.valueLabels ?? {};
+  const canonicalScale = sortCategoriesAscending(Object.keys(firstValueLabels))
+    .filter((code) => !isMissingResponseCode(firstVariable, code))
+    .map((code) => [code, firstValueLabels[code as keyof typeof firstValueLabels]] as const);
+
+  return variables.map((variable, variableIndex) => {
+    const statsItem = getStatsResponseItem(statsData[variable.name] ?? [], variable.name);
+    if (statsItem && isSplitVariableStats(statsItem.stats)) {
+      throw new Error(
+        `transformToMatrixData received split stats for variable ${variable.name}. ` +
+          `Matrix aggregate charts must not receive split variable stats.`
+      );
+    }
+
+    const variableStats = statsItem && !isSplitVariableStats(statsItem.stats) ? statsItem.stats : null;
+    const frequencyTable = variableStats?.frequency_table ?? [];
+
+    return {
+      category: getVariableLabel(variable),
+      categoryKey: variable.name,
+      categoryIndex: variableIndex,
+      segments: canonicalScale.map(([code, label], index) => {
+        const frequency = frequencyTable.find((item) => responseCodesEqual(item.value, code));
+
+        return {
+          segment: `segment${index}`,
+          value: frequency?.percentages ?? 0,
+          label: String(label),
+          count: frequency?.counts ?? 0,
+          color: `var(--chart-${(index % 6) + 1})`,
+        };
+      }),
+    };
+  });
 }
 
 // Helper function to find counted value in frequency table

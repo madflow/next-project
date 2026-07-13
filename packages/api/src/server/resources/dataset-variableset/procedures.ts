@@ -7,9 +7,11 @@ import {
   type DatasetVariableset as DatasetVariablesetRecord,
   type UpdateDatasetVariablesetData,
   dataset,
+  datasetVariable,
   datasetVariablesetContent,
   datasetVariableset as datasetVariablesetTable,
 } from "@repo/database/schema";
+import { getMatrixValueLabelsError } from "../../../shared/matrix-variableset";
 import { type ProcedureContextInput, adminApi, authenticatedApi, call, toProcedureContext } from "../../base";
 import { listCollection } from "../../collection-query";
 import { getDatasetRelatedAccessWhere } from "../dataset/access";
@@ -18,6 +20,46 @@ import { datasetVariablesetQueryDefinition } from "./query-definition";
 const adminDatasetVariablesetApi = adminApi.datasetVariableset;
 const authenticatedDatasetVariablesetApi = authenticatedApi.datasetVariableset;
 const parentVariableset = alias(datasetVariablesetTable, "parent_dataset_variableset");
+
+function badRequest(message: string) {
+  return new ORPCError("BAD_REQUEST", { message, status: 400 });
+}
+
+async function rejectMatrixParent(db: ProcedureContextInput["db"], parentId: string) {
+  const [parent] = await db
+    .select({ category: datasetVariablesetTable.category })
+    .from(datasetVariablesetTable)
+    .where(eq(datasetVariablesetTable.id, parentId))
+    .limit(1)
+    .execute();
+
+  if (parent?.category === "matrix") {
+    throw badRequest("A matrix variableset cannot contain child subsets");
+  }
+}
+
+async function validateMatrixConversion(db: ProcedureContextInput["db"], variablesetId: string) {
+  const contents = await db
+    .select({
+      contentType: datasetVariablesetContent.contentType,
+      valueLabels: datasetVariable.valueLabels,
+    })
+    .from(datasetVariablesetContent)
+    .leftJoin(datasetVariable, eq(datasetVariablesetContent.variableId, datasetVariable.id))
+    .where(eq(datasetVariablesetContent.variablesetId, variablesetId))
+    .orderBy(datasetVariablesetContent.position)
+    .execute();
+
+  if (contents.some((content) => content.contentType === "subset")) {
+    throw badRequest("A matrix variableset cannot contain child subsets");
+  }
+
+  const valueLabelsError = getMatrixValueLabelsError(contents.map((content) => content.valueLabels));
+
+  if (valueLabelsError) {
+    throw badRequest(valueLabelsError);
+  }
+}
 
 type DatasetVariablesetListRow = DatasetVariablesetRecord & {
   dataset?: Dataset;
@@ -59,6 +101,10 @@ export async function detachDatasetVariableset(context: ProcedureContextInput, i
 }
 
 const create = adminDatasetVariablesetApi.create.handler(async ({ context, input }) => {
+  if (input.parentId) {
+    await rejectMatrixParent(context.db, input.parentId);
+  }
+
   return context.db.transaction(async (tx) => {
     const [datasetVariableset] = await tx.insert(datasetVariablesetTable).values(input).returning();
 
@@ -100,6 +146,14 @@ const list = authenticatedDatasetVariablesetApi.list.handler(async ({ context, i
 });
 
 const update = adminDatasetVariablesetApi.update.handler(async ({ context, input }) => {
+  if (input.body.parentId) {
+    await rejectMatrixParent(context.db, input.body.parentId);
+  }
+
+  if (input.body.category === "matrix") {
+    await validateMatrixConversion(context.db, input.params.id);
+  }
+
   const [datasetVariableset] = await context.db
     .update(datasetVariablesetTable)
     .set(input.body)

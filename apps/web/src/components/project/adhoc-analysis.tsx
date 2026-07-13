@@ -640,6 +640,7 @@ export function AdHocAnalysis({ project }: AdHocAnalysisProps) {
                   datasetName={selectedDatasetName ?? ""}
                   onStatsRequestAction={handleStatsRequest}
                   multiResponseAggregateOnly={section.multiResponseAggregateOnly}
+                  matrixAggregateOnly={section.matrixAggregateOnly}
                   hideVariablesetHeader={section.hideVariablesetHeader}
                 />
               ))}

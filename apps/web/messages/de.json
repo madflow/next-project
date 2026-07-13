@@ -523,6 +523,7 @@
     },
     "assignVariables": "Variablen zuweisen",
     "assignment": {
+      "addError": "Variable konnte nicht zugewiesen werden",
       "addToSet": "Zu Set hinzufügen",
       "assigned": "Zugewiesene Inhalte",
       "assignedCount": "{count, plural, =0 {Keine Einträge} =1 {1 Eintrag} other {# Einträge}}",
@@ -595,6 +596,7 @@
       "cancel": "Abbrechen",
       "category": "Kategorie",
       "categoryGeneral": "Allgemein",
+      "categoryMatrix": "Matrix",
       "categoryMultiResponse": "Mehrfachantwort",
       "countedValue": "Gezählter Wert",
       "countedValueHelp": "Der numerische Wert, der 'ausgewählt' in Ihren Daten darstellt",

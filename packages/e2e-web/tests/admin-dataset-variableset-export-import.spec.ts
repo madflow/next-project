@@ -420,7 +420,7 @@ test.describe("Dataset Variableset Export/Import with Order Index", () => {
       // Verify each variableset has category field
       for (const variableSet of exportData.variableSets) {
         expect(variableSet.category).toBeDefined();
-        expect(["general", "multi_response"]).toContain(variableSet.category);
+        expect(["general", "matrix", "multi_response"]).toContain(variableSet.category);
       }
     });
 

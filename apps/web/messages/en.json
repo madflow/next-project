@@ -523,6 +523,7 @@
     },
     "assignVariables": "Assign Variables",
     "assignment": {
+      "addError": "Failed to assign variable",
       "addToSet": "Add to Set",
       "assigned": "Assigned Contents",
       "assignedCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
@@ -595,6 +596,7 @@
       "cancel": "Cancel",
       "category": "Category",
       "categoryGeneral": "General",
+      "categoryMatrix": "Matrix",
       "categoryMultiResponse": "Multiple Response",
       "countedValue": "Counted Value",
       "countedValueHelp": "The numeric value that represents 'selected' in your data",

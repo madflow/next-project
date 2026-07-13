@@ -294,7 +294,7 @@ export function VariableAssignment({ datasetId, selectedSetId, onRefresh }: Vari
       onRefresh();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to assign variable");
+      toast.error(error instanceof Error ? error.message : t("assignment.addError"));
     } finally {
       setIsAssigning(null);
     }
