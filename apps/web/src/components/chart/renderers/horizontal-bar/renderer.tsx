@@ -1,17 +1,18 @@
 "use client";
 
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@repo/ui/components/chart";
+import { ChartConfig, ChartTooltip, ChartTooltipContent } from "@repo/ui/components/chart";
 import {
   type ChartSortConfig,
   transformToMultiResponseIndividualBarData,
   transformToRechartsBarData,
 } from "@/lib/analysis-bridge";
-import { CHART_Y_AXIS_WIDTH, PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
+import { PERCENTAGE_CHART_DECIMALS, formatChartValue } from "@/lib/chart-constants";
 import { getPlotAreaHorizontalBorderCoordinates } from "@/lib/chart-grid";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { type ThemeChartColors } from "@/types/organization";
 import { type StatsResponse } from "@/types/stats";
+import { AdaptiveHorizontalChart, HorizontalCategoryTick } from "../../shared/adaptive-horizontal-chart";
 
 type HorizontalBarChartRendererProps = {
   variable: DatasetVariable;
@@ -46,44 +47,57 @@ export function HorizontalBarChartRenderer({
     : transformToRechartsBarData(variable, stats, sortConfig);
 
   return (
-    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={variable.name}>
-      <BarChart layout="vertical" margin={{ left: 0 }} barCategoryGap={4} accessibilityLayer data={chartData}>
-        <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
-        <XAxis
-          domain={[0, 100]}
-          dataKey="percentage"
-          type="number"
-          tickLine={false}
-          tickMargin={10}
-          axisLine={false}
-          fontSize={12}
-          ticks={[0, 20, 40, 60, 80, 100]}
-          tickFormatter={(value) => `${value}%`}
-        />
-        <YAxis
-          dataKey="label"
-          type="category"
-          tickLine={false}
-          tickMargin={10}
-          axisLine={false}
-          fontSize={12}
-          width={isMultiResponseIndividual ? 0 : CHART_Y_AXIS_WIDTH}
-          hide={isMultiResponseIndividual}
-        />
-        <Bar
-          dataKey="percentage"
-          fill="var(--color-percentage)"
-          isAnimationActive={disableAnimation ? false : undefined}>
-          <LabelList
+    <AdaptiveHorizontalChart
+      labels={chartData.map((entry) => entry.label)}
+      chartConfig={chartConfig}
+      chartColors={chartColors}
+      chartRef={chartRef}
+      exportFilename={variable.name}
+      hideCategoryAxis={isMultiResponseIndividual}
+      rightMargin={48}>
+      {({ axisWidth, barSize, categoryAxisPadding, margin, wrappedLabels }) => (
+        <BarChart layout="vertical" margin={margin} barCategoryGap={4} accessibilityLayer data={chartData}>
+          <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
+          <XAxis
+            domain={[0, 100]}
             dataKey="percentage"
-            position="right"
+            type="number"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
             fontSize={12}
-            fill="#808080"
-            formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
+            ticks={[0, 20, 40, 60, 80, 100]}
+            tickFormatter={(value) => `${value}%`}
           />
-        </Bar>
-        <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-      </BarChart>
-    </ChartContainer>
+          <YAxis
+            dataKey="label"
+            type="category"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            fontSize={12}
+            width={axisWidth}
+            interval={0}
+            hide={isMultiResponseIndividual}
+            padding={categoryAxisPadding}
+            tick={(tickProps) => <HorizontalCategoryTick {...tickProps} lines={wrappedLabels[tickProps.index] ?? []} />}
+          />
+          <Bar
+            dataKey="percentage"
+            barSize={barSize}
+            fill="var(--color-percentage)"
+            isAnimationActive={disableAnimation ? false : undefined}>
+            <LabelList
+              dataKey="percentage"
+              position="right"
+              fontSize={12}
+              fill="#808080"
+              formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
+            />
+          </Bar>
+          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+        </BarChart>
+      )}
+    </AdaptiveHorizontalChart>
   );
 }
