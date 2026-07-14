@@ -1,5 +1,5 @@
 import { cn } from "@repo/ui/lib/utils";
-import { ScrollArea } from "./scroll-area";
+import { ScrollArea, ScrollBar } from "./scroll-area";
 
 type CodeProps = React.ComponentProps<"pre"> & {
   scrollAreaClassName?: string;
@@ -7,7 +7,7 @@ type CodeProps = React.ComponentProps<"pre"> & {
 
 export function Code({ className, scrollAreaClassName, ...props }: CodeProps) {
   return (
-    <ScrollArea className={scrollAreaClassName}>
+    <ScrollArea className={cn("max-w-full min-w-0", scrollAreaClassName)}>
       <pre
         data-slot="pre"
         className={cn(
@@ -17,6 +17,7 @@ export function Code({ className, scrollAreaClassName, ...props }: CodeProps) {
         {...props}>
         <code>{props.children}</code>
       </pre>
+      <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );
 }
