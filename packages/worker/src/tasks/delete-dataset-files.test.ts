@@ -1,6 +1,6 @@
 import type { Task } from "graphile-worker";
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import { createDeleteDatasetFilesTask } from "./delete-dataset-files.js";
 
 type DatasetDeleteJobPayload = {

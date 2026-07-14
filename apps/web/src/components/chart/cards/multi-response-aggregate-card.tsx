@@ -24,9 +24,9 @@ type MultiResponseAggregateCardProps = {
   datasetName: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-function MultiResponseAggregateChartContent({
+export function MultiResponseAggregateChartContent({
   chartConfig,
-  chartColors: _chartColors,
+  chartColors,
   chartData,
   chartRef,
   fileName,
@@ -39,10 +39,8 @@ function MultiResponseAggregateChartContent({
   fileName: string;
   disableAnimation?: boolean;
 }) {
-  void _chartColors;
-
   return (
-    <ChartContainer config={chartConfig} ref={chartRef} data-export-filename={fileName}>
+    <ChartContainer config={chartConfig} chartColors={chartColors} ref={chartRef} data-export-filename={fileName}>
       <BarChart
         layout="vertical"
         margin={{

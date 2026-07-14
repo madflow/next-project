@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { QueryBuilder, boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import {
   type CollectionQueryDefinition,
   compileDrizzleCollectionOrderBy,

@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import { project as projectTable } from "@repo/database/schema";
 import {
   createAdminProcedureContext,
@@ -109,10 +109,13 @@ describe("listProjects", () => {
   test("returns paginated rows with validated scalar filters", async () => {
     const rows = [
       {
-        id: "project_1",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440100",
+        metadata: null,
         name: "Acme Project",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
         slug: "acme-project",
+        updatedAt: null,
       },
     ];
     const { db, state } = createMockListDb(rows, 42);
@@ -139,10 +142,13 @@ describe("listProjects", () => {
   test("searches across configured project fields without joins", async () => {
     const rows = [
       {
-        id: "project_1",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440100",
+        metadata: null,
         name: "Acme Project",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
         slug: "acme-project",
+        updatedAt: null,
       },
     ];
     const { db, state } = createMockListDb(rows, 1);
@@ -158,7 +164,7 @@ describe("listProjects", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "project_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         metadata: null,
         name: "Acme Project",
         organization: {
@@ -192,7 +198,7 @@ describe("listProjects", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "project_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         metadata: null,
         name: "Acme Project",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
@@ -250,10 +256,13 @@ describe("listProjects", () => {
   test("scopes non-admin project listing to membership", async () => {
     const rows = [
       {
-        id: "project_1",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440100",
+        metadata: null,
         name: "Acme Project",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
         slug: "acme-project",
+        updatedAt: null,
       },
     ];
     const { db, state } = createMockListDb(rows, 1);
@@ -268,7 +277,7 @@ describe("listProjects", () => {
   test("returns a project with embedded organization when requested", async () => {
     const row = {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      id: "project_1",
+      id: "550e8400-e29b-41d4-a716-446655440100",
       metadata: null,
       name: "Acme Project",
       organization: {
@@ -325,7 +334,7 @@ describe("listProjects", () => {
   test("rejects non-member access to a project", async () => {
     const row = {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      id: "project_1",
+      id: "550e8400-e29b-41d4-a716-446655440100",
       metadata: null,
       name: "Acme Project",
       organizationId: "550e8400-e29b-41d4-a716-446655440000",
