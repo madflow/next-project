@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import { organization as organizationTable } from "@repo/database/schema";
 import {
   createAdminAPIKeyProcedureContext,
@@ -229,7 +229,17 @@ describe("listOrganizations", () => {
   });
 
   test("returns paginated rows with validated scalar filters", async () => {
-    const rows = [{ id: "org_1", name: "Acme", slug: "acme" }];
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440100",
+        logo: null,
+        metadata: null,
+        name: "Acme",
+        settings: null,
+        slug: "acme",
+      },
+    ];
     const { db, state } = createMockListDb(rows, 42);
 
     const result = await listOrganizations(createAdminProcedureContext(db), {
@@ -251,7 +261,17 @@ describe("listOrganizations", () => {
   });
 
   test("searches across configured organization fields", async () => {
-    const rows = [{ id: "org_1", name: "Acme", slug: "acme" }];
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440100",
+        logo: null,
+        metadata: null,
+        name: "Acme",
+        settings: null,
+        slug: "acme",
+      },
+    ];
     const { db, state } = createMockListDb(rows, 1);
 
     const result = await listOrganizations(createAdminProcedureContext(db), { search: "acme" });
@@ -301,7 +321,17 @@ describe("listOrganizations", () => {
   });
 
   test("allows admin API keys to access organization listing", async () => {
-    const rows = [{ id: "org_1", name: "Acme", slug: "acme" }];
+    const rows = [
+      {
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        id: "550e8400-e29b-41d4-a716-446655440100",
+        logo: null,
+        metadata: null,
+        name: "Acme",
+        settings: null,
+        slug: "acme",
+      },
+    ];
     const { db } = createMockListDb(rows, 1);
 
     const result = await listOrganizations(createAdminAPIKeyProcedureContext(db), {});
@@ -333,7 +363,7 @@ describe("listOrganizations", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "project_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         metadata: null,
         name: "Acme Project",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
@@ -365,7 +395,7 @@ describe("listOrganizations", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "project_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         metadata: null,
         name: "Acme Project",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",

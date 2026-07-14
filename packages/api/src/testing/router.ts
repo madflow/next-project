@@ -458,6 +458,12 @@ export function createMockSequentialSelectDb(rows: Array<Array<Record<string, un
           state.whereValues.push(where);
           return this;
         },
+        then<TResult1 = Array<Record<string, unknown>>, TResult2 = never>(
+          onfulfilled?: ((value: Array<Record<string, unknown>>) => TResult1 | PromiseLike<TResult1>) | null,
+          onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
+        ) {
+          return Promise.resolve(currentRows).then(onfulfilled, onrejected);
+        },
       };
     },
   };

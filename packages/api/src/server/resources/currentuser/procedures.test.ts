@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import { createAnonymousProcedureContext, createUserProcedureContext } from "../../../testing/auth";
 import { createMockLookupUserDb, createMockSequentialSelectDb } from "../../../testing/router";
 import { getCurrentUser, listCurrentUserOrganizations } from "./procedures";

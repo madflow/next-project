@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import { member as memberTable } from "@repo/database/schema";
 import {
   createAdminProcedureContext,
@@ -99,7 +99,7 @@ describe("listMembers", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "member_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
         role: "admin",
         userId: "550e8400-e29b-41d4-a716-446655440001",
@@ -130,7 +130,7 @@ describe("listMembers", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "member_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         organization: {
           createdAt: new Date("2024-01-01T00:00:00.000Z"),
           id: "550e8400-e29b-41d4-a716-446655440000",
@@ -179,7 +179,7 @@ describe("listMembers", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "member_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
         role: "admin",
         userId: "550e8400-e29b-41d4-a716-446655440001",
@@ -197,7 +197,7 @@ describe("listMembers", () => {
     const rows = [
       {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        id: "member_1",
+        id: "550e8400-e29b-41d4-a716-446655440100",
         organizationId: "550e8400-e29b-41d4-a716-446655440000",
         role: "admin",
         userId: "550e8400-e29b-41d4-a716-446655440001",
@@ -228,7 +228,7 @@ describe("listMembers", () => {
   test("returns a member with embedded organization and user when requested", async () => {
     const row = {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      id: "member_1",
+      id: "550e8400-e29b-41d4-a716-446655440100",
       organization: {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         id: "550e8400-e29b-41d4-a716-446655440000",
@@ -297,7 +297,7 @@ describe("listMembers", () => {
   test("rejects access to other users' member records", async () => {
     const row = {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      id: "member_1",
+      id: "550e8400-e29b-41d4-a716-446655440100",
       organizationId: "550e8400-e29b-41d4-a716-446655440000",
       role: "member",
       userId: "550e8400-e29b-41d4-a716-446655440001",

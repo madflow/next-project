@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import { user as userTable } from "@repo/database/schema";
 import {
   createAdminProcedureContext,

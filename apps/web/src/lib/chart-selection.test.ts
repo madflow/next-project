@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import type { DatasetVariableWithAttributes } from "@/types/dataset-variable";
 import type { StatsResponse } from "@/types/stats";
 import { determineChartSelection } from "./chart-selection";

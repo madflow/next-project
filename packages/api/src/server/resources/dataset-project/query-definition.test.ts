@@ -1,6 +1,6 @@
 import { QueryBuilder } from "drizzle-orm/pg-core";
 import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, test } from "vitest";
 import {
   compileDrizzleCollectionOrderBy,
   compileDrizzleCollectionWhere,
