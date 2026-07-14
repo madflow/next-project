@@ -1,6 +1,65 @@
-import { expect, test } from "@playwright/test";
+import { type Locator, expect, test } from "@playwright/test";
 import { testUsers } from "../config";
 import { loginUser } from "../utils";
+
+async function expectCompactSingleBarLayout(chartContent: Locator) {
+  const chart = chartContent.locator("[data-slot='chart']");
+  await expect(chart).toHaveAttribute("data-chart-height", "100");
+  await expect(chart).toHaveAttribute("data-chart-bar-size", "36");
+  await chart.evaluate(
+    () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+  );
+
+  const geometry = await chart.evaluate((element) => {
+    const bars = Array.from(
+      element.querySelectorAll<SVGRectElement>(".recharts-bar-rectangle .recharts-rectangle")
+    ).map((bar) => bar.getBoundingClientRect());
+    const plotBorders = Array.from(element.querySelectorAll<SVGLineElement>(".recharts-cartesian-grid-horizontal line"))
+      .map((line) => line.getBoundingClientRect().top)
+      .sort((first, second) => first - second);
+    const bar = bars[0];
+
+    return {
+      chartHeight: element.getBoundingClientRect().height,
+      barHeights: bars.map(({ height }) => height),
+      edgeGaps:
+        bar && plotBorders.length >= 2
+          ? [bar.top - (plotBorders[0] ?? bar.top), (plotBorders.at(-1) ?? bar.bottom) - bar.bottom]
+          : [],
+    };
+  });
+
+  expect(geometry.chartHeight).toBe(100);
+  expect(geometry.barHeights).toEqual([36]);
+  expect(geometry.edgeGaps).toHaveLength(2);
+  expect(Math.max(...geometry.edgeGaps) - Math.min(...geometry.edgeGaps)).toBeLessThanOrEqual(1);
+  expect(geometry.edgeGaps.every((gap) => Math.abs(gap - 8) <= 1)).toBe(true);
+}
+
+async function expectUniformMultiResponseBarSpacing(multiResponseChart: Locator) {
+  const chart = multiResponseChart.locator("[data-slot='chart']");
+  await expect(chart).toHaveAttribute("data-chart-row-height", /\d+/);
+  await chart.evaluate(
+    () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+  );
+
+  const geometry = await chart.evaluate((element) => {
+    const bars = Array.from(element.querySelectorAll<SVGRectElement>(".recharts-bar-rectangle .recharts-rectangle"))
+      .map((bar) => bar.getBoundingClientRect())
+      .sort((first, second) => first.top - second.top);
+
+    return {
+      configuredGap:
+        Number(element.getAttribute("data-chart-row-height")) - Number(element.getAttribute("data-chart-bar-size")),
+      gaps: bars.slice(1).map((bar, index) => bar.top - (bars[index]?.bottom ?? bar.top)),
+    };
+  });
+
+  expect(geometry.configuredGap).toBe(8);
+  expect(geometry.gaps.length).toBeGreaterThan(0);
+  expect(Math.max(...geometry.gaps) - Math.min(...geometry.gaps)).toBeLessThanOrEqual(1);
+  expect(Math.max(...geometry.gaps)).toBeLessThanOrEqual(9);
+}
 
 test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
   test("should render child multi-response summary charts when selecting their parent variableset", async ({
@@ -83,6 +142,7 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
 
     // We expect at least one bar to be present
     expect(barCount).toBeGreaterThan(0);
+    await expectUniformMultiResponseBarSpacing(multiResponseChart);
 
     // Verify that there's a download button in the footer
     const downloadButton = multiResponseChart.getByRole("button");
@@ -125,23 +185,22 @@ test.describe("Adhoc Analysis - Multi-Response Variableset", () => {
     // Click to expand the group
     await expandButton.click();
 
-    // Try to find one of the variables in the group
-    // The variables should have labels, so we'll look for any variable item
-    const variableItems = page.locator('[data-testid^="variable-item-"]');
+    const newsVariable = page.getByTestId("variable-item-news5");
+    await expect(newsVariable).toBeVisible({ timeout: 3000 });
+    await newsVariable.click();
 
-    // Wait for at least one variable item to be visible
-    await expect(variableItems.first()).toBeVisible({ timeout: 3000 });
-    const variableCount = await variableItems.count();
+    const chartContent = page.getByTestId("chart-content-horizontalBar");
+    await expect(chartContent).toBeVisible({ timeout: 5000 });
+    await expectCompactSingleBarLayout(chartContent);
 
-    expect(variableCount).toBeGreaterThan(0);
+    const variablesetHeader = page.getByRole("heading", { name: "Informationsquellen", level: 2 }).locator("..");
+    const chartCard = chartContent.locator("xpath=ancestor::*[@data-slot='card']");
+    const [headerBounds, cardBounds] = await Promise.all([variablesetHeader.boundingBox(), chartCard.boundingBox()]);
+    expect(headerBounds).not.toBeNull();
+    expect(cardBounds).not.toBeNull();
+    expect(Math.round((cardBounds?.y ?? 0) - ((headerBounds?.y ?? 0) + (headerBounds?.height ?? 0)))).toBe(16);
 
-    // Select the first variable
-    const firstVariable = variableItems.first();
-
-    await firstVariable.click();
-
-    // Verify that a chart is displayed (could be any chart type depending on the variable)
-    const anyChart = page.locator('[data-testid*="chart"], [data-testid*="visualization"], [class*="recharts"]');
-    await expect(anyChart.first()).toBeVisible({ timeout: 5000 });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expectCompactSingleBarLayout(chartContent);
   });
 });

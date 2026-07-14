@@ -2,13 +2,7 @@
 
 import { forwardRef } from "react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@repo/ui/components/chart";
+import { ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@repo/ui/components/chart";
 import {
   hasSplitVariableStatsForVariable,
   transformToMultiResponseIndividualStackedBarData,
@@ -21,6 +15,7 @@ import { getVariableLabel } from "@/lib/variable-helpers";
 import { type DatasetVariable } from "@/types/dataset-variable";
 import { type ThemeChartColors } from "@/types/organization";
 import { type StatsResponse } from "@/types/stats";
+import { AdaptiveHorizontalChart, HorizontalCategoryTick } from "../../shared/adaptive-horizontal-chart";
 import {
   type HorizontalStackedBarModel,
   createSingleHorizontalStackedBarModel,
@@ -93,48 +88,59 @@ export function HorizontalStackedBarChart({
   void _chartColors;
 
   return (
-    <ChartContainer config={model.chartConfig} ref={chartRef} data-export-filename={exportFilename}>
-      <BarChart layout="vertical" margin={{ left: 0 }} accessibilityLayer data={model.chartData}>
-        <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
-        <XAxis
-          domain={[0, 100]}
-          type="number"
-          tickLine={false}
-          tickMargin={10}
-          axisLine={false}
-          fontSize={12}
-          ticks={[0, 20, 40, 60, 80, 100]}
-          tickFormatter={(value) => `${Math.round(value)}%`}
-        />
-        <YAxis
-          dataKey="label"
-          type="category"
-          tickLine={false}
-          tickMargin={10}
-          axisLine={false}
-          fontSize={12}
-          width={100}
-        />
-        <ChartTooltip cursor={false} content={tooltipContent ?? defaultTooltipContent} />
-        {model.segments.map((segment) => (
-          <Bar
-            key={segment.key}
-            dataKey={segment.key}
-            stackId="categories"
-            fill={`var(--color-${segment.key})`}
-            isAnimationActive={disableAnimation ? false : undefined}>
-            <PercentageLabelList dataKey={segment.key} />
-          </Bar>
-        ))}
-        {!hideLegend && (
-          <ChartLegend
-            verticalAlign="top"
-            content={<ChartLegendContent verticalAlign="top" />}
-            className="flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+    <AdaptiveHorizontalChart
+      labels={model.chartData.map((entry) => entry.label)}
+      chartConfig={model.chartConfig}
+      chartRef={chartRef}
+      exportFilename={exportFilename}
+      legendItemCount={hideLegend ? 0 : model.segments.length}>
+      {({ axisWidth, barSize, categoryAxisPadding, margin, wrappedLabels }) => (
+        <BarChart layout="vertical" margin={margin} barCategoryGap={4} accessibilityLayer data={model.chartData}>
+          <CartesianGrid vertical horizontal horizontalCoordinatesGenerator={getPlotAreaHorizontalBorderCoordinates} />
+          <XAxis
+            domain={[0, 100]}
+            type="number"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            fontSize={12}
+            ticks={[0, 20, 40, 60, 80, 100]}
+            tickFormatter={(value) => `${Math.round(value)}%`}
           />
-        )}
-      </BarChart>
-    </ChartContainer>
+          <YAxis
+            dataKey="label"
+            type="category"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            fontSize={12}
+            width={axisWidth}
+            interval={0}
+            padding={categoryAxisPadding}
+            tick={(tickProps) => <HorizontalCategoryTick {...tickProps} lines={wrappedLabels[tickProps.index] ?? []} />}
+          />
+          <ChartTooltip cursor={false} content={tooltipContent ?? defaultTooltipContent} />
+          {model.segments.map((segment) => (
+            <Bar
+              key={segment.key}
+              dataKey={segment.key}
+              stackId="categories"
+              barSize={barSize}
+              fill={`var(--color-${segment.key})`}
+              isAnimationActive={disableAnimation ? false : undefined}>
+              <PercentageLabelList dataKey={segment.key} />
+            </Bar>
+          ))}
+          {!hideLegend && (
+            <ChartLegend
+              verticalAlign="top"
+              content={<ChartLegendContent verticalAlign="top" />}
+              className="flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+            />
+          )}
+        </BarChart>
+      )}
+    </AdaptiveHorizontalChart>
   );
 }
 

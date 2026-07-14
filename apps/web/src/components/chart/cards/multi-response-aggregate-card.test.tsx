@@ -40,4 +40,29 @@ describe("MultiResponseAggregateChartContent", () => {
 
     expect(resolvedBarColors).toEqual([CHART_COLOR, CHART_COLOR, CHART_COLOR]);
   });
+
+  test("allows a wider label column for long aggregate labels", async () => {
+    const { container } = render(
+      <MultiResponseAggregateChartContent
+        chartConfig={{ percentage: { color: "var(--chart-1)", label: "Percent" } }}
+        chartColors={chartColors}
+        chartData={[
+          {
+            count: 10,
+            label: "Fachgeschäfte / Boutiquen (z.B. Mode-, Strumpf- oder Wäschefachgeschäfte)",
+            orderIndex: 0,
+            percentage: 25,
+            variableName: "first",
+          },
+          { count: 20, label: "Second", orderIndex: 1, percentage: 50, variableName: "second" },
+        ]}
+        disableAnimation
+        fileName="multi-response"
+      />
+    );
+
+    const chartContainer = container.querySelector<HTMLElement>("[data-slot='chart']");
+    expect(chartContainer).not.toBeNull();
+    await waitFor(() => expect(chartContainer?.getAttribute("data-chart-axis-width")).toBe("144"));
+  });
 });
