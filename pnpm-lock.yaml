@@ -199,13 +199,13 @@ importers:
         version: 1.14.8(@opentelemetry/api@1.9.1)
       '@orpc/openapi':
         specifier: ^1.14.5
-        version: 1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.0)
+        version: 1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.1)
       '@orpc/openapi-client':
         specifier: ^1.14.5
         version: 1.14.8(@opentelemetry/api@1.9.1)
       '@orpc/server':
         specifier: ^1.14.5
-        version: 1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.0)
+        version: 1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.1)
       '@orpc/tanstack-query':
         specifier: ^1.14.5
         version: 1.14.8(@opentelemetry/api@1.9.1)(@orpc/client@1.14.8(@opentelemetry/api@1.9.1))(@tanstack/query-core@5.101.2)
@@ -381,11 +381,11 @@ importers:
         version: 19.2.7(react@19.2.7)
       react-email:
         specifier: ^6.5.0
-        version: 6.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 6.8.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
     devDependencies:
       '@react-email/ui':
         specifier: ^6.5.0
-        version: 6.8.0(@opentelemetry/api@1.9.1)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 6.8.1(@opentelemetry/api@1.9.1)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -2414,8 +2414,8 @@ packages:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^18.0 || ^19.0 || ^19.0.0-rc
 
-  '@react-email/ui@6.8.0':
-    resolution: {integrity: sha512-1Ru5e0D1bsyVO1QRWqavs2HU6nAp4r72iUeMNQT86gCqoDxcPCVU8zj9fy8D/oYpCD7igfRbXAWSxdPQpogKfQ==}
+  '@react-email/ui@6.8.1':
+    resolution: {integrity: sha512-HnHsUBqhFoWAXZkhGqot88dBxoprUUqYF5XSei/OOI/PsMCOl6b39+HCGEQN2qzTZq335qs2s14pnpVgSCJ8nA==}
 
   '@reduxjs/toolkit@2.12.0':
     resolution: {integrity: sha512-KiT+RzZbp6mQET+Mg+h2c97+9j1sNflUxQkIHI7Yuzf6Peu+OYpmkn6nbHWmLLWj+1ZODUJFwGZ7gx3L9R9EOw==}
@@ -5540,8 +5540,8 @@ packages:
     peerDependencies:
       react: ^19.2.7
 
-  react-email@6.8.0:
-    resolution: {integrity: sha512-U9khl7fasHT4bteltFTk6hSpRgx5UALDgFMH0kbIi6Oz2ReQKN8pmxes3TAPntExk2hNsWoU4IWfiVjs1+zn7g==}
+  react-email@6.8.1:
+    resolution: {integrity: sha512-qx1n/9h/5zRd7qsLpniQh7P3xgH+7pP+xyYspB1MZBRpHcrFJEbcsIYuPkA0vnRx+3jl9fSpSmXQ8xbXIRySwQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
@@ -6324,8 +6324,8 @@ packages:
     resolution: {integrity: sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==}
     engines: {node: '>=10'}
 
-  ws@8.21.0:
-    resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
+  ws@8.21.1:
+    resolution: {integrity: sha512-+0NTnW77fFN/DjQi6k/Sq/Yvk4Sgajw7urW8V+asjXnRgDs9gyGkdb7EzgfhA4goXsRIZKE28fzIXBHEzhuiWw==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -6703,7 +6703,7 @@ snapshots:
       '@babel/code-frame': 7.29.7
       '@babel/generator': 7.29.7
       '@babel/helper-globals': 7.29.7
-      '@babel/parser': 7.29.2
+      '@babel/parser': 7.29.7
       '@babel/template': 7.29.7
       '@babel/types': 7.29.7
       debug: 4.4.3
@@ -7515,13 +7515,13 @@ snapshots:
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/openapi@1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.0)':
+  '@orpc/openapi@1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.1)':
     dependencies:
       '@orpc/client': 1.14.8(@opentelemetry/api@1.9.1)
       '@orpc/contract': 1.14.8(@opentelemetry/api@1.9.1)
       '@orpc/interop': 1.14.8
       '@orpc/openapi-client': 1.14.8(@opentelemetry/api@1.9.1)
-      '@orpc/server': 1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.0)
+      '@orpc/server': 1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.1)
       '@orpc/shared': 1.14.8(@opentelemetry/api@1.9.1)
       '@orpc/standard-server': 1.14.8(@opentelemetry/api@1.9.1)
       json-schema-typed: 8.0.2
@@ -7532,7 +7532,7 @@ snapshots:
       - fastify
       - ws
 
-  '@orpc/server@1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.0)':
+  '@orpc/server@1.14.8(@opentelemetry/api@1.9.1)(ws@8.21.1)':
     dependencies:
       '@orpc/client': 1.14.8(@opentelemetry/api@1.9.1)
       '@orpc/contract': 1.14.8(@opentelemetry/api@1.9.1)
@@ -7546,7 +7546,7 @@ snapshots:
       '@orpc/standard-server-peer': 1.14.8(@opentelemetry/api@1.9.1)
       cookie: 1.1.1
     optionalDependencies:
-      ws: 8.21.0
+      ws: 8.21.1
     transitivePeerDependencies:
       - '@opentelemetry/api'
       - fastify
@@ -7952,7 +7952,7 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@react-email/ui@6.8.0(@opentelemetry/api@1.9.1)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@react-email/ui@6.8.1(@opentelemetry/api@1.9.1)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       esbuild: 0.28.1
       next: 16.2.6(@opentelemetry/api@1.9.1)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -9508,7 +9508,7 @@ snapshots:
       cors: 2.8.6
       debug: 4.4.3
       engine.io-parser: 5.2.3
-      ws: 8.21.0
+      ws: 8.21.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -10946,7 +10946,7 @@ snapshots:
       react: 19.2.7
       scheduler: 0.27.0
 
-  react-email@6.8.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  react-email@6.8.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@babel/parser': 7.29.2
       '@babel/traverse': 7.29.0
@@ -11314,7 +11314,7 @@ snapshots:
   socket.io-adapter@2.5.8:
     dependencies:
       debug: 4.4.3
-      ws: 8.21.0
+      ws: 8.21.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -11896,7 +11896,7 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
 
-  ws@8.21.0: {}
+  ws@8.21.1: {}
 
   xml-name-validator@5.0.0: {}
 
