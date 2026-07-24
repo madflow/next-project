@@ -126,7 +126,7 @@ importers:
         version: 7.82.0(react@19.2.8)
       recharts:
         specifier: ^3.8.0
-        version: 3.9.2(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1)
+        version: 3.10.0(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -489,7 +489,7 @@ importers:
         version: 0.4.6(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       recharts:
         specifier: ^3.8.0
-        version: 3.9.2(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1)
+        version: 3.10.0(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -5697,8 +5697,8 @@ packages:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
 
-  recharts@3.9.2:
-    resolution: {integrity: sha512-G4fy+Pk46RaXgwWMh+Nzhyo/lbFAVqXo9gtetlyehe6Ehge9CsgDuOTwQDD+i1+llaLktNBiNq4bhnGlDRXFtw==}
+  recharts@3.10.0:
+    resolution: {integrity: sha512-wulMvfncpIlmu2uFtRU/mE5/+NiVtASXkw2KdwJTdHs3WsASX0WxZlX+rpKgyn5BDbIhkPtCpUKkB9XNK5KE0w==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -11161,7 +11161,7 @@ snapshots:
 
   readdirp@4.1.2: {}
 
-  recharts@3.9.2(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1):
+  recharts@3.10.0(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1):
     dependencies:
       '@reduxjs/toolkit': 2.12.0(react-redux@9.3.0(@types/react@19.2.17)(react@19.2.8)(redux@5.0.1))(react@19.2.8)
       clsx: 2.1.1
