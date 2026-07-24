@@ -41,7 +41,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^9.39.4",
+    "eslint": "^10.0.0",
     "tsdown": "^0.22.2",
     "typescript": "^6.0.3"
   }
