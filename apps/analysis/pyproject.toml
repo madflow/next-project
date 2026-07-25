@@ -99,6 +99,7 @@ lint.ignore = [
   "D205",
   "ANN401",  # typing.Any are disallowed in `**kwargs
   "PLR0913", # Too many arguments for function call
+  "PLR0917", # Too many positional arguments
   "D106",    # Missing docstring in public nested class
   "E501",    # Line too long - ignore line length checks
 ]
