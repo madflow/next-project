@@ -48,7 +48,7 @@ importers:
         version: 3.2.2(react@19.2.8)
       '@hookform/resolvers':
         specifier: ^5.4.0
-        version: 5.4.1(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.4.3)
+        version: 5.4.2(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.4.3)
       '@repo/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -1469,8 +1469,8 @@ packages:
   '@graphile/logger@0.2.0':
     resolution: {integrity: sha512-jjcWBokl9eb1gVJ85QmoaQ73CQ52xAaOCF29ukRbYNl6lY+ts0ErTaDYOBlejcbUs2OpaiqYLO5uDhyLFzWw4w==}
 
-  '@hookform/resolvers@5.4.1':
-    resolution: {integrity: sha512-CP6jlZlLaXb0QV2c6FQiP1shrMG1kZeFzIKu9GMw/VH9HrMjvrqCkh2e/nTXe/jgyy1DAn5pVfGJ8ZvAFCOZvw==}
+  '@hookform/resolvers@5.4.2':
+    resolution: {integrity: sha512-aPct0xA24dh2qGLHRzBuCqjI3fZf4qiEdgUBTt9z6TVqgpVoP4K7Aq2j17wnY6p/QPD8fQlh5+4Vd3nwSeOn9Q==}
     peerDependencies:
       '@sinclair/typebox': '>=0.25.24'
       '@standard-schema/spec': ^1.0.0
@@ -7373,7 +7373,7 @@ snapshots:
 
   '@graphile/logger@0.2.0': {}
 
-  '@hookform/resolvers@5.4.1(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.4.3)':
+  '@hookform/resolvers@5.4.2(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1)(ajv@8.20.0)(react-hook-form@7.83.0(react@19.2.8))(zod@4.4.3)':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.83.0(react@19.2.8)
