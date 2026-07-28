@@ -16,6 +16,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "105mb",
     },
+    useTypeScriptCli: true,
   },
 };
 const withNextIntl = createNextIntlPlugin();
