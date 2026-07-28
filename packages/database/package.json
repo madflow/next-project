@@ -43,6 +43,6 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.4",
     "tsdown": "^0.22.2",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.0"
   }
 }
