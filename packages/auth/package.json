@@ -29,14 +29,22 @@
   },
   "dependencies": {
     "@better-auth/api-key": "^1.6.23",
-    "better-auth": "^1.6.23",
-    "next": "^16.2.10"
+    "better-auth": "^1.6.23"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.13.3",
     "eslint": "^9.39.4",
+    "next": "^16.2.12",
     "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "next": "^16.2.12"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
   }
 }
