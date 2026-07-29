@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { env } from "@/env";
 import { SignUpForm } from "./form";
 
-export const dynamic = "force-dynamic";
-
-export default function Page() {
+export default async function Page() {
+  await connection();
   const signUpDisabled = !!env.AUTH_DISABLE_SIGNUP;
 
   if (signUpDisabled) {

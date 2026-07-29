@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { getServerAPIClient } from "@/lib/server-api-client";
 
-export const dynamic = "force-dynamic";
-
 export default async function Page() {
   const api = await getServerAPIClient();
   const currentUser = await api.currentuser.get({});
