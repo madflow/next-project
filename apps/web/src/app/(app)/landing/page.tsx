@@ -3,8 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@repo/ui/components/empty";
 import { PageLayout } from "@/components/page/page-layout";
 
-export const dynamic = "force-dynamic";
-
 export default async function Dashboard() {
   const t = await getTranslations("pageLanding");
   return (
