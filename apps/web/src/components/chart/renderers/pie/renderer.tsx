@@ -70,7 +70,7 @@ export function PieChartRenderer({
             formatter={(value: unknown) => `${formatChartValue(Number(value), PERCENTAGE_CHART_DECIMALS)}%`}
           />
         </Pie>
-        <ChartLegend fontSize={12} verticalAlign="top" content={renderOrderedLegend} />
+        <ChartLegend verticalAlign="top" content={renderOrderedLegend} />
       </PieChart>
     </ChartContainer>
   );
