@@ -134,8 +134,12 @@ export function HorizontalStackedBarChart({
           {!hideLegend && (
             <ChartLegend
               verticalAlign="top"
-              content={<ChartLegendContent verticalAlign="top" />}
-              className="flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+              content={
+                <ChartLegendContent
+                  verticalAlign="top"
+                  className="flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                />
+              }
             />
           )}
         </BarChart>
