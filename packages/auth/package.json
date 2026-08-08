@@ -35,7 +35,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.13.3",
-    "eslint": "^9.39.4",
+    "eslint": "^10.0.0",
     "next": "^16.2.12",
     "typescript": "^7.0.0"
   },
