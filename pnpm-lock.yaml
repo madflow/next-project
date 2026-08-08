@@ -99,7 +99,7 @@ importers:
         version: 2.3.3
       lucide-react:
         specifier: ^1.17.0
-        version: 1.28.0(react@19.2.8)
+        version: 1.29.0(react@19.2.8)
       next:
         specifier: ^16.2.12
         version: 16.3.0(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -480,7 +480,7 @@ importers:
         version: 1.1.1(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       lucide-react:
         specifier: ^1.17.0
-        version: 1.28.0(react@19.2.8)
+        version: 1.29.0(react@19.2.8)
       next-intl:
         specifier: ^4.13.0
         version: 4.13.5(next@16.3.0(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(@types/node@24.13.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(typescript@7.0.2)
@@ -5409,8 +5409,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@1.28.0:
-    resolution: {integrity: sha512-fARAFJULsGuDDydjp6+6blekG/sBIM29TerzLjc9bQUKAcEfrSc4ZQKb25KRz4OMKd87cZTb5dgq0w/T6KufVg==}
+  lucide-react@1.29.0:
+    resolution: {integrity: sha512-Xs9QFG5+9sNX04MdKVT4++umA+hJ2qsJVlRlRWHQ7qZobXgMiNHSpZ5eZm8JUoGCdNyoEdXoEwa8HVr0DNjOQg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -5831,10 +5831,6 @@ packages:
 
   postcss@8.5.23:
     resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
-    engines: {node: ^10 || ^12 || >=14}
-
-  postcss@8.5.25:
-    resolution: {integrity: sha512-DTPx3RWSSnWyzLxQnlH0rJP+EW5ekl16ZU4/psbIhA0e53kJfdgaN5vKM+xP7yJtXVu+nfdVFmlgFDEKAe4Pyw==}
     engines: {node: ^10 || ^12 || >=14}
 
   postcss@8.5.26:
@@ -11133,7 +11129,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@1.28.0(react@19.2.8):
+  lucide-react@1.29.0(react@19.2.8):
     dependencies:
       react: 19.2.8
 
@@ -11539,12 +11535,6 @@ snapshots:
       source-map-js: 1.2.1
 
   postcss@8.5.23:
-    dependencies:
-      nanoid: 3.3.17
-      picocolors: 1.1.1
-      source-map-js: 1.2.1
-
-  postcss@8.5.25:
     dependencies:
       nanoid: 3.3.17
       picocolors: 1.1.1
@@ -12446,7 +12436,7 @@ snapshots:
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.5
-      postcss: 8.5.25
+      postcss: 8.5.26
       rolldown: 1.2.2
       tinyglobby: 0.2.17
     optionalDependencies:
